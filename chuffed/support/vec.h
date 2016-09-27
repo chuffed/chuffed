@@ -26,8 +26,8 @@ public:
 	vec(vec<U>& other) : sz(other.size()), cap(sz) {
 		assert(sizeof(U) == sizeof(T));
 		data = (T*) malloc(cap * sizeof(T));
-//		for (int i = 0; i < sz; i++) new (&data[i]) T(other[i]);
-		for (int i = 0; i < sz; i++) data[i] = other[i];
+		for (int i = 0; i < sz; i++) new (&data[i]) T(other[i]);
+//		for (int i = 0; i < sz; i++) data[i] = other[i];
 	}
 
 	~vec(void) {
@@ -46,7 +46,7 @@ public:
 
   // Stack interface:
   void     push  ()                  { if (sz == cap) { cap = imax(2, (cap*3+1)>>1); data = (T*) realloc(data, cap * sizeof(T)); } new (&data[sz++]) T(); }
-  void     push  (const T& elem)     { if (sz == cap) { cap = imax(2, (cap*3+1)>>1); data = (T*) realloc(data, cap * sizeof(T)); } data[sz++] = elem; }
+  void     push  (const T& elem)     { if (sz == cap) { cap = imax(2, (cap*3+1)>>1); data = (T*) realloc(data, cap * sizeof(T)); } new (&data[sz++]) T(elem); }
 
   const T& last  (void) const        { return data[sz-1]; }
   T&       last  (void)              { return data[sz-1]; }
