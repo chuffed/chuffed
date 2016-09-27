@@ -846,20 +846,21 @@ public:
     output_vars(xs);
   }
 
-  void print(void)
+  void print(std::ostream& os)
   {
     int xi = 0;
     for(int ri = 0; ri < height; ri++)
     {
       bool first = true;
-      printf("[");
+      os << "[";
       for(int ci = 0; ci < width; ci++)
       {
-        printf("%s%c", first ? "" : ", ", (char) ('A' + xs[xi]->getVal()));
+        os << (first ? "" : ", ");
+        os << (char) ('A' + xs[xi]->getVal());
         first = false;
         xi++;
       }
-      printf("]\n");
+      os << "]\n";
     }
   }
 

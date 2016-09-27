@@ -232,22 +232,22 @@ found_first:
     return g;
   }
 
-  void print() {
+  void print(std::ostream& os) {
 #if 1
     for(int act = 0; act < acts; act++)
     {
-      printf("[");
+      os << "[";
       for(int ss = 0; ss < shifts; ss++)
       {
-        printf("%d",demand[ss][act]);
+        os << demand[ss][act];
       }
-      printf("]\n");
+      os << "]\n";
     }
 #endif
-    printf("Hours worked: %f\n",1.0*cost->getVal()/4);
+    os << "Hours worked: " << (1.0*cost->getVal()/4) << "\n";
     for(int ww = 0; ww < xv.size(); ww++)
     {
-      printf("[");
+      os << "[";
       for (int ii = 0; ii < shifts; ii++ )
       {
 //        if(ii)
@@ -255,23 +255,23 @@ found_first:
         int val(xv[ww][ii]->getVal());
         if(val < acts)
         {
-          printf("%d",val);
+          os << val;
         } else {
           switch(val - acts)
           {
 #ifdef DISTINCT_REST
             case G_R:
-              printf("R");
+              os << "R";
               break;
             case G_B:
-              printf("B");
+              os << "B";
               break;
             case G_L:
-              printf("L");
+              os << "L";
               break;
 #else
             case G_R:
-              printf("R");
+              os << "R";
               break;
             default:
               assert(0);
@@ -280,7 +280,7 @@ found_first:
           }
         }
       }
-      printf("]\n");
+      os << "]\n";
     }
   }
 };

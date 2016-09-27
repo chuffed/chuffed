@@ -187,13 +187,13 @@ public:
 	}
 
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			int m = e[i]->getVal();
-			printf("e_%d = %d, ", i, m);
+      os << "e_" << i << " = " << m << ", ";
 		}
-		printf("\n");
-		printf("Stacks = %d\n\n", stacks->getVal());
+		os << "\n";
+		os << "Stacks = " << stacks->getVal() << "\n\n";
 	}
 
 };

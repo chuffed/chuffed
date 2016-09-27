@@ -294,17 +294,18 @@ public:
       fprintf(out, "satisfy\n");
   }
   
-  void print() {
+  void print(std::ostream& os) {
     for(int ii = 0; ii < nDays; ii++)
     {
       bool first = true;
-      fprintf(stdout, "[");
+      os << "[";
       for(int jj = 0; jj < nNurses; jj++)
       {
-        fprintf(stdout, "%s%s", first ? "" : ", ", shift_str[xs[ii*nNurses + jj]->getVal()]); 
+        os << (first ? "" : ", ");
+        os << shift_str[xs[ii*nNurses + jj]->getVal()];
         first = false;
       }
-      fprintf(stdout, "]\n");
+      os << "]\n";
     }
   }
 

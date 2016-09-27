@@ -106,14 +106,14 @@ public:
 		}
 	}
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				printf("%d, ", x[i][j]->getVal());
+				os << x[i][j]->getVal() << ", ";
 			}
-			printf("\n");
+			os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 };

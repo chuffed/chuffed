@@ -139,12 +139,12 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n_tasks; i++) {
-			printf("%d, ", s[i]->getVal());
+			os << s[i]->getVal() << ", ";
 		}
-		printf("\n");
-		printf("makespan = %d\n", objective->getVal());
+		os << "\n";
+		os << "makespan = " << objective->getVal() << "\n";
 	}
 
 };

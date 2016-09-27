@@ -262,9 +262,9 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n_orders; i++) {
-			printf("%d, ", x[i]->getVal());
+			os << x[i]->getVal() << ", ";
 		}
 /*
 		for (int i = 0; i < n_slabs; i++) {
@@ -275,7 +275,7 @@ public:
 			printf("\n");
 		}
 */
-		printf("Loss = %d\n", total_loss->getVal());
+		os << "Loss = " << total_loss->getVal() << "\n";
 	}
 
 };

@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <cstdio>
 #include <cassert>
 #include <chuffed/core/engine.h>
@@ -111,20 +112,21 @@ public:
 		}
 	}
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				printf("%4d, ", x[i*m+j]->getVal());
+        os << " " << std::setw(4) << std::setfill('0') << x[i*m+j]->getVal() << ", ";
 			}
-			printf(" | ");
+			os << " | ";
 			for (int j = 0; j < m; j++) {
 				for (int k = j+1; k < m; k++) {
-					printf("%4d, ", (int) abs(x[i*m+j]->getVal() - x[i*m+k]->getVal()));
+          os << " " << std::setw(4) << std::setfill('0')
+             << ((int) abs(x[i*m+j]->getVal() - x[i*m+k]->getVal())) << ", ";
 				}
 			}
-			printf("\n");
+			os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 };

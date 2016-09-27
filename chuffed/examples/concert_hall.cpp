@@ -152,12 +152,12 @@ public:
 		}
 	}
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
-			printf("%d, ", x[i]->getVal());
+      os << x[i]->getVal() << ", ";
 		}
-		printf("\n");
-		printf("total = %d\n", total->getVal());
+		os << "\n";
+		os << "total = " << total->getVal() << "\n";
 	}
 
 };

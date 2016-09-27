@@ -107,14 +107,14 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < p; i++) {
-			printf("|P%d: ", i);
+			os << "|P" << i << ": ";
 			for (int j = 0; j < partitions[i].size(); j++) {
-				printf("%d, ", partitions[i][j]->getVal());
+				os << partitions[i][j]->getVal() << ", ";
 			}
 		}
-		printf("\n");
+		os << "\n";
 //		fprintf(stderr, "Objective = %d\n", colours->getVal());
 		// hack for this problem
 		if (so.ldsb) {

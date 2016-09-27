@@ -101,10 +101,10 @@ public:
         branch(pref_order, VAR_INORDER, VAL_MIN);
     }
  
-    void print() {
+    void print(std::ostream& os) {
       for (int i = 0; i < x.size(); i++) {
-         int v = x[i]->getVal();
-         printf("%d: %d\n", i, v);
+        int v = x[i]->getVal();
+        os << i << ": " << v << "\n";
       }
     }
    

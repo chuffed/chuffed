@@ -87,12 +87,12 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < v; i++) {
-			printf("%d, ", x[i]->getVal());
+			os << x[i]->getVal() << ", ";
 		}
-		printf("\n");
-		fprintf(stderr, "Objective = %d\n", colours->getVal());
+		os << "\n";
+		os << "Objective = " << colours->getVal() << "\n";
 		// hack for this problem
 		if (so.ldsb) {
 			int *a = (int*) ldsb.symmetries[0];

@@ -61,14 +61,14 @@ public:
 		}
 	}
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				printf("%d, ", (x[i]->getVal()-1 == j) ? 1 : 0);
+        os << ((x[i]->getVal()-1 == j) ? 1 : 0) << ", ";
 			}
-			printf("\n");
+			os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 };

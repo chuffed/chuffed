@@ -67,12 +67,12 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n_names; i++) {
-			printf("%d, ", x[i]->getVal());
+      os << x[i]->getVal() << ", ";
 		}
-		printf("\n");
-		printf("SAT = %d\n", sat->getVal());
+    os << std::endl;
+		os << "SAT = " << sat->getVal() << "\n";
 	}
 
 };

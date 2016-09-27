@@ -93,15 +93,15 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				if (x[i][j]->isFixed()) printf("%d, ", x[i][j]->getVal());
-				else printf("?, ");
+				if (x[i][j]->isFixed()) os << x[i][j]->getVal() << ", ";
+				else os << "?, ";
 			}
-			printf("\n");
+			os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 	void addGlobalProp();

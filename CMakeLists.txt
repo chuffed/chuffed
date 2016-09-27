@@ -196,6 +196,106 @@ chuffed/flatzinc/ast.h
 add_executable(fzn_chuffed chuffed/flatzinc/fzn_chuffed.cpp)
 target_link_libraries(fzn_chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(bibd EXCLUDE_FROM_ALL chuffed/examples/bibd.cpp)
+target_link_libraries(bibd chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(blackhole EXCLUDE_FROM_ALL chuffed/examples/blackhole.cpp)
+target_link_libraries(blackhole chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(concert_hall EXCLUDE_FROM_ALL chuffed/examples/concert_hall.cpp)
+target_link_libraries(concert_hall chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(concert_hall_sym EXCLUDE_FROM_ALL chuffed/examples/concert_hall_sym.cpp)
+target_link_libraries(concert_hall_sym chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+#add_executable(cross EXCLUDE_FROM_ALL chuffed/examples/cross.cpp)
+#target_link_libraries(cross chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+#add_executable(fdpent EXCLUDE_FROM_ALL chuffed/examples/fdpent.cpp)
+#target_link_libraries(fdpent chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(golomb EXCLUDE_FROM_ALL chuffed/examples/golomb.cpp)
+target_link_libraries(golomb chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(graceful_graph EXCLUDE_FROM_ALL chuffed/examples/graceful_graph.cpp)
+target_link_libraries(graceful_graph chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(graph_colouring EXCLUDE_FROM_ALL chuffed/examples/graph_colouring.cpp)
+target_link_libraries(graph_colouring chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(graph_colouring_sym EXCLUDE_FROM_ALL chuffed/examples/graph_colouring_sym.cpp)
+target_link_libraries(graph_colouring_sym chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(graph_colouring_sym2 EXCLUDE_FROM_ALL chuffed/examples/graph_colouring_sym2.cpp)
+target_link_libraries(graph_colouring_sym2 chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(grid_colouring EXCLUDE_FROM_ALL chuffed/examples/grid_colouring.cpp)
+target_link_libraries(grid_colouring chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(latin_square EXCLUDE_FROM_ALL chuffed/examples/latin_square.cpp)
+target_link_libraries(latin_square chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(magic_square EXCLUDE_FROM_ALL chuffed/examples/magic_square.cpp)
+target_link_libraries(magic_square chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(mosp EXCLUDE_FROM_ALL chuffed/examples/mosp.cpp)
+target_link_libraries(mosp chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(nn_queens EXCLUDE_FROM_ALL chuffed/examples/nn_queens.cpp)
+target_link_libraries(nn_queens chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(non EXCLUDE_FROM_ALL chuffed/examples/non.cpp)
+target_link_libraries(non chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+#add_executable(nurse EXCLUDE_FROM_ALL chuffed/examples/nurse.cpp)
+#target_link_libraries(nurse chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(photo EXCLUDE_FROM_ALL chuffed/examples/photo.cpp)
+target_link_libraries(photo chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(queens EXCLUDE_FROM_ALL chuffed/examples/queens.cpp)
+target_link_libraries(queens chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(rcpsp EXCLUDE_FROM_ALL chuffed/examples/rcpsp.cpp)
+target_link_libraries(rcpsp chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(shift EXCLUDE_FROM_ALL chuffed/examples/shift.cpp)
+target_link_libraries(shift chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(steel_mill EXCLUDE_FROM_ALL chuffed/examples/steel_mill.cpp)
+target_link_libraries(steel_mill chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(wreg_shift EXCLUDE_FROM_ALL chuffed/examples/wreg_shift.cpp)
+target_link_libraries(wreg_shift chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+add_custom_target(examples)
+add_dependencies(examples
+  bibd
+  blackhole
+  concert_hall
+  concert_hall_sym
+#  cross
+#  fdpent
+  golomb
+  graceful_graph
+  graph_colouring
+  graph_colouring_sym
+  graph_colouring_sym2
+  grid_colouring
+  latin_square
+  magic_square
+  mosp
+  nn_queens
+  non
+#  nurse
+  photo
+  queens
+  rcpsp
+  shift
+  steel_mill
+  wreg_shift
+)
+
 # add_custom_target(
 #   versionTarget
 #   COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/update-version.sh ${CMAKE_BINARY_DIR}/version.h

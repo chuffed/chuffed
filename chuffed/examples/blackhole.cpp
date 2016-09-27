@@ -5,6 +5,8 @@
 #include <chuffed/branching/branching.h>
 #include <chuffed/vars/modelling.h>
 
+#include <iomanip>
+
 #define SYM_BREAK 1
 #define DC_TABLE 1
 
@@ -144,23 +146,23 @@ public:
 
 	}
 
-	void print() {
+  void print(std::ostream& os) {
 		char s[5] = "SCHD";
 		for (int i = 0; i < layers; i++) {
 			for (int j = 0; j < piles; j++) {
 				int v = layout[j][i];
-				printf(" %2d%c", v%ranks+1, s[v/ranks]);
+        os << " " << std::setw(2) << std::setfill('0') << (v%ranks+1) << s[v/ranks];
 			}
-			printf("\n");
+			os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 
 		for (int i = 0; i < cards; i++) {
 			int v = y[i]->getVal();
-			printf("%2d%c ", v%ranks+1, s[v/ranks]);
-			if (i%ranks == ranks-1) printf("\n");
+      os << std::setw(2) << std::setfill('0') << (v%ranks+1) << s[v/ranks] << " ";
+			if (i%ranks == ranks-1) os << "\n";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 };

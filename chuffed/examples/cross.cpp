@@ -97,10 +97,10 @@ public:
 //        branch(pref_order, VAR_MIN_MIN, VAL_SPLIT_MIN);
     }
 
-    void print() {
+    void print(std::ostream&) {
         for (int i = 0; i < nvars; i++) {
             int v = x[i]->getVal();
-            printf("%d: %d\n", i, v);
+            os << i << ": " << v << "\n";
         }
     }
 

@@ -54,11 +54,11 @@ public:
 
 	// Function to print out solution
 
-	void print() {
+  void print(std::ostream& os) {
 		for (int i = 0; i < v; i++) {
-			printf("%d, ", x[i]->getVal());
+			os << x[i]->getVal() << ", ";
 		}
-		printf("\n");
+		os << "\n";
 	}
 
 };
