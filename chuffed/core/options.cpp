@@ -234,6 +234,9 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   std::cout <<
   "  -h, --help\n"
   "     Print this message.\n"
+  "  -a\n"
+  "     Satisfaction problems: Find and print all solutions.\n"
+  "     Optimisation problems: Print all (sub-optimal) intermediate solutions.\n"
   "  -n <n>, --n-of-solutions <n>\n"
   "     An upper bound on the number of solutions (default " << def.nof_solutions << ").\n"
   "  -v, --verbose\n"
@@ -244,6 +247,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     Time out in seconds (default " << def.time_out << ").\n"
   "  --rnd-seed <n>\n"
   "     Set random seed (default " << def.rnd_seed << ").\n"
+  "  --print-sol [on|off], --no-print-sol\n"
+  "     Print solutions (default " << (def.print_sol ? "on" : "off") << ").\n"
   "  --prop-fifo [on|off], --no-prop-fifo\n"
   "     Use FIFO (first in, first out) queues for propagation executions instead of LIFO\n"
   "     (last in, first out) queues (default " << (def.prop_fifo ? "on" : "off") << ").\n"
@@ -315,6 +320,11 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     Allow search decisions on introduced variables and their derived internal variables\n"
   "     (default " << (def.decide_introduced ? "on" : "off") << ").\n"
   "\n"
+  "Pre-Processing Options:\n"
+  "  --fd-simplify [on|off], --no-fd-simplify\n"
+  "     Removal of FD propagators that are satisfied globally (default " << (def.fd_simplify ? "on" : "off") << ").\n"
+  "  --sat-simplify [on|off], --no-sat-simplify\n"
+  "     Removal of clauses that are satisfied globally default " << (def.sat_simplify ? "on" : "off") << ").\n"
   "Parallel Options:\n"
   "  --parallel [on|off], --no-parallel\n"
   "     Run Chuffed in parallel mode (default " << (def.parallel ? "on" : "off") << ").\n"
@@ -370,9 +380,24 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     log file (default " << (def.print_implications ? "on" : "off") << ").\n"
   "  --print-variable-list [on|off], --no-print-variable-list\n"
   "     Print a variable list to a file (default " << (def.print_variable_list ? "on" : "off") << ").\n"
-//  "  --send-skipped [on|off]\n"
-//  "  --send-domains [on|off]\n"
 #endif
+// TODO Description f the listed options below
+//  "  --send-skipped [on|off], --no-send-skipped\n"
+//  "     <Description> (default " << (def.send_skipped ? "on" : "off") << ").\n"
+//  "  --filter-domains <string>\n"
+//  "     <Description> (default " << def.filter_domains << ").\n"
+//  "  --learnt-stats [on|off], --no-learn-stats\n"
+//  "     <Description> (default " << (def.learnt_stats ? "on" : "off") << ").\n"
+//  "  --learnt-stats-nogood [on|off], --no-learn-stats-nogood\n"
+//  "     <Description> (default " << (def.learnt_stats_nogood ? "on" : "off") << ").\n"
+//  "  --debug [on|off], --no-debug\n"
+//  "     <Description> (default " << (def.debug ? "on" : "off") << ").\n"
+//  "  --exhaustive-activity [on|off], --no-exhaustive-activity\n"
+//  "     <Description> (default " << (def.exhaustive_activity ? "on" : "off") << ").\n"
+//  "  --lang-ext-linear [on|off], --no-lang-ext-linear\n"
+//  "     <Description> (default " << (def.lang_ext_linear ? "on" : "off") << ").\n"
+//  "  --well-founded [on|off], --no-well-founded\n"
+//  "     <Description> (default " << (def.well_founded ? "on" : "off") << ").\n"
   ;
 }
 
@@ -502,32 +527,6 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.trial_size = intBuffer;
     } else if (cop.get("--share-act", &intBuffer)) {
       so.share_act = intBuffer;
-    } else if (cop.get("--saved-clauses", &intBuffer)) {
-      so.saved_clauses = intBuffer;
-    } else if (cop.getBool("--use-uiv", boolBuffer)) {
-      so.use_uiv = boolBuffer;
-    } else if (cop.getBool("--alldiff-cheat", boolBuffer)) {
-      so.alldiff_cheat = boolBuffer;
-    } else if (cop.getBool("--alldiff-stage", boolBuffer)) {
-      so.alldiff_stage = boolBuffer;
-    } else if (cop.get("--circuit-alg", &intBuffer)) {
-      so.circuitalg = intBuffer;
-    } else if (cop.get("--prev-expl", &intBuffer)) {
-      so.prevexpl = intBuffer;
-    } else if (cop.get("--check-expl", &intBuffer)) {
-      so.checkexpl = intBuffer;
-    } else if (cop.get("--check-failure", &intBuffer)) {
-      so.checkfailure = intBuffer;
-    } else if (cop.get("--check-evidence", &intBuffer)) {
-      so.checkevidence = intBuffer;
-    } else if (cop.get("--prevent-evidence", &intBuffer)) {
-      so.preventevidence = intBuffer;
-    } else if (cop.get("--scc-evidence", &intBuffer)) {
-      so.sccevidence = intBuffer;
-    } else if (cop.get("--scc-options", &intBuffer)) {
-      so.sccoptions = intBuffer;
-    } else if (cop.get("--root-selection", &intBuffer)) {
-      so.rootSelection = intBuffer;
     } else if (cop.get("-a")) {
       so.nof_solutions = 0;
     } else if (cop.get("-f")) {
