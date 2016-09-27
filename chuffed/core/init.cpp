@@ -38,7 +38,8 @@ void Engine::init() {
 			if (vars[i]->getMax() - vars[i]->getMin() <= so.eager_limit) {
 				vars[i]->specialiseToEL();
 			} else {
-                            std::cerr << "using lazy literal\n";
+        if (so.verbosity >= 2)
+          std::cerr << "using lazy literal\n";
 				vars[i]->specialiseToLL();
 			}
 		}

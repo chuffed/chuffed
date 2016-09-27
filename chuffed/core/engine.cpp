@@ -659,7 +659,8 @@ RESULT Engine::search(const std::string& problemLabel) {
 
             if (!so.vsids && !so.toggle_vsids &&  conflictC >= so.switch_to_vsids_after) {
 	    	if (so.restart_base >= 1000000000) so.restart_base = 100;
-                std::cerr << "restarting and switching to VSIDS\n";
+                if (so.verbosity >= 2)
+                  std::cerr << "restarting and switching to VSIDS\n";
                 sat.btToLevel(0);
                 restartCount++;
                 nodepath.resize(0);
@@ -677,7 +678,8 @@ RESULT Engine::search(const std::string& problemLabel) {
         } else {
 
             if (conflictC >= nof_conflicts) {
-                std::cerr << "restarting due to number of conflicts\n";
+                if (so.verbosity >= 2)
+                  std::cerr << "restarting due to number of conflicts\n";
                 starts++;
                 nof_conflicts += getRestartLimit((starts+1)/2);
                 sat.btToLevel(0);
