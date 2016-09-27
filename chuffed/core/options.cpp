@@ -223,7 +223,6 @@ public:
   }
 };  // class CLOParser
 
-
 void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   Options def;
   std::cout << "Usage: " << argv[0] << " [options] ";
@@ -233,7 +232,9 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   std::cout << "Options:\n";
   std::cout <<
   "  -h, --help\n"
-  "     Print this message.\n"
+  "     Print help for common options.\n"
+  "  --help-all\n"
+  "     Print help for all options.\n"
   "  -a\n"
   "     Satisfaction problems: Find and print all solutions.\n"
   "     Optimisation problems: Print all (sub-optimal) intermediate solutions.\n"
@@ -241,38 +242,56 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     An upper bound on the number of solutions (default " << def.nof_solutions << ").\n"
   "  -v, --verbose\n"
   "     Verbose mode (default " << (def.verbosity == 0 ? "off" : "on") << ").\n"
-  "  --verbosity <n>\n"
-  "     Set verbosity (default " << def.verbosity << ").\n"
   "  --time-out <n>\n"
   "     Time out in seconds (default " << def.time_out << ").\n"
   "  --rnd-seed <n>\n"
   "     Set random seed (default " << def.rnd_seed << ").\n"
-  "  --print-sol [on|off], --no-print-sol\n"
-  "     Print solutions (default " << (def.print_sol ? "on" : "off") << ").\n"
-  "  --prop-fifo [on|off], --no-prop-fifo\n"
-  "     Use FIFO (first in, first out) queues for propagation executions instead of LIFO\n"
-  "     (last in, first out) queues (default " << (def.prop_fifo ? "on" : "off") << ").\n"
   "\n"
   "Search Options:\n"
   "  -f [on|off]\n"
-  "     Free search. Alternates search between user-specified and activity-based one\n"
-  "     when search is restarted. Restart base is set to 100.\n"
+  "     Free search. Alternates between user-specified and activity-based\n"
+  "     search when search is restarted. Restart base is set to 100.\n"
+#ifdef HAS_PROFILER
+  "\n"
+  "Profiler Options:\n"
+  "  --profiling [on|off], --no-profiling\n"
+  "     Send search to CPProfiler (default " << (def.use_profiler ? "on" : "off") << ").\n"
+#endif
+  "\n"
+  ;
+}
+
+void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
+  printHelp(argc, argv, fileExt);
+  Options def;
+  std::cout <<
+  "General Options:\n"
+  "  --verbosity <n>\n"
+  "     Set verbosity (default " << def.verbosity << ").\n"
+  "  --print-sol [on|off], --no-print-sol\n"
+  "     Print solutions (default " << (def.print_sol ? "on" : "off") << ").\n"
+  "  --prop-fifo [on|off], --no-prop-fifo\n"
+  "     Use FIFO (first in, first out) queues for propagation executions instead\n"
+  "     of LIFO (last in, first out) queues (default " << (def.prop_fifo ? "on" : "off") << ").\n"
+  "\n"
+  "More Search Options:\n"
   "  --vsids [on|off], --no-vsids\n"
   "     Use activity-based search on the Boolean variables (default " << (def.vsids ? "on" : "off") << ").\n"
   "  --restart-base <n>\n"
   "     Number of conflicts after which the search restarts (default " << def.restart_base << ").\n"
   "  --toggle-vsids [on|off], --no-toggle-vsids\n"
-  "     Alternate search between user-specified and activity-based one when the search\n"
-  "     is restarted. Starts by the user-specified search. Default restart base is used,\n"
-  "     unless overwritten. (Default " << (def.toggle_vsids ? "on" : "off") << ").\n"
+  "     Alternate search between user-specified and activity-based one when the\n"
+  "     search is restarted. Starts by the user-specified search. Default restart\n"
+  "     base is used, unless overwritten. (Default " << (def.toggle_vsids ? "on" : "off") << ").\n"
   "  --switch-to-vsids-after <n>\n"
-  "     Search starts with the user-specified one and switches to the activity-based one\n"
-  "     after a specified number of conflicts (default " << def.switch_to_vsids_after << ").\n"
+  "     Search starts with the user-specified one and switches to the\n"
+  "     activity-based one after a specified number of conflicts\n"
+  "     (default " << def.switch_to_vsids_after << ").\n"
   "  --branch-random [on|off], --no-branch-random\n"
   "     Random variable selection (default " << (def.branch_random ? "on" : "off") << ").\n"
   "  --sat-polarity <n>\n"
-  "     Selection of the polarity of Boolean variables (0 = default, 1 = same, 2 = anti,\n"
-  "     3 = random) (default " << def.sat_polarity << ").\n"
+  "     Selection of the polarity of Boolean variables\n"
+  "     (0 = default, 1 = same, 2 = anti, 3 = random) (default " << def.sat_polarity << ").\n"
   "\n"
   "Learning Options:\n"
   "  --lazy [on|off], --no-lazy\n"
@@ -289,8 +308,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --eager-limit <n>\n"
   "     The maximal domain size of Integer variables for which the entire Boolean\n"
   "     variables' representation is created upfront (default " << def.eager_limit << ").\n"
-  "     The Boolean variables' representation for Integer variables with larger domain\n"
-  "     size will be created on demand (lazily).\n"
+  "     The Boolean variables' representation for Integer variables with larger\n"
+  "     domain size will be created on demand (lazily).\n"
   "  --sat-var-limit <n>\n"
   "     The maximal number of Boolean variables (default " << def.sat_var_limit << ").\n"
   "  --n-of-learnts <n>\n"
@@ -300,7 +319,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     The maximal memory limit for learnt clauses in Bytes (default " << def.learnts_mlimit << ").\n"
   "     If the limit is reached then some learnt clauses will be deleted.\n"
   "  --sort-learnt-level [on|off], --no-sort-learnt-level\n"
-  "     Sort literals in a learnt clause based on their decision level (default " << (def.sort_learnt_level ? "on" : "off") << ").\n"
+  "     Sort literals in a learnt clause based on their decision level\n"
+  "     (default " << (def.sort_learnt_level ? "on" : "off") << ").\n"
   "  --one-watch [on|off], --no-one-watch\n"
   "     Watch only one literal in a learn clause (default " << (def.one_watch ? "on" : "off") << ").\n"
   "  --bin-clause-opt [on|off], --no-bin-clause-opt\n"
@@ -308,14 +328,14 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "\n"
   "Introduced Variable Options:\n"
   "  --introduced-heuristic [on|off], --no-introduced-heuristic\n"
-  "     Use a simple heuristic on the variable names for deciding whether a variable was\n"
-  "     introduced by MiniZinc (default " << (def.introduced_heuristic ? "on" : "off") << ").\n"
+  "     Use a simple heuristic on the variable names for deciding whether a\n"
+  "     variable was introduced by MiniZinc (default " << (def.introduced_heuristic ? "on" : "off") << ").\n"
   "  --use-var-is-introduced [on|off], --no-use-var-is-introduced\n"
-  "     Use the FlatZinc annotation var_is_introduced for deciding whether a variable was\n"
-  "     introduce by MiniZinc (default " << (def.use_var_is_introduced ? "on" : "off") << ").\n"
+  "     Use the FlatZinc annotation var_is_introduced for deciding whether a\n"
+  "     variable was introduce by MiniZinc (default " << (def.use_var_is_introduced ? "on" : "off") << ").\n"
   "  --exclude-introduced [on|off], --no-exclude-introduced\n"
-  "     Exclude introduced variables and their derived internal variables from learnt\n"
-  "     clauses (default " << (def.exclude_introduced ? "on" : "off") << ").\n"
+  "     Exclude introduced variables and their derived internal variables from\n"
+  "     learnt clauses (default " << (def.exclude_introduced ? "on" : "off") << ").\n"
   "  --decide-introduced [on|off], --no-decide-introduced\n"
   "     Allow search decisions on introduced variables and their derived internal variables\n"
   "     (default " << (def.decide_introduced ? "on" : "off") << ").\n"
@@ -325,6 +345,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     Removal of FD propagators that are satisfied globally (default " << (def.fd_simplify ? "on" : "off") << ").\n"
   "  --sat-simplify [on|off], --no-sat-simplify\n"
   "     Removal of clauses that are satisfied globally default " << (def.sat_simplify ? "on" : "off") << ").\n"
+  "\n"
+#ifdef PARALLEL
   "Parallel Options:\n"
   "  --parallel [on|off], --no-parallel\n"
   "     Run Chuffed in parallel mode (default " << (def.parallel ? "on" : "off") << ").\n"
@@ -342,6 +364,7 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     How to share clause activities between threads (0 = none, 1 = act, 2 = react)\n"
   "     (default " << def.share_act << ").\n"
   "\n"
+#endif
   "Propagator Options:\n"
   "  --cumu-global [on|off], --no-cumu-global\n"
   "     Use the global cumulative propagator if possible (default " << (def.cumu_global ? "on" : "off") << ").\n"
@@ -356,7 +379,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --mip-branch [on|off], --no-mip-branch\n"
   "     Use MIP branching as the branching strategy (default " << (def.mip_branch ? "on" : "off") << ").\n"
   "\n"
-  "(Exclusive) Symmetry Breaking Options:\n"
+  "Symmetry Breaking Options:\n"
+  "  (only one of these can be chosen)\n"
   "  --sym-static [on|off], --no-sym-static\n"
   "     Use static symmetry breaking constraints (default " << (def.sym_static ? "on" : "off") << ").\n"
   "  --ldsb [on|off], --no-ldsb\n"
@@ -370,9 +394,7 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     (default " << (def.ldsbad ? "on" : "off") << ").\n"
 #ifdef HAS_PROFILER
   "\n"
-  "Profiler Options:\n"
-  "  --profiling [on|off], --no-profiling\n"
-  "     Send search to CPProfiler (default " << (def.use_profiler ? "on" : "off") << ").\n"
+  "More Profiler Options:\n"
   "  --print-nodes [on|off], --no-print-nodes\n"
   "     Print search nodes to the node log file (default " << (def.print_nodes ? "on" : "off") << ").\n"
   "  --print-implications [on|off], --no-print-implications\n"
@@ -381,23 +403,23 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --print-variable-list [on|off], --no-print-variable-list\n"
   "     Print a variable list to a file (default " << (def.print_variable_list ? "on" : "off") << ").\n"
 #endif
-// TODO Description f the listed options below
-//  "  --send-skipped [on|off], --no-send-skipped\n"
-//  "     <Description> (default " << (def.send_skipped ? "on" : "off") << ").\n"
-//  "  --filter-domains <string>\n"
-//  "     <Description> (default " << def.filter_domains << ").\n"
-//  "  --learnt-stats [on|off], --no-learn-stats\n"
-//  "     <Description> (default " << (def.learnt_stats ? "on" : "off") << ").\n"
-//  "  --learnt-stats-nogood [on|off], --no-learn-stats-nogood\n"
-//  "     <Description> (default " << (def.learnt_stats_nogood ? "on" : "off") << ").\n"
-//  "  --debug [on|off], --no-debug\n"
-//  "     <Description> (default " << (def.debug ? "on" : "off") << ").\n"
-//  "  --exhaustive-activity [on|off], --no-exhaustive-activity\n"
-//  "     <Description> (default " << (def.exhaustive_activity ? "on" : "off") << ").\n"
-//  "  --lang-ext-linear [on|off], --no-lang-ext-linear\n"
-//  "     <Description> (default " << (def.lang_ext_linear ? "on" : "off") << ").\n"
-//  "  --well-founded [on|off], --no-well-founded\n"
-//  "     <Description> (default " << (def.well_founded ? "on" : "off") << ").\n"
+  // TODO Description f the listed options below
+  //  "  --send-skipped [on|off], --no-send-skipped\n"
+  //  "     <Description> (default " << (def.send_skipped ? "on" : "off") << ").\n"
+  //  "  --filter-domains <string>\n"
+  //  "     <Description> (default " << def.filter_domains << ").\n"
+  //  "  --learnt-stats [on|off], --no-learn-stats\n"
+  //  "     <Description> (default " << (def.learnt_stats ? "on" : "off") << ").\n"
+  //  "  --learnt-stats-nogood [on|off], --no-learn-stats-nogood\n"
+  //  "     <Description> (default " << (def.learnt_stats_nogood ? "on" : "off") << ").\n"
+  //  "  --debug [on|off], --no-debug\n"
+  //  "     <Description> (default " << (def.debug ? "on" : "off") << ").\n"
+  //  "  --exhaustive-activity [on|off], --no-exhaustive-activity\n"
+  //  "     <Description> (default " << (def.exhaustive_activity ? "on" : "off") << ").\n"
+  //  "  --lang-ext-linear [on|off], --no-lang-ext-linear\n"
+  //  "     <Description> (default " << (def.lang_ext_linear ? "on" : "off") << ").\n"
+  //  "  --well-founded [on|off], --no-well-founded\n"
+  //  "     <Description> (default " << (def.well_founded ? "on" : "off") << ").\n"
   ;
 }
 
@@ -411,6 +433,10 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     std::string stringBuffer;
     if (cop.get("-h --help")) {
       printHelp(argc,argv,fileExt);
+      std::exit(EXIT_SUCCESS);
+    }
+    if (cop.get("--help-all")) {
+      printLongHelp(argc,argv,fileExt);
       std::exit(EXIT_SUCCESS);
     }
     if (cop.get("-n --n-of-solutions", &intBuffer)) {
@@ -517,6 +543,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.ldsbad = boolBuffer;
     } else if (cop.getBool("--well-founded", boolBuffer)) {
       so.well_founded = boolBuffer;
+#ifdef PARALLEL
     } else if (cop.getBool("--parallel", boolBuffer)) {
       so.parallel = boolBuffer;
     } else if (cop.get("--share-param", &intBuffer)) {
@@ -527,6 +554,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.trial_size = intBuffer;
     } else if (cop.get("--share-act", &intBuffer)) {
       so.share_act = intBuffer;
+#endif
     } else if (cop.get("-a")) {
       so.nof_solutions = 0;
     } else if (cop.get("-f")) {
