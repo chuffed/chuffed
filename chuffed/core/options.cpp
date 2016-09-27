@@ -454,7 +454,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
   argc = j;
   
   if (fileArg != NULL) {
-    if (j==2) {
+    if (argc==2) {
       std::string filename(argv[1]);
       if (fileExt.size() > 0) {
         if (filename.size() <= fileExt.size()+1 || filename.substr(filename.size()-fileExt.size()-1)!="."+fileExt) {
@@ -464,14 +464,9 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
         }
       }
       *fileArg = filename;
-    } else if (j>2) {
+      --argc;
+    } else if (argc>2) {
       std::cerr << argv[0] << ": more than one file argument not supported\n";
-      std::cerr << argv[0] << ": use --help for more information.\n";
-      std::exit(EXIT_FAILURE);
-    }
-  } else {
-    if (j != 1) {
-      std::cerr << argv[0] << ": unrecognized option " << argv[j] << "\n";
       std::cerr << argv[0] << ": use --help for more information.\n";
       std::exit(EXIT_FAILURE);
     }
