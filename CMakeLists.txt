@@ -193,8 +193,8 @@ chuffed/flatzinc/flatzinc.h
 chuffed/flatzinc/ast.h
 )
 
-add_executable(fzn_chuffed chuffed/flatzinc/fzn_chuffed.cpp)
-target_link_libraries(fzn_chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
+target_link_libraries(fzn-chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(bibd EXCLUDE_FROM_ALL chuffed/examples/bibd.cpp)
 target_link_libraries(bibd chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
@@ -300,9 +300,9 @@ add_dependencies(examples
 #   versionTarget
 #   COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/update-version.sh ${CMAKE_BINARY_DIR}/version.h
 # )
-# add_dependencies(fzn_chuffed versionTarget)
+# add_dependencies(fzn-chuffed versionTarget)
 
-INSTALL(TARGETS fzn_chuffed chuffed
+INSTALL(TARGETS fzn-chuffed chuffed
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
