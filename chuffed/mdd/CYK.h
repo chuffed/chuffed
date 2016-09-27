@@ -21,7 +21,7 @@ cyk_sig mk_sig(CFG::Sym s, int start, int end)
 }
 
 struct cyk_clt {
-  bool operator () (const cyk_sig a, const cyk_sig b) {
+  bool operator () (const cyk_sig a, const cyk_sig b) const {
     if( a.s != b.s )
       return a.s < b.s;
 
