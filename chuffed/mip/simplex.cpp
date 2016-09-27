@@ -24,9 +24,11 @@ void Simplex::init() {
 		A_size += mip->ineqs[i].a.size();
 	}
 
-	fprintf(stderr, "Number of vars = %d\n", n);
-	fprintf(stderr, "Number of cons = %d\n", m);
-	fprintf(stderr, "Number of coeffs = %d\n", A_size);
+  if (so.verbosity >= 2) {
+    fprintf(stderr, "Number of vars = %d\n", n);
+    fprintf(stderr, "Number of cons = %d\n", m);
+    fprintf(stderr, "Number of coeffs = %d\n", A_size);
+  }
 
 	// Allocate memory
 

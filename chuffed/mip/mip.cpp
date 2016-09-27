@@ -288,7 +288,8 @@ void MIP::updateBounds() {
 }
 
 int MIP::getLimit() {
-	fprintf(stderr, "l = %d\n", decisionLevel());
+  if (so.verbosity >= 2)
+    fprintf(stderr, "l = %d\n", decisionLevel());
 	if (decisionLevel() == 0) return 100000;
 	if (level_lb <= decisionLevel() && decisionLevel() <= level_ub) return 100;
 	return DEFAULT_ROUNDS;
@@ -309,11 +310,11 @@ int MIP::doSimplex() {
 //	if (MIP_DEBUG) {
 		int bound = (int) ceil((double) simplex.optimum());
 		if (engine.opt_type == OPT_MAX) bound = -bound;
-		if (steps) fprintf(stderr, "level = %d, %d simplex steps, status = %d, bound = %d\n", decisionLevel(), steps, r, bound);
+		if (steps && so.verbosity >= 2) fprintf(stderr, "level = %d, %d simplex steps, status = %d, bound = %d\n", decisionLevel(), steps, r, bound);
 //		fprintf(stderr, "%d simplex steps, status = %d, bound = %d\n", steps, r, bound);
 //		fprintf(stderr, "%d %d\n", bound, engine.opt_type == OPT_MIN ? vars[0]->getMin() : -vars[0]->getMax());
 //	}
-		exit(0);
+//		exit(0);
 
 
 	if (decisionLevel() == 0) simplex.saveState(simplex.root);
