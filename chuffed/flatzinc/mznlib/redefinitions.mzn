@@ -80,3 +80,6 @@ predicate array_bool_xor(array[int] of var bool: bs) =
                 /\ (cs[cs_lower] = bs[bs_lower] xor bs[bs_lower + 1])
                 /\ (bs[bs_upper] xor cs[cs_upper])
         endif endif endif;
+
+predicate int_mod(var int: x, var int: y, var int: z) =
+  x=(x div y)*y+z;
