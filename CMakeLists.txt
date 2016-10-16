@@ -203,12 +203,43 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/protobuf")
   target_compile_definitions(chuffed PRIVATE HAS_PROFILER)
 endif()
 
+find_program(FLEX_EXEC flex)
+if(FLEX_EXEC)
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/lexer.yy.cpp
+    DEPENDS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
+    COMMAND ${FLEX_EXEC} -L -o${PROJECT_BINARY_DIR}/lexer.yy.cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
+    )
+  set_source_files_properties(${PROJECT_BINARY_DIR}/lexer.yy.cpp GENERATED)
+  set(lexer_cpp ${PROJECT_BINARY_DIR}/lexer.yy.cpp)
+else(FLEX_EXEC)
+  message(WARNING "Flex cannot be run. Using cached file, which may be out of date.")
+  set(lexer_cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.yy.cpp)
+endif(FLEX_EXEC)
+
+find_program(BISON_EXEC bison)
+if(BISON_EXEC)
+  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/chuffed/flatzinc)
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/parser.tab.cpp ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h
+    DEPENDS ${lexer_cpp} ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
+    COMMAND "${BISON_EXEC}" -l -o ${PROJECT_BINARY_DIR}/parser.tab.cpp --defines=${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
+    )
+  set_source_files_properties(${PROJECT_BINARY_DIR}/parser.tab.cpp GENERATED)
+  set(parser_cpp ${PROJECT_BINARY_DIR}/parser.tab.cpp)
+  set(parser_hh ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h)
+else(BISON_EXEC)
+  message(WARNING "Bison cannot be run. Using cached file, which may be out of date.")
+  set(parser_cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.cpp)
+  set(parser_hh ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.h)
+endif(BISON_EXEC)
+
 add_library(chuffed_fzn
-chuffed/flatzinc/parser.tab.cpp
+${parser_cpp}
 chuffed/flatzinc/registry.cpp
 chuffed/flatzinc/flatzinc.cpp
-chuffed/flatzinc/lexer.yy.cpp
-chuffed/flatzinc/parser.tab.h
+${lexer_cpp}
+${parser_h}
 chuffed/flatzinc/flatzinc.h
 chuffed/flatzinc/ast.h
 )
