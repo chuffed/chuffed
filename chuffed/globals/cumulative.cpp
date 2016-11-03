@@ -1245,7 +1245,7 @@ CumulativeProp::ttef_consistency_check(
 		//
 	for (int ii = last_unfixed; ii >= 0; ii--) {
 		i = task_id_lct[ii];
-		if (end == lct(i)) continue;
+		if (end == lct(i) || min_energy(i) == 0) continue;
 			
 			// Check whether the current latest completion time have to be considered
 		int free = max_limit() * (lct(i_last) - lct(i)) - (tt_after_lct[ii] - tt_after_lct[lct_idx_last]);
@@ -1255,12 +1255,14 @@ CumulativeProp::ttef_consistency_check(
 		min_en_avail = max_limit() * (lct(task_id_lct[last_unfixed]) - est(task_id_est[0]));
 		
 		end = lct(i);
-		while (est(task_id_est[est_idx_last]) >= end) est_idx_last--;
+		while (est(task_id_est[est_idx_last]) >= end) est_idx_last--; 
 		en_req_free = 0;
+
 			// Inner Loop: iterating over est in non-increasing order
 			//
 		for (int jj = est_idx_last; jj >= 0; jj--) {
 			j = task_id_est[jj];
+            if (min_energy(j) == 0) continue;
 			assert(est(j) < end);
 			begin = est(j);
 			if (lct(j) <= end) {
@@ -1361,7 +1363,7 @@ CumulativeProp::ttef_bounds_propagation_lb(
 		//
 	for (int ii = last_unfixed; ii >= 0; ii--) {
 		i = task_id_lct[ii];
-		if (end == lct(i)) continue;
+		if (end == lct(i) || min_energy(i) == 0) continue;
 			
 			// Check whether the current latest completion time have to be considered
 		//int free = max_limit() * (lct(i_last) - lct(i)) - (tt_after_lct[ii] - tt_after_lct[lct_idx_last]);
@@ -1383,6 +1385,7 @@ CumulativeProp::ttef_bounds_propagation_lb(
 		for (int jj = est_idx_last; jj >= 0; jj--) {
 			j = task_id_est[jj];
 			assert(est(j) < end);
+            if (min_energy(j) == 0) continue;
 			begin = est(j);
 
 				// Checking for TTEEF propagation on upper bound
@@ -1506,7 +1509,7 @@ CumulativeProp::ttef_bounds_propagation_ub(
 		//
 	for (int ii = 0; ii <= last_unfixed; ii++) {
 		i = task_id_est[ii];
-		if (begin == est(i)) continue;
+		if (begin == est(i) || min_energy(i) == 0) continue;
 		
 			// Intialisation for the minimal avaible energy of a time interval starting
 			// at begin
@@ -1526,6 +1529,7 @@ CumulativeProp::ttef_bounds_propagation_ub(
 		for (int jj = lct_idx_last; jj <= last_unfixed; jj++) {
 			j = task_id_lct[jj];
 			assert(lct(j) > begin);
+            if (min_energy(j) == 0) continue;
 			end = lct(j);
 
 				// Checking for TTEEF propagation on lower bounds
@@ -1779,7 +1783,7 @@ CumulativeProp::ttef_retrieve_tasks(
 	// Getting fixed tasks
 	for (int ii = 0; ii < task_id.size(); ii++) {
 		int i = task_id[ii];
-		if (i == fb_id) continue;
+		if (i == fb_id || min_energy(i) == 0) continue;
 		//printf("\t%d: est %d;  ect %d; lst %d; lct %d (dur: %d; rr: %d; en: %d)\n", i, est(i), ect(i), lst(i), lct(i),
 		//	min_dur(i), min_usage(i), min_energy(i));
 		if (begin <= est(i) && lct(i) <= end) {
