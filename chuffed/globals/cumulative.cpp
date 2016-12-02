@@ -155,12 +155,27 @@ public:
 	// Constructor
 	//
 	CumulativeProp(CUMU_ARR_INTVAR & _start, CUMU_ARR_INTVAR & _dur, CUMU_ARR_INTVAR & _usage, 
-			CUMU_INTVAR _limit)
+			CUMU_INTVAR _limit, list<string> opt)
 	: start(_start), dur(_dur), usage(_usage), limit(_limit), 
 		idem(false), tt_check(true), tt_filt(true), ttef_check(false), ttef_filt(false),
 		bound_update(false),
 		sort_est_asc(this), sort_lct_asc(this)
 	{
+        // Overriding option defaults
+        for (list<string>::iterator it = opt.begin(); it != opt.end(); it++) {
+            if ((*it).compare("tt_filt_on"))
+                tt_filt = true;
+            else if ((*it).compare("ttef_filt_off"))
+                tt_filt = false;
+            if ((*it).compare("ttef_check_on"))
+                ttef_check = true;
+            else if ((*it).compare("ttef_check_off"))
+                ttef_filt = false;
+            if ((*it).compare("ttef_filt_on"))
+                ttef_filt = true;
+            else if ((*it).compare("ttef_filt_off"))
+                ttef_filt = false;
+        }
 		//ttef_expl_deg = ED_NAIVE;
 		//ttef_expl_deg = ED_NORMAL;
 		ttef_expl_deg = ED_LIFT;
@@ -1095,6 +1110,11 @@ CumulativeProp::get_reason_for_update(vec<Lit> & expl) {
 	// Lifting the limit parameter to an integer variable
 	//
 void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit) {
+    std::list<string> opt;
+    cumulative(s, d, r, limit, opt);
+}
+
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<string> opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
@@ -1117,7 +1137,7 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit) {
         if (r_sum <= limit) return;
 
         // Global cumulative constraint
-        new CumulativeProp(s_new, d_new, r_new, vlimit);
+        new CumulativeProp(s_new, d_new, r_new, vlimit, opt);
     } else {
 	    vec<IntVar*> s_new;
 	    vec<int> d_new, r_new;
@@ -1138,8 +1158,12 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit) {
 	}
 }
 
-
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit) {
+    std:list<string> opt;
+    cumulative2(s, d, r, limit, opt);
+}
+
+void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, std::list<string> opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
@@ -1159,7 +1183,7 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
     if (r_sum <= limit->getMin()) return;
 
     // Global cumulative constraint
-    new CumulativeProp(s_new, d_new, r_new, limit);
+    new CumulativeProp(s_new, d_new, r_new, limit, opt);
 }
 
 /********************************************

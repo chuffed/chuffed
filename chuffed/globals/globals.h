@@ -2,6 +2,7 @@
 #define globals_h
 
 #include <chuffed/core/propagator.h>
+#include <list>
 
 //-----
 // Directives
@@ -62,8 +63,11 @@ void disjunctive(vec<IntVar*>& s, vec<int>& d);
 // cumulative.c
 
 void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b);
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b, std::list<std::string> opt);
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* b);
+void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* b, std::list<std::string> opt);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal);
+void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal, std::list<std::string> opt);
 
 // lex.c
 

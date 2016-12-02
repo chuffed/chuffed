@@ -26,6 +26,7 @@
 #include <chuffed/ldsb/ldsb.h>
 #include <chuffed/globals/mddglobals.h>
 #include <chuffed/mdd/opts.h>
+#include <list>
 
 namespace FlatZinc {
 
@@ -114,6 +115,31 @@ namespace FlatZinc {
       }
       return mopts;      
     }
+
+        std::list<string> getCumulativeOptions(AST::Node* ann) {
+            std::list<string> opt;
+            if (ann) {
+                if (ann->hasCall("tt_filt")) {
+                    if (ann->getCall("tt_filt")->args->getBool())
+                        opt.push_back("tt_filt_on");
+                    else
+                        opt.push_back("tt_filt_off");
+                }
+                if (ann->hasCall("ttef_check")) {
+                    if (ann->getCall("ttef_check")->args->getBool())
+                        opt.push_back("ttef_check_on");
+                    else
+                        opt.push_back("ttef_check_off");
+                }
+                if (ann->hasCall("ttef_filt")) {
+                    if (ann->getCall("ttef_filt")->args->getBool())
+                        opt.push_back("ttef_filt_on");
+                    else
+                        opt.push_back("ttef_filt_off");
+                }
+            }
+            return opt;
+        }
 
 		BoolView getBoolVar(AST::Node* n) {
 			if (n->isBoolVar()) {
@@ -625,14 +651,16 @@ namespace FlatZinc {
 			vec<int> d; arg2intargs(d, ce[1]);
 			vec<int> p; arg2intargs(p, ce[2]);
 			int limit = ce[3]->getInt();
-			cumulative(s, d, p, limit);
+            std::list<string> opt = getCumulativeOptions(ann);
+			cumulative(s, d, p, limit, opt);
 		}
 
         void p_cumulative2(const ConExpr& ce, AST::Node* ann) {
             vec<IntVar*> s; arg2intvarargs(s, ce[0]);
             vec<IntVar*> d; arg2intvarargs(d, ce[1]);
             vec<IntVar*> r; arg2intvarargs(r, ce[2]);
-            cumulative2(s, d, r, getIntVar(ce[3]));
+            std::list<string> opt = getCumulativeOptions(ann);
+            cumulative2(s, d, r, getIntVar(ce[3]), opt);
         }
 
 		void p_cumulative_cal(const ConExpr& ce, AST::Node* ann) {
@@ -656,7 +684,8 @@ namespace FlatZinc {
 			vec<int> taskCal; arg2intargs(taskCal, ce[7]);
 			int rho = ce[8]->getInt();
             int resCal = ce[9]->getInt();
-			cumulative_cal(s, d, p, getIntVar(ce[3]), cal, taskCal, rho, resCal);
+            std::list<string> opt = getCumulativeOptions(ann);
+			cumulative_cal(s, d, p, getIntVar(ce[3]), cal, taskCal, rho, resCal, opt);
 		}
 
 		void p_circuit(const ConExpr& ce, AST::Node* ann) {

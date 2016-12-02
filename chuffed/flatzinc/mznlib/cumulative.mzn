@@ -53,3 +53,15 @@ predicate chuffed_cumulative_vars(array[int] of var int: s, array[int] of var in
 predicate chuffed_cumulative_cal(array[int] of var int: s, array[int] of var int: d,
 	array[int] of var int: r, var int: b, int: index1, int: index2, array[int,int] of int: cal, array[int] of int: tc, int: rho, int: resCal);
 
+%------------------------------------------------------------------------------
+% Options for the cumulative constraint
+%   Annotate any cumulative predicate to override Chuffed's defaults for
+%   the cumulative propagator.
+% 
+%   - tt_filt: TimeTable filtering
+%   - ttef_check: TimeTable-EdgeFinding consistency check
+%   - ttef_filt: TimeTable-EdgeFinding filtering
+
+annotation tt_filt(bool: on_or_off);
+annotation ttef_check(bool: on_or_off);
+annotation ttef_filt(bool: on_or_off);

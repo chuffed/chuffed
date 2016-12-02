@@ -99,9 +99,9 @@ public:
 	// Options
 	const CUMU_BOOL	idem;	// Whether the cumulative propagator should be idempotent
 	const CUMU_BOOL	tt_check;
-	const CUMU_BOOL	tt_filt;	// Timetabling bounds filtering of the start times
-	const CUMU_BOOL	ttef_check;	// Timetabling-edge-finding consistency check
-	const CUMU_BOOL	ttef_filt;	// Timetabling-edge-finding filtering of the start times
+	CUMU_BOOL	tt_filt;	// Timetabling bounds filtering of the start times
+	CUMU_BOOL	ttef_check;	// Timetabling-edge-finding consistency check
+	CUMU_BOOL	ttef_filt;	// Timetabling-edge-finding filtering of the start times
 	const CUMU_BOOL	tteef_filt;	// Opportunistic timetabling-extended-edge-finding filtering of the start times
 	long ttef_prop_factor;
 
@@ -155,7 +155,8 @@ public:
 
 	// Constructor
 	CumulativeCalProp(CUMU_ARR_INTVAR & _start, CUMU_ARR_INTVAR & _dur, CUMU_ARR_INTVAR & _usage, 
-			CUMU_INTVAR _limit, CUMU_MATRIX_INT & _cal, CUMU_ARR_INT & _taskCal, CUMU_INT _rho, CUMU_INT _resCalendar)
+			CUMU_INTVAR _limit, CUMU_MATRIX_INT & _cal, CUMU_ARR_INT & _taskCal, CUMU_INT _rho, CUMU_INT _resCalendar,
+            list<string> opt)
 	: start(_start), dur(_dur), usage(_usage), limit(_limit), 
 		calendar2(_cal), taskCalendar(_taskCal), rho(_rho), resCalendar(_resCalendar),
 		minTime(0), maxTime(calendar2[0].size() - 1),
@@ -168,6 +169,22 @@ public:
 	{
 		// Some checks
 		rassert(!tteef_filt || ttef_filt);
+        
+        // Overriding option defaults
+        for (list<string>::iterator it = opt.begin(); it != opt.end(); it++) {
+            if ((*it).compare("tt_filt_on"))
+                tt_filt = true;
+            else if ((*it).compare("ttef_filt_off"))
+                tt_filt = false;
+            if ((*it).compare("ttef_check_on"))
+                ttef_check = true;
+            else if ((*it).compare("ttef_check_off"))
+                ttef_filt = false;
+            if ((*it).compare("ttef_filt_on"))
+                ttef_filt = true;
+            else if ((*it).compare("ttef_filt_off"))
+                ttef_filt = false;
+        }
 
 		// Creating a copy of the calendars
 		calendar = (int **) malloc(calendar2.size() * sizeof(int *));
@@ -1505,6 +1522,11 @@ CumulativeCalProp::get_reason_for_update(vec<Lit> & expl) {
 
 
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in) {
+    list<string> opt;
+    cumulative_cal(s, d, r, limit, cal, taskCal, rho_in, resCal_in);
+}
+
+void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in, list<string> opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
@@ -1528,7 +1550,7 @@ void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* l
     if (r_sum <= limit->getMin()) return;
 
     // Global cumulative constraint
-    new CumulativeCalProp(s_new, d_new, r_new, limit, cal, taskCal_new, rho_in, resCal_in);
+    new CumulativeCalProp(s_new, d_new, r_new, limit, cal, taskCal_new, rho_in, resCal_in, opt);
 }
 
 /********************************************
