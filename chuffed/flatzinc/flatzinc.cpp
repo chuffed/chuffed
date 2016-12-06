@@ -40,7 +40,9 @@ namespace FlatZinc {
 			if (s->id == "first_fail") return VAR_SIZE_MIN;
 			if (s->id == "anti_first_fail") return VAR_SIZE_MAX;
 			if (s->id == "smallest") return VAR_MIN_MIN;
+			if (s->id == "smallest_largest") return VAR_MAX_MIN;
 			if (s->id == "largest") return VAR_MAX_MAX;
+			if (s->id == "largest_smallest") return VAR_MIN_MAX;
 			if (s->id == "occurrence") return VAR_DEGREE_MAX;
 			if (s->id == "most_constrained") return VAR_SIZE_MIN;
 			if (s->id == "max_regret") return VAR_REGRET_MIN_MAX;
