@@ -172,17 +172,17 @@ public:
         
         // Overriding option defaults
         for (list<string>::iterator it = opt.begin(); it != opt.end(); it++) {
-            if ((*it).compare("tt_filt_on"))
+            if (!(*it).compare("tt_filt_on")) 
                 tt_filt = true;
-            else if ((*it).compare("ttef_filt_off"))
+            else if (!(*it).compare("tt_filt_off")) 
                 tt_filt = false;
-            if ((*it).compare("ttef_check_on"))
+            if (!(*it).compare("ttef_check_on"))
                 ttef_check = true;
-            else if ((*it).compare("ttef_check_off"))
-                ttef_filt = false;
-            if ((*it).compare("ttef_filt_on"))
+            else if (!(*it).compare("ttef_check_off"))
+                ttef_check = false;
+            if (!(*it).compare("ttef_filt_on"))
                 ttef_filt = true;
-            else if ((*it).compare("ttef_filt_off"))
+            else if (!(*it).compare("ttef_filt_off"))
                 ttef_filt = false;
         }
 
@@ -1294,7 +1294,7 @@ CumulativeCalProp::time_table_filtering_ub(ProfilePart profile[], int low, int h
 		}
 		// ASSUMPTION for the remaining for-loop
 		// - profile[i].end > lst_2[task]
-		if (profile[i].begin < lst_2[task] && profile[i].level + min_usage(task) > max_limit()) {
+		if (profile[i].begin < lct_2[task] && profile[i].level + min_usage(task) > max_limit()) {
 			// Possibly a upper bound update possible if "task" has no compulsory part 
 			// in this profile part
 			if (lst_2[task] < ect_2[task] && lst_2[task] <= profile[i].begin && profile[i].end <= ect_2[task]) {

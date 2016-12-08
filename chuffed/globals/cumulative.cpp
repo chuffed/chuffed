@@ -125,6 +125,12 @@ public:
 
 	ExplDeg     ttef_expl_deg;
 
+    // Counters
+    long nb_tt_incons;      // Number of timetabling inconsistencies
+    long nb_tt_filt;        // Number of timetabling propagations
+    long nb_ttef_incons;    // Number of timetabling-edge-finding inconsistencies
+    long nb_ttef_filt;      // Number of timetabling-edge-finding propagations
+
 	// Parameters
 	CUMU_BOOL	bound_update;
 
@@ -158,22 +164,23 @@ public:
 			CUMU_INTVAR _limit, list<string> opt)
 	: start(_start), dur(_dur), usage(_usage), limit(_limit), 
 		idem(false), tt_check(true), tt_filt(true), ttef_check(false), ttef_filt(false),
+        nb_tt_incons(0), nb_tt_filt(0), nb_ttef_incons(0), nb_ttef_filt(0), 
 		bound_update(false),
 		sort_est_asc(this), sort_lct_asc(this)
 	{
         // Overriding option defaults
         for (list<string>::iterator it = opt.begin(); it != opt.end(); it++) {
-            if ((*it).compare("tt_filt_on"))
+            if (!(*it).compare("tt_filt_on")) 
                 tt_filt = true;
-            else if ((*it).compare("ttef_filt_off"))
+            else if (!(*it).compare("tt_filt_off")) 
                 tt_filt = false;
-            if ((*it).compare("ttef_check_on"))
+            if (!(*it).compare("ttef_check_on"))
                 ttef_check = true;
-            else if ((*it).compare("ttef_check_off"))
-                ttef_filt = false;
-            if ((*it).compare("ttef_filt_on"))
+            else if (!(*it).compare("ttef_check_off"))
+                ttef_check = false;
+            if (!(*it).compare("ttef_filt_on"))
                 ttef_filt = true;
-            else if ((*it).compare("ttef_filt_off"))
+            else if (!(*it).compare("ttef_filt_off"))
                 ttef_filt = false;
         }
 		//ttef_expl_deg = ED_NAIVE;
@@ -223,6 +230,19 @@ public:
 		}
 		last_unfixed = start.size() - 1;
 	}
+	
+    // Statistics
+	void printStats() {
+        fprintf(stderr, "%% Cumulative propagator statistics:\n");
+        fprintf(stderr, "%%\t#TT incons.: %ld\n", nb_tt_incons);
+        if (tt_filt) 
+            fprintf(stderr, "%%\t#TT prop.: %ld\n", nb_tt_filt);
+        if (ttef_check || ttef_filt)
+            fprintf(stderr, "%%\t#TTEF incons.: %ld\n", nb_ttef_incons);
+        if (ttef_filt) {
+            fprintf(stderr, "%%\t#TTEF prop.: %ld\n", nb_ttef_filt);
+		}
+    }
 
 	/**
 	 * Inline function for parameters of tasks
@@ -512,6 +532,9 @@ public:
 #if CUMUVERB > 20
 					fprintf(stderr, "\t\t\tResource overload (%d > %d) in profile part %d\n", profile[i].level, max_limit(), i);
 #endif
+                    // Increment the inconsistency counter
+                    nb_tt_incons++;
+
 					// The resource is overloaded in this part
 					vec<Lit> expl;
 					if (so.lazy) {
@@ -754,6 +777,7 @@ CUMU_BOOL
 CumulativeProp::filter_limit(ProfilePart * profile, int & i) {
 	if (min_limit() < profile[i].level) {
 		Clause * reason = NULL;
+        nb_tt_filt++;
 		if (so.lazy) {
 			// Lower bound can be updated
 			// XXX Determining what time period is the best
@@ -799,7 +823,7 @@ CumulativeProp::time_table_filtering(ProfilePart profile[], int size, CUMU_ARR_I
 				//
 			index = find_first_profile_for_lb(profile, 0, size - 1, est(task[i]));
 #if CUMUVERB>0
-			fprintf(stderr, "Lower bound starting from index %d\n", index);
+			fprintf(stderr, "Lower bound starting from index %d till index %d\n", index, size - 1);
 #endif
 			// Update the lower bound if possible
 			if (! time_table_filtering_lb(profile, index, size - 1, task[i])) {
@@ -811,7 +835,7 @@ CumulativeProp::time_table_filtering(ProfilePart profile[], int size, CUMU_ARR_I
 			// Find initial profile part for upper bound propagation
 			index = find_first_profile_for_ub(profile, 0, size - 1, lct(task[i]));
 #if CUMUVERB>0
-			fprintf(stderr, "Upper bound starting from index %d\n", index);
+			fprintf(stderr, "Upper bound starting from index %d till index 0\n", index);
 #endif
 			// Update the upper bound if possible
 			if (! time_table_filtering_ub(profile, 0, index, task[i])) {
@@ -827,7 +851,13 @@ CumulativeProp::time_table_filtering(ProfilePart profile[], int size, CUMU_ARR_I
 CUMU_BOOL
 CumulativeProp::time_table_filtering_lb(ProfilePart profile[], int low, int high, int task) {
 	int i;
+#if CUMUVERB>5
+    fprintf(stderr, "task %d: start [%d, %d], end [%d, %d], min usage %d\n", task, est(task), lst(task), ect(task), lct(task), min_usage(task));
+#endif
 	for (i = low; i <= high; i++) {
+#if CUMUVERB>5
+        fprintf(stderr, "\tprofile[%d]: begin %d; end %d; level %d;\n", i, profile[i].begin, profile[i].end, profile[i].level);
+#endif
 		if (ect(task) <= profile[i].begin) {
 			// No lower bound update possible
 			break;
@@ -876,6 +906,7 @@ CumulativeProp::time_table_filtering_lb(ProfilePart profile[], int low, int high
 				// Transform literals to a clause
 				reason = get_reason_for_update(expl);
 			}
+            nb_tt_filt++;
 			// Impose the new lower bound on start[task]
 			if (! start[task]->setMin(expl_end, reason)) {
 				// Conflict occurred
@@ -897,14 +928,20 @@ CumulativeProp::time_table_filtering_lb(ProfilePart profile[], int low, int high
 CUMU_BOOL
 CumulativeProp::time_table_filtering_ub(ProfilePart profile[], int low, int high, int task) {
 	int i;
+#if CUMUVERB>5
+    fprintf(stderr, "task %d: start [%d, %d], end [%d, %d], min usage %d\n", task, est(task), lst(task), ect(task), lct(task), min_usage(task));
+#endif
 	for (i = high; i >= low; i--) {
+#if CUMUVERB>5
+        fprintf(stderr, "\tprofile[%d]: begin %d; end %d; level %d;\n", i, profile[i].begin, profile[i].end, profile[i].level);
+#endif
 		if (profile[i].end <= lst(task)) {
 			// No upper bound update possible
 			break;
 		}
 		// ASSUMPTION for the remaining for-loop
 		// - profile[i].end > lst(task)
-		if (profile[i].begin < lst(task) && profile[i].level + min_usage(task) > max_limit()) {
+		if (profile[i].begin < lct(task) && profile[i].level + min_usage(task) > max_limit()) {
 			// Possibly a upper bound update possible if "task" has no compulsory part 
 			// in this profile part
 			if (lst(task) < ect(task) && lst(task) <= profile[i].begin && profile[i].end <= ect(task)) {
@@ -936,6 +973,7 @@ CumulativeProp::time_table_filtering_ub(ProfilePart profile[], int low, int high
 				// Transform literals to a clause
 				reason = get_reason_for_update(expl);
 			}
+            nb_tt_filt++;
 			// Impose the new lower bound on start[task]
 			if (! start[task]->setMax(expl_begin - min_dur(task), reason)) {
 				// Conflict occurred
@@ -1315,6 +1353,8 @@ CumulativeProp::ttef_consistency_check(
 
 	if (!consistent) {
 		vec<Lit> expl;
+        // Increment the inconsistency counter
+        nb_ttef_incons++;
 		if (so.lazy) {
 			list<TaskDur> tasks_tw;
 			list<TaskDur> tasks_cp;
@@ -1492,6 +1532,8 @@ CumulativeProp::ttef_bounds_propagation_lb(
 
 	if (!consistent) {
 		vec<Lit> expl;
+        // Increment the inconsistency counter
+        nb_ttef_incons++;
 		if (so.lazy) {
 			list<TaskDur> tasks_tw;
 			list<TaskDur> tasks_cp;
@@ -1635,6 +1677,8 @@ CumulativeProp::ttef_bounds_propagation_ub(
 
 	if (!consistent) {
 		vec<Lit> expl;
+        // Increment the inconsistency counter
+        nb_ttef_incons++;
 		if (so.lazy) {
 			list<TaskDur> tasks_tw;
 			list<TaskDur> tasks_cp;
@@ -1719,6 +1763,8 @@ CumulativeProp::ttef_update_bounds(
 					ttef_analyse_limit_and_tasks(begin, end, tasks_tw, tasks_cp, en_lift, expl);
 					reason = get_reason_for_update(expl);
 				}
+                // Increment the filtering counter
+                nb_ttef_filt++;
 				// Update the lower bound
 				if (!start[task]->setMin(bound, reason)) {
 					// Conflict occurred
@@ -1781,6 +1827,8 @@ CumulativeProp::ttef_update_bounds(
 					reason = get_reason_for_update(expl);
 
 				}
+                // Increment the filtering counter
+                nb_ttef_filt++;
 				// Update the lower bound
                 // XXX Is min_dur correct?
 				if (!start[task]->setMax(bound - min_dur(task), reason)) {
