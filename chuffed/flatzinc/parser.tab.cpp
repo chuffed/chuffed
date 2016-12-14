@@ -223,7 +223,6 @@ void initfg(ParserState* pp) {
     pp->domainConstraints2.erase(pp->domainConstraints2.begin() + i);
   }
 #endif
-
   if (!pp->hadError)
     pp->fg = new FlatZincSpace(pp->intvars.size(),
                                 pp->boolvars.size(),

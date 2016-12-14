@@ -80,6 +80,8 @@ class CumulativeCalProp : public Propagator {
 	Tint last_unfixed;
 
 public:
+    string name; // Name of the cumulative constraint for printing statistics
+
 	// Constant Data
 	CUMU_ARR_INTVAR	start;	// Start time variables of the tasks
 	CUMU_ARR_INTVAR	dur;	// Durations of the tasks
@@ -157,7 +159,7 @@ public:
 	CumulativeCalProp(CUMU_ARR_INTVAR & _start, CUMU_ARR_INTVAR & _dur, CUMU_ARR_INTVAR & _usage, 
 			CUMU_INTVAR _limit, CUMU_MATRIX_INT & _cal, CUMU_ARR_INT & _taskCal, CUMU_INT _rho, CUMU_INT _resCalendar,
             list<string> opt)
-	: start(_start), dur(_dur), usage(_usage), limit(_limit), 
+	: name(""), start(_start), dur(_dur), usage(_usage), limit(_limit), 
 		calendar2(_cal), taskCalendar(_taskCal), rho(_rho), resCalendar(_resCalendar),
 		minTime(0), maxTime(calendar2[0].size() - 1),
 		idem(false), tt_check(true), tt_filt(true), ttef_check(true), ttef_filt(true), tteef_filt(false),
@@ -184,6 +186,8 @@ public:
                 ttef_filt = true;
             else if (!(*it).compare("ttef_filt_off"))
                 ttef_filt = false;
+            else if ((*it).find("__name__") == 0)
+                name = (*it).substr(8);
         }
 
 		// Creating a copy of the calendars
@@ -309,7 +313,10 @@ public:
 
 	// Statistics
 	void printStats() {
-        fprintf(stderr, "%% Cumulative propagator statistics:\n");
+        fprintf(stderr, "%% Cumulative propagator with calendars statistics");
+        if (name != "")
+            cerr << " for " << name;
+        fprintf(stderr, ":\n");
         fprintf(stderr, "%%\t#TT incons.: %ld\n", nb_tt_incons);
         if (tt_filt) 
             fprintf(stderr, "%%\t#TT prop.: %ld\n", nb_tt_filt);

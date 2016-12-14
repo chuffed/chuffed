@@ -110,6 +110,8 @@ class CumulativeProp : public Propagator {
 	Tint last_unfixed;
 
 public:
+    string name; // Name of the cumulative constraint for printing statistics
+
 	// Constant Data
 	CUMU_ARR_INTVAR	start;	// Start time variables of the tasks
 	CUMU_ARR_INTVAR	dur;	// Durations of the tasks
@@ -162,7 +164,7 @@ public:
 	//
 	CumulativeProp(CUMU_ARR_INTVAR & _start, CUMU_ARR_INTVAR & _dur, CUMU_ARR_INTVAR & _usage, 
 			CUMU_INTVAR _limit, list<string> opt)
-	: start(_start), dur(_dur), usage(_usage), limit(_limit), 
+	: name(""), start(_start), dur(_dur), usage(_usage), limit(_limit), 
 		idem(false), tt_check(true), tt_filt(true), ttef_check(false), ttef_filt(false),
         nb_tt_incons(0), nb_tt_filt(0), nb_ttef_incons(0), nb_ttef_filt(0), 
 		bound_update(false),
@@ -182,6 +184,8 @@ public:
                 ttef_filt = true;
             else if (!(*it).compare("ttef_filt_off"))
                 ttef_filt = false;
+            else if ((*it).find("__name__") == 0)
+                name = (*it).substr(8);
         }
 		//ttef_expl_deg = ED_NAIVE;
 		//ttef_expl_deg = ED_NORMAL;
@@ -233,7 +237,10 @@ public:
 	
     // Statistics
 	void printStats() {
-        fprintf(stderr, "%% Cumulative propagator statistics:\n");
+        fprintf(stderr, "%% Cumulative propagator statistics");
+        if (name != "")
+            cerr << " for " << name;
+        fprintf(stderr, ":\n");
         fprintf(stderr, "%%\t#TT incons.: %ld\n", nb_tt_incons);
         if (tt_filt) 
             fprintf(stderr, "%%\t#TT prop.: %ld\n", nb_tt_filt);

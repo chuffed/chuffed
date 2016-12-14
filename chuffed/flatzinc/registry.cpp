@@ -137,6 +137,9 @@ namespace FlatZinc {
                     else
                         opt.push_back("ttef_filt_off");
                 }
+                if (ann->hasCall("name")) {
+                    opt.push_back("__name__" + ann->getCall("name")->args->getString());
+                }
             }
             return opt;
         }

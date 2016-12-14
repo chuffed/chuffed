@@ -65,3 +65,4 @@ predicate chuffed_cumulative_cal(array[int] of var int: s, array[int] of var int
 annotation tt_filt(bool: on_or_off);
 annotation ttef_check(bool: on_or_off);
 annotation ttef_filt(bool: on_or_off);
+annotation name(string: s);

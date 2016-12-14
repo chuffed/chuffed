@@ -1594,3 +1594,8 @@ ann_non_array_expr :
           $$ = new AST::IntLit(0); // keep things consistent
         free($1);
       }
+    | STRING_LIT
+      {
+        $$ = new AST::String($1);
+        free($1);
+      }
