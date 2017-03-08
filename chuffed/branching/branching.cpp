@@ -71,9 +71,12 @@ DecInfo* BranchGroup::branch() {
 	return x[best_i]->branch();
 }
 
-
-BranchGroup* branch(vec<Branching*> x, VarBranch var_branch, ValBranch val_branch) {
-	// branching->add(new BranchGroup(x, var_branch, true));
+// Creates and adds a branching to the engine
+void branch(vec<Branching*> x, VarBranch var_branch, ValBranch val_branch) {
+    engine.branching->add(createBranch(x, var_branch, val_branch));
+}
+// Creates a branching without adding to the engine
+BranchGroup* createBranch(vec<Branching*> x, VarBranch var_branch, ValBranch val_branch) {
 	if (val_branch != VAL_DEFAULT) {
         PreferredVal p;
         switch (val_branch) {

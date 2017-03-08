@@ -84,13 +84,3 @@ predicate array_bool_xor(array[int] of var bool: bs) =
 predicate int_mod(var int: x, var int: y, var int: z) =
   x=(x div y)*y+z;
 
-%------------------------------------------------------------------------------%
-% Following variable selection annotations are just place holders until they are
-% included in the MiniZinc distributions.
-
-/** @group annotations.search.varsel Choose the variable with the smallest largest value in its domain */
-annotation smallest_largest;
-
-/** @group annotations.search.varsel Choose the variable with the largest smallest value in its domain */
-annotation largest_smallest;
-

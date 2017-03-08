@@ -237,7 +237,7 @@ namespace FlatZinc {
 						if (v->isFixed()) continue;
 						va.push(v);
 					}
-					branching->add(branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
+					branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
 					if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
 						if (s->s == "all") so.nof_solutions = 0;
 					}
@@ -251,7 +251,7 @@ namespace FlatZinc {
 						vec<Branching*> va(vars->a.size());
 						for (int i=vars->a.size(); i--; )
 							va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
-						branching->add(branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]))); 
+						branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]))); 
 						if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
 							if (s->s == "all") so.nof_solutions = 0;
 						}
