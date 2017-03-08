@@ -190,6 +190,16 @@ namespace FlatZinc {
 		}
 	}
 
+    PriorityBranchGroup* FlatZincSpace::priorityBranch(vec<Branching*> x, AST::Array* ann, VarBranch var_branch) {
+        if (x.size() != ann->a.size()) {
+            fprintf(stderr, "priority branch: vars and annotation arrays must be the same length");
+            return NULL;
+        }
+        PriorityBranchGroup * pbg = new PriorityBranchGroup(x, var_branch);
+        parseSolveAnn(ann, pbg);
+        return pbg;
+    }
+
 	void flattenAnnotations(AST::Array* ann, std::vector<AST::Node*>& out) {
 		for (unsigned int i=0; i<ann->a.size(); i++) {
 			if (ann->a[i]->isCall("seq_search")) {
@@ -205,8 +215,12 @@ namespace FlatZinc {
 	}
 
 	// Users should add search annotation with (core vars, default, default) even if they know nothing
+    
+    void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
+        parseSolveAnn(ann, engine.branching);
+    }
 
-	void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
+	void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup *branching) {
 		bool hadSearchAnnotation = false;
 		if (ann) {
 			std::vector<AST::Node*> flatAnn;
@@ -223,7 +237,7 @@ namespace FlatZinc {
 						if (v->isFixed()) continue;
 						va.push(v);
 					}
-					branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]));
+					branching->add(branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
 					if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
 						if (s->s == "all") so.nof_solutions = 0;
 					}
@@ -237,14 +251,30 @@ namespace FlatZinc {
 						vec<Branching*> va(vars->a.size());
 						for (int i=vars->a.size(); i--; )
 							va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
-						branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]));        
+						branching->add(branch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]))); 
 						if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
 							if (s->s == "all") so.nof_solutions = 0;
 						}
 						hadSearchAnnotation = true;
 					} catch (AST::TypeError& e) {
 						(void) e;
-						fprintf(stderr, "%% Type error in search annotation. Ignoring!\n");
+                        try {
+                            AST::Call *call = flatAnn[i]->getCall("priority_search");
+                            AST::Array *args = call->getArgs(4);
+                            AST::Array *vars = args->a[0]->getArray();
+                            AST::Array *annotations = args->a[1]->getArray();
+                            vec<Branching*> va(vars->a.size());
+                            for (int i=0; i < vars->a.size(); i++)
+                                va[i] = iv[vars->a[i]->getIntVar()];
+                            branching->add(priorityBranch(va, annotations, ann2ivarsel(args->a[2])));
+                            if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
+                                if (s->s == "all") so.nof_solutions = 0;
+                            }
+                            hadSearchAnnotation = true;
+                        } catch (AST::TypeError& e) {
+                            (void) e;
+                            fprintf(stderr, "%% Type error in search annotation. Ignoring!\n");
+                        }
 					}
 				}
 			}

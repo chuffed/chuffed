@@ -81,6 +81,29 @@ public:
 
 };
 
-void branch(vec<Branching*> x, VarBranch var_branch, ValBranch val_branch);
+BranchGroup* branch(vec<Branching*> x, VarBranch var_branch, ValBranch val_branch);
+
+class PriorityBranchGroup : public BranchGroup {
+public:
+	vec<Branching*> decisionVars;
+    vec<Branching*> annotations;
+	VarBranch var_branch;
+
+	// Persistent data
+	Tint fin;
+	Tint cur;
+
+	// Intermediate data
+	vec<int> moves;
+
+	PriorityBranchGroup(vec<Branching*>& _x, VarBranch vb);
+
+	bool finished();
+	double getScore(VarBranch vb);
+	DecInfo* branch();
+
+	void add(Branching *n) { annotations.push(n); }
+
+};
 
 #endif
