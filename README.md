@@ -41,6 +41,10 @@ To build the C++ examples:
     cmake ..
     cmake --build . --target examples
 
+To build a debug or release version use the following command instead of `cmake ..`:
+
+    cmake -DCMAKE_BUILD_TYPE=[Debug|Release] ..
+
 #### Integration with CP Profiler
 
 The [CP Profiler tool](https://github.com/cp-profiler) can be used with Chuffed
