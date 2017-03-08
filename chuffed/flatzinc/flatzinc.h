@@ -275,7 +275,11 @@ namespace FlatZinc {
     /// Construct problem with given number of variables
     FlatZincSpace(int intVars, int boolVars, int setVars);
 
+        /// Create priority branch group
+        PriorityBranchGroup* priorityBranch(vec<Branching*> x, AST::Array* ann, VarBranch var_branch);
+
 		/// Parse the solve annotations and create corresponding branchings
+        void parseSolveAnn(AST::Array* ann, BranchGroup *branching);
 		void parseSolveAnn(AST::Array* ann);
 		/// Create final branching that fixes all variables
 		void fixAllSearch();
