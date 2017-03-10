@@ -369,6 +369,15 @@ public:
 					}
 				}
 			}
+            // TODO Optional task propagation
+            if (!bound_update) {
+                if (tt_filt && tt_profile_size > 0) {
+                    if (!tt_optional_task_propagation()) {
+                        // Inconsistency was detected
+                        return false;
+                    }
+                }
+            }
 		} while (idem && bound_update);
 #if CUMUVERB > 0
 		fprintf(stderr, "\tLeaving cumulative propagation loop\n");
@@ -654,6 +663,10 @@ public:
 	find_first_profile_for_lb(ProfilePart profile[], int low, int high, CUMU_INT t);
 	int
 	find_first_profile_for_ub(ProfilePart profile[], int low, int high, CUMU_INT t);
+
+    // Time-table filtering for optional tasks
+    CUMU_BOOL
+    tt_optional_task_propagation();
 
 	// Analysing the conflict and generation of the explanations
 	// NOTE: Fixed durations and resource usages are assumed!!!
@@ -997,6 +1010,80 @@ CumulativeProp::time_table_filtering_ub(ProfilePart profile[], int low, int high
 	return true;
 }
 
+CUMU_BOOL
+CumulativeProp::tt_optional_task_propagation() {
+    for (int ii = 0; ii <= last_unfixed; ii++) {
+        const int i = task_id[ii];
+        assert(max_dur(i) > 0 && max_usage(i) > 0);
+        if (min_dur(i) <= 0 || min_usage(i) <= 0) {
+            //fprintf(stderr, "task %d: start [%d, %d], dur %d, usage %d\n", i, est(i), lst(i), min_dur(i), min_usage(i));
+            // Getting the smallest non-zero value for the duration
+            const int dur_smallest = max(1, min_dur(i));
+            // Getting the smallest non-zero value for the usage
+            const int usage_smallest = max(1, min_usage(i));
+            // XXX Only for the moment to make the propagation easier
+            if (est(i) < lst(i))
+                continue;
+            // Getting the starting profile index
+			const int index = find_first_profile_for_lb(tt_profile, 0, tt_profile_size - 1, est(i));
+            // TODO Check whether a task with a duration 'dur_smallest' and a usage 'usage_smallest'
+            // can be scheduled
+            //fprintf(stderr, "%d: start %d; profile (%d, %d, %d)\n", i, est(i), tt_profile[index].begin, tt_profile[index].end, tt_profile[index].level);
+            if (est(i) < tt_profile[index].end && tt_profile[index].begin < est(i) + dur_smallest 
+                && tt_profile[index].level + usage_smallest > max_limit()) {
+                // Tasks cannot be performed on this resource
+
+                Clause * reason = NULL;
+                if (so.lazy) {
+                    // Explanation for the propagation required
+				    vec<Lit> expl;
+
+                    // Lifting the usage
+                    int lift_usage = tt_profile[index].level + usage_smallest - max_limit() - 1;
+                    // Defining explanation time interval
+                    const int overlap_begin = max(tt_profile[index].begin, est(i));
+                    const int overlap_end   = min(tt_profile[index].end, est(i) + dur_smallest);
+                    const int expl_begin = overlap_begin + ((overlap_end - overlap_begin - 1)/2);
+                    const int expl_end   = expl_begin + 1;
+				    
+                    // Explanation parts for task 'i'
+                    // Get the negated literal for [[start[i] >= expl_end - dur_smallest]]
+				    expl.push(getNegGeqLit(start[i], expl_end - dur_smallest));
+				    // Get the negated literal for [[start[task] <= expl_begin]]
+				    expl.push(getNegLeqLit(start[i], expl_begin));
+                    // Get the negated literal for [[dur[i] >= min_dur(i)]]
+                    if (min_dur0(i) < min_dur(i) && 0 < min_dur(i)) 
+                        expl.push(getNegGeqLit(dur[i], min_dur(i)));
+                    // Get the negated literal for [[usage[i] >= min_usage(i)]]
+                    if (min_usage0(i) < min_usage(i) && 0 < min_usage(i)) 
+                        expl.push(getNegGeqLit(usage[i], min_usage(i)));
+
+				    // Get the negated literals for the tasks in the profile and the resource limit
+				    analyse_limit_and_tasks(expl, tt_profile[index].tasks, lift_usage, expl_begin, expl_end);
+				    // Transform literals to a clause
+				    reason = get_reason_for_update(expl);
+                }
+                // Increment filtering counter
+                nb_tt_filt++;
+                if (min_usage(i) <= 0) {
+			        // Impose the new upper bound on usage[i]
+			        if (! usage[i]->setMax(0, reason)) {
+			        	// Conflict occurred
+			        	return false;
+			        }
+                }
+                else {
+			        // Impose the new upper bound on usage[i]
+			        if (! dur[i]->setMax(0, reason)) {
+			        	// Conflict occurred
+			        	return false;
+			        }
+                }
+            }
+        }
+    }
+    return true;
+}
 
 int
 CumulativeProp::find_first_profile_for_lb(ProfilePart profile[], int low, int high, CUMU_INT t) {
