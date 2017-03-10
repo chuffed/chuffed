@@ -46,11 +46,11 @@ namespace FlatZinc {
 			if (s->id == "occurrence") return VAR_DEGREE_MAX;
 			if (s->id == "most_constrained") return VAR_SIZE_MIN;
 			if (s->id == "max_regret") return VAR_REGRET_MIN_MAX;
-			if (s->id == "random") return VAR_RANDOM;
+			if (s->id == "random_order") return VAR_RANDOM;
 		}
-		std::cerr << "% Warning, ignored search annotation: ";
-		ann->print(std::cerr);
-		std::cerr << std::endl;
+        cerr << "% Warning: Unknown or not support variable selection annotation '";
+        ann->print(cerr);
+        cerr << "'! Ignore variable selection annotation and replace it by 'input_order'." << endl;
 		return VAR_INORDER;
 	}
 
@@ -190,102 +190,169 @@ namespace FlatZinc {
 		}
 	}
 
-    PriorityBranchGroup* FlatZincSpace::priorityBranch(vec<Branching*> x, AST::Array* ann, VarBranch var_branch) {
-        if (x.size() != ann->a.size()) {
-            fprintf(stderr, "priority branch: vars and annotation arrays must be the same length");
-            return NULL;
-        }
-        PriorityBranchGroup * pbg = new PriorityBranchGroup(x, var_branch);
-        parseSolveAnn(ann, pbg);
-        return pbg;
-    }
-
-	void flattenAnnotations(AST::Array* ann, std::vector<AST::Node*>& out) {
-		for (unsigned int i=0; i<ann->a.size(); i++) {
-			if (ann->a[i]->isCall("seq_search")) {
-				AST::Call* c = ann->a[i]->getCall();
-				if (c->args->isArray())
-					flattenAnnotations(c->args->getArray(), out);
-				else
-					out.push_back(c->args);
-			} else {
-				out.push_back(ann->a[i]);
-			}
-		}
-	}
-
-	// Users should add search annotation with (core vars, default, default) even if they know nothing
     
-    void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
-        parseSolveAnn(ann, engine.branching);
+    // Parsing the 'int_search' annotation and setting up the branching for it
+    void FlatZincSpace::parseSolveAnnIntSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
+        assert(elemAnn->isCall("int_search"));
+        try {
+            // Retrieval of the data
+			AST::Call *call = elemAnn->getCall("int_search");
+			AST::Array *args = call->getArgs(4);
+			AST::Array *vars = args->a[0]->getArray();
+			vec<Branching*> va;
+			for (unsigned int i = 0; i < vars->a.size(); i++) {
+                // Removal of constants
+				if (vars->a[i]->isInt()) continue;
+				IntVar* v = iv[vars->a[i]->getIntVar()];
+                // Removal of fixed variables
+				if (v->isFixed()) continue;
+				va.push(v);
+			}
+			branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
+			if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
+				if (s->s == "all") so.nof_solutions = 0;
+			}
+			nbNonEmptySearchAnnotations++;
+        }
+        catch (AST::TypeError& e) {
+            throw FlatZinc::Error("Type error in int_search annotation", e.what());
+        }
     }
 
-	void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup *branching) {
-		bool hadSearchAnnotation = false;
-		if (ann) {
-			std::vector<AST::Node*> flatAnn;
-			flattenAnnotations(ann, flatAnn);
-			for (unsigned int i=0; i<flatAnn.size(); i++) {
-				try {
-					AST::Call *call = flatAnn[i]->getCall("int_search");
-					AST::Array *args = call->getArgs(4);
-					AST::Array *vars = args->a[0]->getArray();
-					vec<Branching*> va;
-					for (unsigned int i = 0; i < vars->a.size(); i++) {
-						if (vars->a[i]->isInt()) continue;
-						IntVar* v = iv[vars->a[i]->getIntVar()];
-						if (v->isFixed()) continue;
-						va.push(v);
-					}
-					branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
-					if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-						if (s->s == "all") so.nof_solutions = 0;
-					}
-					hadSearchAnnotation = true;
-				} catch (AST::TypeError& e) {
-					(void) e;
-					try {
-						AST::Call *call = flatAnn[i]->getCall("bool_search");
-						AST::Array *args = call->getArgs(4);
-						AST::Array *vars = args->a[0]->getArray();
-						vec<Branching*> va(vars->a.size());
-						for (int i=vars->a.size(); i--; )
-							va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
-						branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]))); 
-						if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-							if (s->s == "all") so.nof_solutions = 0;
-						}
-						hadSearchAnnotation = true;
-					} catch (AST::TypeError& e) {
-						(void) e;
-                        try {
-                            AST::Call *call = flatAnn[i]->getCall("priority_search");
-                            AST::Array *args = call->getArgs(4);
-                            AST::Array *vars = args->a[0]->getArray();
-                            AST::Array *annotations = args->a[1]->getArray();
-                            vec<Branching*> va(vars->a.size());
-                            for (int i=0; i < vars->a.size(); i++)
-                                va[i] = iv[vars->a[i]->getIntVar()];
-                            branching->add(priorityBranch(va, annotations, ann2ivarsel(args->a[2])));
-                            if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-                                if (s->s == "all") so.nof_solutions = 0;
-                            }
-                            hadSearchAnnotation = true;
-                        } catch (AST::TypeError& e) {
-                            (void) e;
-                            fprintf(stderr, "%% Type error in search annotation. Ignoring!\n");
-                        }
-					}
-				}
+    // Parsing the 'bool_search' annotation and setting up the branching for it
+    void FlatZincSpace::parseSolveAnnBoolSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
+        assert(elemAnn->isCall("bool_search"));
+        try {
+            // Retrieval of the data
+			AST::Call *call = elemAnn->getCall("bool_search");
+			AST::Array *args = call->getArgs(4);
+			AST::Array *vars = args->a[0]->getArray();
+			vec<Branching*> va(vars->a.size());
+			for (int i=vars->a.size(); i--; )
+				va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
+			branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2]))); 
+			if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
+				if (s->s == "all") so.nof_solutions = 0;
 			}
-		} 
-		if (!hadSearchAnnotation) {
+			nbNonEmptySearchAnnotations++;
+        }
+        catch (AST::TypeError& e) {
+            throw FlatZinc::Error("Type error in bool_search annotation", e.what());
+        }
+    }
+
+    // Parsing the 'priority_search' annotation and setting up the branching for it
+    void FlatZincSpace::parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
+        assert(elemAnn->isCall("priority_search"));
+        try {
+            // Retrieval of the data
+            AST::Call *call = elemAnn->getCall("priority_search");
+            AST::Array *args = call->getArgs(4);
+            AST::Array *vars = args->a[0]->getArray();
+            AST::Array *annotations = args->a[1]->getArray();
+            // Retrieval of all variables
+            // NOTE that constants or fixed variables cannot be removed, because they act as 
+            // delegates for choosing the branch group to search on next
+			vec<Branching*> va;
+			for (unsigned int i = 0; i < vars->a.size(); i++) {
+                // Removal of constants
+                IntVar* v = NULL;
+                if (vars->a[i]->isInt()) {
+					int value = vars->a[i]->getInt();
+					v = getConstant(value);
+                }
+                else {
+				    v = iv[vars->a[i]->getIntVar()];
+                }
+				va.push(v);
+			}
+            // Create a new priority branch group and add to branching
+            PriorityBranchGroup * priorityBranching = new PriorityBranchGroup(va, ann2ivarsel(args->a[2]));
+            // Parse search annotations
+            int nbChildSearchAnnotations = 0;
+            parseSolveAnn(annotations, priorityBranching, nbChildSearchAnnotations);
+            if (vars->a.size() != nbChildSearchAnnotations)
+                throw FlatZinc::Error("Type error in priority_search annotation", "Variable and annotation array must have the same size");
+            if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
+                if (s->s == "all") so.nof_solutions = 0;
+            }
+            branching->add(priorityBranching);
+            nbNonEmptySearchAnnotations++;
+	    } 
+        catch (AST::TypeError& e) {
+            throw FlatZinc::Error("Type error in priority_search annotation", e.what());
+        }
+    }
+
+    void FlatZincSpace::parseSolveAnnAux(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
+        if (elemAnn->isCall("int_search")) {
+            parseSolveAnnIntSearch(elemAnn, branching, nbNonEmptySearchAnnotations);
+        }
+        else if (elemAnn->isCall("bool_search")) {
+            parseSolveAnnBoolSearch(elemAnn, branching, nbNonEmptySearchAnnotations);
+        }
+        else if (elemAnn->isCall("priority_search")) {
+            parseSolveAnnPrioritySearch(elemAnn, branching, nbNonEmptySearchAnnotations);
+        }
+        else {
+            throw FlatZinc::Error("Error in search annotation", "Unknown search annotation");
+        }
+    }
+	
+    // Users should add search annotation with (core vars, default, default) even if they know nothing
+
+    // Entry function for parsing the solve annotation
+    void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
+        int nbNonEmptySearchAnnotations = 0;
+        try {
+            // Parse the search annotation
+            parseSolveAnn(ann, engine.branching, nbNonEmptySearchAnnotations);
+        } 
+        catch (FlatZinc::Error& e) {
+            cerr << "% " << e.toString() << ". Ignore search annotation!" << endl;
+            // Removal of successful parsed parts of the search annotation
+            engine.branching = new BranchGroup();
+            // Reset counter
+            nbNonEmptySearchAnnotations = 0;
+        }
+        // Check whether a search was specified
+        if (nbNonEmptySearchAnnotations == 0) {
 			if (!so.vsids) {
 				so.vsids = true;
 				engine.branching->add(&sat);
 			}
 		}
-	}
+    }
+
+    void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching, int & nbNonEmptySearchAnnotations) {
+	    if (ann) {
+            for (unsigned int i = 0; i < ann->a.size(); i++) {
+                if (ann->a[i]->isCall("seq_search")) {
+                    // Get the call
+				    AST::Call* c = ann->a[i]->getCall();
+                    // Create a new branch group and add to the branching
+                    BranchGroup* newBranching = new BranchGroup();
+                    branching->add(newBranching);
+                    if (c->args->isArray()) {
+                        // Parse annotation and add to the newly created branching
+                        int nbChildSearchAnnotations = 0;
+                        parseSolveAnn(c->args->getArray(), newBranching, nbChildSearchAnnotations);
+                        if (nbChildSearchAnnotations > 0)
+                            nbNonEmptySearchAnnotations++;
+                    }
+                    else {
+                        // Parse annotation and add to the newly created branching
+                        parseSolveAnnAux(c->args, newBranching, nbNonEmptySearchAnnotations);
+                    }
+                }
+                else {
+                    // Parse annotation and add to the branching
+                    parseSolveAnnAux(ann->a[i], branching, nbNonEmptySearchAnnotations);
+                }
+            }
+        }
+    }
+
 
 	void FlatZincSpace::fixAllSearch() {
 		vec<Branching*> va;

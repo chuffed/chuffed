@@ -27,23 +27,39 @@ double BranchGroup::getScore(VarBranch vb) {
 }
 
 DecInfo* BranchGroup::branch() {
-	// If we're working on a group and it's not finished, continue there
-	if (cur >= 0 && !x[cur]->finished()) return x[cur]->branch();
+    // Check whether current branching group has finished,
+    // if not yet then continue search on this group
+	if (cur >= 0 && !x[cur]->finished()) 
+        return x[cur]->branch();
 
-//	printf("bra");
+    /* Find the next branching group to branch on */
 
-	// Need to find new group
+	// Special case of input order selection
 	if (var_branch == VAR_INORDER) {
 		int i = 0;
 		while (i < x.size() && x[i]->finished()) i++;
 		if (i == x.size()) {
-//			assert(is_top_level_branching);
 			return NULL;
 		}
 		if (!terminal) cur = i;
 		return x[i]->branch();
 	}
+    // Special case of random order selection
+    if (var_branch == VAR_RANDOM) {
+        moves.clear();
+        for (int i = 0; i < x.size(); i++) {
+            if (!x[i]->finished())
+                moves.push(i);
+        }
+        if (moves.size() == 0)
+            return NULL;
+        int best_i = moves[ rand() % moves.size() ];
+        if (!terminal)
+            cur = best_i;
+        return x[best_i]->branch();
+    }
 
+    // All other selection criteria
 	double best = -1e100;
 	moves.clear();
 	for (int i = 0; i < x.size(); i++) {
@@ -58,14 +74,11 @@ DecInfo* BranchGroup::branch() {
 		}
 	}
 	if (moves.size() == 0) {
-//		assert(is_top_level_branching);
 		return NULL;
 	}
 	int best_i = moves[0];
+    // Random selection of best move
 	if (so.branch_random) best_i = moves[rand()%moves.size()];
-
-//	printf("best = %.2f\n", best);
-//	printf("%d: %d ", engine.decisionLevel(), best_i);
 
 	if (!terminal) cur = best_i;
 	return x[best_i]->branch();
@@ -92,8 +105,8 @@ BranchGroup* createBranch(vec<Branching*> x, VarBranch var_branch, ValBranch val
 }
 
 
-PriorityBranchGroup::PriorityBranchGroup(vec<Branching*>& x, VarBranch vb) :
-	decisionVars(x), var_branch(vb), fin(0), cur(-1) {}
+PriorityBranchGroup::PriorityBranchGroup(vec<Branching*>& _x, VarBranch vb) 
+    : BranchGroup(_x, vb) {}
 
 bool PriorityBranchGroup::finished() {
 	if (fin) return true;
@@ -106,18 +119,21 @@ bool PriorityBranchGroup::finished() {
 
 double PriorityBranchGroup::getScore(VarBranch vb) {
 	double sum = 0;
-	for (int i = 0; i < decisionVars.size(); i++) {
-		sum += decisionVars[i]->getScore(vb);
+	for (int i = 0; i < x.size(); i++) {
+		sum += x[i]->getScore(vb);
 	}
-	return sum / decisionVars.size();
+	return sum / x.size();
 }
 
 DecInfo* PriorityBranchGroup::branch() {
-	// If we're working on a group and it's not finished, continue there
-	if (cur >= 0 && !annotations[cur]->finished()) return annotations[cur]->branch();
+    // Check whether the current branching group has finished, 
+    // if not yet then continue search with this one
+	if (cur >= 0 && !annotations[cur]->finished())
+        return annotations[cur]->branch();
 
+    /* Select the next branching group */
 
-	// Need to find new group
+    // Special case of input order selection
 	if (var_branch == VAR_INORDER) {
 		int i = 0;
 		while (i < annotations.size() && annotations[i]->finished()) i++;
@@ -127,12 +143,31 @@ DecInfo* PriorityBranchGroup::branch() {
 		if (!terminal) cur = i;
 		return annotations[i]->branch();
 	}
+    // Special case of random order selection
+    if (var_branch == VAR_RANDOM) {
+        moves.clear();
+        for (int i = 0; i < annotations.size(); i++) {
+            if (!annotations[i]->finished()) {
+                moves.push(i);
+            }
+        }
+        if (moves.size() == 0)
+            return NULL;
+        int rand_int = rand();
+        int index = rand_int % moves.size();
 
+        int best_i = moves[rand() % moves.size()];
+        if (!terminal)
+            cur = best_i;
+        return annotations[best_i]->branch();
+    }
+
+    // All other selection strategies
 	double best = -1e100;
 	moves.clear();
 	for (int i = 0; i < annotations.size(); i++) {
 		if (annotations[i]->finished()) continue;
-		double s = decisionVars[i]->getScore(var_branch);
+		double s = x[i]->getScore(var_branch);
 		if (s >= best) {
 			if (s > best) {
 				best = s;
@@ -145,7 +180,8 @@ DecInfo* PriorityBranchGroup::branch() {
 		return NULL;
 	}
 	int best_i = moves[0];
-	if (so.branch_random) best_i = moves[rand()%moves.size()];
+    // Special case of random selection of best moves
+	if (so.branch_random) best_i = moves[rand() % moves.size()];
 
 	if (!terminal) cur = best_i;
 	return annotations[best_i]->branch();

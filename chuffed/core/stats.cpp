@@ -37,6 +37,7 @@ void Engine::printStats() {
 		fprintf(stderr, "%.2fMb base memory usage\n", base_memory);
 		fprintf(stderr, "%.2fMb trail memory usage\n", trail.capacity() * sizeof(TrailElem) / 1048576.0);
 		fprintf(stderr, "%.2fMb peak memory usage\n", memUsed());
+        fprintf(stderr, "%d random seed used\n", so.rnd_seed);
 		if (so.ldsb) fprintf(stderr, "%.2f seconds ldsb time\n", ldsb.ldsb_time);
 		if (so.parallel) master.printStats();
 		fprintf(stderr, "\n");

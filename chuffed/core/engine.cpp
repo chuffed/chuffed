@@ -823,6 +823,13 @@ RESULT Engine::search(const std::string& problemLabel) {
 void Engine::solve(Problem *p, const std::string& problemLabel) {
     problem = p;
 
+    // Setting the random seed
+    if (so.rnd_seed == 0) {
+        so.rnd_seed = time(0);
+    }
+    srand(so.rnd_seed);
+
+
     init();
 
     so.time_out += time(NULL);

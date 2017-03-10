@@ -279,7 +279,6 @@ namespace FlatZinc {
         PriorityBranchGroup* priorityBranch(vec<Branching*> x, AST::Array* ann, VarBranch var_branch);
 
 		/// Parse the solve annotations and create corresponding branchings
-        void parseSolveAnn(AST::Array* ann, BranchGroup *branching);
 		void parseSolveAnn(AST::Array* ann);
 		/// Create final branching that fixes all variables
 		void fixAllSearch();
@@ -311,7 +310,15 @@ namespace FlatZinc {
                 
                 void printDomains(std::ostream& out = std::cout);
                 std::string getDomainsString(void);
-
+    
+    // Private membership functions
+    private:
+		/// Auxiliary functions for parsing the solve annotations and creating corresponding branchings
+        void parseSolveAnn(AST::Array* ann, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
+        void parseSolveAnnAux(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
+        void parseSolveAnnIntSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
+        void parseSolveAnnBoolSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
+        void parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
 	};
 
 	extern FlatZincSpace *s;

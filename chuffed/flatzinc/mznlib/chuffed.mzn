@@ -23,6 +23,9 @@ annotation priority_search(
 % Following variable selection annotations are just place holders until they are
 % included in the MiniZinc distributions.
 
+/** @group annotations.search.varsel Choose a random variable */
+annotation random_order;
+
 /** @group annotations.search.varsel Choose the variable with the smallest largest value in its domain */
 annotation smallest_largest;
 
