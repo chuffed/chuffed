@@ -336,6 +336,10 @@ namespace FlatZinc {
 		void p_int_negate(const ConExpr& ce, AST::Node* ann) {
 			int_negate(getIntVar(ce[0]), getIntVar(ce[1]));
 		}
+		void p_range_size_fzn(const ConExpr& ce, AST::Node* ann) {
+			range_size(getIntVar(ce[0]), getIntVar(ce[1]));
+		}
+
 
 		/* Boolean constraints */
 		void p_bool_CMP(int brt, const ConExpr& ce, AST::Node* ann, int sz) {
@@ -1014,6 +1018,7 @@ namespace FlatZinc {
 				registry().add("int_max", &p_int_max);
 				registry().add("int_abs", &p_abs);
 				registry().add("int_negate", &p_int_negate);
+				registry().add("range_size_fzn", &p_range_size_fzn);
 				registry().add("bool_and", &p_bool_and);
 				registry().add("bool_not", &p_bool_not);
 				registry().add("bool_or", &p_bool_or);

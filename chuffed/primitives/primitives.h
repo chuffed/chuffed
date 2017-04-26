@@ -138,4 +138,9 @@ void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offs
 void array_var_int_element_dom(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
 
 
+// domain.c
+
+// y = |ub(x) - lb(y) + 1|
+void range_size(IntVar* x, IntVar* s);
+
 #endif

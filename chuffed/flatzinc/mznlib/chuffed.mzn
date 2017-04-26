@@ -3,6 +3,19 @@
 % them.
 %------------------------------------------------------------------------------%
 
+
+%------------------------------------------------------------------------------%
+% Range Size of an Integer variable
+
+function var int: range_size(var int: x) = 
+    let {
+        var 1..ub(x) - lb(x) + 1: rs;
+        constraint range_size_fzn(x, rs);
+    } in rs;
+
+predicate range_size_fzn(var int: x, var int: rs);
+
+
 %------------------------------------------------------------------------------%
 % Following search annotation is a place holders until it is includede in the
 % MiniZinc distribution

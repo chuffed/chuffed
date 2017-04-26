@@ -148,6 +148,7 @@ chuffed/primitives/element.cpp
 chuffed/primitives/bool.cpp
 chuffed/primitives/linear.cpp
 chuffed/primitives/arithmetic.cpp
+chuffed/primitives/domain.cpp
 chuffed/primitives/binary.cpp
 chuffed/branching/branching.cpp
 chuffed/core/init.cpp
