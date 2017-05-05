@@ -106,6 +106,8 @@ void int_linear_dom(vec<int>& a, vec<IntVar*>& x, int c);
 
 // y = |x|
 void int_abs(IntVar* x, IntVar* y);
+// z = x ^ y
+void int_pow(IntVar* x, IntVar* y, IntVar* z);
 // z = x * y
 void int_times(IntVar* x, IntVar* y, IntVar* z);
 // z = floor(x / y)

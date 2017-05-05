@@ -312,6 +312,10 @@ namespace FlatZinc {
 		}
 
 		// can specialise
+		void p_int_pow(const ConExpr& ce, AST::Node* ann) {
+			int_pow(getIntVar(ce[0]), getIntVar(ce[1]), getIntVar(ce[2]));    
+		}
+		// can specialise
 		void p_int_times(const ConExpr& ce, AST::Node* ann) {
 			int_times(getIntVar(ce[0]), getIntVar(ce[1]), getIntVar(ce[2]));    
 		}
@@ -1011,6 +1015,7 @@ namespace FlatZinc {
 				registry().add("int_lin_gt_reif", &p_int_lin_gt_reif);
 				registry().add("int_plus", &p_int_plus);
 				registry().add("int_minus", &p_int_minus);
+				registry().add("int_pow", &p_int_pow);
 				registry().add("int_times", &p_int_times);
 				registry().add("int_div", &p_int_div);
 				registry().add("int_mod", &p_int_mod);
