@@ -75,7 +75,6 @@ void int_abs(IntVar* x, IntVar* y) {
 // z = x ^ y
 
 int64_t my_pow(const int64_t base, const int64_t exponent) {
-    printf("my_pow(%lld, %lld)\n", base, exponent);
     assert(exponent >= 0);
     if (exponent == 0)
         return 1;
