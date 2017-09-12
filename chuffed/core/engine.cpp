@@ -17,6 +17,7 @@
 #include <chuffed/ldsb/ldsb.h>
 
 #include <chuffed/flatzinc/flatzinc.h>
+#include <chuffed/core/assume.h>
 
 #ifdef HAS_PROFILER
 #include <submodules/cp-profiler-integration/connector.hpp>
@@ -343,8 +344,12 @@ inline bool Engine::constrain() {
 
     if (so.lazy) {
         Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
-        assumptions.clear();
-        assumptions.push(toInt(p));
+        // GKG: Preserves existing assumptions, but assumes we've reserved
+        // space at the end for the objective bound.
+        if(assumptions.size() == 0)
+          assumptions.push(toInt(p));
+        else
+          assumptions.last() = toInt(p);
     } else {
         // Special-case, since get-lit breaks if lazy is false.
         if (opt_type) { // maximize
@@ -533,6 +538,42 @@ void Engine::toggleVSIDS() {
     }
 }
 
+void Engine::set_assumptions(vec<BoolView>& xs) {
+  // Push the assumptions, then search as usual.
+  assumptions.clear();
+  for(int li = 0; li < xs.size(); li++)
+    assumptions.push(toInt(xs[li].getLit(true)));
+  // constrain will overwrite the last assumption;
+  // make sure there is a placeholder to overwrite.
+  if(opt_var)
+    assumptions.push(toInt(lit_True));
+}
+
+void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
+  vec<Lit> out_nogood;
+  int assump_sz = sat.decisionLevel();
+  assert(assump_sz < engine.assumptions.size());
+
+  Lit q(toLit(engine.assumptions[assump_sz]));
+  assert(sat.value(q) == l_False);
+  
+  // Mark the available assumptions
+  for(int ii = 0; ii < assump_sz; ii++) {
+    assert(sat.value(toLit(engine.assumptions[ii])) == l_True);
+    sat.seen[engine.assumptions[ii]>>1] = 2;
+  }
+
+  // Collect the nogood.
+  pushback_reason([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
+  
+  for(int ii = 0; ii < out_nogood.size(); ii++)
+    xs.push(out_nogood[ii]);
+
+  // Finally, clear the marked assumptions
+  for(int ii = 0; ii < assump_sz; ii++)
+    sat.seen[engine.assumptions[ii]>>1] = 2;
+}
+
 #ifdef HAS_VAR_IMPACT
 vec<int> &Engine::getVarSizes(vec<int> &outVarSizes) const {
 	int const n = vars.size();
@@ -543,7 +584,6 @@ vec<int> &Engine::getVarSizes(vec<int> &outVarSizes) const {
 	return outVarSizes;
 }
 #endif
-
 
 RESULT Engine::search(const std::string& problemLabel) {
     unsigned int starts = 1;

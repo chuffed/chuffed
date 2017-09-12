@@ -271,6 +271,8 @@ namespace FlatZinc {
         /// Indicates whether a Boolean variable is introduced by mzn2fzn
         std::vector<bool> bv_introduced;
 
+        vec<BoolView> assumptions;
+
         AST::Array* output;
 
         /// Construct problem with given number of variables

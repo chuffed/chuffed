@@ -21,6 +21,7 @@ class Problem;
 class Propagator;
 class PseudoProp;
 class TrailElem;
+class BoolView;
 
 //-----
 
@@ -113,6 +114,9 @@ public:
     // Interface methods
     RESULT search(const std::string& problemLabel = "chuffed");
     void solve(Problem *p, const std::string& problemLabel = "chuffed");
+
+    void set_assumptions(vec<BoolView>& xs);
+    void retrieve_assumption_nogood(vec<BoolView>& xs);
 
     // Stats
     void printStats();

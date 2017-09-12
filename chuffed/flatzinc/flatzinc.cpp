@@ -373,6 +373,12 @@ namespace FlatZinc {
                         CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
                     }
                     if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt()); }
+                } else if (ann->a[i]->isCall("assume")) {
+                    AST::Call *call = flatAnn[i]->getCall("assume");
+                    AST::Array *vars = call->args->getArray();
+                    for(int ii = 0; ii < vars->a.size(); ii++) {
+                        assumptions.push(bv[vars->a[ii]->getBoolVar()]);
+                    }
                 } else if (ann->a[i]->isCall("seq_search")) {
                     // Get the call
                     AST::Call* c = ann->a[i]->getCall();
