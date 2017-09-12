@@ -326,6 +326,7 @@ namespace FlatZinc {
 
     // Entry function for parsing the solve annotation
     void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
+        assumptions.clear();
         int nbNonEmptySearchAnnotations = 0;
         try {
             // Parse the search annotation
