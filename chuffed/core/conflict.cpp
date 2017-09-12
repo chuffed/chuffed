@@ -6,6 +6,7 @@
 #include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
 #include <chuffed/ldsb/ldsb.h>
+#include <chuffed/core/assume.h>
 
 #include <iostream>
 #include <fstream>
@@ -399,6 +400,61 @@ void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
 	for (int i = 0; i < removed.size(); i++) seen[var(removed[i])] = 0;
 
 	pushback_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
+}
+
+template<class P>
+void push_back(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
+  assert(sat.value(p) == l_False);
+  
+  out_nogood.push(~p);
+
+  vec<Lit> removed;
+  assert(!sat.reason[var(p)].isLazy()); 
+  Clause* cp = sat.getExpl(~p);
+  if(!cp) {
+    // Two possibilities here: either p is false at the root,
+    // or somebody pushed inconsistent assumptions.
+    // * This may happen if, in an optimization problem, the user
+    // * provided an objective lower bound which is achieved.
+    if(sat.trailpos[var(p)] >= 0) {
+      // If p and ~p are assumptions, we just return a
+      // tautological clause.
+      out_nogood.push(p);
+    }
+    return;
+  } else {
+    // Otherwise, fill in the reason for ~p...
+    for(int i = 1; i < cp->size(); i++) {
+      Lit q((*cp)[i]);
+      out_nogood.push(q);
+      // Only look at the first bit of seen, because
+      // we're using the second bit for assumption-ness.
+      sat.seen[var(q)] |= 1;
+    }
+    // then push it back to assumptions.
+    for(int i = 1; i < out_nogood.size(); i++) {
+      Lit q(out_nogood[i]);
+      if(is_extractable(q)) continue;
+      assert(!sat.reason[var(p)].isLazy());
+      Clause& c = *sat.getExpl(~q);
+      assert(&c != nullptr);
+      removed.push(q);
+      out_nogood[i] = out_nogood.last();
+      out_nogood.pop();
+      --i;
+
+      for(int j = 1; j < c.size(); j++) {
+        Lit r(c[j]);
+        if(!(sat.seen[var(r)]&1)) {
+          sat.seen[var(r)] = true;
+          out_nogood.push(r);
+        }
+      }
+    }
+  }
+  // Clear the 'seen' bit.
+	for (int i = 0; i < removed.size(); i++) sat.seen[var(removed[i])] &= (~1);
+  for (int i = 1; i < out_nogood.size(); i++) sat.seen[var(out_nogood[i])] &= (~1);
 }
 
 void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
