@@ -564,7 +564,8 @@ void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
   }
 
   // Collect the nogood.
-  pushback_reason([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
+  // pushback_reason([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
+  pushback_reason_lazy([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
   
   for(int ii = 0; ii < out_nogood.size(); ii++)
     xs.push(out_nogood[ii]);
