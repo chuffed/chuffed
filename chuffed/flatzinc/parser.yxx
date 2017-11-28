@@ -1627,7 +1627,28 @@ non_array_expr_list_head :
 /********************************/
 
 solve_expr:
-        ID
+        INT_LIT
+        {
+            ParserState *pp = static_cast<ParserState*>(parm);
+            // Create a new variable in the parser and append at the end
+            const int i = pp->intvars.size();
+            const std::string objname = "X_INTRODUCED_CHUFFEDOBJ";
+            pp->intvarTable.put(objname, i);
+            pp->intvars.push_back(varspec(objname,
+                new IntVarSpec($1,false,true,false)));
+            if (pp->fg != NULL) {
+                // Add a new IntVar to the FlatZincSpace if it was already created
+                try {
+                    pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
+                    IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
+                    intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                } catch (FlatZinc::Error& e) {
+                    yyerror(pp, e.toString().c_str());
+                }
+            }
+            $$ = i;
+        }
+    |   ID
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
             int tmp = -1;
