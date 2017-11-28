@@ -82,6 +82,12 @@ namespace FlatZinc {
     }
 
     void FlatZincSpace::newIntVar(IntVarSpec* vs) {
+        // Resizing of the vectors if required
+        if (intVarCount == iv.size()) {
+            const int newSize = 2 * intVarCount;
+            iv.growTo(newSize);
+            iv_introduced.resize(newSize);
+        }
         bool considerIntroduced = false;
         if (so.use_var_is_introduced) considerIntroduced = vs->introduced;
         else                          considerIntroduced = !vs->output;
@@ -117,6 +123,12 @@ namespace FlatZinc {
     }
 
     void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
+        // Resizing of the vectors if required
+        if (boolVarCount == iv.size()) {
+            const int newSize = 2 * boolVarCount;
+            bv.growTo(newSize);
+            bv_introduced.resize(newSize);
+        }
         bool considerIntroduced = false;
         if (so.use_var_is_introduced) considerIntroduced = vs->introduced;
         else                          considerIntroduced = !vs->output;
@@ -360,23 +372,23 @@ namespace FlatZinc {
 
     void FlatZincSpace::fixAllSearch() {
         vec<Branching*> va;
-        for (int i = 0; i < iv.size(); i++) {
+        for (int i = 0; i < intVarCount; i++) {
             if (iv_introduced[i]) continue;
             IntVar* v = iv[i];
             if (v->isFixed()) continue;
             va.push(v);
         }
-        for (int i = 0; i < bv.size(); i++) {
+        for (int i = 0; i < boolVarCount; i++) {
             if (bv_introduced[i]) continue;
             va.push(new BoolView(bv[i]));
         }
-        for (int i = iv.size(); i--; ) {
+        for (int i = intVarCount; i--; ) {
             if (!iv_introduced[i]) continue;
             IntVar* v = iv[i];
             if (v->isFixed()) continue;
             va.push(v);
         }
-        for (int i = 0; i < bv.size(); i++) {
+        for (int i = 0; i < boolVarCount; i++) {
             if (!bv_introduced[i]) continue;
             va.push(new BoolView(bv[i]));
         }
