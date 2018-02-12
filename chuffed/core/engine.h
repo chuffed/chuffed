@@ -167,6 +167,16 @@ static inline void trailChange(T& v, const U u) {
     v = u;
 }
 
+// Like trailChange, but don't actually update the value.
+template<class T>
+static inline void trailSave(T& v) {
+  int *pt = (int*) &v;
+  engine.trail.push(TrailElem(pt, sizeof(T)));
+  if (sizeof(T) == 8) {
+    engine.trail.push(TrailElem(pt+1, sizeof(T)));
+  }
+}
+
 
 
 //------
