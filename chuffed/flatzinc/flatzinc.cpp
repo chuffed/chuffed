@@ -24,6 +24,7 @@
 #include <chuffed/flatzinc/flatzinc.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/branching/branching.h>
+#include <chuffed/branching/warm-start.h>
 
 
 using namespace std;
@@ -380,6 +381,14 @@ namespace FlatZinc {
                     for(int ii = 0; ii < vars->a.size(); ii++) {
                         assumptions.push(bv[vars->a[ii]->getBoolVar()]);
                     }
+                } else if (ann->a[i]->isCall("warm_start")) {
+                    vec<Lit> decs;
+                    AST::Call *call = flatAnn[i]->getCall("warm_start");
+                    AST::Array* vars = call->args->getArray();
+                    for(int ii = 0; ii < vars->a.size(); ii++) {
+                        decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
+                    }
+                    engine.branching->add(new WarmStartBrancher(decs));
                 } else if (ann->a[i]->isCall("seq_search")) {
                     // Get the call
                     AST::Call* c = ann->a[i]->getCall();
