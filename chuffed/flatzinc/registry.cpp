@@ -807,6 +807,15 @@ namespace FlatZinc {
 			NOT_SUPPORTED;
 		}
 
+    void val_prec(const ConExpr& ce, AST::Node* ann) {
+      vec<IntVar*> iv0; arg2intvarargs(iv0, ce[2]);
+      value_precede_int(ce[0]->getInt(), ce[1]->getInt(), iv0);
+    }
+    void val_prec_seq(const ConExpr& ce, AST::Node* ann) {
+      vec<IntVar*> iv0; arg2intvarargs(iv0, ce[0]);
+      value_precede_seq(iv0);
+    }
+
 		void p_bool_sum_CMP(IntRelType irt, const ConExpr& ce, AST::Node* ann) {
 			vec<BoolView> bv; arg2BoolVarArgs(bv, ce[0]);
 			bool_linear(bv, irt, getIntVar(ce[1]));
@@ -1135,6 +1144,8 @@ namespace FlatZinc {
 				registry().add("values_interchange", &val_sym);
 				registry().add("variables_sequences", &var_seq_sym);
 				registry().add("values_sequences", &val_seq_sym);
+				registry().add("chuffed_value_precede", &val_prec);
+				registry().add("value_precede_seq", &val_prec_seq);
 
 /*	    
 				registry().add("all_different_int", &p_distinct);

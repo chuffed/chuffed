@@ -95,6 +95,7 @@ add_library(chuffed
   chuffed/globals/edit_distance.cpp
   chuffed/globals/EdExplFinder.cpp
   chuffed/globals/EdExplFinder.h
+  chuffed/globals/value-precede.cpp
   chuffed/mdd/MDD.cpp
   chuffed/mdd/mdd_prop.cpp
   chuffed/mdd/mdd_to_lgraph.cpp

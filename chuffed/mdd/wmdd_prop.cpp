@@ -1370,7 +1370,7 @@ void WMDDProp::minimize_expln(int var, int val, int maxC)
         {
           int eid = node.out->edges[ei];
           Edge& e(edges[eid]);
-          if(!vals[e.val].status&VAL_LOCKED)
+          if(!(vals[e.val].status&VAL_LOCKED))
           {
             if(!nodes[e.end].status)
             {

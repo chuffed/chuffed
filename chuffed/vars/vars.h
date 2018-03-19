@@ -29,6 +29,14 @@ enum PreferredVal {
 	PV_MEDIAN
 };
 
+// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
+enum LitRel {
+  LR_NE = 0,
+  LR_EQ = 1,
+  LR_GE = 2,
+  LR_LE = 3
+};
+
 class Var : public Branching {
 public:
 	virtual VarType getType() = 0;

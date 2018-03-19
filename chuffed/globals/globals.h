@@ -85,4 +85,7 @@ void
 edit_distance(int max_char, vec<int> &insertion_cost, vec<int> &deletion_cost, vec<int> &substitution_cost,
               vec<IntVar *> &seq1, vec<IntVar *> &seq2, IntVar *ed);
 
+// value-precede.c
+void value_precede_int(int s, int t, vec<IntVar*>& x);
+void value_precede_seq(vec<IntVar*>& x);
 #endif
