@@ -115,4 +115,13 @@ static T** new2d(int n, int m) {
 	return a;
 }
 
+template<class T, class U>
+  T conv(const U& x) {
+  static_assert(sizeof(T) == sizeof(U),
+		"Must bit-cast between values of equal size.");
+  T ret;
+  memcpy(&ret, &x, sizeof(U));
+  return ret;
+}
+
 #endif
