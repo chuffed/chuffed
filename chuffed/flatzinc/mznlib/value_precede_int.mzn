@@ -17,5 +17,5 @@ predicate value_precede_int_dec(int: s, int: t, array[int] of var int: x) =
     );
 
 predicate value_precede_int(int: s, int: t, array [int] of var int: x) =
-  %chuffed_value_precede(s, t, x);
-  value_precede_int_dec(s, t, x);
+  chuffed_value_precede(s, t, x);
+  %value_precede_int_dec(s, t, x);
