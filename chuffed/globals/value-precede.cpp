@@ -18,20 +18,22 @@ class value_precede : public Propagator {
 
   Clause* ex_s(int si, int ti) {
     Clause* r(Reason_new(ti+1));
-    Lit* p(&((*r)[1]));
-    for(int ii = 0; ii < si; ++ii, ++p)
-      (*p) = xs[ii]->getLit(s, LR_EQ);
-    for(int ii = si+1; ii < ti; ++ii, ++p)
-      (*p) = xs[ii]->getLit(s, LR_EQ);
-    (*p) = xs[ti]->getLit(t, LR_NE);
+    int jj = 1;
+    for(int ii = 0; ii < si; ++ii, ++jj)
+      (*r)[jj] = xs[ii]->getLit(s, LR_EQ);
+    for(int ii = si+1; ii < ti; ++ii, ++jj)
+      (*r)[jj] = xs[ii]->getLit(s, LR_EQ);
+    (*r)[jj++] = xs[ti]->getLit(t, LR_NE);
+    assert(jj == ti+1);
     return r;
   }
 
   Clause* ex_t(int ti) {
     Clause* r(Reason_new(ti+1));
-    for(int ii = 0; ii < ti; ++ii) {
+    int jj = 1;
+    for(int ii = 0; ii < ti; ++ii, ++jj) {
       assert(!xs[ii]->indomain(s));
-      (*r)[ii+1] = xs[ii]->getLit(s, LR_EQ);
+      (*r)[jj] = xs[ii]->getLit(s, LR_EQ);
     }
     return r;
   }
@@ -40,7 +42,7 @@ public:
     : s(_s), t(_t), satisfied(0) {
     // Find the first possible occurrence of s.
     int ii = 0;
-    /*
+    /* // Can't do remVal before initialization.
     for(; ii < vs.size(); ii++) {
       if(vs[ii]->remValNotR(t)) {
         if(!vs[ii]->remVal(t)) TL_FAIL();
@@ -51,7 +53,8 @@ public:
     */
 
     // Now copy the remaining values.
-    first_s = xs.size()+1;
+    bool t_seen = false;
+    first_s = 0;
     for(; ii < vs.size(); ii++) {
       IntVar* x(vs[ii]);
       if(x->isFixed() && x->getVal() == s)
@@ -60,21 +63,21 @@ public:
       if(!x->indomain(s) && !x->indomain(t))
         continue;
       x->specialiseToEL();
-      BoolView b(x->getLit(s, LR_EQ));
+      // BoolView b(x->getLit(s, LR_EQ));
       // b.attach(this, (xs.size()<<1), EVENT_U);
       x->attach(this, (xs.size()<<1), EVENT_C);
       x->attach(this, (xs.size()<<1)|1, EVENT_F);
       xs.push(x);
 
       if(x->isFixed() && x->getVal() == t) {
-        first_t = xs.size()-1;
+        t_seen = true;
         break;
       }
     }
-    if(xs.size() < first_t) first_t = xs.size()+1;
+    first_t = xs.size() - t_seen;
 
     int si = 1;
-    for(; si < vs.size(); ++si) {
+    for(; si < xs.size(); ++si) {
       if(xs[si]->indomain(s))
         break;
     }
@@ -98,13 +101,18 @@ public:
     int sz = xs.size();
     int si = first_s;
     // Update the first occurrence
-    for(; si < sz; ++si) {
+    for(; si < first_t; ++si) {
       if(xs[si]->remValNotR(t)) {
         if(!xs[si]->remVal(t, Reason(prop_id, conv<int, tag_t>(t_tag(si)))))
           return false;
       }
       if(xs[si]->indomain(s))
         break;
+    }
+    if(si == sz) {
+      // Reached the end.
+      satisfied = true;
+      return true;
     }
     if(si >= first_t) {
       Clause* r(ex_t(first_t));
