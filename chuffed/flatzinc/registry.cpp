@@ -1145,7 +1145,7 @@ namespace FlatZinc {
 				registry().add("variables_sequences", &var_seq_sym);
 				registry().add("values_sequences", &val_seq_sym);
 				registry().add("chuffed_value_precede", &val_prec);
-				registry().add("value_precede_seq", &val_prec_seq);
+				registry().add("chuffed_seq_precede", &val_prec_seq);
 
 /*	    
 				registry().add("all_different_int", &p_distinct);

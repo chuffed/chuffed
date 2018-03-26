@@ -115,9 +115,11 @@ public:
       return true;
     }
     if(si >= first_t) {
-      Clause* r(ex_t(first_t));
-      (*r)[0] = xs[first_t]->getLit(t, LR_NE);
-      sat.confl = r;
+      if(so.lazy) {
+        Clause* r(ex_t(first_t));
+        (*r)[0] = xs[first_t]->getLit(t, LR_NE);
+        sat.confl = r;
+      }
       return false;
     }
     if(si > first_s) first_s = si;
@@ -299,6 +301,7 @@ forward_done:
       if(xs[ii]->indomain(lval-1)) {
         assert(first[lval-1] <= ii);
         if(first[lval-1] == ii) {
+            assert(lval <= 1 || xs[ii]->getMax() == lval-1);
             if(xs[ii]->setMinNotR(lval-1)) {
             if(!xs[ii]->setMin(lval-1, Reason(prop_id, lb_tag(ii, lval-1))))
               return false;
@@ -324,8 +327,333 @@ forward_done:
   vec<Tint> limit; // The latest point at which we must have achieved k.
 };
 
+// Incremental version of the seq_precede_chain propagator.
+#if 1
+class seq_precede_inc : public Propagator {
+  Clause* ex_ub(int xi, int k) {
+    Clause* r = Reason_new(xi+1);
+    
+    // One of the predecessors must be (at least) k.
+    for(int ii = 0; ii < xi; ++ii) {
+      (*r)[ii+1] = xs[ii]->getLit(k, LR_GE);
+    }
+    return r;
+  }
+
+  // Need to construct a chain.
+  Clause* ex_lb(int xi, int k) {
+    vec<Lit> r; r.push();
+    // Three components.
+    // Why can't the frontier already be above k?
+    for(int ii = 0; ii < xi; ii++) {
+      r.push(xs[ii]->getLit(k, LR_GE));
+    }
+    // Why can't the frontier get higher afterwards?
+    int l = k;
+    int ii = xi+1;
+    for(; xs[ii]->getMin() <= l; ++ii) {
+      if(xs[ii]->indomain(l)) {
+        ++l;
+      } else {
+        r.push(~xs[ii]->getLit(l, LR_EQ));
+      }
+    }
+    r.push(~(xs[ii]->getLit(l, LR_LE)));
+    return Reason_new(r);
+  }
+
+  struct tag_t {
+    tag_t(void) : flag(0), x(0), k(0) { }
+    tag_t(bool _flag, int _x, int _k)
+      : flag(_flag), x(_x), k(_k) { }
+
+	  unsigned flag : 1 ;
+	  unsigned x : 15;
+	  unsigned k : 16;
+  };
+  int lb_tag(int x, int k) {
+    return conv<int, tag_t>(tag_t(0, x, k));
+  }
+  int ub_tag(int x, int k) {
+    return conv<int, tag_t>(tag_t(1, x, k));
+  }
+
+  Clause* explain(Lit p, int inf_id) {
+    tag_t t(conv<tag_t, int>(inf_id));
+    if(t.flag) {
+      // Upper bound  
+      return ex_ub(t.x, t.k);
+    } else {
+      // Lower bound
+      return ex_lb(t.x, t.k);
+    }
+  }
+  
+public:
+  inline bool is_first(int ii) {
+    return first[first_val[ii]] == ii;
+  }
+  inline bool is_limit(int ii) {
+    return limit[limit_val[ii]] == ii;
+  }
+
+	void wakeup(int ii, int c) {
+    // How do we know when to wake up?
+    if(is_first(ii) && xs[ii]->getMax() < first_val[ii]) {
+      first_change.push(first_val[ii]);
+      pushInQueue();
+    }
+    int m = xs[ii]->getMin();
+    if(ii < limit[m]) {
+      if(max_def < m)
+        max_def = m;
+      limit_change.push(m);
+      limit[m] = ii;
+      limit_val[ii] = m;
+      pushInQueue();
+    }
+    if(is_limit(ii) && !xs[ii]->indomain(limit_val[ii])) {
+      limit_change.push(limit_val[ii]);
+      pushInQueue();
+    }
+  }
+
+  void clearPropState(void) {
+    in_queue = false;
+    first_change.clear();
+    limit_change.clear();
+  }
+  
+  void log_state(void) {
+    fprintf(stderr, "UB: [");
+    if(xs.size() > 0) {
+      fprintf(stderr, "%d", xs[0]->getMin());
+      for(int ii = 1; ii < xs.size(); ii++)
+        fprintf(stderr,", %d", xs[ii]->getMin());
+    }
+    fprintf(stderr,"]\n");
+
+    fprintf(stderr, "FS: [");
+    if(first.size() > 0) {
+      fprintf(stderr, "%d", first[0].v);
+      for(int ii = 1; ii < first.size(); ii++)
+        fprintf(stderr, ", %d", first[ii].v);
+    }
+    fprintf(stderr, "]\n");
+
+    fprintf(stderr, "LM: [");
+    if(limit.size() > 0) {
+      fprintf(stderr, "%d", limit[0].v);
+      for(int ii = 1; ii < limit.size(); ii++)
+        fprintf(stderr, ", %d", limit[ii].v);
+    }
+    fprintf(stderr, "]\n");
+
+    fprintf(stderr, "FV: [");
+    if(first_val.size() > 0) {
+      fprintf(stderr, "%d", first_val[0].v);
+      for(int ii = 1; ii < first_val.size(); ii++)
+        fprintf(stderr, ", %d", first_val[ii].v);
+    }
+    fprintf(stderr, "]\n");
+
+    fprintf(stderr, "LV: [");
+    if(limit_val.size() > 0) {
+      fprintf(stderr, "%d", limit_val[0].v);
+      for(int ii = 1; ii < limit_val.size(); ii++)
+        fprintf(stderr, ", %d", limit_val[ii].v);
+    }
+    fprintf(stderr, "]\n");
+
+  }
+
+  void check_firsts(void) {
+    for(int ii = 1; ii < first.size(); ii++) {
+      for(int jj = 0; jj < first[ii]; ++jj) {
+        assert(xs[jj]->getMax() < ii);
+      }
+    }
+  }
+
+  bool propagate(void) {
+    // fprintf(stderr, "Running value-precede-chain.\n");
+#if 0
+    fprintf(stderr, "BEFORE value-precede-chain:\n");
+    log_state();
+#endif
+    // fprintf(stderr, "Queues: [%d, %d].\n", first_change.size(), limit_change.size());
+    for(int fi = 0; fi < first_change.size(); fi++) {
+      if(!repair_upper(first_change[fi]))
+        return false;
+    }
+    first_change.clear();
+
+    for(int li = 0; li < limit_change.size(); li++) {
+      if(!repair_limit(limit_change[li]))
+        return false;
+    }
+    limit_change.clear();
+    /*
+    // check_firsts();
+    for(int ii = 1; ii < xs.size(); ii++) {
+      if(!repair_upper(ii))
+        return false;
+      // check_firsts();
+    }
+    // check_firsts();
+    for(int ii = max_def; ii > 0; ii--) {
+      if(!repair_limit(ii))
+        return false;
+    }
+    */
+
+    return true;
+  }
+
+  seq_precede_inc(vec<IntVar*>& _xs)
+    : xs(_xs), max_def(0), max_val(xs.size()),
+      first(xs.size()+1, 0), limit(xs.size()+1, xs.size()),
+      first_val(xs.size(), 0), limit_val(xs.size(), xs.size()) {
+    int sz = xs.size();
+    priority = 3;
+
+    int M = 1;
+    // Initialize firsts.
+    for(int ii = 0; ii < sz; ii++) {
+      if(xs[ii]->setMaxNotR(M) && !xs[ii]->setMax(M)) TL_FAIL();  
+      if(xs[ii]->indomain(M)) {
+        first[M] = ii;
+        first_val[ii] = M;
+        ++M;
+      }
+      xs[ii]->attach(this, ii, EVENT_C);
+    }
+    max_val = M-1;
+
+    // check_firsts();
+
+    // Initialize lasts. 
+    int m = 0;
+    int k = 0;
+    for(int ii = sz-1; ii >= 0; --ii) {
+      int mx = xs[ii]->getMin();
+      if(mx > k) {
+        k = mx;
+        if(mx > m)
+          m = mx;
+      }
+      if(k && xs[ii]->indomain(k)) {
+        limit[k] = ii;
+        limit_val[ii] = k;
+        // Definite occurrence
+        if(first[k] == ii && xs[ii]->setMinNotR(k)) {
+          if(!xs[ii]->setMin(k))
+            TL_FAIL();
+        }
+        --k;
+      }
+    }
+    max_def = m;
+  }
+
+  bool repair_upper(int k) {
+    if(k >= max_val) return true;
+    unsigned int ii = first[k];
+    unsigned int lim = limit[k+1];
+    for(; ii < lim; ++ii) {
+      if(xs[ii]->setMaxNotR(k)) {
+        if(!xs[ii]->setMax(k, Reason(prop_id, ub_tag(ii, k))))
+          return false;
+      }
+      if(xs[ii]->indomain(k)) {
+        // Found the earliest occurrence of k; update.
+        first[k] = ii;
+        first_val[ii] = k;
+
+        // Check if we need to continue with k+1
+        ++k;
+        // ++ii;
+        if(k == max_val || ii < first[k])
+          return true;
+        lim = limit[k+1];
+      }
+    }
+    // We've either tightened the maximum value, or
+    // the first occurrence of k is too late.
+    if(ii < xs.size()) {
+      // Failure: no occurrence of 
+      if(so.lazy) {
+        vec<Lit> ex;
+        for(int xi = 0; xi < ii; ++xi) {
+          assert(xs[xi]->getMax() < k);
+          ex.push(xs[xi]->getLit(k, LR_GE));
+        }
+        for(; xs[ii]->getMin() <= k; ++ii) {
+          if(xs[ii]->indomain(k)) {
+            ++k;
+          } else {
+            ex.push(xs[ii]->getLit(k, LR_EQ));
+          }
+        }
+        ex.push(xs[ii]->getLit(k, LR_LE));
+        sat.confl = Reason_new(ex);
+      }
+      return false;
+    }
+    // No supports for k.
+    assert(k < max_val);
+    max_val = k;
+    return true;
+  }
+
+  // Always repair limit after upper bounds,
+  // so we detect infeasibility the easy way.
+  bool repair_limit(int k) {
+    int ii = limit[k];
+    for(; ii >= 0; --ii) {
+      // No change
+      if(limit[k] < ii)
+        return true;
+      assert(ii >= first[k]);
+      if(xs[ii]->indomain(k)) {
+        limit[k] = ii;
+        limit_val[ii] = k;
+        if(ii == first[k]) {
+          // First and last occurrences coincide.
+          if(xs[ii]->setMinNotR(k)) {
+            if(!xs[ii]->setMin(k, Reason(prop_id, lb_tag(ii, k))))
+              return false;
+          }
+        }
+        k--;
+      }
+    }
+    return true;
+  }
+
+	// Parameters
+  vec<IntVar*> xs;
+
+  // Persistent state
+  vec<Tint> first; // First occurrence of each ordered value
+  vec<Tint> limit; // The latest point at which we must have achieved k.
+
+  vec<Tint> first_val; // If this variable is a first, what is the value value?
+  vec<Tint> limit_val; // Similarly, if this is a limit, to what value?
+  
+  Tint max_val; // Largest value which could occur
+  Tint max_def; // Largest value which definitely occurs
+
+  // Transient state
+  vec<int> first_change;
+  vec<int> limit_change;
+};
+#endif
+
+
 void value_precede_seq(vec<IntVar*>& xs) {
-  new seq_precede_chain(xs);
+  // new seq_precede_chain(xs);
+  new seq_precede_inc(xs);
 }
 
 void value_precede_int(int s, int t, vec<IntVar*>& xs) {
