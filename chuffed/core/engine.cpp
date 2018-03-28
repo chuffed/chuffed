@@ -346,6 +346,7 @@ inline bool Engine::constrain() {
         assumptions.clear();
         assumptions.push(toInt(p));
     } else {
+        // Special-case, since get-lit breaks if lazy is false.
         if (opt_type) { // maximize
             if(!opt_var->setMin(best_sol+1)) return false;
         } else {
