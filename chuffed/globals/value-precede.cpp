@@ -404,7 +404,8 @@ public:
       pushInQueue();
     }
     int m = xs[ii]->getMin();
-    if(ii < limit[m]) {
+    // Can probably actually relax this to m > 1.
+    if(m > 0 && ii < limit[m]) {
       if(max_def < m)
         max_def = m;
       limit_change.push(m);
