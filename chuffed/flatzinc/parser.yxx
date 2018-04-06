@@ -366,6 +366,7 @@ namespace FlatZinc {
         // yydebug = 1;
         yyparse(&pp);
         FlatZinc::s->output = pp.getOutput();
+        FlatZinc::s->setOutput();
         
         if (pp.yyscanner)
             yylex_destroy(pp.yyscanner);
