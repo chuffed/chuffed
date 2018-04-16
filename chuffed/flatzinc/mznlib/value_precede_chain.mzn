@@ -36,7 +36,7 @@ predicate value_precede_chain(array [int] of int: vs, array [int] of var int: xs
     else
       if forall (i in 2..N) (vs_1d[i-1]+1 = vs_1d[i])
           /\ vs_1d[N] >= M then
-        chuffed_seq_precede(xs)
+        chuffed_seq_precede([x - lb_array(vs) + 1 | x in xs])
       else
         % value_precede_chain_dec(vs_1d, xs)
         chuffed_seq_precede(rank_of_array(vs, xs))

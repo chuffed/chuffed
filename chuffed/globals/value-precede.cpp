@@ -42,15 +42,13 @@ public:
     : s(_s), t(_t), satisfied(0) {
     // Find the first possible occurrence of s.
     int ii = 0;
-    /* // Can't do remVal before initialization.
+    // Can't do remVal before initialization.
     for(; ii < vs.size(); ii++) {
-      if(vs[ii]->remValNotR(t)) {
-        if(!vs[ii]->remVal(t)) TL_FAIL();
-      }
+      if(vs[ii]->indomain(t))
+        int_rel(vs[ii], IRT_NE, t);
       if(vs[ii]->indomain(s))
         break;
     }
-    */
 
     // Now copy the remaining values.
     bool t_seen = false;
@@ -62,18 +60,27 @@ public:
 
       if(!x->indomain(s) && !x->indomain(t))
         continue;
-      x->specialiseToEL();
-      // BoolView b(x->getLit(s, LR_EQ));
-      // b.attach(this, (xs.size()<<1), EVENT_U);
-      x->attach(this, (xs.size()<<1), EVENT_C);
-      x->attach(this, (xs.size()<<1)|1, EVENT_F);
-      xs.push(x);
 
       if(x->isFixed() && x->getVal() == t) {
         t_seen = true;
         break;
       }
     }
+
+    if(xs.size() <= 1) {
+      satisfied = true;
+      return;
+    }
+
+    for(int ii = 0; ii < xs.size(); ii++) {
+      IntVar* x(xs[ii]);
+      x->specialiseToEL();
+      if(x->indomain(s))
+        x->attach(this, ii<<1, EVENT_C);
+      if(x->indomain(t))
+        x->attach(this, (ii<<1)|1, EVENT_F);
+    }
+
     first_t = xs.size() - t_seen;
 
     int si = 1;
@@ -483,6 +490,7 @@ public:
     log_state();
 #endif
     // fprintf(stderr, "Queues: [%d, %d].\n", first_change.size(), limit_change.size());
+#if 1
     for(int fi = 0; fi < first_change.size(); fi++) {
       if(!repair_upper(first_change[fi]))
         return false;
@@ -494,19 +502,18 @@ public:
         return false;
     }
     limit_change.clear();
-    /*
-    // check_firsts();
+#else
     for(int ii = 1; ii < xs.size(); ii++) {
       if(!repair_upper(ii))
         return false;
-      // check_firsts();
     }
-    // check_firsts();
     for(int ii = max_def; ii > 0; ii--) {
       if(!repair_limit(ii))
         return false;
     }
-    */
+    first_change.clear();
+    limit_change.clear();
+#endif
 
     return true;
   }
@@ -613,7 +620,7 @@ public:
     int ii = limit[k];
     for(; ii >= 0; --ii) {
       // No change
-      if(limit[k] < ii)
+      if(k < 1 || limit[k] < ii)
         return true;
       assert(ii >= first[k]);
       if(xs[ii]->indomain(k)) {
