@@ -244,7 +244,7 @@ void initfg(ParserState* pp) {
         }
         if (pp->intvars[i].first[0] != '[') {
             delete pp->intvars[i].second;
-            pp->intvars[i].second = NULL;
+            pp->intvars[i].second = nullptr;
         }
     }
     for (unsigned int i = 0; i < pp->boolvars.size(); i++) {
@@ -269,7 +269,7 @@ void initfg(ParserState* pp) {
         }
         if (pp->boolvars[i].first[0] != '[') {
             delete pp->boolvars[i].second;
-            pp->boolvars[i].second = NULL;
+            pp->boolvars[i].second = nullptr;
         }
     }
     for (unsigned int i = 0; i < pp->setvars.size(); i++) {
@@ -282,14 +282,14 @@ void initfg(ParserState* pp) {
         }            
         if (pp->setvars[i].first[0] != '[') {
             delete pp->setvars[i].second;
-            pp->setvars[i].second = NULL;
+            pp->setvars[i].second = nullptr;
         }
     }
     for (unsigned int i = pp->domainConstraints.size(); i--;) {
         if (!pp->hadError) {
             try {
                 assert(pp->domainConstraints[i]->args->a.size() == 2);
-                pp->fg->postConstraint(*pp->domainConstraints[i], NULL);
+                FlatZinc::FlatZincSpace::postConstraint(*pp->domainConstraints[i], nullptr);
                 delete pp->domainConstraints[i];
             } catch (FlatZinc::Error& e) {
                 yyerror(pp, e.toString().c_str());              
@@ -300,7 +300,7 @@ void initfg(ParserState* pp) {
     for (int i = 0; i < static_cast<int>(pp->domainConstraints2.size()); ++i) {
         if (!pp->hadError) {
             try {
-                pp->fg->postConstraint(*pp->domainConstraints2[i].first, pp->domainConstraints2[i].second);
+                FlatZinc::FlatZincSpace::postConstraint(*pp->domainConstraints2[i].first, pp->domainConstraints2[i].second);
                 delete pp->domainConstraints2[i].first;
                 delete pp->domainConstraints2[i].second;
             } catch (FlatZinc::Error& e) {
@@ -312,7 +312,7 @@ void initfg(ParserState* pp) {
 }
 
 AST::Node* arrayOutput(AST::Call* ann) {
-    AST::Array* a = NULL;
+    AST::Array* a = nullptr;
     
     if (ann->args->isArray()) {
         a = ann->args->getArray();
@@ -341,7 +341,7 @@ AST::Node* arrayOutput(AST::Call* ann) {
     }
 
     if (!ann->args->isArray()) {
-        a->a[0] = NULL;
+        a->a[0] = nullptr;
         delete a;
     }
     return new AST::String(oss.str());
@@ -2232,7 +2232,7 @@ yyreduce:
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !(yyvsp[-5].oSet)() || !(yyvsp[-5].oSet).some()->empty(), "Empty set domain.");
             yyassert(pp, (yyvsp[0].arg)->isSet(), "Invalid set initializer.");
-            AST::SetLit* set = NULL;
+            AST::SetLit* set = nullptr;
             if ((yyvsp[0].arg)->isSet())
                 set = (yyvsp[0].arg)->getSet();
             pp->setvals.put((yyvsp[-3].sValue), *set);
@@ -2858,7 +2858,7 @@ yyreduce:
                     pp->fg->enable_store_solution = true;
                 } else {
                     try {
-                        pp->fg->postConstraint(c, (yyvsp[0].argVec));
+                        FlatZinc::FlatZincSpace::postConstraint(c, (yyvsp[0].argVec));
                     } catch (FlatZinc::Error& e) {
                         yyerror(pp, e.toString().c_str());
                     }
@@ -2882,7 +2882,7 @@ yyreduce:
             ConExpr c("bool_eq", args);
             if (!pp->hadError) {
                 try {
-                    pp->fg->postConstraint(c, (yyvsp[0].argVec));
+                    FlatZinc::FlatZincSpace::postConstraint(c, (yyvsp[0].argVec));
                 } catch (FlatZinc::Error& e) {
                     yyerror(pp, e.toString().c_str());
                 }
@@ -2905,7 +2905,7 @@ yyreduce:
             ConExpr c("bool_eq", args);
             if (!pp->hadError) {
                 try {
-                    pp->fg->postConstraint(c, (yyvsp[0].argVec));
+                    FlatZinc::FlatZincSpace::postConstraint(c, (yyvsp[0].argVec));
                 } catch (FlatZinc::Error& e) {
                     yyerror(pp, e.toString().c_str());
                 }
@@ -3256,7 +3256,7 @@ yyreduce:
             pp->intvarTable.put(objname, i);
             pp->intvars.push_back(varspec(objname,
                 new IntVarSpec((yyvsp[0].iValue),false,true,false)));
-            if (pp->fg != NULL) {
+            if (pp->fg != nullptr) {
                 // Add a new IntVar to the FlatZincSpace if it was already created
                 try {
                     pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
@@ -3279,7 +3279,7 @@ yyreduce:
                 pp->intvarTable.put((yyvsp[0].sValue), i);
                 pp->intvars.push_back(varspec((yyvsp[0].sValue),
                     new IntVarSpec(tmp,false,true,false)));
-                if (pp->fg != NULL) {
+                if (pp->fg != nullptr) {
                     // Add a new IntVar to the FlatZincSpace if it was already created
                     try {
                         pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
@@ -3322,7 +3322,7 @@ yyreduce:
 
   case 141: /* annotations: %empty  */
         { 
-            (yyval.argVec) = NULL; 
+            (yyval.argVec) = nullptr; 
         }
     break;
 
