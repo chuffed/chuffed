@@ -1269,10 +1269,35 @@ constraint_item :
 #else
             ConExpr c($2, $4);
             if (!pp->hadError) {
-                try {
-                    pp->fg->postConstraint(c, $6);
-                } catch (FlatZinc::Error& e) {
-                    yyerror(pp, e.toString().c_str());
+                if (c.id == "chuffed_on_restart_status") {
+                    pp->fg->restart_status = c.args->a[0]->getIntVar();
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_complete") {
+                    mark_complete(pp->fg->bv[c.args->a[0]->getBoolVar()], &pp->fg->mark_complete);
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_uniform_int") {
+                    pp->fg->int_uniform.emplace_back(std::array<int, 3>{ c.args->a[0]->getInt(), c.args->a[1]->getInt(), c.args->a[2]->getIntVar() });
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_last_val_bool") {
+                    pp->last_val_bool.emplace_back(c.args->a[0]->getBoolVar(), c.args->a[1]->getBoolVar());
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_last_val_int") {
+                    pp->last_val_int.emplace_back(c.args->a[0]->getIntVar(), c.args->a[1]->getIntVar());
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_sol_bool") {
+                    pp->fg->bool_sol.emplace_back(std::tuple<int, bool, int>{ c.args->a[0]->getBoolVar(), false, c.args->a[1]->getBoolVar() });
+                    pp->fg->enable_on_restart = true;
+                    pp->fg->enable_store_solution = true;
+                } else if (c.id == "chuffed_on_restart_sol_int") {
+                    pp->fg->int_sol.emplace_back(std::array<int, 3>{ c.args->a[0]->getIntVar(), 0, c.args->a[1]->getIntVar() });
+                    pp->fg->enable_on_restart = true;
+                    pp->fg->enable_store_solution = true;
+                } else {
+                    try {
+                        pp->fg->postConstraint(c, $6);
+                    } catch (FlatZinc::Error& e) {
+                        yyerror(pp, e.toString().c_str());
+                    }
                 }
             }
             delete $6;
@@ -1329,6 +1354,7 @@ solve_item :
             if (!pp->hadError) {
                 pp->fg->solve($2);
             }
+            pp->postOnRestartPropagators();
             delete $2;
         }
     |   SOLVE annotations minmax solve_expr
@@ -1340,6 +1366,7 @@ solve_item :
                 else
                     pp->fg->maximize($4,$2);
             }
+            pp->postOnRestartPropagators();
             delete $2;
         }
 

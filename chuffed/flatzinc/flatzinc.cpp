@@ -678,4 +678,90 @@ void FlatZincSpace::printElem(AST::Node* ai, ostream& out) const {
 	}
 }
 
+void FlatZincSpace::storeSolution() {
+	solution_found = true;
+	if (!enable_store_solution) {
+		return;
+	}
+
+	for (auto& i : int_sol) {
+		i[1] = iv[i[0]]->getVal();
+	}
+	for (auto& i : bool_sol) {
+		std::get<1>(i) = bv[std::get<0>(i)].isTrue();
+	}
+	new_solution = true;
+}
+
+bool FlatZincSpace::onRestart(Engine* e) {
+	if (!enable_on_restart) {
+		return true;
+	}
+	if (mark_complete) {
+		return true;
+	}
+
+	// Reset Assumptions if not called from constrain()
+	if (e->assumptions.size() != 0) {
+		if (!solution_found) {
+			e->assumptions.clear();
+		} else if (e->assumptions.size() > 1) {
+			Lit p = e->opt_type != 0 ? e->opt_var->getLit(e->best_sol + 1, LR_GE)
+															 : e->opt_var->getLit(e->best_sol - 1, LR_LE);
+			e->assumptions.clear();
+			e->assumptions.push(toInt(p));
+		}
+	}
+
+	// Helper functions to create assumptions using value assignments
+	auto assume_int_val = [&](IntVar* iv, int v) {
+		if (iv->getType() == INT_VAR_LL) {
+			e->assumptions.push(toInt(iv->getLit(v, LR_GE)));
+			e->assumptions.push(toInt(iv->getLit(v, LR_LE)));
+		} else {
+			e->assumptions.push(toInt(iv->getLit(v, LR_EQ)));
+		}
+	};
+	auto assume_bool_val = [&](BoolView bv, bool v) {
+		BoolView nv = v ? bv : ~bv;
+		e->assumptions.push(toInt(nv));
+	};
+
+	// Set restart status
+	if (restart_status > 0) {
+		if (new_solution) {
+			assume_int_val(iv[restart_status], 4);  // SAT
+		} else if (!solution_found) {
+			assume_int_val(iv[restart_status], 1);  // START
+		} else {
+			assume_int_val(iv[restart_status], 2);  // UNKNOWN
+		}
+	}
+
+	// Set variables to last captured assignments
+	for (const auto& i : int_last_val) {
+		assume_int_val(iv[i[0]], i[1]);
+	}
+	for (const auto& i : bool_last_val) {
+		assume_bool_val(bv[i.first], i.second);
+	}
+
+	// Set new random values
+	for (const auto& i : int_uniform) {
+		std::uniform_int_distribution<int> rnd_range(i[0], i[1]);
+		assume_int_val(iv[i[2]], rnd_range(engine.rnd));
+	}
+
+	// Set last found solutions values
+	for (const auto& i : int_sol) {
+		assume_int_val(iv[i[2]], i[1]);
+	}
+	for (const auto& i : bool_sol) {
+		assume_bool_val(bv[std::get<2>(i)], std::get<1>(i));
+	}
+
+	new_solution = false;
+	return false;
+}
+
 }  // namespace FlatZinc

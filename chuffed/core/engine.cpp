@@ -334,6 +334,10 @@ inline bool Engine::constrain() {
 	if (so.sbps) {
 		saveCurrentSolution();
 	}
+	auto* fzn = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
+	if (fzn != nullptr) {
+		fzn->storeSolution();
+	}
 
 	sat.btToLevel(0);
 	restart_count++;
@@ -369,6 +373,13 @@ inline bool Engine::constrain() {
 			if (!opt_var->setMax(best_sol - 1)) {
 				return false;
 			}
+		}
+	}
+
+	if (fzn != nullptr) {
+		bool done = fzn->onRestart(this);
+		if (done) {
+			return false;
 		}
 	}
 
@@ -659,6 +670,11 @@ RESULT Engine::search(const std::string& problemLabel) {
 		profilerConnector->start(problemLabel, so.cpprofiler_id, true);
 	}
 #endif
+	auto* fzn = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
+	if ((fzn != nullptr) && fzn->restart_status >= 0) {
+		Lit p = fzn->iv[fzn->restart_status]->getLit(1, LR_EQ);  // START
+		assumptions.push(toInt(p));
+	}
 
 	decisionLevelTip.push_back(1);
 
@@ -863,6 +879,13 @@ RESULT Engine::search(const std::string& problemLabel) {
 					profilerConnector->restart(restart_count);
 				}
 #endif
+				if (fzn != nullptr) {
+					bool done = fzn->onRestart(this);
+					if (done) {
+						return RES_GUN;
+					}
+				}
+
 				toggleVSIDS();
 			}
 
@@ -883,6 +906,12 @@ RESULT Engine::search(const std::string& problemLabel) {
 					profilerConnector->restart(restart_count);
 				}
 #endif
+				if (fzn != nullptr) {
+					bool done = fzn->onRestart(this);
+					if (done) {
+						return RES_GUN;
+					}
+				}
 
 				sat.confl = nullptr;
 				if (so.lazy && so.toggle_vsids && (starts % 2 == 1)) {
@@ -910,6 +939,19 @@ RESULT Engine::search(const std::string& problemLabel) {
 					engine.dec_info.push(DecInfo(nullptr, p));
 					newDecisionLevel();
 				} else if (sat.value(toLit(p)) == l_False) {
+					if (fzn != nullptr) {
+						if (!fzn->solution_found || decisionLevel() != 0) {
+							sat.btToLevel(0);
+							restart_count++;
+							nodepath.resize(0);
+							altpath.resize(0);
+							bool done = fzn->onRestart(this);
+							if (done) {
+								return RES_GUN;
+							}
+							continue;
+						}
+					}
 					return RES_LUN;
 				} else {
 					di = new DecInfo(nullptr, p);
@@ -942,10 +984,9 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 #ifdef HAS_PROFILER
 				if (doProfiling()) {
-					auto* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
-					if (fzs != nullptr) {
+					if (fzn != nullptr) {
 						std::stringstream s;
-						fzs->printDomains(s);
+						fzn->printDomains(s);
 						sendNode(profilerConnector
 												 ->createNode({nodeid, restart_count, 0}, {parent, restart_count, 0}, myalt,
 																			0, cpprofiler::NodeStatus::SOLVED)

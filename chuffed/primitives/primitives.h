@@ -161,4 +161,9 @@ void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, Int
 // y = |ub(x) - lb(y) + 1|
 void range_size(IntVar* x, IntVar* y);
 
+void last_val(IntVar* x, int* v);
+void last_val(BoolView* x, bool* v);
+
+void mark_complete(BoolView x, bool* v);
+
 #endif

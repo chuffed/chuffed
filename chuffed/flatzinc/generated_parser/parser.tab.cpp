@@ -968,13 +968,13 @@ static const yytype_int16 yyrline[] =
     1036,  1060,  1063,  1069,  1074,  1081,  1087,  1091,  1106,  1130,
     1133,  1139,  1144,  1151,  1154,  1158,  1173,  1197,  1200,  1206,
     1211,  1218,  1225,  1228,  1235,  1238,  1245,  1248,  1255,  1258,
-    1264,  1282,  1303,  1326,  1334,  1351,  1355,  1359,  1365,  1369,
-    1383,  1384,  1391,  1395,  1404,  1407,  1413,  1418,  1426,  1429,
-    1435,  1440,  1448,  1451,  1457,  1462,  1470,  1473,  1479,  1485,
-    1497,  1501,  1508,  1512,  1519,  1522,  1528,  1532,  1536,  1540,
-    1544,  1593,  1607,  1610,  1616,  1620,  1631,  1650,  1678,  1700,
-    1701,  1709,  1712,  1718,  1722,  1729,  1734,  1740,  1744,  1752,
-    1755,  1761,  1765,  1771,  1775,  1779,  1783,  1787,  1830,  1841
+    1264,  1307,  1328,  1351,  1360,  1378,  1382,  1386,  1392,  1396,
+    1410,  1411,  1418,  1422,  1431,  1434,  1440,  1445,  1453,  1456,
+    1462,  1467,  1475,  1478,  1484,  1489,  1497,  1500,  1506,  1512,
+    1524,  1528,  1535,  1539,  1546,  1549,  1555,  1559,  1563,  1567,
+    1571,  1620,  1634,  1637,  1643,  1647,  1658,  1677,  1705,  1727,
+    1728,  1736,  1739,  1745,  1749,  1756,  1761,  1767,  1771,  1779,
+    1782,  1788,  1792,  1798,  1802,  1806,  1810,  1814,  1857,  1868
 };
 #endif
 
@@ -2833,10 +2833,35 @@ yyreduce:
 #else
             ConExpr c((yyvsp[-4].sValue), (yyvsp[-2].argVec));
             if (!pp->hadError) {
-                try {
-                    pp->fg->postConstraint(c, (yyvsp[0].argVec));
-                } catch (FlatZinc::Error& e) {
-                    yyerror(pp, e.toString().c_str());
+                if (c.id == "chuffed_on_restart_status") {
+                    pp->fg->restart_status = c.args->a[0]->getIntVar();
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_complete") {
+                    mark_complete(pp->fg->bv[c.args->a[0]->getBoolVar()], &pp->fg->mark_complete);
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_uniform_int") {
+                    pp->fg->int_uniform.emplace_back(std::array<int, 3>{ c.args->a[0]->getInt(), c.args->a[1]->getInt(), c.args->a[2]->getIntVar() });
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_last_val_bool") {
+                    pp->last_val_bool.emplace_back(c.args->a[0]->getBoolVar(), c.args->a[1]->getBoolVar());
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_last_val_int") {
+                    pp->last_val_int.emplace_back(c.args->a[0]->getIntVar(), c.args->a[1]->getIntVar());
+                    pp->fg->enable_on_restart = true;
+                } else if (c.id == "chuffed_on_restart_sol_bool") {
+                    pp->fg->bool_sol.emplace_back(std::tuple<int, bool, int>{ c.args->a[0]->getBoolVar(), false, c.args->a[1]->getBoolVar() });
+                    pp->fg->enable_on_restart = true;
+                    pp->fg->enable_store_solution = true;
+                } else if (c.id == "chuffed_on_restart_sol_int") {
+                    pp->fg->int_sol.emplace_back(std::array<int, 3>{ c.args->a[0]->getIntVar(), 0, c.args->a[1]->getIntVar() });
+                    pp->fg->enable_on_restart = true;
+                    pp->fg->enable_store_solution = true;
+                } else {
+                    try {
+                        pp->fg->postConstraint(c, (yyvsp[0].argVec));
+                    } catch (FlatZinc::Error& e) {
+                        yyerror(pp, e.toString().c_str());
+                    }
                 }
             }
             delete (yyvsp[0].argVec);
@@ -2897,6 +2922,7 @@ yyreduce:
             if (!pp->hadError) {
                 pp->fg->solve((yyvsp[-1].argVec));
             }
+            pp->postOnRestartPropagators();
             delete (yyvsp[-1].argVec);
         }
     break;
@@ -2910,6 +2936,7 @@ yyreduce:
                 else
                     pp->fg->maximize((yyvsp[0].iValue),(yyvsp[-2].argVec));
             }
+            pp->postOnRestartPropagators();
             delete (yyvsp[-2].argVec);
         }
     break;

@@ -29,11 +29,14 @@
 #include <chuffed/support/vec.h>
 
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <map>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -307,6 +310,41 @@ public:
 
 	AST::Array* output;
 
+	// === Experimental `on_restart` support ===
+	// Index of the status() variable
+	int restart_status = -1;
+	// When set to true, the search is marked as complete the next time onRestart() is called
+	bool mark_complete = false;
+	// Whether any solution has been found
+	bool solution_found = false;
+	// Whether a solution was found since the last restart
+	bool new_solution = false;
+	// Definition for variables given uniformly random values on restart
+	// (lower bound, upper bound, variable index)
+	std::vector<std::array<int, 3>> int_uniform;
+	// Definition for solution values stored and assigned on restart
+	// (variable index for solution being stored, stored value, variable index being assigned)
+	std::vector<std::array<int, 3>> int_sol;
+	std::vector<std::tuple<int, bool, int>> bool_sol;
+	// Definition for last assigned values stored and assigned on restart
+	// (variable index being assigned, value stored)
+	// Note that `LastVal` propagators are used to store the values when assigned
+	std::vector<std::array<int, 2>> int_last_val;
+	std::vector<std::pair<int, bool>> bool_last_val;
+
+	// Method called when a new solution is found.
+	// Note this method is a no-op if `int_sol` is empty.
+	void storeSolution();
+	// Whether storeSolution() should be called
+	bool enable_store_solution = false;
+	// Method called before the search process is restarted
+	// Returns false when the search should be marked as complete
+	bool onRestart(Engine* e);
+	// Whether onRestart() should be called
+	bool enable_on_restart = false;
+
+	// === End `on_restart` ===
+
 	/// Construct problem with given number of variables
 	FlatZincSpace(int intVars, int boolVars, int setVars);
 
@@ -495,7 +533,7 @@ private:
 
 extern FlatZincSpace* s;
 
-typedef std::pair<std::string, Option<std::vector<int>*> > intvartype;
+typedef std::pair<std::string, Option<std::vector<int>*>> intvartype;
 typedef std::pair<std::string, VarSpec*> varspec;
 
 /// State of the FlatZinc parser
@@ -511,32 +549,35 @@ public:
 	const char* buf;
 	unsigned int pos, length;
 	FlatZinc::FlatZincSpace* fg;
-	std::vector<std::pair<std::string, AST::Node*> > _output;
+	std::vector<std::pair<std::string, AST::Node*>> _output;
 
 	SymbolTable<int> intvarTable;
 	SymbolTable<int> boolvarTable;
 	SymbolTable<int> floatvarTable;
 	SymbolTable<int> setvarTable;
-	SymbolTable<std::vector<int> > intvararrays;
-	SymbolTable<std::vector<int> > boolvararrays;
-	SymbolTable<std::vector<int> > floatvararrays;
-	SymbolTable<std::vector<int> > setvararrays;
-	SymbolTable<std::vector<int> > intvalarrays;
-	SymbolTable<std::vector<int> > boolvalarrays;
+	SymbolTable<std::vector<int>> intvararrays;
+	SymbolTable<std::vector<int>> boolvararrays;
+	SymbolTable<std::vector<int>> floatvararrays;
+	SymbolTable<std::vector<int>> setvararrays;
+	SymbolTable<std::vector<int>> intvalarrays;
+	SymbolTable<std::vector<int>> boolvalarrays;
 	SymbolTable<int> intvals;
 	SymbolTable<bool> boolvals;
 	SymbolTable<AST::SetLit> setvals;
-	SymbolTable<std::vector<AST::SetLit> > setvalarrays;
+	SymbolTable<std::vector<AST::SetLit>> setvalarrays;
 
 	std::vector<varspec> intvars;
 	std::vector<varspec> boolvars;
 	std::vector<varspec> setvars;
 
+	std::vector<std::pair<int, int>> last_val_bool;
+	std::vector<std::pair<int, int>> last_val_int;
+
 	std::vector<ConExpr*> domainConstraints;
 #if EXPOSE_INT_LITS
 	// for some reason the above list is posted in reverse order,
 	// don't want to disturb things so add the following (forward):
-	std::vector<std::pair<ConExpr*, AST::Node*> > domainConstraints2;
+	std::vector<std::pair<ConExpr*, AST::Node*>> domainConstraints2;
 #endif
 
 	bool hadError;
@@ -572,6 +613,20 @@ public:
 			a->a.push_back(new AST::String(";\n"));
 		}
 		return a;
+	}
+
+	void postOnRestartPropagators() {
+		fg->bool_last_val.resize(last_val_bool.size());
+		for (size_t i = 0; i < last_val_bool.size(); ++i) {
+			fg->bool_last_val[i] = std::pair<int, bool>{last_val_bool[i].second, false};
+			last_val(&fg->bv[last_val_bool[i].first], &(fg->bool_last_val[i].second));
+		}
+		fg->int_last_val.resize(last_val_int.size());
+		for (size_t i = 0; i < last_val_int.size(); ++i) {
+			fg->int_last_val[i] =
+					std::array<int, 2>{last_val_int[i].second, fg->iv[last_val_int[i].first]->getMin()};
+			last_val(fg->iv[last_val_int[i].first], &(fg->int_last_val[i][1]));
+		}
 	}
 };
 
