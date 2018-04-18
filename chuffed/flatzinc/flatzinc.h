@@ -440,6 +440,7 @@ namespace FlatZinc {
         void parseSolveAnnIntSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
         void parseSolveAnnBoolSearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
         void parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
+        void parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations);
     };
 
     extern FlatZincSpace *s;

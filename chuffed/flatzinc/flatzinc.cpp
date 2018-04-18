@@ -308,6 +308,40 @@ namespace FlatZinc {
         }
     }
 
+    void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
+        vec<Lit> decs;
+        AST::Call *call = elemAnn->getCall("warm_start");
+        /*
+        AST::Array* vars = call->args->getArray();
+        for(int ii = 0; ii < vars->a.size(); ii++)
+        decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
+        */
+        AST::Array* args = call->getArgs(2);
+        AST::Array* vars = args->a[0]->getArray();
+        AST::Array* vals = args->a[1]->getArray();
+        if(vars->a.size() != vals->a.size()) {
+            fprintf(stderr, "WARNING: length mismatch in warm_start annotation.\n");
+        }
+        int sz = min(vars->a.size(), vals->a.size());
+        for(int ii = 0; ii < sz; ii++) {
+            IntVar* x(iv[vars->a[ii]->getIntVar()]);
+            int k(vals->a[ii]->getInt());
+            switch(x->getType()) {
+                case INT_VAR_EL:
+                case INT_VAR_SL:
+                    decs.push(x->getLit(k, 1));
+                    break;
+                default:
+                    // Fallback. TODO: Do something nicer here.
+                    BoolView r = ::newBoolVar();
+                    int_rel_reif(x, IRT_EQ, k, r);
+                    decs.push(r.getLit(true));
+                    break;
+            }
+        }
+        branching->add(new WarmStartBrancher(decs));
+    }
+
     void FlatZincSpace::parseSolveAnnAux(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
         if (elemAnn->isCall("int_search")) {
             parseSolveAnnIntSearch(elemAnn, branching, nbNonEmptySearchAnnotations);
@@ -316,7 +350,9 @@ namespace FlatZinc {
             parseSolveAnnBoolSearch(elemAnn, branching, nbNonEmptySearchAnnotations);
         }
         else if (elemAnn->isCall("priority_search")) {
-            parseSolveAnnPrioritySearch(elemAnn, branching, nbNonEmptySearchAnnotations);
+            parseSolveAnnPrioritySearch(elemAnn, branching, nbNonEmptySearchAnnotations);    
+        } else if (elemAnn->isCall("warm_start")) {
+            parseSolveAnnWarmStart(elemAnn, branching, nbNonEmptySearchAnnotations);
         }
         else {
             throw FlatZinc::Error("Error in search annotation", "Unknown search annotation");
@@ -376,44 +412,12 @@ namespace FlatZinc {
                     }
                     if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt()); }
                 } else if (ann->a[i]->isCall("assume")) {
-                    AST::Call *call = flatAnn[i]->getCall("assume");
+                    AST::Call *call = ann->a[i]->getCall("assume");
                     AST::Array *vars = call->args->getArray();
                     for(int ii = 0; ii < vars->a.size(); ii++) {
                         assumptions.push(bv[vars->a[ii]->getBoolVar()]);
                     }
-                } else if (ann->a[i]->isCall("warm_start")) {
-                    vec<Lit> decs;
-                    AST::Call *call = flatAnn[i]->getCall("warm_start");
-                    /*
-                    AST::Array* vars = call->args->getArray();
-                    for(int ii = 0; ii < vars->a.size(); ii++)
-                    decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
-                    */
-                    AST::Array* args = call->getArgs(2);
-                    AST::Array* vars = args->a[0]->getArray();
-                    AST::Array* vals = args->a[1]->getArray();
-                    if(vars->a.size() != vals->a.size()) {
-                        fprintf(stderr, "WARNING: length mismatch in warm_start annotation.\n");
-                    }
-                    int sz = min(vars->a.size(), vals->a.size());
-                    for(int ii = 0; ii < sz; ii++) {
-                        IntVar* x(iv[vars->a[ii]->getIntVar()]);
-                        int k(vals->a[ii]->getInt());
-                        switch(x->getType()) {
-                            case INT_VAR_EL:
-                            case INT_VAR_SL:
-                                decs.push(x->getLit(k, 1));
-                                break;
-                            default:
-                                // Fallback. TODO: Do something nicer here.
-                                BoolView r = ::newBoolVar();
-                                int_rel_reif(x, IRT_EQ, k, r);
-                                decs.push(r.getLit(true));
-                                break;
-                        }
-                    }
-                    engine.branching->add(new WarmStartBrancher(decs));
-                } else if (ann->a[i]->isCall("seq_search")) {
+                } else if (ann->a[i]->isCall("seq_search") || ann->a[i]->isCall("warm_start_array")) {
                     // Get the call
                     AST::Call* c = ann->a[i]->getCall();
                     // Create a new branch group and add to the branching
