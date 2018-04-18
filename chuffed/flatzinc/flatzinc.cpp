@@ -384,9 +384,33 @@ namespace FlatZinc {
                 } else if (ann->a[i]->isCall("warm_start")) {
                     vec<Lit> decs;
                     AST::Call *call = flatAnn[i]->getCall("warm_start");
+                    /*
                     AST::Array* vars = call->args->getArray();
-                    for(int ii = 0; ii < vars->a.size(); ii++) {
-                        decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
+                    for(int ii = 0; ii < vars->a.size(); ii++)
+                    decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
+                    */
+                    AST::Array* args = call->getArgs(2);
+                    AST::Array* vars = args->a[0]->getArray();
+                    AST::Array* vals = args->a[1]->getArray();
+                    if(vars->a.size() != vals->a.size()) {
+                        fprintf(stderr, "WARNING: length mismatch in warm_start annotation.\n");
+                    }
+                    int sz = min(vars->a.size(), vals->a.size());
+                    for(int ii = 0; ii < sz; ii++) {
+                        IntVar* x(iv[vars->a[ii]->getIntVar()]);
+                        int k(vals->a[ii]->getInt());
+                        switch(x->getType()) {
+                            case INT_VAR_EL:
+                            case INT_VAR_SL:
+                                decs.push(x->getLit(k, 1));
+                                break;
+                            default:
+                                // Fallback. TODO: Do something nicer here.
+                                BoolView r = ::newBoolVar();
+                                int_rel_reif(x, IRT_EQ, k, r);
+                                decs.push(r.getLit(true));
+                                break;
+                        }
                     }
                     engine.branching->add(new WarmStartBrancher(decs));
                 } else if (ann->a[i]->isCall("seq_search")) {

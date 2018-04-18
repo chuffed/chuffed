@@ -57,6 +57,3 @@ annotation largest_smallest;
 
 /** @group chuffed.annotations annotation for assumption handling. */
 annotation assume(array [int] of var bool);
-
-/** @group chuffed.annotations annotation for warm-start. */
-annotation warm_start(array [int] of var bool: decs);
