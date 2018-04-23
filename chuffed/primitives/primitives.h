@@ -85,9 +85,11 @@ void int_rel(IntVar* x, IntRelType t, int c);
 // x rel y + c <-> r
 void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c = 0);
 // x rel y + c <- r
-void int_rel_half_reif(IntVar* a, IntRelType t, IntVar* b, BoolView r, int c);
+void int_rel_half_reif(IntVar* a, IntRelType t, IntVar* b, BoolView r, int c = 0);
 // x rel c <-> r
 void int_rel_reif(IntVar* a, IntRelType t, int c, BoolView r);
+// x rel c <- r
+void int_rel_half_reif(IntVar* a, IntRelType t, int c, BoolView r);
 
 // linear.c
 

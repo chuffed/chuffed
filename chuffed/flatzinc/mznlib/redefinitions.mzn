@@ -84,3 +84,9 @@ predicate array_bool_xor(array[int] of var bool: bs) =
 predicate int_mod(var int: x, var int: y, var int: z) =
   x=(x div y)*y+z;
 
+predicate int_eq_imp(var int: a, var int: b, var bool: r);
+predicate int_ne_imp(var int: a, var int: b, var bool: r);
+predicate int_ge_imp(var int: a, var int: b, var bool: r);
+predicate int_gt_imp(var int: a, var int: b, var bool: r);
+predicate int_le_imp(var int: a, var int: b, var bool: r);
+predicate int_lt_imp(var int: a, var int: b, var bool: r);
