@@ -395,9 +395,9 @@ void int_rel_half_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		}
 		break;
 		case IRT_LE: bool_rel(b2, BRT_OR, ~r); break;
-		case IRT_LT: bool_rel(~b2, BRT_OR, ~r); break;
+		case IRT_LT: bool_rel(~b1, BRT_OR, ~r); break;
 		case IRT_GE: bool_rel(b1, BRT_OR, ~r); break;
-		case IRT_GT: bool_rel(~b1, BRT_OR, ~r); break;
+		case IRT_GT: bool_rel(~b2, BRT_OR, ~r); break;
 		default: NEVER;
 	}
 }
