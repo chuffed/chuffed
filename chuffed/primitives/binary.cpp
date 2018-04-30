@@ -202,6 +202,7 @@ struct IRR {
 };
 
 vec<IRR> ircs;
+vec<IRR> ihrcs;
 
 
 //-----
@@ -313,6 +314,10 @@ void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
 
 // x rel y + c <- r
 
+void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r) {
+	ihrcs.push(IRR(x, t, c, r));
+}
+
 void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
 	switch (t) {
 		case IRT_EQ:
@@ -365,11 +370,45 @@ void int_rel_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		case IRT_GT: bool_rel(b2, BRT_EQ, ~r); break;
 		default: NEVER;
 	}
-} 
+}
+
+void int_rel_half_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
+	if (r.isFalse()) {
+		return;
+	}
+	if (r.isTrue() && t == IRT_NE && x->getType() == INT_VAR_EL) {
+		TL_SET(x, remVal, c); return;
+	}
+	if (x->getType() == INT_VAR) {
+		assert(!so.lazy);
+		IntVar* v = getConstant(c);
+		int_rel_half_reif(x, t, v, r);
+		return;
+	}
+	BoolView b1(x->getLit(c,2)), b2(x->getLit(c,3));
+	switch (t) {
+		case IRT_EQ: bool_rel(b2, BRT_OR, ~r); bool_rel(b1, BRT_OR, ~r); break;
+		case IRT_NE:
+		{
+			vec<Lit> ps1; ps1.push(~b1); ps1.push(~b2); ps1.push(~r); sat.addClause(ps1);
+			vec<Lit> ps2; ps2.push(b1); ps2.push(b2); ps2.push(~r); sat.addClause(ps2);
+		}
+		break;
+		case IRT_LE: bool_rel(b2, BRT_OR, ~r); break;
+		case IRT_LT: bool_rel(~b1, BRT_OR, ~r); break;
+		case IRT_GE: bool_rel(b1, BRT_OR, ~r); break;
+		case IRT_GT: bool_rel(~b2, BRT_OR, ~r); break;
+		default: NEVER;
+	}
+}
 
 void process_ircs() {
 	for (int i = 0; i < ircs.size(); i++) {
 		int_rel_reif_real(ircs[i].x, ircs[i].t, ircs[i].c, ircs[i].r);
 	}
 	ircs.clear(true);
+	for (int j = 0; j < ihrcs.size(); ++j) {
+		int_rel_half_reif_real(ihrcs[j].x, ihrcs[j].t, ihrcs[j].c, ihrcs[j].r);
+	}
+	ihrcs.clear(true);
 }
