@@ -343,7 +343,25 @@ namespace FlatZinc {
     void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching, int & nbNonEmptySearchAnnotations) {
         if (ann) {
             for (unsigned int i = 0; i < ann->a.size(); i++) {
-                if (ann->a[i]->isCall("seq_search")) {
+                if (ann->a[i]->isCall("restart_constant")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_constant");
+                    so.restart_type = CONSTANT;
+                    so.restart_scale = static_cast<unsigned int>(call->args->getInt());
+                } else if (ann->a[i]->isCall("restart_linear")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_linear");
+                    so.restart_type = LINEAR;
+                    so.restart_scale = static_cast<unsigned int>(call->args->getInt());
+                } else if (ann->a[i]->isCall("restart_luby")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_luby");
+                    so.restart_type = LUBY;
+                    so.restart_scale = static_cast<unsigned int>(call->args->getInt());
+                } else if (ann->a[i]->isCall("restart_geometric")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_geometric");
+                    so.restart_type = GEOMETRIC;
+                    AST::Array* args = call->getArgs(2);
+                    so.restart_base = args->a[0]->getFloat();
+                    so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt());
+                } else if (ann->a[i]->isCall("seq_search")) {
                     // Get the call
                     AST::Call* c = ann->a[i]->getCall();
                     // Create a new branch group and add to the branching

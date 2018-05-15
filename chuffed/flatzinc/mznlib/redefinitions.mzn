@@ -90,3 +90,13 @@ predicate int_ge_imp(var int: a, var int: b, var bool: r);
 predicate int_gt_imp(var int: a, var int: b, var bool: r);
 predicate int_le_imp(var int: a, var int: b, var bool: r);
 predicate int_lt_imp(var int: a, var int: b, var bool: r);
+
+%% Restart Strategies
+% restart after fixed number of nodes
+annotation restart_constant(int: nodes);
+% restart with scaled Luby sequence
+annotation restart_luby(int: scale);
+% restart with scaled geometric sequence (scale*base^n in the n-th iteration)
+annotation restart_geometric(float: base, int: scale);
+% restart with linear sequence (scale*n in the n-th iteration)
+annotation restart_linear(int: scale);
