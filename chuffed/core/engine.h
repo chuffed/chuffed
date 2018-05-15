@@ -79,7 +79,7 @@ private:
     void topLevelCleanUp();
     void simplifyDB();
     void blockCurrentSol();
-    int  getRestartLimit(int starts);
+    unsigned int getRestartLimit(unsigned int i); // Return the restart limit for restart i
     void toggleVSIDS();
 
 public:

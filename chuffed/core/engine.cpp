@@ -435,10 +435,30 @@ void Engine::blockCurrentSol() {
 }
 
 
-int Engine::getRestartLimit(int starts) {
-    //  return so.restart_base * ((int) pow(1.5, starts));
-    //  return so.restart_base;
-    return (((starts-1) & ~starts) + 1) * so.restart_base;
+unsigned int Engine::getRestartLimit(unsigned int i) {
+    switch (so.restart_type) {
+        case CONSTANT:
+            return so.restart_scale;
+        case LINEAR:
+            return i * so.restart_scale;
+        case LUBY:
+            while (true) {
+                unsigned int exp = 0U;
+                if (i != 1U) {
+                    while ( (i >> (++exp)) > 1U ) {}
+                }
+                if (i == (1U<<(exp+1))-1) {
+                    return static_cast<int>(1UL << exp) * so.restart_scale;
+                }
+                i=i-(1U<<exp)+1;
+            }
+        case GEOMETRIC:
+            return so.restart_scale * ((int) pow(so.restart_base, i));
+        default:
+            i = (i+1)/2;
+            return (((i-1) & ~i) + 1) * so.restart_scale;
+    }
+    NEVER;
 }
 
 void Engine::toggleVSIDS() {
@@ -461,9 +481,9 @@ void Engine::toggleVSIDS() {
 }
 
 RESULT Engine::search(const std::string& problemLabel) {
-    int starts = 0;
-    int nof_conflicts = so.restart_base;
-    int conflictC = 0;
+    unsigned int starts = 0;
+    unsigned int nof_conflicts = so.restart_scale;
+    unsigned int conflictC = 0;
 
     if (so.print_variable_list) {
         std::ofstream s;
@@ -658,7 +678,7 @@ RESULT Engine::search(const std::string& problemLabel) {
             }
 
             if (!so.vsids && !so.toggle_vsids &&  conflictC >= so.switch_to_vsids_after) {
-            if (so.restart_base >= 1000000000) so.restart_base = 100;
+            if (so.restart_scale >= 1000000000) so.restart_scale = 100;
                 if (so.verbosity >= 2)
                     std::cerr << "restarting and switching to VSIDS\n";
                 sat.btToLevel(0);
@@ -680,7 +700,12 @@ RESULT Engine::search(const std::string& problemLabel) {
                 if (so.verbosity >= 2)
                     std::cerr << "restarting due to number of conflicts\n";
                 starts++;
-                nof_conflicts += getRestartLimit((starts+1)/2);
+                if (so.restart_type == CHUFFED_DEFAULT) {
+                    //TODO: Why does default add instead of replace?
+                    nof_conflicts += getRestartLimit(starts);
+                } else {
+                    nof_conflicts = getRestartLimit(starts);
+                }
                 sat.btToLevel(0);
                 restartCount++;
                 nodepath.resize(0);
