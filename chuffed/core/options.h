@@ -23,7 +23,7 @@ public:
 	int verbosity;                   // Verbosity
 	bool print_sol;                  // Print solutions
 	unsigned int restart_scale;      // How many conflicts before restart
-	float restart_base;              // How is the restart limit scaled (linear, geometric)
+	double restart_base;              // How is the restart limit scaled (linear, geometric)
 	RestartType restart_type;        // How is the restart limit computed
 
 	// Search options

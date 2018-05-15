@@ -14,6 +14,8 @@ Options::Options() :
 	, verbosity(0)
 	, print_sol(true)
 	, restart_scale(1000000000)
+    , restart_base(1.5)
+    , restart_type(CHUFFED_DEFAULT)
 
 	, toggle_vsids(false)
 	, branch_random(false)
@@ -278,8 +280,12 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "More Search Options:\n"
   "  --vsids [on|off], --no-vsids\n"
   "     Use activity-based search on the Boolean variables (default " << (def.vsids ? "on" : "off") << ").\n"
+  "  --restart [chuffed|constant|linear|luby|geometric]\n"
+  "     Restart sequence type (default chuffed).\n"
+  "  --restart-scale <n>\n"
+  "     Scale factor for restart sequence (default " << def.restart_scale << ").\n"
   "  --restart-base <n>\n"
-  "     Number of conflicts after which the search restarts (default " << def.restart_scale << ").\n"
+  "     Base for geometric restart sequence (default " << def.restart_base << ").\n"
   "  --toggle-vsids [on|off], --no-toggle-vsids\n"
   "     Alternate search between user-specified and activity-based one when the\n"
   "     search is restarted. Starts by the user-specified search. Default restart\n"
@@ -452,8 +458,25 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.verbosity = intBuffer;
     } else if (cop.getBool("--print-sol", boolBuffer)) {
       so.print_sol = boolBuffer;
-    } else if (cop.get("--restart-base", &intBuffer)) {
-      so.restart_scale = intBuffer;
+    } else if (cop.get("--restart", &stringBuffer)) {
+      if (stringBuffer == "chuffed") {
+        so.restart_base = CHUFFED_DEFAULT;
+      } else if (stringBuffer == "constant") {
+        so.restart_base = CONSTANT;
+      } else if (stringBuffer == "linear") {
+        so.restart_base = LINEAR;
+      } else if (stringBuffer == "luby") {
+        so.restart_base = LUBY;
+      } else if (stringBuffer == "geometric") {
+        so.restart_base = GEOMETRIC;
+      } else {
+        std::cerr << argv[0] << ": Unknown restart strategy " << stringBuffer
+                  << ". Chuffed will use its default strategy.\n";
+      }
+    } else if (cop.get("--restart-scale", &intBuffer)) {
+      so.restart_scale = static_cast<unsigned int>(intBuffer);
+    } else if (cop.get("--restart-base", &stringBuffer)) {
+      so.restart_base = stod(stringBuffer);
     } else if (cop.getBool("--toggle-vsids", boolBuffer)) {
       so.toggle_vsids = boolBuffer;
     } else if (cop.getBool("--branch-random", boolBuffer)) {
