@@ -54,9 +54,9 @@ int yy_input_proc(char* buf, int size, yyscan_t yyscanner);
 -?[0-9]+          { yylval->iValue = atoi(yytext); return INT_LIT; }
 -?0x[0-9A-Fa-f]+  { yylval->iValue = atoi(yytext); return INT_LIT; }
 -?0o[0-7]+        { yylval->iValue = atoi(yytext); return INT_LIT; }
--?[0-9]+\.[0-9]+  { return FLOAT_LIT; }
--?[0-9]+\.[0-9]+[Ee][+-]?[0-9]+  { return FLOAT_LIT; }
--?[0-9]+[Ee][+-]?[0-9]+  { return FLOAT_LIT; }
+-?[0-9]+\.[0-9]+  { yylval->dValue = atof(yytext); return FLOAT_LIT; }
+-?[0-9]+\.[0-9]+[Ee][+-]?[0-9]+  { yylval->dValue = atof(yytext); return FLOAT_LIT; }
+-?[0-9]+[Ee][+-]?[0-9]+  { yylval->dValue = atof(yytext); return FLOAT_LIT; }
 [=:;{}(),\[\]\.]    { return *yytext; }
 \.\.              { return DOTDOT; }
 ::                { return COLONCOLON; }
