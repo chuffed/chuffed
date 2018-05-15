@@ -700,12 +700,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 if (so.verbosity >= 2)
                     std::cerr << "restarting due to number of conflicts\n";
                 starts++;
-                if (so.restart_type == CHUFFED_DEFAULT) {
-                    //TODO: Why does default add instead of replace?
-                    nof_conflicts += getRestartLimit(starts);
-                } else {
-                    nof_conflicts = getRestartLimit(starts);
-                }
+                nof_conflicts += getRestartLimit(starts);
                 sat.btToLevel(0);
                 restartCount++;
                 nodepath.resize(0);
