@@ -17,7 +17,7 @@ predicate range_size_fzn(var int: x, var int: rs);
 
 
 %------------------------------------------------------------------------------%
-% Following search annotation is a place holders until it is includede in the
+% Following search annotation is a place holders until it is included in the
 % MiniZinc distribution
 
 /** @group annotations.search Specify search on a group of searches \a search,
@@ -45,4 +45,15 @@ annotation smallest_largest;
 /** @group annotations.search.varsel Choose the variable with the largest smallest value in its domain */
 annotation largest_smallest;
 
+%------------------------------------------------------------------------------%
+% Following restart strategy annotations are just place holders until they are
+% included in the MiniZinc distributions.
 
+/** @group annotations.search.restart Restart after fixed number of conflicts */
+annotation restart_constant(int: nodes);
+/** @group annotations.search.restart Restart with scaled Luby sequence */
+annotation restart_luby(int: scale);
+/** @group annotations.search.restart Restart with scaled geometric sequence (scale*base^n in the n-th iteration) */
+annotation restart_geometric(float: base, int: scale);
+/** @group annotations.search.restart Restart with linear sequence (scale*n in the n-th iteration) */
+annotation restart_linear(int: scale);
