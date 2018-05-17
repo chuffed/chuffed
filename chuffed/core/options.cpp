@@ -477,6 +477,9 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.restart_scale = static_cast<unsigned int>(intBuffer);
     } else if (cop.get("--restart-base", &stringBuffer)) {
       so.restart_base = stod(stringBuffer);
+      if (so.restart_base < 1.0) {
+        CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
+      }
     } else if (cop.getBool("--toggle-vsids", boolBuffer)) {
       so.toggle_vsids = boolBuffer;
     } else if (cop.getBool("--branch-random", boolBuffer)) {

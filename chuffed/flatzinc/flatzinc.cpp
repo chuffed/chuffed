@@ -360,6 +360,9 @@ namespace FlatZinc {
                     so.restart_type = GEOMETRIC;
                     AST::Array* args = call->getArgs(2);
                     so.restart_base = args->a[0]->getFloat();
+                    if (so.restart_base < 1.0) {
+                        CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
+                    }
                     so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt());
                 } else if (ann->a[i]->isCall("seq_search")) {
                     // Get the call
