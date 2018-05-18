@@ -343,7 +343,9 @@ namespace FlatZinc {
     void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching, int & nbNonEmptySearchAnnotations) {
         if (ann) {
             for (unsigned int i = 0; i < ann->a.size(); i++) {
-                if (ann->a[i]->isCall("restart_constant")) {
+                if (ann->a[i]->isCall("restart_none")) {
+                    so.restart_type = NONE;
+                } else if (ann->a[i]->isCall("restart_constant")) {
                     AST::Call* call = ann->a[i]->getCall("restart_constant");
                     so.restart_type = CONSTANT;
                     so.restart_scale = static_cast<unsigned int>(call->args->getInt());

@@ -12,7 +12,7 @@
 
 #define DEBUG_VERBOSE 0
 
-enum RestartType { CHUFFED_DEFAULT, CONSTANT, LINEAR, LUBY, GEOMETRIC};
+enum RestartType { CHUFFED_DEFAULT, NONE, CONSTANT, LINEAR, LUBY, GEOMETRIC};
 
 class Options {
 public:

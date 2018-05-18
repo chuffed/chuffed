@@ -49,6 +49,8 @@ annotation largest_smallest;
 % Following restart strategy annotations are just place holders until they are
 % included in the MiniZinc distributions.
 
+/** @group annotations.search.restart Do not use restarts during search */
+annotation restart_none;
 /** @group annotations.search.restart Restart after fixed number of conflicts */
 annotation restart_constant(int: nodes);
 /** @group annotations.search.restart Restart with scaled Luby sequence */

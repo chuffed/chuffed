@@ -280,7 +280,7 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "More Search Options:\n"
   "  --vsids [on|off], --no-vsids\n"
   "     Use activity-based search on the Boolean variables (default " << (def.vsids ? "on" : "off") << ").\n"
-  "  --restart [chuffed|constant|linear|luby|geometric]\n"
+  "  --restart [chuffed|none|constant|linear|luby|geometric]\n"
   "     Restart sequence type (default chuffed).\n"
   "  --restart-scale <n>\n"
   "     Scale factor for restart sequence (default " << def.restart_scale << ").\n"
@@ -461,6 +461,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("--restart", &stringBuffer)) {
       if (stringBuffer == "chuffed") {
         so.restart_type = CHUFFED_DEFAULT;
+      } else if (stringBuffer == "none") {
+        so.restart_type = NONE;
       } else if (stringBuffer == "constant") {
         so.restart_type = CONSTANT;
       } else if (stringBuffer == "linear") {

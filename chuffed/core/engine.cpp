@@ -437,6 +437,8 @@ void Engine::blockCurrentSol() {
 
 unsigned int Engine::getRestartLimit(unsigned int i) {
     switch (so.restart_type) {
+        case NONE:
+            CHUFFED_ERROR("A restart occurred while using search without restarts");
         case CONSTANT:
             return so.restart_scale;
         case LINEAR:
@@ -482,7 +484,7 @@ void Engine::toggleVSIDS() {
 
 RESULT Engine::search(const std::string& problemLabel) {
     unsigned int starts = 0;
-    unsigned int nof_conflicts = so.restart_scale;
+    unsigned int nof_conflicts = (so.restart_type == NONE) ? UINT_MAX : so.restart_scale;
     unsigned int conflictC = 0;
 
     if (so.print_variable_list) {
