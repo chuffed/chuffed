@@ -460,15 +460,15 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.print_sol = boolBuffer;
     } else if (cop.get("--restart", &stringBuffer)) {
       if (stringBuffer == "chuffed") {
-        so.restart_base = CHUFFED_DEFAULT;
+        so.restart_type = CHUFFED_DEFAULT;
       } else if (stringBuffer == "constant") {
-        so.restart_base = CONSTANT;
+        so.restart_type = CONSTANT;
       } else if (stringBuffer == "linear") {
-        so.restart_base = LINEAR;
+        so.restart_type = LINEAR;
       } else if (stringBuffer == "luby") {
-        so.restart_base = LUBY;
+        so.restart_type = LUBY;
       } else if (stringBuffer == "geometric") {
-        so.restart_base = GEOMETRIC;
+        so.restart_type = GEOMETRIC;
       } else {
         std::cerr << argv[0] << ": Unknown restart strategy " << stringBuffer
                   << ". Chuffed will use its default strategy.\n";
