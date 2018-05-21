@@ -438,6 +438,9 @@ void Engine::blockCurrentSol() {
 unsigned int Engine::getRestartLimit(unsigned int i) {
     switch (so.restart_type) {
         case NONE:
+            if (i > 1) {
+                CHUFFED_ERROR("A restart occurred while using search without restarts");
+            }
             return UINT_MAX;
         case CONSTANT:
             return so.restart_scale;
