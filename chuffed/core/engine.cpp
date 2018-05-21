@@ -718,7 +718,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #endif
 
                 sat.confl = NULL;
-                if (so.lazy && so.toggle_vsids && (starts % 2 == 0)) toggleVSIDS();
+                if (so.lazy && so.toggle_vsids && (starts % 2 == 1)) toggleVSIDS();
                 continue;
             }
             
