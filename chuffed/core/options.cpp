@@ -478,6 +478,9 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("--restart-scale", &intBuffer)) {
       so.restart_scale = static_cast<unsigned int>(intBuffer);
     } else if (cop.get("--restart-base", &stringBuffer)) {
+      // TODO: Remove warning when appropriate
+      std::cerr << "WARNING: the --restart-base flag has recently been changed."
+                << "The old behaviour of \"restart base\" is now implemented by --restart-scale.";
       so.restart_base = stod(stringBuffer);
       if (so.restart_base < 1.0) {
         CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
