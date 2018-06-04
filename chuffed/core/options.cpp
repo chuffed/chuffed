@@ -14,8 +14,11 @@ Options::Options() :
 	, verbosity(0)
 	, print_sol(true)
 	, restart_scale(1000000000)
+    , restart_scale_override(true)
     , restart_base(1.5)
+    , restart_base_override(true)
     , restart_type(CHUFFED_DEFAULT)
+    , restart_type_override(true)
 
 	, toggle_vsids(false)
 	, branch_random(false)
@@ -475,8 +478,10 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
         std::cerr << argv[0] << ": Unknown restart strategy " << stringBuffer
                   << ". Chuffed will use its default strategy.\n";
       }
+      so.restart_type_override = false;
     } else if (cop.get("--restart-scale", &intBuffer)) {
       so.restart_scale = static_cast<unsigned int>(intBuffer);
+      so.restart_scale_override = false;
     } else if (cop.get("--restart-base", &stringBuffer)) {
       // TODO: Remove warning when appropriate
       std::cerr << "WARNING: the --restart-base flag has recently been changed."
@@ -485,6 +490,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       if (so.restart_base < 1.0) {
         CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
       }
+      so.restart_base_override = false;
     } else if (cop.getBool("--toggle-vsids", boolBuffer)) {
       so.toggle_vsids = boolBuffer;
     } else if (cop.getBool("--branch-random", boolBuffer)) {
