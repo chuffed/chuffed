@@ -13,7 +13,12 @@ Options::Options() :
 	, rnd_seed(0)
 	, verbosity(0)
 	, print_sol(true)
-	, restart_base(1000000000)
+	, restart_scale(1000000000)
+    , restart_scale_override(true)
+    , restart_base(1.5)
+    , restart_base_override(true)
+    , restart_type(CHUFFED_DEFAULT)
+    , restart_type_override(true)
 
 	, toggle_vsids(false)
 	, branch_random(false)
@@ -278,8 +283,12 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "More Search Options:\n"
   "  --vsids [on|off], --no-vsids\n"
   "     Use activity-based search on the Boolean variables (default " << (def.vsids ? "on" : "off") << ").\n"
+  "  --restart [chuffed|none|constant|linear|luby|geometric]\n"
+  "     Restart sequence type (default chuffed).\n"
+  "  --restart-scale <n>\n"
+  "     Scale factor for restart sequence (default " << def.restart_scale << ").\n"
   "  --restart-base <n>\n"
-  "     Number of conflicts after which the search restarts (default " << def.restart_base << ").\n"
+  "     Base for geometric restart sequence (default " << def.restart_base << ").\n"
   "  --toggle-vsids [on|off], --no-toggle-vsids\n"
   "     Alternate search between user-specified and activity-based one when the\n"
   "     search is restarted. Starts by the user-specified search. Default restart\n"
@@ -452,8 +461,36 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.verbosity = intBuffer;
     } else if (cop.getBool("--print-sol", boolBuffer)) {
       so.print_sol = boolBuffer;
-    } else if (cop.get("--restart-base", &intBuffer)) {
-      so.restart_base = intBuffer;
+    } else if (cop.get("--restart", &stringBuffer)) {
+      if (stringBuffer == "chuffed") {
+        so.restart_type = CHUFFED_DEFAULT;
+      } else if (stringBuffer == "none") {
+        so.restart_type = NONE;
+      } else if (stringBuffer == "constant") {
+        so.restart_type = CONSTANT;
+      } else if (stringBuffer == "linear") {
+        so.restart_type = LINEAR;
+      } else if (stringBuffer == "luby") {
+        so.restart_type = LUBY;
+      } else if (stringBuffer == "geometric") {
+        so.restart_type = GEOMETRIC;
+      } else {
+        std::cerr << argv[0] << ": Unknown restart strategy " << stringBuffer
+                  << ". Chuffed will use its default strategy.\n";
+      }
+      so.restart_type_override = false;
+    } else if (cop.get("--restart-scale", &intBuffer)) {
+      so.restart_scale = static_cast<unsigned int>(intBuffer);
+      so.restart_scale_override = false;
+    } else if (cop.get("--restart-base", &stringBuffer)) {
+      // TODO: Remove warning when appropriate
+      std::cerr << "WARNING: the --restart-base flag has recently been changed."
+                << "The old behaviour of \"restart base\" is now implemented by --restart-scale.";
+      so.restart_base = stod(stringBuffer);
+      if (so.restart_base < 1.0) {
+        CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
+      }
+      so.restart_base_override = false;
     } else if (cop.getBool("--toggle-vsids", boolBuffer)) {
       so.toggle_vsids = boolBuffer;
     } else if (cop.getBool("--branch-random", boolBuffer)) {
@@ -560,7 +597,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.nof_solutions = 0;
     } else if (cop.get("-f")) {
       so.toggle_vsids = true;
-      so.restart_base = 100;
+      so.restart_scale = 100;
     } else if (cop.get("-p", &intBuffer)) {
       so.parallel = true;
       so.num_cores = intBuffer;

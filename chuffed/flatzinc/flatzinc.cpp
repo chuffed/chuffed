@@ -343,7 +343,30 @@ namespace FlatZinc {
     void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching, int & nbNonEmptySearchAnnotations) {
         if (ann) {
             for (unsigned int i = 0; i < ann->a.size(); i++) {
-                if (ann->a[i]->isCall("seq_search")) {
+                if (ann->a[i]->isCall("restart_none") && so.restart_type_override) {
+                    so.restart_type = NONE;
+                } else if (ann->a[i]->isCall("restart_constant")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_constant");
+                    if (so.restart_type_override) { so.restart_type = CONSTANT; }
+                    if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(call->args->getInt()); }
+                } else if (ann->a[i]->isCall("restart_linear")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_linear");
+                    if (so.restart_type_override) { so.restart_type = LINEAR; }
+                    if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(call->args->getInt()); }
+                } else if (ann->a[i]->isCall("restart_luby")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_luby");
+                    if (so.restart_type_override) { so.restart_type = LUBY; }
+                    if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(call->args->getInt()); }
+                } else if (ann->a[i]->isCall("restart_geometric")) {
+                    AST::Call* call = ann->a[i]->getCall("restart_geometric");
+                    if (so.restart_type_override) { so.restart_type = GEOMETRIC; }
+                    AST::Array* args = call->getArgs(2);
+                    if (so.restart_base_override) { so.restart_base = args->a[0]->getFloat(); }
+                    if (so.restart_base < 1.0) {
+                        CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
+                    }
+                    if (so.restart_scale_override) { so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt()); }
+                } else if (ann->a[i]->isCall("seq_search")) {
                     // Get the call
                     AST::Call* c = ann->a[i]->getCall();
                     // Create a new branch group and add to the branching
