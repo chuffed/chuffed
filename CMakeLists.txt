@@ -251,12 +251,6 @@ target_link_libraries(concert_hall chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT}
 add_executable(concert_hall_sym EXCLUDE_FROM_ALL chuffed/examples/concert_hall_sym.cpp)
 target_link_libraries(concert_hall_sym chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
-#add_executable(cross EXCLUDE_FROM_ALL chuffed/examples/cross.cpp)
-#target_link_libraries(cross chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
-
-#add_executable(fdpent EXCLUDE_FROM_ALL chuffed/examples/fdpent.cpp)
-#target_link_libraries(fdpent chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
-
 add_executable(golomb EXCLUDE_FROM_ALL chuffed/examples/golomb.cpp)
 target_link_libraries(golomb chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
@@ -290,9 +284,6 @@ target_link_libraries(nn_queens chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 add_executable(non EXCLUDE_FROM_ALL chuffed/examples/non.cpp)
 target_link_libraries(non chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
-#add_executable(nurse EXCLUDE_FROM_ALL chuffed/examples/nurse.cpp)
-#target_link_libraries(nurse chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
-
 add_executable(photo EXCLUDE_FROM_ALL chuffed/examples/photo.cpp)
 target_link_libraries(photo chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
@@ -311,14 +302,32 @@ target_link_libraries(steel_mill chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 add_executable(wreg_shift EXCLUDE_FROM_ALL chuffed/examples/wreg_shift.cpp)
 target_link_libraries(wreg_shift chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
 
+find_package(ZLIB)
+if(ZLIB_FOUND)
+  include_directories(${ZLIB_INCLUDE_DIRS})
+
+  add_executable(cross EXCLUDE_FROM_ALL chuffed/examples/cross.cpp)
+  target_link_libraries(cross chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES})
+
+  add_executable(fdpent EXCLUDE_FROM_ALL chuffed/examples/fdpent.cpp)
+  target_link_libraries(fdpent chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES})
+
+  add_executable(nurse EXCLUDE_FROM_ALL chuffed/examples/nurse.cpp)
+  target_link_libraries(nurse chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES})
+
+  set(ZLIB_EXAMPLES
+    cross
+    fdpent
+    nurse
+  )
+endif()
+
 add_custom_target(examples)
 add_dependencies(examples
   bibd
   blackhole
   concert_hall
   concert_hall_sym
-#  cross
-#  fdpent
   golomb
   graceful_graph
   graph_colouring
@@ -330,13 +339,13 @@ add_dependencies(examples
   mosp
   nn_queens
   non
-#  nurse
   photo
   queens
   rcpsp
   shift
   steel_mill
   wreg_shift
+  ${ZLIB_EXAMPLES}
 )
 
 # ------------- TARGET install -------------

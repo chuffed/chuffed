@@ -84,7 +84,7 @@ public:
             {
                 table(w, tables[rel]);
             } else {
-                mdd_table(w, tables[rel]);
+                mdd_table(w, tables[rel], MDDOpts());
             }
         }
 
@@ -97,7 +97,7 @@ public:
 //        branch(pref_order, VAR_MIN_MIN, VAL_SPLIT_MIN);
     }
 
-    void print(std::ostream&) {
+    void print(std::ostream& os) {
         for (int i = 0; i < nvars; i++) {
             int v = x[i]->getVal();
             os << i << ": " << v << "\n";
