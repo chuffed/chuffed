@@ -6,12 +6,21 @@ set(chuffed_VERSION_MAJOR 0)
 set(chuffed_VERSION_MINOR 9)
 set(chuffed_VERSION_PATCH 0)
 
+### Additional Definitions:
+# STATIC:BOOL (default:FALSE) - Create static binaries when set to true
+
+if(NOT DEFINED STATIC)
+  set(STATIC FALSE)
+endif()
+
 # ------------- Compiler Configuration -------------
 
-# Use this to make static binaries.
-# SET(CMAKE_EXE_LINKER_FLAGS "-static")
+if(STATIC)
+  message(WARNING "Compiling with the -static flag. This is not supported on all systems.")
+  set(CMAKE_EXE_LINKER_FLAGS "-static")
+endif()
 
-if (USE_STDLIBCPP)
+if(USE_STDLIBCPP)
   set(LIBCPP libstdc++)
 else()
   set(LIBCPP libc++)
