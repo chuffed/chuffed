@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.1.0)
 
 project(chuffed CXX C)
 # The version number.
@@ -22,22 +22,7 @@ if(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 endif(APPLE)
 
-if( (CMAKE_VERSION VERSION_GREATER 3.1.0) OR (CMAKE_VERSION VERSION_EQUAL 3.1.0) )
-  set (CMAKE_CXX_STANDARD 11)
-else()
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag(-std=c++11 HAS_STDCPP11)
-  if (HAS_STDCPP11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  else()
-    check_cxx_compiler_flag(-std=c++0x HAS_STDCPP0X)
-    if(HAS_STDCPP0X)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    else()
-      message(SEND_ERROR "CMake >= 3.1.0 required to detect whether compiler supports C++11")
-    endif()
-  endif()
-endif()
+set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads)
 
