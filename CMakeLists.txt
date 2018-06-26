@@ -350,5 +350,7 @@ add_dependencies(examples
 
 # ------------- TARGET install -------------
 
+configure_file(chuffed.msc.in chuffed.msc)
 install(TARGETS fzn-chuffed RUNTIME DESTINATION bin)
 install(DIRECTORY chuffed/flatzinc/mznlib DESTINATION share/chuffed)
+install(FILES ${CMAKE_BINARY_DIR}/chuffed.msc DESTINATION .)
