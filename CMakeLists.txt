@@ -7,12 +7,11 @@ set(chuffed_VERSION_MINOR 9)
 set(chuffed_VERSION_PATCH 0)
 
 ### Additional Definitions:
-# STATIC:BOOL (default:FALSE) - Create static binaries
+option(STATIC "compile with the -static linker flag" OFF)
 
 # ------------- Compiler Configuration -------------
 
 if(STATIC)
-  message(WARNING "Compiling with the -static flag. This is not supported on all systems.")
   set(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
