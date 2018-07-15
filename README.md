@@ -41,7 +41,7 @@ To build the C++ examples:
     cmake ..
     cmake --build . --target examples
 
-To build a debug or release version use the following command instead of `cmake ..`:
+To build a debug or release, chosen by default, version use the following command instead of `cmake ..`:
 
     cmake -DCMAKE_BUILD_TYPE=[Debug|Release] ..
 
@@ -107,8 +107,8 @@ Although Chuffed implements lazy clause generation, which is cutting edge and
 rather complex, the FD parts of Chuffed are relatively simple. In fact, it is
 quite minimalistic. Chuffed only supports 3 different propagator priorities.
 Chuffed implements a number of global propagators (alldiff, inverse,
-minimum, table, regular, mdd, cumulative, disjunctive, circuit, difference). 
-It also only supports two kinds of integer variables. Small integer variables 
+minimum, table, regular, mdd, cumulative, disjunctive, circuit, difference).
+It also only supports two kinds of integer variables. Small integer variables
 for which the domain is represented by a byte string.
 And large integer variables for which the domain is represented only by its
 upper and lower bound (no holes allowed). All boolean variables and boolean
