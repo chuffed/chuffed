@@ -34,6 +34,11 @@ To build the `fzn-chuffed` executable:
     cmake ..
     cmake --build .
 
+To install `fzn-chuffed` run the following command in the build directory:
+`cmake --build . --target install`. The installation directory can be chosen by
+appending `-DCMAKE_INSTALL_PREFIX=$LOCATION` with the chosen location to the
+initial CMake command.
+
 To build the C++ examples:
 
     mkdir build
