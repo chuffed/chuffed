@@ -453,7 +453,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.nof_solutions = intBuffer;
     } else if (cop.get("--time-out", &intBuffer)) {
       so.time_out = intBuffer;
-    } else if (cop.get("--rnd-seed", &intBuffer)) {
+    } else if (cop.get("-r --rnd-seed", &intBuffer)) {
       so.rnd_seed = intBuffer;
     } else if (cop.getBool("-v --verbose", boolBuffer)) {
       so.verbosity = boolBuffer;

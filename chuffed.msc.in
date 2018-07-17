@@ -6,7 +6,7 @@
   "mznlib": "share/chuffed/mznlib",
   "executable": "bin/fzn-chuffed",
   "tags": ["cp","lcg","int"],
-  "stdFlags": ["-a","-n"],
+  "stdFlags": ["-a","-f","-n","-r","-s","-v"],
   "supportsMzn": false,
   "supportsFzn": true,
   "needsSolns2Out": true,
