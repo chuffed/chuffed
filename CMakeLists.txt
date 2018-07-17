@@ -246,10 +246,10 @@ add_library(chuffed_fzn
   chuffed/flatzinc/ast.h
 )
 
-# ------------- Chuffed Examples -------------
-
 add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
 target_link_libraries(fzn-chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+
+# ------------- Chuffed Examples -------------
 
 add_executable(bibd EXCLUDE_FROM_ALL chuffed/examples/bibd.cpp)
 target_link_libraries(bibd chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
