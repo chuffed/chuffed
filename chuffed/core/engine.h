@@ -2,9 +2,13 @@
 #define engine_h
 
 #include <chuffed/support/misc.h>
+#include <chrono>
 #include <string>
 
 #define DEBUG 0
+
+using clock_chuf = std::chrono::steady_clock;
+using time_point = std::chrono::time_point<clock_chuf>;
 
 enum OPT_TYPE { OPT_MIN = 0, OPT_MAX = 1 };
 enum RESULT { RES_SAT, RES_LUN, RES_GUN, RES_UNK, RES_SEA };
@@ -43,6 +47,7 @@ public:
     int opt_type;
     int best_sol;
     RESULT status;
+    time_point time_out;
 
     // Intermediate propagation state
     vec<IntVar*> v_queue;           // List of changed vars

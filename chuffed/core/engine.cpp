@@ -569,7 +569,7 @@ RESULT Engine::search(const std::string& problemLabel) {
         Conflict:
             conflicts++; conflictC++;
 
-            if (time(NULL) > so.time_out) {
+            if (clock_chuf::now() > time_out) {
                 (*output_stream) << "% Time limit exceeded!\n";
                 return RES_UNK;
             }
@@ -871,7 +871,7 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
 
     init();
 
-    so.time_out += time(NULL);
+    time_out = clock_chuf::now() + so.time_out;
 
     init_time = wallClockTime() - start_time;
     base_memory = memUsed();
