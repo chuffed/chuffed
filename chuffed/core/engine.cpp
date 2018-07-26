@@ -569,7 +569,7 @@ RESULT Engine::search(const std::string& problemLabel) {
         Conflict:
             conflicts++; conflictC++;
 
-            if (clock_chuf::now() > time_out) {
+            if (so.time_out > duration(0) && clock_chuf::now() > time_out) {
                 (*output_stream) << "% Time limit exceeded!\n";
                 return RES_UNK;
             }

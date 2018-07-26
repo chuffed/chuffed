@@ -9,7 +9,7 @@ Options so;
 
 Options::Options() :
 		nof_solutions(1)
-	, time_out(1800000)
+	, time_out(0)
 	, rnd_seed(0)
 	, verbosity(0)
 	, print_sol(true)
@@ -248,7 +248,7 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  -v, --verbose\n"
   "     Verbose mode (default " << (def.verbosity == 0 ? "off" : "on") << ").\n"
   "  --time-out <n>\n"
-  "     Time out in milliseconds (default " << def.time_out.count() << ").\n"
+  "     Time out in milliseconds (default " << def.time_out.count() << ", 0 = run indefinitely).\n"
   "  --rnd-seed <n>\n"
   "     Set random seed (default " << def.rnd_seed << "). If 0 then the current time\n"
   "     via std::time(0) is used.\n"
