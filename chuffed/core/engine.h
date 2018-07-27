@@ -66,6 +66,8 @@ public:
     double start_time, init_time, opt_time, search_time;
     double base_memory;
     long long int conflicts, nodes, propagations, solutions, next_simp_db;
+    int peak_depth;
+    int restart_count;
 
     std::ostream* output_stream;
 private:

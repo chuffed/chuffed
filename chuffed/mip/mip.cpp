@@ -323,7 +323,7 @@ int MIP::doSimplex() {
 }
 
 void MIP::printStats() {
-	fprintf(stderr, "simplex = %lld\n", simplex.simplexs);
-	fprintf(stderr, "refactors = %lld\n", simplex.refactors);
+	printf("%%%%%%mzn-stat: simplex=%lld\n", simplex.simplexs);
+	printf("%%%%%%mzn-stat: refactors=%lld\n", simplex.refactors);
 }
 

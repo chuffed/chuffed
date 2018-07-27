@@ -97,8 +97,6 @@ std::vector<int> altpath;
 // stale and meaningless.
 std::vector<int> decisionLevelTip;
 
-int restartCount;
-
 // When we rewind after a backjump, should we send the skipped nodes
 // to the profiler?
 enum RewindStyle {
@@ -173,7 +171,7 @@ void rewindPaths(
             if (doProfiling()) {
               sendNode(profilerConnector
                        .createNode(nodeid, parent, myalt, 0, SKIPPED)
-                       .set_restart_id(restartCount)
+                       .set_restart_id(engine.restart_count)
                        .set_decision_level(currentDecisionLevel)
                        .set_time(timestamp));
             }
@@ -229,6 +227,7 @@ inline void Engine::newDecisionLevel() {
     sat.newDecisionLevel();
     if (so.mip) mip->newDecisionLevel();
     assert(dec_info.size() == decisionLevel());
+    peak_depth = max(peak_depth, decisionLevel());
 }
 
 inline void Engine::doFixPointStuff() {
@@ -290,13 +289,13 @@ inline bool Engine::constrain() {
     opt_time = wallClockTime() - start_time - init_time;
 
     sat.btToLevel(0);
-    restartCount++;
+    restart_count++;
     nodepath.resize(0);
     altpath.resize(0);
     /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
     if (doProfiling()) {
-      profilerConnector.restart("chuffed", restartCount);
+      profilerConnector.restart("chuffed", restart_count);
     }
 #endif
   
@@ -511,10 +510,10 @@ RESULT Engine::search(const std::string& problemLabel) {
     }
     std::string variableListString = ss.str();
 
-    restartCount = 0;
+    restart_count = 0;
 #ifdef HAS_PROFILER
     if (doProfiling()) {
-        profilerConnector.restart(problemLabel, restartCount, variableListString);
+        profilerConnector.restart(problemLabel, restart_count, variableListString);
     }
 #endif
   
@@ -559,7 +558,7 @@ RESULT Engine::search(const std::string& problemLabel) {
             std::cerr << "failure\n";
             std::cerr << "createNode(" << nodeid << ", " << parent << ", " << myalt << ", 0, NodeStatus::FAILED)\n";
             std::cerr << "label: " << mostRecentLabel << "\n";
-            std::cerr << "restart: " << restartCount << "\n";
+            std::cerr << "restart: " << restart_count << "\n";
 #endif
             /* c.createNode(nodeid, parent, myalt, 0, FAILED).set_label(mostRecentLabel).send(); */
             /* mostRecentLabel = ""; */
@@ -577,7 +576,7 @@ RESULT Engine::search(const std::string& problemLabel) {
             if (decisionLevel() == 0) {
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_restart_id(restartCount).set_decision_level(previousDecisionLevel));
+                    sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_restart_id(restart_count).set_decision_level(previousDecisionLevel));
                     mostRecentLabel = "";
                 }
 #endif
@@ -640,7 +639,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                     int backjumpDistance = previousDecisionLevel - decisionLevel();
 
                     if (doProfiling()) {
-                        sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_nogood(ss.str()).set_nogood_bld(bld).set_uses_assumptions(usesAssumptions).set_restart_id(restartCount).set_info(contribString.str()).set_backjump_distance(backjumpDistance).set_decision_level(previousDecisionLevel));
+                        sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_nogood(ss.str()).set_nogood_bld(bld).set_uses_assumptions(usesAssumptions).set_restart_id(restart_count).set_info(contribString.str()).set_backjump_distance(backjumpDistance).set_decision_level(previousDecisionLevel));
                     }
                     mostRecentLabel = "";
 #if DEBUG_VERBOSE
@@ -667,7 +666,7 @@ RESULT Engine::search(const std::string& problemLabel) {
             }   else {
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_restart_id(restartCount).set_decision_level(previousDecisionLevel));
+                    sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, FAILED).set_time(timeus).set_label(mostRecentLabel).set_restart_id(restart_count).set_decision_level(previousDecisionLevel));
                     mostRecentLabel = "";
                 }
 #endif
@@ -687,13 +686,13 @@ RESULT Engine::search(const std::string& problemLabel) {
                 if (so.verbosity >= 2)
                     std::cerr << "restarting and switching to VSIDS\n";
                 sat.btToLevel(0);
-                restartCount++;
+                restart_count++;
                 nodepath.resize(0);
                 altpath.resize(0);
                 /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    profilerConnector.restart("chuffed", restartCount);
+                    profilerConnector.restart("chuffed", restart_count);
                 }
 #endif
                 toggleVSIDS();
@@ -707,13 +706,13 @@ RESULT Engine::search(const std::string& problemLabel) {
                 starts++;
                 nof_conflicts += getRestartLimit(starts);
                 sat.btToLevel(0);
-                restartCount++;
+                restart_count++;
                 nodepath.resize(0);
                 altpath.resize(0);
                 /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    profilerConnector.restart("chuffed", restartCount);
+                    profilerConnector.restart("chuffed", restart_count);
                 }
 #endif
 
@@ -776,14 +775,14 @@ RESULT Engine::search(const std::string& problemLabel) {
                             .set_label(mostRecentLabel)
                             .set_info(s.str())
                             .set_decision_level(previousDecisionLevel)
-                            .set_restart_id(restartCount));
+                            .set_restart_id(restart_count));
                     }
                     else {
                         sendNode(profilerConnector.createNode(nodeid, parent, myalt, 0, SOLVED)
                             .set_time(timeus)
                             .set_label(mostRecentLabel)
                             .set_decision_level(previousDecisionLevel)
-                            .set_restart_id(restartCount));
+                            .set_restart_id(restart_count));
                     }
                 }
                 //FlatZinc::FlatZincSpace *fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
@@ -796,7 +795,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 //               .set_label(mostRecentLabel)
                 //               .set_info(s.str())
                 //               .set_decision_level(previousDecisionLevel)
-                //               .set_restart_id(restartCount));
+                //               .set_restart_id(restart_count));
                 //    }
                 //} else {
                 //    if (doProfiling()) {
@@ -804,7 +803,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 //               .set_time(timeus)
                 //               .set_label(mostRecentLabel)
                 //               .set_decision_level(previousDecisionLevel)
-                //               .set_restart_id(restartCount));
+                //               .set_restart_id(restart_count));
                 //    }
                 //}
 #endif
@@ -846,7 +845,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                                           .set_label(mostRecentLabel)
                                           .set_info(info)
                                           .set_decision_level(previousDecisionLevel)
-                                          .set_restart_id(restartCount));
+                                          .set_restart_id(restart_count));
                 mostRecentLabel = "";
             }
 #endif

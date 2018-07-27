@@ -559,15 +559,17 @@ void SAT::printLearntStats() {
 }
 
 void SAT::printStats() {
-	fprintf(stderr, "%d SAT variables\n", nVars());
-	fprintf(stderr, "%d orig bin clauses\n", bin_clauses);
-	fprintf(stderr, "%d orig tern clauses\n", tern_clauses);
-	fprintf(stderr, "%d orig long clauses (avg. len. %.2f)\n", long_clauses, long_clauses ? (double) (clauses_literals - 3*tern_clauses) / long_clauses : 0);
-	fprintf(stderr, "%d learnt clauses (avg. len. %.2f)\n", learnts.size(), learnts.size() ? (double) learnts_literals / learnts.size() : 0);
-	fprintf(stderr, "%lld SAT propagations\n", propagations);
-	fprintf(stderr, "%lld back jumps\n", back_jumps);
-	fprintf(stderr, "%lld natural restarts\n", nrestarts);
-	if (so.ldsb) fprintf(stderr, "%.2f pushback time\n", pushback_time);
+	printf("%%%%%%mzn-stat: binClauses=%d\n", bin_clauses);
+	printf("%%%%%%mzn-stat: ternClauses=%d\n", tern_clauses);
+	printf("%%%%%%mzn-stat: longClauses=%d\n", long_clauses);
+	printf("%%%%%%mzn-stat: avgLongClauseLen=%.2f\n", long_clauses ? (double) (clauses_literals - 3*tern_clauses) / long_clauses : 0);
+	printf("%%%%%%mzn-stat: learntClauses=%d\n", learnts.size());
+	printf("%%%%%%mzn-stat: avgLearntClauseLen=%.2f\n", learnts.size() ? (double) learnts_literals / learnts.size() : 0);
+	printf("%%%%%%mzn-stat: satPropagations=%lld\n", propagations);
+	printf("%%%%%%mzn-stat: naturalRestarts=%lld\n", nrestarts);
+	if (so.ldsb) {
+		printf("%%%%%%mzn-stat: pushbackTime=%.2f\n", pushback_time);
+	}
 }
 
 
