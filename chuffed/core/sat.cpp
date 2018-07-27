@@ -62,7 +62,7 @@ inline void SAT::untrailToPos(vec<Lit>& t, int p) {
 
 SAT::SAT() :
 		lit_sort(trailpos)
-	, pushback_time(0)
+	, pushback_time(duration::zero())
 	, trail(1)
 	, qhead(1,0)
 	, rtrail(1)
@@ -84,7 +84,7 @@ SAT::SAT() :
 	, tot_literals(0)
 	, avg_depth(100)
 	, confl_rate(1000)
-	, ll_time(wallClockTime())
+	, ll_time(chuffed_clock::now())
 	, ll_inc(1)
 	, learnt_len_el(10)
 	, learnt_len_occ(MAX_SHARE_LEN,learnt_len_el*1000/MAX_SHARE_LEN)
@@ -568,7 +568,7 @@ void SAT::printStats() {
 	printf("%%%%%%mzn-stat: satPropagations=%lld\n", propagations);
 	printf("%%%%%%mzn-stat: naturalRestarts=%lld\n", nrestarts);
 	if (so.ldsb) {
-		printf("%%%%%%mzn-stat: pushbackTime=%.2f\n", pushback_time);
+		printf("%%%%%%mzn-stat: pushbackTime=%.3f\n", to_sec(pushback_time));
 	}
 }
 

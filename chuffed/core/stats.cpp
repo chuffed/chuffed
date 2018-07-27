@@ -11,7 +11,7 @@
 void Engine::printStats() {
 	if (so.thread_no != -1) return;
 
-	search_time = wallClockTime() - start_time - init_time;
+	search_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time) - init_time;
 
     // MiniZinc standard statistics
 	printf("%%%%%%mzn-stat: nodes=%lld\n", nodes);
@@ -28,12 +28,12 @@ void Engine::printStats() {
     printf("%%%%%%mzn-stat: nogoods=%lld\n", conflicts); //TODO: Is this correct (e.g., sat.learnts.size())
     printf("%%%%%%mzn-stat: backjumps=%lld\n", sat.back_jumps);
     printf("%%%%%%mzn-stat: peakMem=%.2f\n", memUsed());
-    printf("%%%%%%mzn-stat: initTime=%.2f\n", init_time);
-    printf("%%%%%%mzn-stat: solveTime=%.2f\n", search_time);
+    printf("%%%%%%mzn-stat: initTime=%.3f\n", to_sec(init_time));
+    printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
 
     // Chuffed specific statistics
     if (opt_var) {
-        printf("%%%%%%mzn-stat: optTime=%.2f\n", opt_time);
+        printf("%%%%%%mzn-stat: optTime=%.3f\n", to_sec(opt_time));
     }
     printf("%%%%%%mzn-stat: baseMem=%.2f\n", base_memory);
     printf("%%%%%%mzn-stat: trailMem=%.2f\n", trail.capacity() * sizeof(TrailElem) / 1048576.0);
@@ -57,7 +57,7 @@ void Engine::printStats() {
         printf("%%%%%%mzn-stat: bestSol=%d\n", best_sol);
 
 		if (so.ldsb) {
-            printf("%%%%%%mzn-stat: ldsbTime=%.2f\n", ldsb.ldsb_time);
+            printf("%%%%%%mzn-stat: ldsbTime=%.3f\n", to_sec(ldsb.ldsb_time));
 		}
 		if (so.parallel) {
 		    master.printStats();

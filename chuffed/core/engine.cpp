@@ -197,9 +197,9 @@ Engine::Engine()
     , opt_var(NULL)
     , best_sol(-1)
     , last_prop(NULL)
-      
-    , start_time(wallClockTime())
-    , opt_time(0)
+
+    , start_time(chuffed_clock::now())
+    , opt_time(duration::zero())
     , conflicts(0)
     , nodes(1)
     , propagations(0)
@@ -286,7 +286,7 @@ void optimize(IntVar* v, int t) {
 
 inline bool Engine::constrain() {
     best_sol = opt_var->getVal();
-    opt_time = wallClockTime() - start_time - init_time;
+    opt_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time) - init_time;
 
     sat.btToLevel(0);
     restart_count++;
@@ -568,7 +568,7 @@ RESULT Engine::search(const std::string& problemLabel) {
         Conflict:
             conflicts++; conflictC++;
 
-            if (so.time_out > duration(0) && clock_chuf::now() > time_out) {
+            if (so.time_out > duration(0) && chuffed_clock::now() > time_out) {
                 (*output_stream) << "% Time limit exceeded!\n";
                 return RES_UNK;
             }
@@ -870,9 +870,9 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
 
     init();
 
-    time_out = clock_chuf::now() + so.time_out;
+    time_out = chuffed_clock::now() + so.time_out;
 
-    init_time = wallClockTime() - start_time;
+    init_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time);
     base_memory = memUsed();
 
 #ifdef HAS_PROFILER
