@@ -13,31 +13,32 @@ void Engine::printStats() {
 
 	search_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time) - init_time;
 
-    // MiniZinc standard statistics
+	// MiniZinc standard statistics
 	printf("%%%%%%mzn-stat: nodes=%lld\n", nodes);
 	printf("%%%%%%mzn-stat: failures=%lld\n", conflicts);
 	printf("%%%%%%mzn-stat: restarts=%d\n", restart_count);
-    printf("%%%%%%mzn-stat: variables=%d\n", vars.size() + sat.nVars());
-    printf("%%%%%%mzn-stat: intVars=%d\n", vars.size());
-    printf("%%%%%%mzn-stat: boolVariables=%d\n", sat.nVars()-2); //Do not count constant True/False
+	printf("%%%%%%mzn-stat: variables=%d\n", vars.size() + sat.nVars());
+	printf("%%%%%%mzn-stat: intVars=%d\n", vars.size());
+	printf("%%%%%%mzn-stat: boolVariables=%d\n", sat.nVars()-2); //Do not count constant True/False
 //    printf("%%%%%%mzn-stat: floatVariables=%d\n", );
 //    printf("%%%%%%mzn-stat: setVariables=%d\n", );
-    printf("%%%%%%mzn-stat: propagators=%d\n", propagators.size());
-    printf("%%%%%%mzn-stat: propagations=%lld\n", propagations);
-    printf("%%%%%%mzn-stat: peakDepth=%d\n", peak_depth);
-    printf("%%%%%%mzn-stat: nogoods=%lld\n", conflicts); //TODO: Is this correct (e.g., sat.learnts.size())
-    printf("%%%%%%mzn-stat: backjumps=%lld\n", sat.back_jumps);
-    printf("%%%%%%mzn-stat: peakMem=%.2f\n", memUsed());
-    printf("%%%%%%mzn-stat: initTime=%.3f\n", to_sec(init_time));
-    printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
+	printf("%%%%%%mzn-stat: propagators=%d\n", propagators.size());
+	printf("%%%%%%mzn-stat: propagations=%lld\n", propagations);
+	printf("%%%%%%mzn-stat: peakDepth=%d\n", peak_depth);
+	printf("%%%%%%mzn-stat: nogoods=%lld\n", conflicts); //TODO: Is this correct (e.g., sat.learnts.size())
+	printf("%%%%%%mzn-stat: backjumps=%lld\n", sat.back_jumps);
+	printf("%%%%%%mzn-stat: peakMem=%.2f\n", memUsed());
+	printf("%%%%%%mzn-stat: initTime=%.3f\n", to_sec(init_time));
+	printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
 
-    // Chuffed specific statistics
-    if (opt_var) {
-        printf("%%%%%%mzn-stat: optTime=%.3f\n", to_sec(opt_time));
-    }
-    printf("%%%%%%mzn-stat: baseMem=%.2f\n", base_memory);
-    printf("%%%%%%mzn-stat: trailMem=%.2f\n", trail.capacity() * sizeof(TrailElem) / 1048576.0);
-    printf("%%%%%%mzn-stat: randomSeed=%d\n", so.rnd_seed);
+	// Chuffed specific statistics
+	printf("%%%%%%mzn-stat: objective=%d\n", best_sol);
+	if (opt_var) {
+		printf("%%%%%%mzn-stat: optTime=%.3f\n", to_sec(opt_time));
+	}
+	printf("%%%%%%mzn-stat: baseMem=%.2f\n", base_memory);
+	printf("%%%%%%mzn-stat: trailMem=%.2f\n", trail.capacity() * sizeof(TrailElem) / 1048576.0);
+	printf("%%%%%%mzn-stat: randomSeed=%d\n", so.rnd_seed);
 
 	if (so.verbosity >= 2) {
 		int nl = 0, el = 0, ll = 0;
@@ -50,25 +51,24 @@ void Engine::printStats() {
 				default: NEVER;
 			}
 		}
-        printf("%%%%%%mzn-stat: noLits=%d\n", nl);
-        printf("%%%%%%mzn-stat: eagerLits=%d\n", el);
-        printf("%%%%%%mzn-stat: lazyLits=%d\n", ll);
-        printf("%%%%%%mzn-stat: solutions=%lld\n", solutions);
-        printf("%%%%%%mzn-stat: bestSol=%d\n", best_sol);
+		printf("%%%%%%mzn-stat: noLitIntVars=%d\n", nl);
+		printf("%%%%%%mzn-stat: eagerLitIntVars=%d\n", el);
+		printf("%%%%%%mzn-stat: lazyLitIntVars=%d\n", ll);
+		printf("%%%%%%mzn-stat: solutions=%lld\n", solutions);
 
 		if (so.ldsb) {
-            printf("%%%%%%mzn-stat: ldsbTime=%.3f\n", to_sec(ldsb.ldsb_time));
+			printf("%%%%%%mzn-stat: ldsbTime=%.3f\n", to_sec(ldsb.ldsb_time));
 		}
 		if (so.parallel) {
-		    master.printStats();
+			master.printStats();
 		}
 		sat.printStats();
 		/* sat.printLearntStats(); */
 		if (so.mip) {
-		    mip->printStats();
+			mip->printStats();
 		}
 		for (int i = 0; i < engine.propagators.size(); i++) {
-            engine.propagators[i]->printStats();
+			engine.propagators[i]->printStats();
 		}
 	}
 }
