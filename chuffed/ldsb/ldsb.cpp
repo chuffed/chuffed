@@ -36,7 +36,7 @@ public:
 //-------
 
 void LDSB::init() {
-	ldsb_time = 0;
+	ldsb_time = duration::zero();
 	for (int i = 0; i < engine.vars.size(); i++) lookupTable.push();
 	for (int i = 0; i < symmetries.size(); i++) symmetries[i]->init();
 }
@@ -53,7 +53,7 @@ void LDSB::processDec(Lit p) {
 }
 
 bool LDSB::processImpl(Clause *c) {
-	ldsb_time -= wallClockTime();
+	time_point start = chuffed_clock::now();
 
 	sym_learnts.clear();
 	sl_origin.clear();
@@ -75,7 +75,7 @@ bool LDSB::processImpl(Clause *c) {
 		for (int i = 0; i < syms.size(); i++) {
 			if (syms[i].first == sl_origin[k]) continue;
 			if (!symmetries[syms[i].first]->processImpl(sym_learnts[k], syms[i].second)) {
-				ldsb_time += wallClockTime();
+				ldsb_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
 				return false;
 			}
 		}
@@ -90,7 +90,7 @@ bool LDSB::processImpl(Clause *c) {
 		printf("%d %d\n", sat.c_info[var((*sym_learnts[i])[0])].cons_id, sat.c_info[var((*sym_learnts[i])[0])].v);
 	}
 */
-	ldsb_time += wallClockTime();
+	ldsb_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);;
 	return true;
 }
 

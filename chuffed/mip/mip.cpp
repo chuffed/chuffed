@@ -14,7 +14,7 @@ MIP *mip;
 //-----
 // Main propagator methods
 
-MIP::MIP() : level_lb(-1), level_ub(-1), status(0), simplex_time(0) {
+MIP::MIP() : level_lb(-1), level_ub(-1), status(0), simplex_time(duration::zero()) {
 //	priority = 3;
 	priority = 0;
 }
@@ -73,7 +73,7 @@ void MIP::wakeup(int i, int c) {
 
 
 bool MIP::propagate() {
-	simplex_time -= wallClockTime();
+	time_point start = chuffed_clock::now();
 //	printObjective();
 
 	updateBounds();
@@ -85,7 +85,7 @@ bool MIP::propagate() {
 
 //	printf("Depth = %d\n", decisionLevel());
 
-	simplex_time += wallClockTime();
+	simplex_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
 
 	if (status == SIMPLEX_UNBOUNDED) {
 		if (MIP_DEBUG) printf("MIP failure\n");
@@ -323,7 +323,7 @@ int MIP::doSimplex() {
 }
 
 void MIP::printStats() {
-	fprintf(stderr, "simplex = %lld\n", simplex.simplexs);
-	fprintf(stderr, "refactors = %lld\n", simplex.refactors);
+	printf("%%%%%%mzn-stat: simplex=%lld\n", simplex.simplexs);
+	printf("%%%%%%mzn-stat: refactors=%lld\n", simplex.refactors);
 }
 

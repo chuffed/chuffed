@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cassert>
+#include <chrono>
 #include <ctime>
 #include <cstring>
 
@@ -62,40 +63,20 @@ static inline unsigned int myrand(int& rseed) {
 
 //------
 
+using chuffed_clock = std::chrono::steady_clock;
+using time_point = std::chrono::time_point<chuffed_clock>;
+using duration = std::chrono::milliseconds;
+
+static inline double to_sec(duration d) {
+	return std::chrono::duration_cast<std::chrono::duration<double>>(d).count();
+}
+
 template <class T>
 static inline int bitcount(T s) {
 	int c = 0;
 	while (s) {	s &= s-1;	c++; }
 	return c;
 }
-
-static inline double wallClockTime() {
-#ifdef WIN32
-  static const unsigned __int64 epoch = ((unsigned __int64) 116444736000000000ULL);
-  FILETIME    file_time;
-  SYSTEMTIME  system_time;
-  ULARGE_INTEGER ularge;
-  
-  GetSystemTime(&system_time);
-  SystemTimeToFileTime(&system_time, &file_time);
-  ularge.LowPart = file_time.dwLowDateTime;
-  ularge.HighPart = file_time.dwHighDateTime;
-
-  long sec = (ularge.QuadPart - epoch) / 10000000L;
-  long msec = system_time.wMilliseconds;
-  return (double) sec + (double) msec/1000;
-#else
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return (double) tp.tv_sec + (double) tp.tv_usec/1000000;
-#endif
-}
-
-/*
-static inline double wallClockTime() {
-	return (double) time(NULL);
-}
-*/
 
 static int mylog2 (int val) {
 	int ret = -1;

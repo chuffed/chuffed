@@ -22,8 +22,9 @@ std::ofstream implication_stream;
 inline void SAT::learntLenBumpActivity(int l) {
 	if (l >= MAX_SHARE_LEN) return;
 	if (engine.conflicts % 16 == 0) {
-		double new_ll_time = wallClockTime();
-		double factor = exp((new_ll_time-ll_time)/learnt_len_el);
+		time_point new_ll_time = chuffed_clock::now();
+		auto diff = std::chrono::duration_cast<duration>(new_ll_time-ll_time);
+		double factor = exp(to_sec(diff)/learnt_len_el);
 		if ((ll_inc *= factor) > 1e100) {
 			for (int i = 0; i < MAX_SHARE_LEN; i++) learnt_len_occ[i] *= 1e-100;
 			ll_inc *= 1e-100;
@@ -377,7 +378,7 @@ int SAT::findConflictLevel() {
 }
 
 void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
-	pushback_time -= wallClockTime();
+	time_point start = chuffed_clock::now();
 
 	vec<Lit> removed;
 	for (int i = 1; i < out_learnt.size(); i++) {
@@ -402,7 +403,7 @@ void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
 
 	for (int i = 0; i < removed.size(); i++) seen[var(removed[i])] = 0;
 
-	pushback_time += wallClockTime();
+	pushback_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
 }
 
 void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {

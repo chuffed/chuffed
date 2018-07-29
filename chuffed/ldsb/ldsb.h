@@ -20,7 +20,7 @@ public:
 	vec<Clause*> sym_learnts;         // List of symmetric learnt clauses
 	vec<int> sl_origin;               // Source of new learnt clause
 
-	double ldsb_time;
+	duration ldsb_time;
 
 	void init();
 	void processDec(Lit p);

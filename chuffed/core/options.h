@@ -1,7 +1,6 @@
 #ifndef options_h
 #define options_h
 
-#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -13,7 +12,6 @@
 
 #define DEBUG_VERBOSE 0
 
-using duration = std::chrono::milliseconds;
 
 enum RestartType { CHUFFED_DEFAULT, NONE, CONSTANT, LINEAR, LUBY, GEOMETRIC};
 

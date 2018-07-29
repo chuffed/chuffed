@@ -2,13 +2,10 @@
 #define engine_h
 
 #include <chuffed/support/misc.h>
-#include <chrono>
 #include <string>
 
 #define DEBUG 0
 
-using clock_chuf = std::chrono::steady_clock;
-using time_point = std::chrono::time_point<clock_chuf>;
 
 enum OPT_TYPE { OPT_MIN = 0, OPT_MAX = 1 };
 enum RESULT { RES_SAT, RES_LUN, RES_GUN, RES_UNK, RES_SEA };
@@ -63,9 +60,12 @@ public:
     vec<int> trail_lim;
 
     // Statistics
-    double start_time, init_time, opt_time, search_time;
+    time_point start_time;
+    duration init_time, opt_time, search_time;
     double base_memory;
     long long int conflicts, nodes, propagations, solutions, next_simp_db;
+    int peak_depth;
+    int restart_count;
 
     std::ostream* output_stream;
 private:

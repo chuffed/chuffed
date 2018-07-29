@@ -50,7 +50,7 @@ public:
 
 	int status;
 
-	long double simplex_time;
+	duration simplex_time;
 
 	VarGroup *toplevelgroup;
 

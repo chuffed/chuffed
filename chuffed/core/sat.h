@@ -66,7 +66,7 @@ public:
   vec<int> trailpos;                // the trailPos at which the assignment was made
 	vec<LitFlags> flags;              // Info about literal
 
-	double pushback_time;
+	duration pushback_time;
 
 	// Lazy Lit Generation
 	int orig_cutoff;
@@ -117,7 +117,7 @@ public:
 
 	// Parallel
 
-	double ll_time;
+	time_point ll_time;
 	double ll_inc;
 	double learnt_len_el;
 	vec<double> learnt_len_occ;
