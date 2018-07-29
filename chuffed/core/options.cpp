@@ -9,7 +9,7 @@ Options so;
 
 Options::Options() :
 		nof_solutions(1)
-	, time_out(1800)
+	, time_out(0)
 	, rnd_seed(0)
 	, verbosity(0)
 	, print_sol(true)
@@ -248,7 +248,7 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  -v, --verbose\n"
   "     Verbose mode (default " << (def.verbosity == 0 ? "off" : "on") << ").\n"
   "  --time-out <n>\n"
-  "     Time out in seconds (default " << def.time_out << ").\n"
+  "     Time out in milliseconds (default " << def.time_out.count() << ", 0 = run indefinitely).\n"
   "  --rnd-seed <n>\n"
   "     Set random seed (default " << def.rnd_seed << "). If 0 then the current time\n"
   "     via std::time(0) is used.\n"
@@ -451,8 +451,11 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     }
     if (cop.get("-n --n-of-solutions", &intBuffer)) {
       so.nof_solutions = intBuffer;
-    } else if (cop.get("--time-out", &intBuffer)) {
-      so.time_out = intBuffer;
+    } else if (cop.get("-t --time-out", &intBuffer)) {
+      // TODO: Remove warning when appropriate
+      std::cerr << "WARNING: the --time-out flag has recently been changed."
+                << "The time-out is now provided in milliseconds instead of seconds";
+      so.time_out = duration(intBuffer);
     } else if (cop.get("-r --rnd-seed", &intBuffer)) {
       so.rnd_seed = intBuffer;
     } else if (cop.getBool("-v --verbose", boolBuffer)) {

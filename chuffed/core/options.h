@@ -1,6 +1,7 @@
 #ifndef options_h
 #define options_h
 
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -12,13 +13,15 @@
 
 #define DEBUG_VERBOSE 0
 
+using duration = std::chrono::milliseconds;
+
 enum RestartType { CHUFFED_DEFAULT, NONE, CONSTANT, LINEAR, LUBY, GEOMETRIC};
 
 class Options {
 public:
 	// Solver options
 	int nof_solutions;               // Number of solutions to find
-	int time_out;                    // Amount of time before giving up
+	duration time_out;               // Amount of time before giving up
 	int rnd_seed;                    // Random seed
 	int verbosity;                   // Verbosity
 	bool print_sol;                  // Print solutions
