@@ -61,7 +61,7 @@ public:
 
     // Statistics
     time_point start_time;
-    duration init_time, opt_time, search_time;
+    duration init_time, opt_time;
     double base_memory;
     long long int conflicts, nodes, propagations, solutions, next_simp_db;
     int peak_depth;

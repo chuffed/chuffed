@@ -11,7 +11,8 @@
 void Engine::printStats() {
 	if (so.thread_no != -1) return;
 
-	search_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time) - init_time;
+	auto total_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time);
+	duration search_time = total_time - init_time;
 
 	// MiniZinc standard statistics
 	printf("%%%%%%mzn-stat: nodes=%lld\n", nodes);
@@ -28,6 +29,7 @@ void Engine::printStats() {
 	printf("%%%%%%mzn-stat: nogoods=%lld\n", conflicts); //TODO: Is this correct (e.g., sat.learnts.size())
 	printf("%%%%%%mzn-stat: backjumps=%lld\n", sat.back_jumps);
 	printf("%%%%%%mzn-stat: peakMem=%.2f\n", memUsed());
+	printf("%%%%%%mzn-stat: time=%.3f\n", to_sec(total_time));
 	printf("%%%%%%mzn-stat: initTime=%.3f\n", to_sec(init_time));
 	printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
 
