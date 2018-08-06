@@ -454,7 +454,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("-t --time-out", &intBuffer)) {
       // TODO: Remove warning when appropriate
       std::cerr << "WARNING: the --time-out flag has recently been changed."
-                << "The time-out is now provided in milliseconds instead of seconds";
+                << "The time-out is now provided in milliseconds instead of seconds"
+                << std::endl;
       so.time_out = duration(intBuffer);
     } else if (cop.get("-r --rnd-seed", &intBuffer)) {
       so.rnd_seed = intBuffer;
@@ -488,7 +489,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("--restart-base", &stringBuffer)) {
       // TODO: Remove warning when appropriate
       std::cerr << "WARNING: the --restart-base flag has recently been changed."
-                << "The old behaviour of \"restart base\" is now implemented by --restart-scale.";
+                << "The old behaviour of \"restart base\" is now implemented by --restart-scale."
+                << std::endl;
       so.restart_base = stod(stringBuffer);
       if (so.restart_base < 1.0) {
         CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
