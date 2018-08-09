@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1.0)
 project(chuffed CXX C)
 # The version number.
 set(chuffed_VERSION_MAJOR 0)
-set(chuffed_VERSION_MINOR 9)
+set(chuffed_VERSION_MINOR 10)
 set(chuffed_VERSION_PATCH 0)
 
 ### Additional Definitions:
