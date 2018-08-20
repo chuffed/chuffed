@@ -205,43 +205,42 @@ endif()
 
 # ------------- FZN Chuffed -------------
 
-find_program(FLEX_EXEC flex)
-if(FLEX_EXEC)
-  add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/lexer.yy.cpp
-    DEPENDS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
-    COMMAND ${FLEX_EXEC} -L -o${PROJECT_BINARY_DIR}/lexer.yy.cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
-  )
-  set_source_files_properties(${PROJECT_BINARY_DIR}/lexer.yy.cpp GENERATED)
-  set(lexer_cpp ${PROJECT_BINARY_DIR}/lexer.yy.cpp)
-else(FLEX_EXEC)
-  message(WARNING "Flex cannot be run. Using cached file, which may be out of date.")
-  set(lexer_cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.yy.cpp)
-endif(FLEX_EXEC)
-
-find_program(BISON_EXEC bison)
-if(BISON_EXEC)
+find_package(BISON)
+if(BISON_FOUND)
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/chuffed/flatzinc)
-  add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/parser.tab.cpp ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h
-    DEPENDS ${lexer_cpp} ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
-    COMMAND "${BISON_EXEC}" -l -o ${PROJECT_BINARY_DIR}/parser.tab.cpp --defines=${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
+  bison_target(FZNParser
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
+    ${PROJECT_BINARY_DIR}/parser.tab.cpp
+    DEFINES_FILE ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h
+    COMPILE_FLAGS "-l"
   )
-  set_source_files_properties(${PROJECT_BINARY_DIR}/parser.tab.cpp GENERATED)
-  set(parser_cpp ${PROJECT_BINARY_DIR}/parser.tab.cpp)
-  set(parser_hh ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h)
-else(BISON_EXEC)
+else()
   message(WARNING "Bison cannot be run. Using cached file, which may be out of date.")
-  set(parser_cpp ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.cpp)
-  set(parser_hh ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.h)
-endif(BISON_EXEC)
+  set(BISON_FZNParser_OUTPUTS
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.cpp
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.h
+  )
+endif()
+
+find_package(FLEX)
+if(FLEX_FOUND)
+  flex_target(FZNLexer
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
+    ${PROJECT_BINARY_DIR}/lexer.yy.cpp
+    COMPILE_FLAGS "-L"
+  )
+  add_flex_bison_dependency(FZNLexer FZNParser)
+else()
+  message(WARNING "Flex cannot be run. Using cached file, which may be out of date.")
+  set(FLEX_FZNLexer_OUTPUTS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.yy.cpp)
+endif()
 
 add_library(chuffed_fzn
   ${parser_cpp}
   chuffed/flatzinc/registry.cpp
   chuffed/flatzinc/flatzinc.cpp
-  ${lexer_cpp}
-  ${parser_h}
+  ${FLEX_FZNLexer_OUTPUTS}
+  ${BISON_FZNParser_OUTPUTS}
   chuffed/flatzinc/flatzinc.h
   chuffed/flatzinc/ast.h
 )
