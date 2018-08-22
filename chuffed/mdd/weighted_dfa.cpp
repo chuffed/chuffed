@@ -167,55 +167,72 @@ inline void EVLayerGraph::deallocNode(EVLayerGraph::NodeRef node)
    free(node);
 }
 
+inline void create_edges(EVLayerGraph &graph,
+                         vec<EVLayerGraph::EInfo>& edges,
+                         const vec<EVLayerGraph::NodeID>& previous_layer,
+                         const WDFATrans *T, int dom,
+                         int nstates, int soff)
+{
+  edges.clear();
+  for (int xi = 0; xi < dom; xi++)
+  {
+    int tidx = soff + xi;
+    const WDFATrans &trans(T[tidx]);
+    int destination = trans.dest;
+    if (destination > 0) // a valid transition
+    {
+      destination--;
+      EVLayerGraph::NodeID dest = previous_layer[destination];
+      if (dest != EVLayerGraph::EVFalse)
+      {
+        EVLayerGraph::EInfo edge = {xi+1, trans.weight, previous_layer[destination]};
+        edges.push(edge);
+      }
+    }
+  }
+}
 
-EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom, WDFATrans* T, int nstates, vec<int>& accepts)
+EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph &graph, int nvars,
+                                        int dom, WDFATrans *T, int nstates,
+                                        int q0, vec<int> &accepts)
 {
   vec<EVLayerGraph::NodeID> layers[2];
   int curr = 0;
   int prev = 1;
 
   // At the bottem level, only accept states can reach T
-  for(int si = 0; si < nstates; si++)
+  for (int si = 0; si < nstates; si++)
   {
     layers[curr].push(EVLayerGraph::EVFalse);
   }
-  for(int ai = 0; ai < accepts.size(); ai++)
+
+  for (int ai = 0; ai < accepts.size(); ai++)
   {
-    layers[curr][accepts[ai]] = EVLayerGraph::EVTrue;
+    layers[curr][accepts[ai]-1] = EVLayerGraph::EVTrue;
   }
-  
-  for(int vv = nvars-1; vv >= 0; vv--)
+
+  vec<EVLayerGraph::EInfo> edges;
+
+  for (int vv = nvars - 1; vv > 0; vv--)
   {
     // Alternate the levels
     curr = 1 - curr;
     prev = 1 - prev;
     layers[curr].clear();
 
-    // For each source node...
-    for(int si = 0; si < nstates; si++)
+    for (int si = 0; si < nstates; si++)
     {
-      int soff = si*dom;
-      vec<EVLayerGraph::EInfo> edges;
-      // And each value...
-      for(int xi = 0; xi < dom; xi++)
-      {
-        // Compute the corresponding transition
-        int tidx = soff + xi;
-        const WDFATrans& trans(T[tidx]);
-        EVLayerGraph::NodeID dest = layers[prev][trans.dest];
-        if(dest != EVLayerGraph::EVFalse)
-        {
-          EVLayerGraph::EInfo edge = { xi, trans.weight, layers[prev][trans.dest] };
-          edges.push(edge);
-        }
-      }
+      int soff = si * dom;
+      create_edges(graph, edges, layers[prev], T, dom, nstates, soff);
       layers[curr].push(graph.insert(vv, edges));
     }
   }
-  // Return formula corresponding to the start state
-  // at the most recent level.
-  // (Currently assuming state 0 is the start state.)
-  return layers[curr][0];
+
+  int soff = (q0 - 1) * dom;
+  prev = 1 - prev;
+  create_edges(graph, edges, layers[prev], T, dom, nstates, soff);
+  int root = graph.insert(0, edges);
+  return root;
 }
 
 EVEdge EVNode::operator[](int eidx)

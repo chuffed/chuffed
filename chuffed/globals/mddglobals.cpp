@@ -168,17 +168,17 @@ void wmdd_cost_regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, vec<vec
   // Construct the weighted transitions.
   for(int qi = 0; qi < q; qi++)
   {
-    vec<int>& d_q(d[q]);
-    vec<int>& w_q(w[q]);
+    vec<int>& d_q(d[qi]);
+    vec<int>& w_q(w[qi]);
 
     for(int vi = 0; vi < s; vi++)
     {
-      WDFATrans t = { d_q[vi], w_q[vi] };
+      WDFATrans t = { w_q[vi], d_q[vi] };
       T.push(t);
     }
   }
 
   EVLayerGraph g;
-  EVLayerGraph::NodeID root = wdfa_to_layergraph(g, x.size(), s, (WDFATrans*) T, q, f);
+  EVLayerGraph::NodeID root = wdfa_to_layergraph(g, x.size(), s, (WDFATrans*) T, q, q0, f);
   evgraph_to_wmdd(x, cost, g, root, mopts);
 }
