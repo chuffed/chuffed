@@ -1,14 +1,13 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.0.5.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,130 +30,101 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+#ifndef YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+# define YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     INT_LIT = 258,
-     BOOL_LIT = 259,
-     FLOAT_LIT = 260,
-     ID = 261,
-     STRING_LIT = 262,
-     VAR = 263,
-     PAR = 264,
-     ANNOTATION = 265,
-     ANY = 266,
-     ARRAY = 267,
-     BOOLTOK = 268,
-     CASE = 269,
-     COLONCOLON = 270,
-     CONSTRAINT = 271,
-     DEFAULT = 272,
-     DOTDOT = 273,
-     ELSE = 274,
-     ELSEIF = 275,
-     ENDIF = 276,
-     ENUM = 277,
-     FLOATTOK = 278,
-     FUNCTION = 279,
-     IF = 280,
-     INCLUDE = 281,
-     INTTOK = 282,
-     LET = 283,
-     MAXIMIZE = 284,
-     MINIMIZE = 285,
-     OF = 286,
-     SATISFY = 287,
-     OUTPUT = 288,
-     PREDICATE = 289,
-     RECORD = 290,
-     SET = 291,
-     SHOW = 292,
-     SHOWCOND = 293,
-     SOLVE = 294,
-     STRING = 295,
-     TEST = 296,
-     THEN = 297,
-     TUPLE = 298,
-     TYPE = 299,
-     VARIANT_RECORD = 300,
-     WHERE = 301
-   };
+  enum yytokentype
+  {
+    INT_LIT = 258,
+    BOOL_LIT = 259,
+    FLOAT_LIT = 260,
+    ID = 261,
+    STRING_LIT = 262,
+    VAR = 263,
+    PAR = 264,
+    ANNOTATION = 265,
+    ANY = 266,
+    ARRAY = 267,
+    BOOLTOK = 268,
+    CASE = 269,
+    COLONCOLON = 270,
+    CONSTRAINT = 271,
+    DEFAULT = 272,
+    DOTDOT = 273,
+    ELSE = 274,
+    ELSEIF = 275,
+    ENDIF = 276,
+    ENUM = 277,
+    FLOAT = 278,
+    FUNCTION = 279,
+    IF = 280,
+    INCLUDE = 281,
+    INT = 282,
+    LET = 283,
+    MAXIMIZE = 284,
+    MINIMIZE = 285,
+    OF = 286,
+    SATISFY = 287,
+    OUTPUT = 288,
+    PREDICATE = 289,
+    RECORD = 290,
+    SET = 291,
+    SHOW = 292,
+    SHOWCOND = 293,
+    SOLVE = 294,
+    STRING = 295,
+    TEST = 296,
+    THEN = 297,
+    TUPLE = 298,
+    TYPE = 299,
+    VARIANT_RECORD = 300,
+    WHERE = 301
+  };
 #endif
-/* Tokens.  */
-#define INT_LIT 258
-#define BOOL_LIT 259
-#define FLOAT_LIT 260
-#define ID 261
-#define STRING_LIT 262
-#define VAR 263
-#define PAR 264
-#define ANNOTATION 265
-#define ANY 266
-#define ARRAY 267
-#define BOOLTOK 268
-#define CASE 269
-#define COLONCOLON 270
-#define CONSTRAINT 271
-#define DEFAULT 272
-#define DOTDOT 273
-#define ELSE 274
-#define ELSEIF 275
-#define ENDIF 276
-#define ENUM 277
-#define FLOATTOK 278
-#define FUNCTION 279
-#define IF 280
-#define INCLUDE 281
-#define INTTOK 282
-#define LET 283
-#define MAXIMIZE 284
-#define MINIMIZE 285
-#define OF 286
-#define SATISFY 287
-#define OUTPUT 288
-#define PREDICATE 289
-#define RECORD 290
-#define SET 291
-#define SHOW 292
-#define SHOWCOND 293
-#define SOLVE 294
-#define STRING 295
-#define TEST 296
-#define THEN 297
-#define TUPLE 298
-#define TYPE 299
-#define VARIANT_RECORD 300
-#define WHERE 301
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 365 "flatzinc/parser.yxx"
-{ int iValue; char* sValue; bool bValue; double dValue;
-         std::vector<int>* setValue;
-         FlatZinc::AST::SetLit* setLit;
-         std::vector<double>* floatSetValue;
-         std::vector<FlatZinc::AST::SetLit>* setValueList;
-         FlatZinc::Option<FlatZinc::AST::SetLit* > oSet;
-         FlatZinc::VarSpec* varSpec;
-         FlatZinc::Option<FlatZinc::AST::Node*> oArg;
-         std::vector<FlatZinc::VarSpec*>* varSpecVec;
-         FlatZinc::Option<std::vector<FlatZinc::VarSpec*>* > oVarSpecVec;
-         FlatZinc::AST::Node* arg;
-         FlatZinc::AST::Array* argVec;
-       }
-/* Line 1489 of yacc.c.  */
-#line 155 "flatzinc/parser.tab.h"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+union YYSTYPE
+{
+
+ 
+    int iValue; 
+    char* sValue; 
+    bool bValue; 
+    double dValue;
+    std::vector<int>* setValue;
+    FlatZinc::AST::SetLit* setLit;
+    std::vector<double>* floatSetValue;
+    std::vector<FlatZinc::AST::SetLit>* setValueList;
+    FlatZinc::Option<FlatZinc::AST::SetLit* > oSet;
+    FlatZinc::VarSpec* varSpec;
+    FlatZinc::Option<FlatZinc::AST::Node*> oArg;
+    std::vector<FlatZinc::VarSpec*>* varSpecVec;
+    FlatZinc::Option<std::vector<FlatZinc::VarSpec*>* > oVarSpecVec;
+    FlatZinc::AST::Node* arg;
+    FlatZinc::AST::Array* argVec;
+
+
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
 
 
 
+int yyparse (void *parm);
+
+#endif /* !YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
