@@ -574,12 +574,12 @@ vardecl_item :
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !$2() || !$2.some()->empty(), "Empty var int domain.");
-            bool print = $5->hasAtom("output_var");
+            bool print = $5 && $5->hasAtom("output_var");
             pp->intvarTable.put($4, pp->intvars.size());
             if (print) {
                 pp->output(std::string($4), new AST::IntVar(pp->intvars.size()));
             }
-            bool introduced = $5->hasAtom("var_is_introduced");
+            bool introduced = $5 && $5->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($4, "X_INTRODUCED_", 13) == 0);
             if ($6()) {
                 AST::Node* arg = $6.some();
@@ -605,12 +605,12 @@ vardecl_item :
     |   VAR bool_ti_expr_tail ':' ID annotations non_array_expr_opt
         {
             ParserState* pp = static_cast<ParserState*>(parm);
-            bool print = $5->hasAtom("output_var");
+            bool print = $5 && $5->hasAtom("output_var");
             pp->boolvarTable.put($4, pp->boolvars.size());
             if (print) {
                 pp->output(std::string($4), new AST::BoolVar(pp->boolvars.size()));
             }
-            bool introduced = $5->hasAtom("var_is_introduced");
+            bool introduced = $5 && $5->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($4, "X_INTRODUCED_", 13) == 0);
             if ($6()) {
                 AST::Node* arg = $6.some();
@@ -643,12 +643,12 @@ vardecl_item :
     |   VAR SET OF int_ti_expr_tail ':' ID annotations non_array_expr_opt
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
-            bool print = $7->hasAtom("output_var");
+            bool print = $7 && $7->hasAtom("output_var");
             pp->setvarTable.put($6, pp->setvars.size());
             if (print) {
                 pp->output(std::string($6), new AST::SetVar(pp->setvars.size()));
             }
-            bool introduced = $7->hasAtom("var_is_introduced");
+            bool introduced = $7 && $7->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($6, "X_INTRODUCED_", 13) == 0);
             if ($8()) {
                 AST::Node* arg = $8.some();
