@@ -192,6 +192,11 @@ typedef struct {
   int dest;
 } WDFATrans;
 
-EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom, WDFATrans* T, int nstates, vec<int>& accepts);
+inline void create_edges(EVLayerGraph &graph,
+                         vec<EVLayerGraph::EInfo> &edges,
+                         const vec<EVLayerGraph::NodeID> &previous_layer,
+                         const WDFATrans *T, int dom,
+                         int nstates, int soff);
+EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph &graph, int nvars, int dom, WDFATrans *T, int nstates, int q0, vec<int> &accepts);
 
 #endif
