@@ -1065,7 +1065,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-{ return FLOATTOK; }
+{ return FLOAT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
@@ -1081,7 +1081,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-{ return INTTOK; }
+{ return INT; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
