@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.0.5.  */
+/* A Bison parser, made by GNU Bison 3.1.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.5"
+#define YYBISON_VERSION "3.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -436,8 +436,8 @@ namespace FlatZinc {
 
 /* In a future release of Bison, this section will be replaced
    by #include "parser.tab.h".  */
-#ifndef YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-# define YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+# define YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -471,11 +471,11 @@ extern int yydebug;
     ELSEIF = 275,
     ENDIF = 276,
     ENUM = 277,
-    FLOAT = 278,
+    FLOATTOK = 278,
     FUNCTION = 279,
     IF = 280,
     INCLUDE = 281,
-    INT = 282,
+    INTTOK = 282,
     LET = 283,
     MAXIMIZE = 284,
     MINIMIZE = 285,
@@ -533,7 +533,7 @@ typedef union YYSTYPE YYSTYPE;
 
 int yyparse (void *parm);
 
-#endif /* !YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
@@ -558,13 +558,13 @@ typedef signed char yytype_int8;
 #ifdef YYTYPE_UINT16
 typedef YYTYPE_UINT16 yytype_uint16;
 #else
-typedef unsigned short int yytype_uint16;
+typedef unsigned short yytype_uint16;
 #endif
 
 #ifdef YYTYPE_INT16
 typedef YYTYPE_INT16 yytype_int16;
 #else
-typedef short int yytype_int16;
+typedef short yytype_int16;
 #endif
 
 #ifndef YYSIZE_T
@@ -576,7 +576,7 @@ typedef short int yytype_int16;
 #  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYSIZE_T size_t
 # else
-#  define YYSIZE_T unsigned int
+#  define YYSIZE_T unsigned
 # endif
 #endif
 
@@ -628,7 +628,7 @@ typedef short int yytype_int16;
 # define YYUSE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 # define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
     _Pragma ("GCC diagnostic push") \
@@ -796,7 +796,7 @@ union yyalloc
 #define YYMAXUTOK   301
 
 #define YYTRANSLATE(YYX)                                                \
-  ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+  ((unsigned) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, without out-of-bounds checking.  */
@@ -866,12 +866,12 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "INT_LIT", "BOOL_LIT", "FLOAT_LIT", "ID",
   "STRING_LIT", "VAR", "PAR", "ANNOTATION", "ANY", "ARRAY", "BOOLTOK",
   "CASE", "COLONCOLON", "CONSTRAINT", "DEFAULT", "DOTDOT", "ELSE",
-  "ELSEIF", "ENDIF", "ENUM", "FLOAT", "FUNCTION", "IF", "INCLUDE", "INT",
-  "LET", "MAXIMIZE", "MINIMIZE", "OF", "SATISFY", "OUTPUT", "PREDICATE",
-  "RECORD", "SET", "SHOW", "SHOWCOND", "SOLVE", "STRING", "TEST", "THEN",
-  "TUPLE", "TYPE", "VARIANT_RECORD", "WHERE", "';'", "'('", "')'", "','",
-  "':'", "'['", "']'", "'='", "'{'", "'}'", "$accept", "model",
-  "preddecl_items", "preddecl_items_head", "vardecl_items",
+  "ELSEIF", "ENDIF", "ENUM", "FLOATTOK", "FUNCTION", "IF", "INCLUDE",
+  "INTTOK", "LET", "MAXIMIZE", "MINIMIZE", "OF", "SATISFY", "OUTPUT",
+  "PREDICATE", "RECORD", "SET", "SHOW", "SHOWCOND", "SOLVE", "STRING",
+  "TEST", "THEN", "TUPLE", "TYPE", "VARIANT_RECORD", "WHERE", "';'", "'('",
+  "')'", "','", "':'", "'['", "']'", "'='", "'{'", "'}'", "$accept",
+  "model", "preddecl_items", "preddecl_items_head", "vardecl_items",
   "vardecl_items_head", "constraint_items", "constraint_items_head",
   "preddecl_item", "pred_arg_list", "pred_arg_list_head", "pred_arg",
   "pred_arg_type", "pred_arg_simple_type", "pred_array_init",
@@ -1319,7 +1319,7 @@ do {                                                            \
 static void
 yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void *parm)
 {
-  unsigned long int yylno = yyrline[yyrule];
+  unsigned long yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
   int yyi;
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
@@ -1756,7 +1756,7 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
       yyvsp = yyvs + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-                  (unsigned long int) yystacksize));
+                  (unsigned long) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
         YYABORT;

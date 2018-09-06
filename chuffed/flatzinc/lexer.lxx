@@ -71,11 +71,11 @@ int yy_input_proc(char* buf, int size, yyscan_t yyscanner);
 "elseif"          { return ELSEIF; }
 "endif"           { return ENDIF; }
 "enum"            { return ENUM; }
-"float"           { return FLOAT; }
+"float"           { return FLOATTOK; }
 "function"        { return FUNCTION; }
 "if"              { return IF; }
 "include"         { return INCLUDE; }
-"int"             { return INT; }
+"int"             { return INTTOK; }
 "let"             { return LET; }
 "maximize"        { yylval->bValue = false; return MAXIMIZE; }
 "minimize"        { yylval->bValue = true; return MINIMIZE; }

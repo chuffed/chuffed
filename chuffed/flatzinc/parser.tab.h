@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.0.5.  */
+/* A Bison parser, made by GNU Bison 3.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-# define YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+# define YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -65,11 +65,11 @@ extern int yydebug;
     ELSEIF = 275,
     ENDIF = 276,
     ENUM = 277,
-    FLOAT = 278,
+    FLOATTOK = 278,
     FUNCTION = 279,
     IF = 280,
     INCLUDE = 281,
-    INT = 282,
+    INTTOK = 282,
     LET = 283,
     MAXIMIZE = 284,
     MINIMIZE = 285,
@@ -127,4 +127,4 @@ typedef union YYSTYPE YYSTYPE;
 
 int yyparse (void *parm);
 
-#endif /* !YY_YY_USERS_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
