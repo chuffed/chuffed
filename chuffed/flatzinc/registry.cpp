@@ -50,12 +50,12 @@ namespace FlatZinc {
 
 		ConLevel ann2icl(AST::Node* ann) {
 			if (ann) {
-				if (ann->hasAtom("val")) return CL_VAL;
-				if (ann->hasAtom("bounds") ||
-						ann->hasAtom("boundsR") ||
-						ann->hasAtom("boundsD") ||
-						ann->hasAtom("boundsZ")) return CL_BND;
-				if (ann->hasAtom("domain"))	return CL_DOM;
+				if (ann && ann->hasAtom("val")) return CL_VAL;
+				if (ann && (ann->hasAtom("bounds") ||
+						    ann->hasAtom("boundsR") ||
+						    ann->hasAtom("boundsD") ||
+						    ann->hasAtom("boundsZ"))) return CL_BND;
+				if (ann && ann->hasAtom("domain"))	return CL_DOM;
 			}
 			return CL_DEF;
 		}
@@ -602,7 +602,7 @@ namespace FlatZinc {
 					ts.last().push(tuples[i*noOfVars+j]);
 				}
 			}
-			if (ann->hasAtom("mdd") || ann->hasCall("mdd"))
+			if (ann && (ann->hasAtom("mdd") || ann->hasCall("mdd")))
 				mdd_table(x, ts, getMDDOpts(ann));
       else
 				table(x, ts);
@@ -634,7 +634,7 @@ namespace FlatZinc {
 				for (unsigned int i = 0; i < sl->s.size(); i++) f.push(sl->s[i]);
 			}
             
-			if(ann->hasAtom("mdd"))
+			if(ann && ann->hasAtom("mdd"))
 				mdd_regular(iv, q, s, d, q0, f, true, getMDDOpts(ann));
       else
 				regular(iv, q, s, d, q0, f);
