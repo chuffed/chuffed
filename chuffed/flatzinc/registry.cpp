@@ -1111,6 +1111,32 @@ namespace FlatZinc {
                     tree(vs,es,ad,en);
                 }
 
+            void p_tree_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[4]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[5]);
+                
+                vec<vec<int> > en;
+                vec<vec<int> > ad;
+                for (int i = 0; i < nb_nodes; i++) {
+                    ad.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ad[u].push(i);
+                    ad[v].push(i);
+                }
+                tree(vs,es,ad,en);
+            }
+
                 void p_connected(const ConExpr& ce, AST::Node* ann) {
                     vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
                     vec< BoolView > es; arg2BoolVarArgs(es, ce[1]);
@@ -1159,8 +1185,34 @@ namespace FlatZinc {
                             en[i].push(en_flat[es.size()+i] - 1);
                         }
                     }
-                    tree(vs,es,ad,en);
+                    connected(vs,es,ad,en);
                 }
+
+            void p_connected_new(const ConExpr& ce, AST::Node* ann) {
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[2]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[3]);
+                int nb_nodes = vs.size();
+                int nb_edges = es.size();
+                vec<int> from; arg2intargs(from, ce[0]);
+                vec<int> to; arg2intargs(to, ce[1]);
+                
+                vec<vec<int> > en;
+                vec<vec<int> > ad;
+                for (int i = 0; i < nb_nodes; i++) {
+                    ad.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ad[u].push(i);
+                    ad[v].push(i);
+                }
+                connected(vs,es,ad,en);
+            }
 
                 void p_steiner_tree(const ConExpr& ce, AST::Node* ann) {
                     vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
@@ -1219,6 +1271,34 @@ namespace FlatZinc {
                     steiner_tree(vs,es,ad,en,w,ws);
                 }
 
+            void p_steiner_tree_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                vec<int> ws; arg2intargs(to, ce[4]);
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[5]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[6]);
+                IntVar* w = getIntVar(ce[7]);
+                
+                vec<vec<int> > en;
+                vec<vec<int> > ad;
+                for (int i = 0; i < nb_nodes; i++) {
+                    ad.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ad[u].push(i);
+                    ad[v].push(i);
+                }
+                steiner_tree(vs,es,ad,en,w,ws);
+            }
+            
                 void p_mst(const ConExpr& ce, AST::Node* ann) {
                     vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
                     vec< BoolView > es; arg2BoolVarArgs(es, ce[1]);
@@ -1276,45 +1356,33 @@ namespace FlatZinc {
                     mst(vs,es,ad,en,w,ws);
                 }
 
-
-                void p_dconnected(const ConExpr& ce, AST::Node* ann) {
-                    vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
-                    vec< BoolView > es; arg2BoolVarArgs(es, ce[1]);
-                    int from = ce[2]->getInt() - 1;
-
-                    vec< bool > in_flat; arg2boolargs(in_flat, ce[3]);
-                    assert(in_flat.size() == vs.size()*es.size());
-                    vec<vec<int> > in;
-                    for (int i = 0; i < vs.size(); i++) {
-                        in.push(vec<int>());
-                        for (int j = 0; j < es.size(); j++) {
-                            if  (in_flat[i*es.size()+j])
-                                in[i].push(j);
-                        }
-                    }
-                    vec< bool > ou_flat; arg2boolargs(ou_flat, ce[4]);
-                    assert(ou_flat.size() == vs.size()*es.size());
-                    vec<vec<int> > ou;
-                    for (int i = 0; i < vs.size(); i++) {
-                        ou.push(vec<int>());
-                        for (int j = 0; j < es.size(); j++) {
-                            if  (ou_flat[i*es.size()+j])
-                                ou[i].push(j);
-                        }
-                    }
-                    vec< int > en_flat; arg2intargs(en_flat, ce[5]);
-                    //assert(en_flat.size() == es.size()*vs.size());
-                    assert(en_flat.size() == es.size()*2);
-                    vec<vec<int> > en;
-                    for (int i = 0; i < es.size(); i++) {
-                        en.push(vec<int>());
-                        // The -1 is becaise indexes in MZ start at 1
-                        en[i].push(en_flat[i] - 1);
-                        en[i].push(en_flat[es.size()+i] - 1);
-                    }
-
-                    dconnected(from, vs, es, in, ou, en);
+            void p_mst_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                vec<int> ws; arg2intargs(to, ce[4]);
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[5]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[6]);
+                IntVar* w = getIntVar(ce[7]);
+                
+                vec<vec<int> > en;
+                vec<vec<int> > ad;
+                for (int i = 0; i < nb_nodes; i++) {
+                    ad.push(vec<int>());
                 }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ad[u].push(i);
+                    ad[v].push(i);
+                }
+                mst(vs,es,ad,en,w,ws);
+            }
 
 
                 void p_dtree(const ConExpr& ce, AST::Node* ann) {
@@ -1358,6 +1426,37 @@ namespace FlatZinc {
                     dtree(from, vs, es, in, ou, en);
                 }
 
+
+            void p_dtree_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                int root = ce[4]->getInt();
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[5]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[6]);
+
+                vec<vec<int> > en;
+                vec<vec<int> > in;
+                vec<vec<int> > ou;
+                for (int i = 0; i < nb_nodes; i++) {
+                    in.push(vec<int>());
+                    ou.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ou[u].push(i);
+                    in[v].push(i);
+                }
+                dtree(root, vs, es, in, ou, en);
+            }
+
+            
                 void p_dag(const ConExpr& ce, AST::Node* ann) {
                     vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
                     vec< BoolView > es; arg2BoolVarArgs(es, ce[1]);
@@ -1399,6 +1498,42 @@ namespace FlatZinc {
                     dag(from, vs, es, in, ou, en);
                 }
 
+            void p_dag_new(const ConExpr& ce, AST::Node* ann) {
+                vec<int> from; arg2intargs(from, ce[0]);
+                vec<int> to; arg2intargs(to, ce[1]);
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[2]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[3]);
+                int nb_nodes = vs.size();
+                int nb_edges = es.size();
+
+                int extra = nb_nodes; //Extra node with edges to everyone
+                vs.push(bv_true);
+                for (int i = 0; i < nb_nodes; i++) {
+                    from.push(extra);
+                    to.push(i);
+                    es.push(bv_true);
+                }
+
+                vec<vec<int> > en;
+                vec<vec<int> > in;
+                vec<vec<int> > ou;
+                for (int i = 0; i < nb_nodes; i++) {
+                    in.push(vec<int>());
+                    ou.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ou[u].push(i);
+                    in[v].push(i);
+                }
+                dag(extra, vs, es, in, ou, en);
+            }
+
                 void p_path(const ConExpr& ce, AST::Node* ann) {
                     vec< BoolView > vs; arg2BoolVarArgs(vs, ce[0]);
                     vec< BoolView > es; arg2BoolVarArgs(es, ce[1]);
@@ -1438,6 +1573,37 @@ namespace FlatZinc {
 
                     path(from, to, vs, es, in, ou, en);
                 }
+
+
+            void p_path_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                int s = ce[4]->getInt() - 1;
+                int t = ce[5]->getInt() - 1;
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[6]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[7]);
+
+                vec<vec<int> > en;
+                vec<vec<int> > in;
+                vec<vec<int> > ou;
+                for (int i = 0; i < nb_nodes; i++) {
+                    in.push(vec<int>());
+                    ou.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ou[u].push(i);
+                    in[v].push(i);
+                }
+                path(s, t, vs, es, in, ou, en);
+            }
 
 
                 void p_bounded_path(const ConExpr& ce, AST::Node* ann) {
@@ -1508,7 +1674,40 @@ namespace FlatZinc {
 
                 }
 
+            void p_bounded_path_new(const ConExpr& ce, AST::Node* ann) {
+                int nb_nodes = ce[0]->getInt();
+                int nb_edges = ce[1]->getInt();
+                vec<int> from; arg2intargs(from, ce[2]);
+                vec<int> to; arg2intargs(to, ce[3]);
+                vec< int > ws; arg2intargs(ws,ce[4]);
+                int s = ce[5]->getInt() - 1;
+                int t = ce[6]->getInt() - 1;
+                vec< BoolView > vs; arg2BoolVarArgs(vs, ce[7]);
+                vec< BoolView > es; arg2BoolVarArgs(es, ce[8]);
+                IntVar* w = getIntVar(ce[9]);
 
+                vec<vec<int> > en;
+                vec<vec<int> > in;
+                vec<vec<int> > ou;
+                for (int i = 0; i < nb_nodes; i++) {
+                    in.push(vec<int>());
+                    ou.push(vec<int>());
+                }
+                for (int i = 0; i < nb_edges; i++) {
+                    en.push(vec<int>());
+                    // The -1 is because indexes in MZ start at 1
+                    int u = from[i] - 1;
+                    int v = to[i] - 1;
+                    en[i].push(u);
+                    en[i].push(v);
+                    ou[u].push(i);
+                    in[v].push(i);
+                }
+                path(s, t, vs, es, in, ou, en);
+                bounded_path(s, t, vs, es, in, ou, en, ws, w);
+            }
+
+            
 		class IntPoster {
 		public:
 			IntPoster(void) {
@@ -1646,14 +1845,14 @@ namespace FlatZinc {
 				registry().add("bool_lin_gt_reif", &p_bool_lin_gt_reif);
 */
 
-                               registry().add("fzn_tree", &p_tree);
-                               registry().add("fzn_connected", &p_connected);
-                               registry().add("fzn_steiner_tree", &p_steiner_tree);
-                               registry().add("fzn_mst", &p_mst);
-                               registry().add("fzn_dconnected", &p_dconnected);
-                               registry().add("fzn_path", &p_path);
-                               registry().add("fzn_dag", &p_dag);
-                               registry().add("fzn_bounded_path", &p_bounded_path);
+                               registry().add("fzn_tree", &p_tree_new);
+                               registry().add("fzn_connected", &p_connected_new);
+                               registry().add("fzn_steiner", &p_steiner_tree_new);
+                               registry().add("fzn_mst", &p_mst_new);
+                               registry().add("fzn_dtree", &p_dtree_new);
+                               registry().add("fzn_dpath", &p_path_new);
+                               registry().add("fzn_dag", &p_dag_new);
+                               registry().add("fzn_bounded_dpath", &p_bounded_path_new);
 			}
 		};
 		IntPoster __int_poster;
