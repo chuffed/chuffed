@@ -116,8 +116,8 @@ static inline Clause* Reason_new(int sz) {
 	sat.rtrail.last().push(c);
   return c;
 }
-
-static inline Clause* Reason_new(vec<Lit>& ps) {
+template<typename T>
+static inline Clause* Reason_new(T& ps) {
 	Clause *c = Clause_new(ps);
 	c->temp_expl = 1;
 	sat.rtrail.last().push(c);

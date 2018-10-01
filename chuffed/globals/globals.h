@@ -89,4 +89,29 @@ edit_distance(int max_char, vec<int> &insertion_cost, vec<int> &deletion_cost, v
 // value-precede.c
 void value_precede_int(int s, int t, vec<IntVar*>& x);
 void value_precede_seq(vec<IntVar*>& x);
+
+//tree.c
+void tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _adj, vec< vec<int> >& _en);
+void connected(vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _adj, vec< vec<int> >& _en);
+
+//mst.c
+void mst(vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _adj, vec< vec<int> >& _en, IntVar* _w, vec<int>& _ws);
+
+//minimum_weight_tree.c
+void steiner_tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _adj, vec< vec<int> >& _en, IntVar* _w, vec<int> _ws);
+
+//dconnected.c
+void dconnected(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en);
+
+//dtree.c
+void dtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en);
+void reversedtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en);
+void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en);
+
+//dag.c
+void dag(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en);
+
+//bounded_path.c
+void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec< vec<int> >& _in, vec< vec<int> >& _out, vec< vec<int> >& _en, vec<int>& _ws, IntVar* w);
+
 #endif
