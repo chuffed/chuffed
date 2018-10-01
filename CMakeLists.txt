@@ -133,6 +133,14 @@ add_library(chuffed
   chuffed/globals/regular.cpp
   chuffed/globals/lex.cpp
   chuffed/globals/table.cpp
+  chuffed/globals/graph.cpp
+  chuffed/globals/tree.cpp
+  chuffed/globals/minimum_weight_tree.cpp
+  chuffed/globals/mst.cpp
+  chuffed/globals/dconnected.cpp
+  chuffed/globals/dtree.cpp
+  chuffed/globals/dag.cpp
+  chuffed/globals/bounded_path.cpp
   chuffed/mdd/MDD.cpp
   chuffed/mdd/mdd_prop.cpp
   chuffed/mdd/mdd_to_lgraph.cpp
@@ -171,6 +179,18 @@ add_library(chuffed
   chuffed/support/misc.h
   chuffed/support/heap.h
   chuffed/support/sparse_set.h
+  chuffed/support/union_find.h
+  chuffed/support/union_find.cpp
+  chuffed/support/trailed_cst_list.h
+  chuffed/support/lengauer_tarjan.h
+  chuffed/support/lengauer_tarjan.cpp
+  chuffed/support/dijkstra.h
+  chuffed/support/dijkstra.cpp
+  chuffed/support/kosaraju_scc.h
+  chuffed/support/kosaraju_scc.cpp
+  chuffed/support/dynamic_kmeans.h
+  chuffed/support/floyd_warshall.h
+  chuffed/support/set_finder.h
   chuffed/ldsb/ldsb.h
   chuffed/globals/globals.h
   chuffed/globals/mddglobals.h

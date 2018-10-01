@@ -78,6 +78,34 @@ static inline int bitcount(T s) {
 	return c;
 }
 
+static inline double wallClockTime() {
+#ifdef WIN32
+  static const unsigned __int64 epoch = ((unsigned __int64) 116444736000000000ULL);
+  FILETIME    file_time;
+  SYSTEMTIME  system_time;
+  ULARGE_INTEGER ularge;
+  
+  GetSystemTime(&system_time);
+  SystemTimeToFileTime(&system_time, &file_time);
+  ularge.LowPart = file_time.dwLowDateTime;
+  ularge.HighPart = file_time.dwHighDateTime;
+
+  long sec = (ularge.QuadPart - epoch) / 10000000L;
+  long msec = system_time.wMilliseconds;
+  return (double) sec + (double) msec/1000;
+#else
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  return (double) tp.tv_sec + (double) tp.tv_usec/1000000;
+#endif
+}
+
+/*
+static inline double wallClockTime() {
+	return (double) time(NULL);
+}
+*/
+
 static int mylog2 (int val) {
 	int ret = -1;
 	while (val != 0) { val >>= 1; ret++; }
