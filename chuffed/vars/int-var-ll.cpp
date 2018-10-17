@@ -34,8 +34,8 @@ DecInfo* IntVarLL::branch() {
 	switch (preferred_val) {
 		case PV_MIN: return new DecInfo(this, min, 3);
 		case PV_MAX: return new DecInfo(this, max-1, 2);
-		case PV_SPLIT_MIN: return new DecInfo(this, (max+min-1)/2, 3);
-		case PV_SPLIT_MAX: return new DecInfo(this, (max+min)/2, 2);
+		case PV_SPLIT_MIN: return new DecInfo(this, min+(max-min-1)/2, 3);
+		case PV_SPLIT_MAX: return new DecInfo(this, min+(max-min  )/2, 2);
 		default: NEVER;
 	}
 }
