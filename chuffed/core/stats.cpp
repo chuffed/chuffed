@@ -34,8 +34,8 @@ void Engine::printStats() {
 	printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
 
 	// Chuffed specific statistics
-	printf("%%%%%%mzn-stat: objective=%d\n", best_sol);
 	if (opt_var) {
+		printf("%%%%%%mzn-stat: objective=%d\n", best_sol);
 		printf("%%%%%%mzn-stat: optTime=%.3f\n", to_sec(opt_time));
 	}
 	printf("%%%%%%mzn-stat: baseMem=%.2f\n", base_memory);
