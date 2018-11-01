@@ -105,7 +105,12 @@ namespace FlatZinc {
                     for (unsigned int i = 0; i < sl->s.size(); i++) d.push(sl->s[i]);
                     sort((int*) d, (int*) d + d.size());
                     v = ::newIntVar(d[0], d.last());
-                    if (!v->allowSet(d)) TL_FAIL();
+                    if ((d.last()-d[0] >= d.size() * mylog2(d.size())) ||
+                        (d.size() <= so.eager_limit && (d.last() - d[0] + 1) > so.eager_limit)) {
+                        new (v) IntVarSL(*v, d);
+                    } else {
+                        if (!v->allowSet(d)) TL_FAIL();
+                    }
                 }
             } 
             else {

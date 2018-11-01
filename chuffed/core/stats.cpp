@@ -43,19 +43,20 @@ void Engine::printStats() {
 	printf("%%%%%%mzn-stat: randomSeed=%d\n", so.rnd_seed);
 
 	if (so.verbosity >= 2) {
-		int nl = 0, el = 0, ll = 0;
+		int nl = 0, el = 0, ll = 0, sl = 0;
 		for (int i = 0; i < vars.size(); i++) {
 			switch (vars[i]->getType()) {
 				case INT_VAR: nl++; break;
 				case INT_VAR_EL: el++; break;
 				case INT_VAR_LL: ll++; break;
-				case INT_VAR_SL: el++; break;
+				case INT_VAR_SL: sl++; break;
 				default: NEVER;
 			}
 		}
 		printf("%%%%%%mzn-stat: noLitIntVars=%d\n", nl);
 		printf("%%%%%%mzn-stat: eagerLitIntVars=%d\n", el);
 		printf("%%%%%%mzn-stat: lazyLitIntVars=%d\n", ll);
+		printf("%%%%%%mzn-stat: sparseLitIntVars=%d\n", sl);
 		printf("%%%%%%mzn-stat: solutions=%lld\n", solutions);
 
 		if (so.ldsb) {
