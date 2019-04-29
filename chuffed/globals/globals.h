@@ -48,6 +48,8 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* y);
 void minimum(vec<IntVar*>& x, IntVar* y);
 void maximum(vec<IntVar*>& x, IntVar* y);
 
+void bool_arg_max(vec<BoolView>& x, int offset, IntVar* y);
+
 // table.c
 
 void table(vec<IntVar*>& x, vec<vec<int> >& t);

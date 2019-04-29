@@ -124,6 +124,7 @@ add_library(chuffed
   chuffed/globals/well-founded.cpp
   chuffed/globals/circuit.cpp
   chuffed/globals/minimum.cpp
+  chuffed/globals/bool_arg_max.cpp
   chuffed/globals/alldiff.cpp
   chuffed/globals/template.cpp
   chuffed/globals/directives.cpp
