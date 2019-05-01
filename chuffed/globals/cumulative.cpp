@@ -1237,6 +1237,29 @@ CumulativeProp::get_reason_for_update(vec<Lit> & expl) {
 	return reason;
 }
 
+int fixed_profile_max(vec<int>& t, vec<int>& delta) {
+  vec<int> perm;
+  for(int ii = 0; ii < t.size(); ++ii)
+    perm.push(ii);
+  std::sort((int*) perm, ((int*) perm) + perm.size(),
+    [&t](int i, int j) { return t[i] < t[j]; });
+  
+  // Sweep over the profile
+  int time = INT_MIN;
+  int level = 0;
+  int limit = 0;
+  for(int ii = 0; ii < perm.size(); ii++) {
+    int ti(perm[ii]);
+    assert(time <= t[ti]);
+    if(time < t[ti]) {
+      if(level > limit)
+        limit = level;
+      time = t[ti];
+    }
+    level += delta[ti];
+  }
+  return limit;
+}
 
 	// XXX Which version of the cumulative constraint should be used?
 	// Lifting the limit parameter to an integer variable
@@ -1254,12 +1277,37 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<
     // Option switch
     if (so.cumu_global) {
         vec<IntVar*> s_new, d_new, r_new;
+        vec<int> fix_t, fix_delta;
 		IntVar * vlimit = newIntVar(limit, limit);
         int r_sum = 0;
-	    
+	      
+        // First, find the earliest/latest unfixed regions.
+        int sMin = INT_MAX;
+        int sMax = INT_MIN;
+        for(int i = 0; i < s.size(); i++) {
+          if(r[i] > 0 && d[i] > 0) {
+              if(s[i]->isFixed()) {
+                 fix_t.push(s[i]->getMin());
+                 fix_t.push(s[i]->getMax() + d[i]);
+                 fix_delta.push(r[i]);
+                 fix_delta.push(-r[i]);
+              } else {
+                sMin = std::min(sMin, s[i]->getMin());
+                sMax = std::max(sMax, s[i]->getMax() + d[i]);
+              }
+          }
+        }
+        int fixed_top = fixed_profile_max(fix_t, fix_delta);
+        if(fixed_top > limit)
+          TL_FAIL();
+
+        vec<int> fixed_t;
+        vec<int> fixed_delta;
         for (int i = 0; i < s.size(); i++) {
 	    	if (r[i] > 0 && d[i] > 0) {
-	    		s_new.push(s[i]);
+	        if(s[i]->getMax() + d[i] <= sMin || sMax <= s[i]->getMin())
+               continue;
+    		s_new.push(s[i]);
 	    		d_new.push(newIntVar(d[i], d[i]));
 	    		r_new.push(newIntVar(r[i], r[i]));
 	    		r_sum += r[i];
@@ -1295,16 +1343,41 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
     cumulative2(s, d, r, limit, opt);
 }
 
+
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit, std::list<string> opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
     
     vec<IntVar*> s_new, d_new, r_new;
+    vec<int> fix_t, fix_delta;
     int r_sum = 0;
 	
+    int sMin = INT_MAX;
+    int sMax = INT_MIN;
+    for(int i = 0; i < s.size(); i++) {
+      if(r[i]->getMax() > 0 && d[i]->getMax() > 0) {
+        if(s[i]->isFixed() && d[i]->isFixed() && r[i]->isFixed()) {
+          fix_t.push(s[i]->getMin());
+          fix_t.push(s[i]->getMax() + d[i]->getMax());
+          fix_delta.push(r[i]->getMin());
+          fix_delta.push(-r[i]->getMin());
+        } else {
+          sMin = std::min(sMin, s[i]->getMin());
+          sMax = std::max(sMax, s[i]->getMax() + d[i]->getMax());
+        }
+      }
+    }
+    int fixed_top = fixed_profile_max(fix_t, fix_delta);
+    TL_SET(limit, setMin, fixed_top);
+
     for (int i = 0; i < s.size(); i++) {
 		if (r[i]->getMax() > 0 && d[i]->getMax() > 0) {
+      // TODO: Check fixed section of the profile.
+      if(s[i]->getMax() + d[i]->getMax() <= sMin
+        || sMax <= s[i]->getMin())
+        continue;
+
 			s_new.push(s[i]);
 			d_new.push(d[i]);
 			r_new.push(r[i]);
