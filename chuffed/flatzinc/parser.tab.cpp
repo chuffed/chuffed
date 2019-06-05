@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.1.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.1"
+#define YYBISON_VERSION "3.0.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -436,8 +436,8 @@ namespace FlatZinc {
 
 /* In a future release of Bison, this section will be replaced
    by #include "parser.tab.h".  */
-#ifndef YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-# define YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+# define YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -533,7 +533,7 @@ typedef union YYSTYPE YYSTYPE;
 
 int yyparse (void *parm);
 
-#endif /* !YY_YY_USERS_TACK_PROGRAMMING_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
@@ -558,13 +558,13 @@ typedef signed char yytype_int8;
 #ifdef YYTYPE_UINT16
 typedef YYTYPE_UINT16 yytype_uint16;
 #else
-typedef unsigned short yytype_uint16;
+typedef unsigned short int yytype_uint16;
 #endif
 
 #ifdef YYTYPE_INT16
 typedef YYTYPE_INT16 yytype_int16;
 #else
-typedef short yytype_int16;
+typedef short int yytype_int16;
 #endif
 
 #ifndef YYSIZE_T
@@ -576,7 +576,7 @@ typedef short yytype_int16;
 #  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYSIZE_T size_t
 # else
-#  define YYSIZE_T unsigned
+#  define YYSIZE_T unsigned int
 # endif
 #endif
 
@@ -628,7 +628,7 @@ typedef short yytype_int16;
 # define YYUSE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 # define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
     _Pragma ("GCC diagnostic push") \
@@ -796,7 +796,7 @@ union yyalloc
 #define YYMAXUTOK   301
 
 #define YYTRANSLATE(YYX)                                                \
-  ((unsigned) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+  ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, without out-of-bounds checking.  */
@@ -1319,7 +1319,7 @@ do {                                                            \
 static void
 yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void *parm)
 {
-  unsigned long yylno = yyrline[yyrule];
+  unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
   int yyi;
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
@@ -1545,7 +1545,6 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
       case N:                               \
         yyformat = S;                       \
       break
-    default: /* Avoid compiler warnings. */
       YYCASE_(0, YY_("syntax error"));
       YYCASE_(1, YY_("syntax error, unexpected %s"));
       YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
@@ -1756,7 +1755,7 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
       yyvsp = yyvs + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-                  (unsigned long) yystacksize));
+                  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
         YYABORT;
@@ -2091,7 +2090,7 @@ yyreduce:
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[-10].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
-                bool print = (yyvsp[-1].argVec)->hasCall("output_array");
+                bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
                 vector<int> vars((yyvsp[-8].iValue));
                 yyassert(pp, !(yyvsp[-4].oSet)() || !(yyvsp[-4].oSet).some()->empty(), "Empty var int domain.");
                 if (!pp->hadError) {
@@ -2149,7 +2148,7 @@ yyreduce:
 
     {
             ParserState* pp = static_cast<ParserState*>(parm);
-            bool print = (yyvsp[-1].argVec)->hasCall("output_array");
+            bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
             yyassert(pp, (yyvsp[-10].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
                 vector<int> vars((yyvsp[-8].iValue));
@@ -2214,7 +2213,7 @@ yyreduce:
 
     { 
             ParserState* pp = static_cast<ParserState*>(parm);
-            bool print = (yyvsp[-1].argVec)->hasCall("output_array");
+            bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
             yyassert(pp, (yyvsp[-12].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
                 vector<int> vars((yyvsp[-10].iValue));
