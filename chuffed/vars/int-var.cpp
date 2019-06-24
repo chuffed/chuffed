@@ -198,7 +198,7 @@ DecInfo* IntVar::branch() {
 		// should probably revisit this and make them consistent
 		case PV_SPLIT_MIN : {
 				if (!vals)
-					return new DecInfo(this, (max + min) / 2, 3);
+					return new DecInfo(this, min + (max - min) / 2, 3);
 				int values = (size()- 1) / 2;
 				iterator j = begin();
 				for (int i = 0; i < values; ++i)
@@ -207,7 +207,7 @@ DecInfo* IntVar::branch() {
 			}
 		case PV_SPLIT_MAX : {
 				if (!vals)
-					return new DecInfo(this, (max + 1 + min) / 2, 2);
+					return new DecInfo(this, min + (max - min - 1) / 2, 2);
 				int values = size() / 2;
 				iterator j = begin();
 				for (int i = 0; i < values; ++i)
@@ -216,7 +216,7 @@ DecInfo* IntVar::branch() {
 			}
 		case PV_MEDIAN: {
 				if (!vals)
-					return new DecInfo(this, (max + min) / 2, 1);
+					return new DecInfo(this, min + (max - min) / 2, 1);
 				int values = (size() - 1) / 2;
 				iterator j = begin();
 				for (int i = 0; i < values; ++i)
@@ -224,9 +224,9 @@ DecInfo* IntVar::branch() {
 				return new DecInfo(this, *j, 1);
 			}
 #else
-		case PV_SPLIT_MIN : return new DecInfo(this, (max+min-1)/2, 3);
-		case PV_SPLIT_MAX : return new DecInfo(this, (max+min)/2, 2);
-		case PV_MEDIAN : return new DecInfo(this, (max+min-1)/2, 1);
+		case PV_SPLIT_MIN : return new DecInfo(this, min+(max-min-1)/2, 3);
+		case PV_SPLIT_MAX : return new DecInfo(this, min+(max-min  )/2, 2);
+		case PV_MEDIAN    : return new DecInfo(this, min+(max-min  )/2, 1);
 #endif
 		default: NEVER;
 	}

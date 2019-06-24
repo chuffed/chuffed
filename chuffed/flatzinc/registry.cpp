@@ -757,6 +757,11 @@ namespace FlatZinc {
 			maximum(iv, getIntVar(ce[0]));
 		}
 
+		void p_bool_arg_max(const ConExpr& ce, AST::Node* ann) {
+			vec<BoolView> bv; arg2BoolVarArgs(bv, ce[0]);
+			bool_arg_max(bv, ce[1]->getInt(), getIntVar(ce[2]));
+		}
+
     void p_lex_less(const ConExpr& ce, AST::Node* ann) {
       vec<IntVar*> iv0; arg2intvarargs(iv0, ce[0]);
       vec<IntVar*> iv1; arg2intvarargs(iv1, ce[1]);
@@ -1110,6 +1115,7 @@ namespace FlatZinc {
                 registry().add("chuffed_subcircuit", &p_subcircuit);
 				registry().add("minimum_int", &p_minimum);
 				registry().add("maximum_int", &p_maximum);
+				registry().add("chuffed_maximum_arg_bool", &p_bool_arg_max);
 				registry().add("lex_less_int", &p_lex_less);
 				registry().add("lex_lesseq_int", &p_lex_lesseq);
 

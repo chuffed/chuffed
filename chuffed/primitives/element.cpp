@@ -299,11 +299,12 @@ public:
 		// propagate holes in y
 		for (int v = y.getMin(); v <= y.getMax(); v++) {
 			if (!y.indomain(v)) continue;
-			assert(num_support[v] > 0);
 			int *s = support[v];
-			if (x.indomain(s[0]) && a[s[0]].indomain(v)) continue;
 			int f = 0;
-			while (!(x.indomain(s[f]) && a[s[f]].indomain(v)) && ++f < num_support[v]);
+			if (num_support[v] > 0) {
+				if (x.indomain(s[0]) && a[s[0]].indomain(v)) continue;
+				while (!(x.indomain(s[f]) && a[s[f]].indomain(v)) && ++f < num_support[v]);
+			}
 			if (f == num_support[v]) {
 				// v has no support, remove from y
 				Clause* r = NULL;

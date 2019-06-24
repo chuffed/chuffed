@@ -34,7 +34,12 @@
 %
 %
 
+include "nosets.mzn";
+
 % Sums over Boolean variables
+predicate bool_lin_eq(array[int] of int: x, array[int] of var bool: b, var int: c) =
+  sum(i in index_set(x)) (x[i]*b[i])=c;
+
 %predicate bool_lin_eq(array[int] of int: a, array[int] of var bool: x,
 %                      var int: c);
 %predicate bool_lin_ne(array[int] of int: a, array[int] of var bool: x,

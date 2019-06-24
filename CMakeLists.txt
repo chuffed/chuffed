@@ -4,7 +4,7 @@ project(chuffed CXX C)
 # The version number.
 set(chuffed_VERSION_MAJOR 0)
 set(chuffed_VERSION_MINOR 10)
-set(chuffed_VERSION_PATCH 3)
+set(chuffed_VERSION_PATCH 4)
 
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
@@ -124,6 +124,7 @@ add_library(chuffed
   chuffed/globals/well-founded.cpp
   chuffed/globals/circuit.cpp
   chuffed/globals/minimum.cpp
+  chuffed/globals/bool_arg_max.cpp
   chuffed/globals/alldiff.cpp
   chuffed/globals/template.cpp
   chuffed/globals/directives.cpp

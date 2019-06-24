@@ -34,8 +34,8 @@ DecInfo* IntVarLL::branch() {
 	switch (preferred_val) {
 		case PV_MIN: return new DecInfo(this, min, 3);
 		case PV_MAX: return new DecInfo(this, max-1, 2);
-		case PV_SPLIT_MIN: return new DecInfo(this, (max+min-1)/2, 3);
-		case PV_SPLIT_MAX: return new DecInfo(this, (max+min)/2, 2);
+		case PV_SPLIT_MIN: return new DecInfo(this, min+(max-min-1)/2, 3);
+		case PV_SPLIT_MAX: return new DecInfo(this, min+(max-min  )/2, 2);
 		default: NEVER;
 	}
 }
@@ -164,6 +164,11 @@ inline void IntVarLL::updateFixed() {
 
 bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
+	if (vals) {
+		while (!vals[v] && v <= max) {
+			v++;
+		}
+	}
 	Lit p = getGELit(v);
 	if (channel) sat.cEnqueue(p, r);
 	if (v > max) { assert(sat.confl); return false; }
@@ -176,6 +181,11 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 
 bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
+	if (vals) {
+		while (!vals[v] && v >= min) {
+			v--;
+		}
+	}
 	Lit p = getLELit(v);
 	if (channel) sat.cEnqueue(p, r);
 	if (v < min) { assert(sat.confl); return false; }

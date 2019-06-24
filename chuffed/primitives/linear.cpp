@@ -318,11 +318,22 @@ void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
 
 	if (x.size() == 2 && !scale) {
 		if (r.isTrue()) {
-			if (a[0] == -1 && a[1] == -1) bin_linear(x[0], x[1], -t, -c);
-			if (a[0] == 1 && a[1] == -1) int_rel(x[0], t, x[1], c);
-			if (a[0] == -1 && a[1] == 1) int_rel(x[1], t, x[0], c);
-			if (a[0] == 1 && a[1] == 1) bin_linear(x[0], x[1], t, c);
-			return;
+      if (a[0] == -1 && a[1] == -1 && t != IRT_NE) {
+        bin_linear(x[0], x[1], -t, -c);
+        return;
+      }
+      if (a[0] == 1 && a[1] == -1) {
+        int_rel(x[0], t, x[1], c);
+        return;
+      }
+      if (a[0] == -1 && a[1] == 1) {
+        int_rel(x[1], t, x[0], c);
+        return;
+      }
+      if (a[0] == 1 && a[1] == 1 && t != IRT_NE) {
+        bin_linear(x[0], x[1], t, c);
+        return;
+      }
 		} else if (a[0] + a[1] == 0) {
 			if (a[0] == 1 && a[1] == -1) int_rel_reif(x[0], t, x[1], r, c);
 			if (a[0] == -1 && a[1] == 1) int_rel_reif(x[1], t, x[0], r, c);
