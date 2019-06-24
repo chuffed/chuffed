@@ -4,7 +4,7 @@
 %------------------------------------------------------------------------------%
 
 /***
- @groupdef gecode Additional declarations for Chuffed
+ @groupdef chuffed Additional declarations for Chuffed
  
  These annotations and predicates are available for the Chuffed
  solver. In order to use them in a model, include the file "chuffed.mzn".
