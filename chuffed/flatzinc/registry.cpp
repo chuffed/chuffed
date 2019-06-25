@@ -584,6 +584,13 @@ namespace FlatZinc {
 			all_different(va, ann2icl(ann));
 		}
 
+		void p_all_different_int_imp(const ConExpr& ce, AST::Node* ann) {
+			vec<IntVar*> va; arg2intvarargs(va, ce[0]);
+      assert(ce[1]->isBoolVar());
+			BoolView r = getBoolVar(ce[1]);
+			all_different_imp(r, va, ann2icl(ann));
+		}
+
 		void p_inverse_offsets(const ConExpr& ce, AST::Node* ann) {
 			vec<IntVar*> x; arg2intvarargs(x, ce[0]);
 			vec<IntVar*> y; arg2intvarargs(y, ce[2]);
@@ -1123,6 +1130,7 @@ namespace FlatZinc {
         registry().add("set_in_reif", &p_set_in_reif);
 
 				registry().add("fzn_all_different_int", &p_all_different_int);
+				registry().add("fzn_all_different_int_imp", &p_all_different_int_imp);
 				registry().add("inverse_offsets", &p_inverse_offsets);
 				registry().add("chuffed_table_int", &p_table_int);
 				registry().add("chuffed_regular", &p_regular);

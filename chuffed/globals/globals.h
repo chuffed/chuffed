@@ -23,6 +23,7 @@ void wf_init();
 
 void all_different(vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl = CL_DEF);
+void all_different_imp(BoolView b, vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1 = 0, int o2 = 0, ConLevel cl = CL_DEF);
 
 // circuit.c
