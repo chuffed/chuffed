@@ -95,6 +95,7 @@ BranchGroup* createBranch(vec<Branching*> x, VarBranch var_branch, ValBranch val
         switch (val_branch) {
             case VAL_MIN: p = PV_MIN; break;
             case VAL_MAX: p = PV_MAX; break;
+            case VAL_MEDIAN: p = PV_MEDIAN; break;
             case VAL_SPLIT_MIN: p = PV_SPLIT_MIN; break;
             case VAL_SPLIT_MAX: p = PV_SPLIT_MAX; break;
             default: CHUFFED_ERROR("The value selection branching is not yet supported\n");

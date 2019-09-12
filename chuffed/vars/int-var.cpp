@@ -224,9 +224,21 @@ DecInfo* IntVar::branch() {
 				return new DecInfo(this, *j, 1);
 			}
 #else
-		case PV_SPLIT_MIN : return new DecInfo(this, min+(max-min-1)/2, 3);
-		case PV_SPLIT_MAX : return new DecInfo(this, min+(max-min  )/2, 2);
-		case PV_MEDIAN    : return new DecInfo(this, min+(max-min  )/2, 1);
+		case PV_SPLIT_MIN:
+			return new DecInfo(this, min+(max-min-1)/2, 3);
+		case PV_SPLIT_MAX:
+			return new DecInfo(this, min+(max-min)/2, 2);
+		case PV_MEDIAN:
+			if (!vals) {
+				CHUFFED_ERROR("Median value selection is not supported this variable.\n");
+			}
+			else {
+				int values = (size() - 1) / 2;
+				iterator j = begin();
+				for (int i = 0; i < values; ++i)
+					++j;
+				return new DecInfo(this, *j, 1);
+			}
 #endif
 		default: NEVER;
 	}

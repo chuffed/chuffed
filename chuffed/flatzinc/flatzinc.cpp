@@ -62,8 +62,7 @@ namespace FlatZinc {
             if (s->id == "indomain_max") return VAL_MAX;
             //if (s->id == "indomain_middle") return VAL_MIDDLE;
             if (s->id == "indomain_middle") CHUFFED_ERROR("The value choice annotation 'indomain_middle' is not supported yet!\n");
-            //if (s->id == "indomain_median") return VAL_MEDIAN;
-            if (s->id == "indomain_median") CHUFFED_ERROR("The value choice annotation 'indomain_median' is not supported yet!\n");
+            if (s->id == "indomain_median") return VAL_MEDIAN;
             if (s->id == "indomain_split") return VAL_SPLIT_MIN;
             if (s->id == "indomain_reverse_split") return VAL_SPLIT_MAX;
             //if (s->id == "indomain_random") return VAL_RANDOM;
