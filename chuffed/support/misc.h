@@ -9,9 +9,11 @@
 
 #ifdef WIN32
 #include <windows.h>
+#define __SEP__ '\\'
 #else
 #include <sys/time.h>
 #include <unistd.h>
+#define __SEP__ '/'
 #endif
 
 #include <stdint.h>
@@ -25,9 +27,13 @@ extern uint64_t bit[65];
 #define getbit(i,s) (((s) >> (i)) & 1)
 
 //------
-
+#ifdef NDEBUG
+#define __FILENAME__ (strrchr(__FILE__, __SEP__) ? strrchr(__FILE__, __SEP__) + 1 : __FILE__)
+#else
+#define __FILENAME__ __FILE__
+#endif
 #define CHUFFED_ERROR(...) do {                                                            \
-	fprintf(stderr, "%s:%d: ", __FILE__, __LINE__);         \
+	fprintf(stderr, "%s:%d: ", __FILENAME__, __LINE__);         \
 	fprintf(stderr, __VA_ARGS__);                                                    \
 	abort();                                                                         \
 } while (0)
