@@ -189,7 +189,7 @@ public:
 	void    decVarUse(int v);
 	void    setConfl(Lit p = lit_False, Lit q = lit_False);
 
-	bool isRootLevel(int v) const { return trailpos[v] < engine.trail_lim[0]; }
+	bool isRootLevel(int v) const { return engine.trail_lim.size()==0 || trailpos[v] < engine.trail_lim[0]; }
 	bool isCurLevel(int v) const { return trailpos[v] >= engine.trail_lim.last(); }
 	int getLevel(int v) const { 
           for (int i = engine.trail_lim.size(); i--; ) {
