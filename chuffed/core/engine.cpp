@@ -416,7 +416,6 @@ void Engine::simplifyDB() {
 }
 
 void Engine::blockCurrentSol() {
-    if (outputs.size() == 0) NOT_SUPPORTED;
     Clause& c = *Reason_new(outputs.size());
     bool root_failure = true;
     for (int i = 0; i < outputs.size(); i++) {
