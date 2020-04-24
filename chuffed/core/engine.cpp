@@ -522,7 +522,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
     if (doProfiling()) {
         // TODO: use 'variableListString'?
-        profilerConnector.start(problemLabel);
+        profilerConnector.start(problemLabel, -1, true);
     }
 #endif
   
