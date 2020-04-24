@@ -19,8 +19,8 @@
 #include <chuffed/flatzinc/flatzinc.h>
 
 #ifdef HAS_PROFILER
-#include "submodules/cp-profiler-integration/connector.hpp"
-#include "submodules/cp-profiler-integration/message.hpp"
+#include <submodules/cp-profiler-integration/connector.hpp>
+#include <submodules/cp-profiler-integration/message.hpp>
 #endif
 
 // #include <boost/date_time/posix_time/posix_time.hpp>

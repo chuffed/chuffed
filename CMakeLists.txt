@@ -38,33 +38,21 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads)
 
-# ------------- CP Profiler Integration -------------
-
-if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/protobuf")
-  include_directories("submodules/cp-profiler-integration/protobuf")
-  if(WIN32)
-    include_directories("submodules/cp-profiler-integration/protobuf/config_win")
-  else()
-    include_directories("submodules/cp-profiler-integration/protobuf/config_unix")
-  endif()
-else()
-  message("Configuring without CP Profiler support.")
-endif()
-
 include_directories(${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 if(WIN32)
   add_definitions(-DYY_NO_UNISTD_H)
 endif()
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration")
+# ------------- CP Profiler Integration -------------
 
+if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration")
   set(CHUFFED_PROFILER_SOURCES
     ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/connector.hpp
     ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/message.hpp
   )
-
-
+else()
+  message("Configuring without CP Profiler support.")
 endif()
 
 # ------------- Main Chuffed Definition -------------
