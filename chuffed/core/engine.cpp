@@ -34,7 +34,7 @@ Tint trail_inc;
 int nextnodeid = 0;
 
 #ifdef HAS_PROFILER
-cpprofiler::Connector profilerConnector(6565);
+cpprofiler::Connector* profilerConnector;
 #endif
 
 std::map<IntVar*, string> intVarString;
@@ -48,7 +48,7 @@ std::ofstream node_stream;
 
 #ifdef HAS_PROFILER
 static bool doProfiling() {
-    return so.print_nodes || profilerConnector.connected();
+    return so.print_nodes || (profilerConnector && profilerConnector->connected());
 }
 
 static ostream& operator<<(ostream& os, const cpprofiler::NodeUID& uid) {
@@ -304,7 +304,7 @@ inline bool Engine::constrain() {
     /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
     if (doProfiling()) {
-      profilerConnector.restart(restart_count);
+      profilerConnector->restart(restart_count);
     }
 #endif
   
@@ -522,7 +522,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
     if (doProfiling()) {
         // TODO: use 'variableListString'?
-        profilerConnector.start(problemLabel, -1, true);
+        profilerConnector->start(problemLabel, so.cpprofiler_id, true);
     }
 #endif
   
@@ -586,7 +586,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
               if (doProfiling()) {
                 sendNode(profilerConnector
-                             .createNode({nodeid, restart_count, 0},
+                            ->createNode({nodeid, restart_count, 0},
                                          {parent, restart_count, 0}, myalt, 0,
                                          cpprofiler::NodeStatus::FAILED)
                              //  .set_time(timeus)
@@ -655,7 +655,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 
                     if (doProfiling()) {
                       sendNode(profilerConnector
-                                   .createNode({nodeid, restart_count, 0},
+                                  ->createNode({nodeid, restart_count, 0},
                                                {parent, restart_count, 0},
                                                myalt, 0,
                                                cpprofiler::NodeStatus::FAILED)
@@ -677,7 +677,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                     std::cerr << "\n";
 #endif
 
-                    rewindPaths(profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
+                    rewindPaths(*profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
                                 
                     std::stringstream ss2;
                     /* ss2 << "-> "; */
@@ -694,7 +694,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
                   sendNode(profilerConnector
-                               .createNode({nodeid, restart_count, 0},
+                              ->createNode({nodeid, restart_count, 0},
                                            {parent, restart_count, 0}, myalt, 0,
                                            cpprofiler::NodeStatus::FAILED)
                                //    .set_time(timeus)
@@ -708,7 +708,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 sat.btToLevel(decisionLevel()-1);
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    rewindPaths(profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
+                    rewindPaths(*profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
                 }
 #endif
                 makeDecision(di, 1);
@@ -725,7 +725,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    profilerConnector.restart(restart_count);
+                    profilerConnector->restart(restart_count);
                 }
 #endif
                 toggleVSIDS();
@@ -745,7 +745,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 /* nextnodeid = 0; */
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    profilerConnector.restart(restart_count);
+                    profilerConnector->restart(restart_count);
                 }
 #endif
 
@@ -805,7 +805,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                         fzs->printDomains(s);
                         sendNode(
                             profilerConnector
-                                .createNode({nodeid, restart_count, 0},
+                               ->createNode({nodeid, restart_count, 0},
                                             {parent, restart_count, 0}, myalt,
                                             0, cpprofiler::NodeStatus::SOLVED)
                                 // .set_time(timeus)
@@ -815,7 +815,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                     }
                     else {
                       sendNode(profilerConnector
-                                   .createNode({nodeid, restart_count, 0},
+                                  ->createNode({nodeid, restart_count, 0},
                                                {parent, restart_count, 0},
                                                myalt, 0,
                                                cpprofiler::NodeStatus::SOLVED)
@@ -880,7 +880,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 }
 
                 sendNode(profilerConnector
-                             .createNode({nodeid, restart_count, 0},
+                            ->createNode({nodeid, restart_count, 0},
                                          {parent, restart_count, 0}, myalt, 2,
                                          cpprofiler::NodeStatus::BRANCH)
                              .set_label(mostRecentLabel)
@@ -916,8 +916,9 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
     base_memory = memUsed();
 
 #ifdef HAS_PROFILER
-    if (so.use_profiler)
-        profilerConnector.connect();
+    profilerConnector = new cpprofiler::Connector(so.cpprofiler_port);
+    if (so.cpprofiler_enabled)
+        profilerConnector->connect();
 #endif
 
     /* if (so.debug) { */
@@ -964,8 +965,9 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
     }
 
 #ifdef HAS_PROFILER
-    profilerConnector.done();
-    profilerConnector.disconnect();
+    profilerConnector->done();
+    profilerConnector->disconnect();
+    delete profilerConnector;
 #endif
 
     if (so.verbosity >= 1) printStats();

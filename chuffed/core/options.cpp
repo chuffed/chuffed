@@ -49,7 +49,6 @@ Options::Options() :
         , decide_introduced(true)
         , introduced_heuristic(false)
         , use_var_is_introduced(false)
-        , use_profiler(false)
         , print_nodes(false)
         , print_implications(false)
         , print_variable_list(false)
@@ -103,6 +102,11 @@ Options::Options() :
 
 	, alldiff_cheat(true)
 	, alldiff_stage(true)
+  , cpprofiler_enabled(false)
+#ifdef HAS_PROFILER
+  , cpprofiler_id(-1)
+  , cpprofiler_port(6565)
+#endif
 {}
 
 
@@ -260,8 +264,12 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
 #ifdef HAS_PROFILER
   "\n"
   "Profiler Options:\n"
-  "  --profiling [on|off], --no-profiling\n"
-  "     Send search to CPProfiler (default " << (def.use_profiler ? "on" : "off") << ").\n"
+  "  -cpprofiler\n"
+  "     Send search to CP Profiler.\n"
+  "  -cpprofiler-id\n"
+  "     Execution ID for CP Profiler (default " << def.cpprofiler_id << ").\n"
+  "  -cpprofiler-port\n"
+  "     Port to connect to CP Profiler (default " << def.cpprofiler_port << ").\n"
 #endif
   "\n"
   ;
@@ -536,10 +544,6 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.introduced_heuristic = boolBuffer;
     } else if (cop.getBool("--use-var-is-introduced", boolBuffer)) {
       so.use_var_is_introduced = boolBuffer;
-#ifdef HAS_PROFILER
-    } else if (cop.getBool("--profiling", boolBuffer)) {
-      so.use_profiler = boolBuffer;
-#endif
     } else if (cop.getBool("--print-nodes", boolBuffer)) {
       so.print_nodes = boolBuffer;
     } else if (cop.getBool("--print-variable-list", boolBuffer)) {
@@ -608,6 +612,14 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.num_cores = intBuffer;
     } else if (cop.get("-s -S")) {
       so.verbosity = 1;
+#ifdef HAS_PROFILER
+    } else if (cop.get("-cpprofiler")) {
+      so.cpprofiler_enabled = true;
+    } else if (cop.get("-cpprofiler-port", &intBuffer)) {
+      so.cpprofiler_port = intBuffer;
+    } else if (cop.get("-cpprofiler-id", &intBuffer)) {
+      so.cpprofiler_id = intBuffer;
+#endif
     } else if (argv[i][0] == '-') {
       std::cerr << argv[0] << ": unrecognized option " << argv[i] << "\n";
       std::cerr << argv[0] << ": use --help for more information.\n";
