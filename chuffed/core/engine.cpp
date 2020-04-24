@@ -58,22 +58,31 @@ static ostream& operator<<(ostream& os, const cpprofiler::NodeUID& uid) {
 template<typename T>
 static void printNode(T&& node, std::ostream& os) {
   os << node.nodeUID() << ", parent: " << node.parentUID()
-     << ", alt: " << node.alt() << ", kids: " << node.kids() << "\n";
+     << ", alt: " << node.alt() << ", kids: " << node.kids()
+     << ", status: " << node.status();
+  if (node.label().valid()) {
+    os << ", label: " << node.label().value();
+  }
+  if (node.nogood().valid()) {
+    os << ", nogood: " << node.nogood().value();
+  }
+  if (node.info().valid()) {
+    os << ", info: " << node.info().value();
+  }
+  os << "\n";
 }
 
 template<typename T>
 static void sendNode(T&& node) {
-    // if (so.print_nodes) {
-        // if (!node_stream.is_open()) {
-        //     node_stream.open("node-log.csv");
-        //     node_stream << "type,id,restart,parent,alt,children,status,time,label,nogood,block,uses_objective,backjump_distance,decision_level,info\n";
-        // } 
-        // node.print(node_stream);
-        // if (so.debug) {
-            // node.print(std::cerr);
+    if (so.print_nodes) {
+        if (!node_stream.is_open()) {
+            node_stream.open("node-log.log");
+        } 
+        printNode(node, node_stream);
+        if (so.debug) {
             printNode(node, std::cerr);
-        // }
-    // }
+        }
+    }
     node.send();
 }
 #endif
