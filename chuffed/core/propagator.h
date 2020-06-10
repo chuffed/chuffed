@@ -21,6 +21,7 @@ Assumptions:
 #include <climits>
 #include <new>
 #include <algorithm>
+#include <vector>
 #include <chuffed/support/misc.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/core/sat-types.h>
@@ -121,6 +122,13 @@ static inline Clause* Reason_new(vec<Lit>& ps) {
 	return c;
 }
 
+static inline Clause* Reason_new(std::vector<Lit> ps) {
+  ps.insert(ps.begin(), Lit());
+	Clause *c = Clause_new(ps);
+	c->temp_expl = 1;
+	sat.rtrail.last().push(c);
+	return c;
+}
 
 #define TL_SET(var, op, val) do {                                     \
 	if (var->op ## NotR(val) && !var->op(val)) TL_FAIL(); } while (0)

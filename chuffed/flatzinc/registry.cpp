@@ -512,6 +512,12 @@ namespace FlatZinc {
 				array_var_int_element_bound(sel, iv, getIntVar(ce[2]), 1);
 			}
 		}
+		void p_array_var_int_element_imp(const ConExpr& ce, AST::Node* ann) {
+			vec<IntVar*> iv; arg2intvarargs(iv, ce[1]);
+			IntVar* sel = getIntVar(ce[0]);
+      BoolView r = getBoolVar(ce[3]);
+      array_var_int_element_bound_imp(r, sel, iv, getIntVar(ce[2]), 1);
+		}
 		void p_array_bool_element(const ConExpr& ce, AST::Node* ann) {
 			vec<bool> ba; arg2boolargs(ba, ce[1]);
 			IntVar* sel = getIntVar(ce[0]);
@@ -1122,6 +1128,7 @@ namespace FlatZinc {
 				registry().add("bool_clause_reif", &p_array_bool_clause_reif);
 				registry().add("array_int_element", &p_array_int_element);
 				registry().add("array_var_int_element", &p_array_var_int_element);
+				registry().add("array_var_int_element_imp", &p_array_var_int_element_imp);
 				registry().add("array_bool_element", &p_array_bool_element);
 				registry().add("array_var_bool_element", &p_array_var_bool_element);
 				registry().add("bool2int", &p_bool2int);

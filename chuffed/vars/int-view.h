@@ -270,8 +270,8 @@ public:
 		return var->remVal(v, r, channel);
 	}
 
-	Lit operator =  (int val) { return getLit(val, 1); }
-	Lit operator != (int val) { return getLit(val, 0); }
+	Lit operator =  (int val) const { return getLit(val, 1); }
+	Lit operator != (int val) const { return getLit(val, 0); }
 
 };
 

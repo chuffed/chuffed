@@ -108,6 +108,237 @@ void array_var_bool_element(IntVar* _x, vec<BoolView>& a, BoolView y, int offset
 // y = a[x]
 
 template <int U = 0, int V = 0, int W = 0>
+class IntElemBoundsImp : public Propagator {
+  BoolView b;
+	IntView<U> const y;
+	IntView<V> const x;
+	vec<IntView<W> > a;
+
+	// persistent state
+
+  Tchar is_fixed;
+	Tint min_support;
+	Tint max_support;
+	Tint fixed_index;
+
+	// intermediate state
+
+	bool no_min_support;
+	bool no_max_support;
+
+public:
+
+	IntElemBoundsImp(BoolView _b, IntView<U> _y, IntView<V> _x, vec<IntView<W> >& _a) :
+		b(_b), y(_y), x(_x), a(_a), is_fixed(false), min_support(-1), max_support(-1), fixed_index(-1),
+		no_min_support(false), no_max_support(false) {
+		for (int i = 0; i < a.size(); i++) a[i].attach(this, i, EVENT_LU);
+		y.attach(this, a.size(), EVENT_LU);
+		x.attach(this, a.size()+1, EVENT_C);
+    b.attach(this, a.size()+2, EVENT_F);
+	}
+
+	void wakeup(int i, int c) {
+    if (i == a.size()+2 && (c & EVENT_F)) {
+      if (!b.getVal()) {
+        return;
+      }
+    }
+		if (i == a.size()+1 && (c & EVENT_F)) {
+      is_fixed = true;
+			fixed_index = x.getVal();
+			no_min_support = no_max_support = false;
+			pushInQueue();
+		} else if (is_fixed) {
+			if (i == a.size() || i == fixed_index) pushInQueue();
+		} else {
+			if (i < a.size()) {
+				if (i == min_support && a[i].getMin() > y.getMin()) no_min_support = true;
+				if (i == max_support && a[i].getMax() < y.getMax()) no_max_support = true;
+				pushInQueue();
+			} else if (i == a.size()+1) {
+				if (!x.indomain(min_support)) { no_min_support = true; pushInQueue(); }
+				if (!x.indomain(max_support)) { no_max_support = true; pushInQueue(); }
+			} else pushInQueue();
+		}
+	}
+
+	bool propagate() {
+    if (b.isFixed() && b.isFalse()) {
+      return true;
+    }
+
+    // x is out of bounds
+    if (is_fixed && (fixed_index < 0 || fixed_index >= a.size())) {
+      return b.setVal(false, x.getValLit());
+    }
+
+		// y = a[fixed_index]
+		if (is_fixed) {
+			assert(x.getVal() == fixed_index);
+			IntView<W>& f = a[fixed_index];
+      if (b.isFixed()) {
+        setDom(y, setMin, f.getMin(), Reason_new({b.getValLit(), f.getMinLit(), x.getValLit()}));
+        setDom(f, setMin, y.getMin(), Reason_new({b.getValLit(), y.getMinLit(), x.getValLit()}));
+        setDom(y, setMax, f.getMax(), Reason_new({b.getValLit(), f.getMaxLit(), x.getValLit()}));
+        setDom(f, setMax, y.getMax(), Reason_new({b.getValLit(), y.getMaxLit(), x.getValLit()}));
+        if (y.isFixed() && f.isFixed()) satisfied = true;
+      } else if (f.getMin() > y.getMax()) {
+        Clause* r = Reason_new({x.getValLit(), f.getMinLit(), y.getMaxLit()});
+        return b.setVal(false, r);
+      } else if (f.getMax() < y.getMin()) {
+        Clause* r = Reason_new({x.getValLit(), f.getMaxLit(), y.getMinLit()});
+        return b.setVal(false, r);
+      }
+      return true;
+		}
+
+    if (b.isFixed()) {
+      for (int i = 0; i < a.size(); i++) {
+        if (!x.indomain(i)) continue;
+        if (y.getMax() < a[i].getMin()) {
+          Clause* r = Reason_new({b.getValLit(), a[i].getMinLit(), y.getMaxLit()});
+          setDom(x, remVal, i, r);
+        }
+        if (y.getMin() > a[i].getMax()) {
+          Clause* r = Reason_new({b.getValLit(), a[i].getMaxLit(), y.getMinLit()});
+          setDom(x, remVal, i, r);
+        }
+      }
+    } else {
+      std::vector<Lit> expl;
+      bool push_min = false;
+      bool push_max = false;
+      int i = 0;
+      while (i <= a.size()) {
+        if (!x.indomain(i)) {
+          expl.push_back(x != i);
+        } else if (y.getMax() < a[i].getMin()) {
+          if (!push_max) {
+            expl.push_back(y.getMaxLit());
+            push_max = true;
+          }
+          expl.push_back(a[i].getMinLit());
+        } else if (y.getMin() > a[i].getMax()) {
+          if (!push_min) {
+            expl.push_back(y.getMinLit());
+            push_min = true;
+          }
+          expl.push_back(a[i].getMaxLit());
+        } else {
+          break;
+        }
+        i++;
+      }
+      if (i > x.getMax()) {
+        Clause* r = Reason_new(expl);
+        return b.setVal(false, r);
+      }
+    }
+
+		if (no_min_support) {
+			int64_t old_m = y.getMin();
+			int64_t new_m = INT64_MAX;
+			int best = -1;
+			for (int i = 0; i < a.size(); i++) {
+				if (!x.indomain(i)) continue;
+				int64_t cur_m = a[i].getMin();
+				if (cur_m < new_m) {
+					best = i;
+					new_m = cur_m;
+					if (cur_m <= old_m) break;
+				}
+			}
+			min_support = best;
+			if (y.setMinNotR(new_m)) {
+        auto reason = [&] {
+          Clause *r = NULL;
+          if (so.lazy) {
+            r = Reason_new(a.size()+2);
+            // Finesse lower bounds
+            for (int i = 0; i < a.size(); i++) {
+              (*r)[i+2] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, 1);
+            }
+          }
+          return r;
+        };
+        if (b.isFixed()) {
+          Clause* r = reason();
+          (*r)[1] = b.getValLit();
+          if (!y.setMin(new_m, reason())) {
+            return false;
+          }
+        } else if (y.getMax() < new_m) {
+          Clause* r = reason();
+          (*r)[1] = y.getMaxLit();
+          return b.setVal(false, r);
+        }
+			}
+			no_min_support = false;
+		}
+
+		if (no_max_support) {
+			int64_t old_m = y.getMax();
+			int64_t new_m = INT_MIN;
+			int best = -1;
+			for (int i = 0; i < a.size(); i++) {
+				if (!x.indomain(i)) continue;
+				int64_t cur_m = a[i].getMax();
+				if (cur_m > new_m) {
+					best = i;
+					new_m = cur_m;
+					if (cur_m >= old_m) break;
+				}
+			}
+			max_support = best;
+			if (y.setMaxNotR(new_m)) {
+        auto reason = [&] {
+          Clause *r = NULL;
+          if (so.lazy) {
+            r = Reason_new(a.size()+1);
+            // Finesse upper bounds
+            for (int i = 0; i < a.size(); i++) {
+              (*r)[i+1] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
+            }
+          }
+          return r;
+        };
+        if (b.isFixed()) {
+          Clause* r = reason();
+          (*r)[1] = b.getValLit();
+          if (!y.setMax(new_m, r)) {
+            return false;
+          }
+        } else if (y.getMin() > new_m) {
+          Clause* r = reason();
+          (*r)[1] = y.getMinLit();
+          return b.setVal(false, r);
+        }
+			}
+			no_max_support = false;
+		}
+
+		return true;
+	}
+
+	void clearPropState() {
+		in_queue = false;
+		no_min_support = false;
+		no_max_support = false;
+  }
+
+	int checkSatisfied() {
+		if (satisfied) return 1;
+    if (b.isFixed() && !b.getVal()) {
+			satisfied = true;
+    } else if (b.isFixed() && x.isFixed() && y.isFixed() && a[static_cast<int>(x.getVal())].isFixed()) {
+			satisfied = true;
+		}
+		return 3;
+	}
+
+};
+
+template <int U = 0, int V = 0, int W = 0>
 class IntElemBounds : public Propagator {
 	IntView<U> const y;
 	IntView<V> const x;
@@ -373,6 +604,14 @@ void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offs
 	for (int i = 0; i < a.size(); i++) w.push(IntView<>(a[i]));
 	if (offset) new IntElemBounds<0,4,0>(IntView<>(y), IntView<4>(x,1,-offset), w);
 	else        new IntElemBounds<0,0,0>(IntView<>(y), IntView<>(x), w);
+}
+
+void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y, int offset) {
+	x->specialiseToEL();
+	vec<IntView<> > w;
+	for (int i = 0; i < a.size(); i++) w.push(IntView<>(a[i]));
+	if (offset) new IntElemBoundsImp<0,4,0>(b, IntView<>(y), IntView<4>(x,1,-offset), w);
+	else        new IntElemBoundsImp<0,0,0>(b, IntView<>(y), IntView<>(x), w);
 }
 
 // domain consistent version

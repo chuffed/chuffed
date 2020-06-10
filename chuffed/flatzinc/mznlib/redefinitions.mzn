@@ -96,6 +96,8 @@ predicate int_gt_imp(var int: a, var int: b, var bool: r);
 predicate int_le_imp(var int: a, var int: b, var bool: r);
 predicate int_lt_imp(var int: a, var int: b, var bool: r);
 
+predicate array_var_int_element_imp(var int: b, array [int] of var int: as, var int: c, var bool: r);
+
 %%% NOTE: because of a mistake in the MiniZinc standard library, the
 % `warm_start` annotation is overloaded on the FlatZinc level, the following
 % definitions disambiguate these annotations within Chuffed.

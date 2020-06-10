@@ -140,6 +140,7 @@ void array_var_bool_element(IntVar* x, vec<BoolView>& a, BoolView y, int offset 
 // y = a[x-offset]
 void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
 void array_var_int_element_dom(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
+void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
 
 
 // domain.c
