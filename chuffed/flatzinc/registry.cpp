@@ -1102,19 +1102,19 @@ namespace FlatZinc {
         registry().add("set_in", &p_set_in);
         registry().add("set_in_reif", &p_set_in_reif);
 
-				registry().add("all_different_int", &p_all_different_int);
+				registry().add("fzn_all_different_int", &p_all_different_int);
 				registry().add("inverse_offsets", &p_inverse_offsets);
-				registry().add("table_int", &p_table_int);
-				registry().add("regular", &p_regular);
-				registry().add("cost_regular", &p_cost_regular);
+				registry().add("chuffed_table_int", &p_table_int);
+				registry().add("chuffed_regular", &p_regular);
+				registry().add("chuffed_cost_regular", &p_cost_regular);
 				registry().add("chuffed_disjunctive_strict", &p_disjunctive);
 				registry().add("chuffed_cumulative", &p_cumulative);
 				registry().add("chuffed_cumulative_vars", &p_cumulative2);
 				registry().add("chuffed_cumulative_cal", &p_cumulative_cal);
                 registry().add("chuffed_circuit", &p_circuit);
                 registry().add("chuffed_subcircuit", &p_subcircuit);
-				registry().add("minimum_int", &p_minimum);
-				registry().add("maximum_int", &p_maximum);
+				registry().add("array_int_minimum", &p_minimum);
+				registry().add("array_int_maximum", &p_maximum);
 				registry().add("chuffed_maximum_arg_bool", &p_bool_arg_max);
 				registry().add("lex_less_int", &p_lex_less);
 				registry().add("lex_lesseq_int", &p_lex_lesseq);

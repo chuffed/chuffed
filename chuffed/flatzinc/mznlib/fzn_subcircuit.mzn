@@ -6,7 +6,7 @@ include "all_different.mzn";
   is not in the circuit.
 */
 
-predicate subcircuit(array[int] of var int: x) = 
+predicate fzn_subcircuit(array[int] of var int: x) = 
     % XXX [AS] It seems so that the decompositionis performing better than the
     % global propagator.
     % TODO Extensive performance tests should be conducted
