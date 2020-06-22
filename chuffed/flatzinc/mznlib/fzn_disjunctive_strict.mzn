@@ -7,10 +7,8 @@
 %  - forall i, d[i] >= 0
 %------------------------------------------------------------------------------%
 
-predicate disjunctive_strict(array[int] of var int: s,
-                             array[int] of var int: d) =
-    assert(index_set(s) == index_set(d),
-        "disjunctive_strict: the array arguments must have identical index sets",
+predicate fzn_disjunctive_strict(array[int] of var int: s,
+                                 array[int] of var int: d) =
         forall(i in index_set(d))(d[i] >= 0)
     /\  if is_fixed(d) then
             chuffed_disjunctive_strict(s, fix(d))
@@ -19,9 +17,8 @@ predicate disjunctive_strict(array[int] of var int: s,
               s[i] + d[i] <= s[j] \/ s[j] + d[j] <= s[i]
             )
         endif
-    );
+    ;
 
     % Global disjunctive propagator
     %
 predicate chuffed_disjunctive_strict(array[int] of var int: s, array[int] of int: d);
-

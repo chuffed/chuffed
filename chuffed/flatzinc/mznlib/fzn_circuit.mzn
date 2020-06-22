@@ -5,7 +5,7 @@ include "all_different.mzn";
   that \p j is the successor of \p i. 
 */
 
-predicate circuit(array[int] of var int: x) = 
+predicate fzn_circuit(array[int] of var int: x) = 
     % XXX [AS] It seems so that the decompositionis performing better than the
     % global propagator.
     % TODO Extensive performance tests should be conducted
@@ -22,8 +22,8 @@ predicate circuit_decomp(array[int] of var int: x) =
 	  int: n = card(S),
 	  array[S] of var 1..n: order
         } in
-    alldifferent(x) /\	
-    alldifferent(order) /\
+    all_different(x) /\	
+    all_different(order) /\
     forall(i in S)(x[i] != i) /\ 
     order[l] = 1 /\
     forall(i in S)(order[i] != n -> order[x[i]] = order[i] + 1) /\
