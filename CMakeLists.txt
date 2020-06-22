@@ -38,8 +38,6 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads)
 
-include_directories("chuffed")
-
 # ------------- CP Profiler Integration -------------
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/protobuf")
@@ -53,8 +51,8 @@ else()
   message("Configuring without CP Profiler support.")
 endif()
 
-include_directories(".")
 include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR})
 if(WIN32)
   add_definitions(-DYY_NO_UNISTD_H)
 endif()
@@ -237,7 +235,6 @@ else()
 endif()
 
 add_library(chuffed_fzn
-  ${parser_cpp}
   chuffed/flatzinc/registry.cpp
   chuffed/flatzinc/flatzinc.cpp
   ${FLEX_FZNLexer_OUTPUTS}
