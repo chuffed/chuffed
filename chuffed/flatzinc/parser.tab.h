@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.6.4.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,8 +31,12 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-# define YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+#ifndef YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
+# define YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -40,64 +45,67 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INT_LIT = 258,
-    BOOL_LIT = 259,
-    FLOAT_LIT = 260,
-    ID = 261,
-    STRING_LIT = 262,
-    VAR = 263,
-    PAR = 264,
-    ANNOTATION = 265,
-    ANY = 266,
-    ARRAY = 267,
-    BOOLTOK = 268,
-    CASE = 269,
-    COLONCOLON = 270,
-    CONSTRAINT = 271,
-    DEFAULT = 272,
-    DOTDOT = 273,
-    ELSE = 274,
-    ELSEIF = 275,
-    ENDIF = 276,
-    ENUM = 277,
-    FLOATTOK = 278,
-    FUNCTION = 279,
-    IF = 280,
-    INCLUDE = 281,
-    INTTOK = 282,
-    LET = 283,
-    MAXIMIZE = 284,
-    MINIMIZE = 285,
-    OF = 286,
-    SATISFY = 287,
-    OUTPUT = 288,
-    PREDICATE = 289,
-    RECORD = 290,
-    SET = 291,
-    SHOW = 292,
-    SHOWCOND = 293,
-    SOLVE = 294,
-    STRING = 295,
-    TEST = 296,
-    THEN = 297,
-    TUPLE = 298,
-    TYPE = 299,
-    VARIANT_RECORD = 300,
-    WHERE = 301
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    INT_LIT = 258,                 /* INT_LIT  */
+    BOOL_LIT = 259,                /* BOOL_LIT  */
+    FLOAT_LIT = 260,               /* FLOAT_LIT  */
+    ID = 261,                      /* ID  */
+    STRING_LIT = 262,              /* STRING_LIT  */
+    VAR = 263,                     /* VAR  */
+    PAR = 264,                     /* PAR  */
+    ANNOTATION = 265,              /* ANNOTATION  */
+    ANY = 266,                     /* ANY  */
+    ARRAY = 267,                   /* ARRAY  */
+    BOOLTOK = 268,                 /* BOOLTOK  */
+    CASE = 269,                    /* CASE  */
+    COLONCOLON = 270,              /* COLONCOLON  */
+    CONSTRAINT = 271,              /* CONSTRAINT  */
+    DEFAULT = 272,                 /* DEFAULT  */
+    DOTDOT = 273,                  /* DOTDOT  */
+    ELSE = 274,                    /* ELSE  */
+    ELSEIF = 275,                  /* ELSEIF  */
+    ENDIF = 276,                   /* ENDIF  */
+    ENUM = 277,                    /* ENUM  */
+    FLOATTOK = 278,                /* FLOATTOK  */
+    FUNCTION = 279,                /* FUNCTION  */
+    IF = 280,                      /* IF  */
+    INCLUDE = 281,                 /* INCLUDE  */
+    INTTOK = 282,                  /* INTTOK  */
+    LET = 283,                     /* LET  */
+    MAXIMIZE = 284,                /* MAXIMIZE  */
+    MINIMIZE = 285,                /* MINIMIZE  */
+    OF = 286,                      /* OF  */
+    SATISFY = 287,                 /* SATISFY  */
+    OUTPUT = 288,                  /* OUTPUT  */
+    PREDICATE = 289,               /* PREDICATE  */
+    RECORD = 290,                  /* RECORD  */
+    SET = 291,                     /* SET  */
+    SHOW = 292,                    /* SHOW  */
+    SHOWCOND = 293,                /* SHOWCOND  */
+    SOLVE = 294,                   /* SOLVE  */
+    STRING = 295,                  /* STRING  */
+    TEST = 296,                    /* TEST  */
+    THEN = 297,                    /* THEN  */
+    TUPLE = 298,                   /* TUPLE  */
+    TYPE = 299,                    /* TYPE  */
+    VARIANT_RECORD = 300,          /* VARIANT_RECORD  */
+    WHERE = 301                    /* WHERE  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
 union YYSTYPE
 {
-
  
     int iValue; 
     char* sValue; 
@@ -117,7 +125,6 @@ union YYSTYPE
 
 
 };
-
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -127,4 +134,4 @@ typedef union YYSTYPE YYSTYPE;
 
 int yyparse (void *parm);
 
-#endif /* !YY_YY_HOME_JDEKKER_REPOSITORIES_CHUFFED_BUILD_RELEASE_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
