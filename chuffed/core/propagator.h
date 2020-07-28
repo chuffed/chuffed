@@ -123,10 +123,10 @@ static inline Clause* Reason_new(vec<Lit>& ps) {
 }
 
 static inline Clause* Reason_new(std::vector<Lit> ps) {
-  ps.insert(ps.begin(), Lit());
-	Clause *c = Clause_new(ps);
-	c->temp_expl = 1;
-	sat.rtrail.last().push(c);
+  Clause *c = Reason_new(ps.size() + 1);
+  for (int i = 0; i < ps.size(); i++) {
+    (*c)[i+1] = ps[i];
+  }
 	return c;
 }
 
