@@ -164,6 +164,7 @@ public:
 
 	bool propagate() {
     if (b.isFixed() && b.isFalse()) {
+      satisfied = true;
       return true;
     }
 
@@ -211,7 +212,7 @@ public:
       int i = 0;
       while (i <= a.size()) {
         if (!x.indomain(i)) {
-          expl.push_back(x != i);
+          expl.push_back(x.getLit(i, 1));
         } else if (y.getMax() < a[i].getMin()) {
           if (!push_max) {
             expl.push_back(y.getMaxLit());
@@ -264,7 +265,7 @@ public:
         if (b.isFixed()) {
           Clause* r = reason();
           (*r)[1] = b.getValLit();
-          if (!y.setMin(new_m, reason())) {
+          if (!y.setMin(new_m, r)) {
             return false;
           }
         } else if (y.getMax() < new_m) {
@@ -294,10 +295,10 @@ public:
         auto reason = [&] {
           Clause *r = NULL;
           if (so.lazy) {
-            r = Reason_new(a.size()+1);
+            r = Reason_new(a.size()+2);
             // Finesse upper bounds
             for (int i = 0; i < a.size(); i++) {
-              (*r)[i+1] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
+              (*r)[i+2] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
             }
           }
           return r;
