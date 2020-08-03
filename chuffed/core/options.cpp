@@ -264,12 +264,8 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
 #ifdef HAS_PROFILER
   "\n"
   "Profiler Options:\n"
-  "  -cpprofiler\n"
-  "     Send search to CP Profiler.\n"
-  "  -cpprofiler-id\n"
-  "     Execution ID for CP Profiler (default " << def.cpprofiler_id << ").\n"
-  "  -cpprofiler-port\n"
-  "     Port to connect to CP Profiler (default " << def.cpprofiler_port << ").\n"
+  "  -cpprofiler id,port\n"
+  "     Send search to CP Profiler with the given execution ID and port.\n"
 #endif
   "\n"
   ;
@@ -613,12 +609,15 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("-s -S")) {
       so.verbosity = 1;
 #ifdef HAS_PROFILER
-    } else if (cop.get("-cpprofiler")) {
-      so.cpprofiler_enabled = true;
-    } else if (cop.get("-cpprofiler-port", &intBuffer)) {
-      so.cpprofiler_port = intBuffer;
-    } else if (cop.get("-cpprofiler-id", &intBuffer)) {
-      so.cpprofiler_id = intBuffer;
+    } else if (cop.get("-cpprofiler", &stringBuffer)) {
+      std::stringstream ss(stringBuffer);
+      char sep;
+      ss >> so.cpprofiler_id >> sep >> so.cpprofiler_port;
+      if (sep == ',' && ss.eof()) {
+        so.cpprofiler_enabled = true;
+      } else {
+        CHUFFED_ERROR("Invalid value for -cpprofiler.");
+      }
 #endif
     } else if (argv[i][0] == '-') {
       std::cerr << argv[0] << ": unrecognized option " << argv[i] << "\n";
