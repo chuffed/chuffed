@@ -67,7 +67,6 @@ public:
         bool use_var_is_introduced;      // Use var_is_introduced annotation to decide
                                          // whether a variable is introduced
 
-  bool use_profiler;               // Connect to CP Profiler
   bool print_nodes;                // Print nodes as they are sent to the profiler (or
                                          // would be sent)
         bool print_implications;
@@ -144,6 +143,13 @@ public:
 	// for Nick's test (defaults probably work best in practice)
 	bool alldiff_cheat;              // if n vars over n vals, enforce that all vals are taken
 	bool alldiff_stage;              // if bounds or domain consistency, put value propagator too
+
+#ifdef HAS_PROFILER
+  // CP Profiler
+  bool cpprofiler_enabled;
+  int cpprofiler_id;
+  int cpprofiler_port;
+#endif
 
 	Options();
 

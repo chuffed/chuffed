@@ -8,6 +8,9 @@
 #include <cstring>
 
 #ifdef WIN32
+#ifdef HAS_PROFILER
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #define __SEP__ '\\'
 #else
