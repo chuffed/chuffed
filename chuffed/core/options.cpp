@@ -102,8 +102,8 @@ Options::Options() :
 
 	, alldiff_cheat(true)
 	, alldiff_stage(true)
-  , cpprofiler_enabled(false)
 #ifdef HAS_PROFILER
+  , cpprofiler_enabled(false)
   , cpprofiler_id(-1)
   , cpprofiler_port(6565)
 #endif
