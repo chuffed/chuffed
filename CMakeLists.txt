@@ -46,7 +46,7 @@ endif()
 
 # ------------- CP Profiler Integration -------------
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration")
+if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/connector.hpp")
   set(CHUFFED_PROFILER_SOURCES
     ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/connector.hpp
     ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/message.hpp
@@ -151,7 +151,7 @@ add_library(chuffed
   ${CHUFFED_PROFILER_SOURCES}
 )
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration")
+if(CHUFFED_PROFILER_SOURCES)
   target_compile_definitions(chuffed PRIVATE HAS_PROFILER)
 endif()
 
