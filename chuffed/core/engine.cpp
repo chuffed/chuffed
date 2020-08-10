@@ -48,7 +48,7 @@ std::ofstream node_stream;
 
 #ifdef HAS_PROFILER
 static bool doProfiling() {
-    return so.print_nodes || (profilerConnector && profilerConnector->connected());
+    return so.print_nodes || profilerConnector->connected();
 }
 
 static ostream& operator<<(ostream& os, const cpprofiler::NodeUID& uid) {
@@ -144,9 +144,6 @@ std::string showVec(const vec<int>& v) {
 
 // Rewind nodepath and altpath after a backjump.
 void rewindPaths(
-#ifdef HAS_PROFILER
-    cpprofiler::Connector& profilerConnector,
-#endif
     int previousDecisionLevel, int newDecisionLevel, RewindStyle rewindStyle,
     long timestamp
 ) {
@@ -187,7 +184,7 @@ void rewindPaths(
             
 #ifdef HAS_PROFILER
             if (doProfiling()) {
-              sendNode(profilerConnector.createNode(
+              sendNode(profilerConnector->createNode(
                   {nodeid, engine.restart_count, 0}, {parent, 0, 0}, myalt, 0,
                   cpprofiler::NodeStatus::SKIPPED));
               //    .set_decision_level(currentDecisionLevel)
@@ -686,7 +683,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                     std::cerr << "\n";
 #endif
 
-                    rewindPaths(*profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
+                    rewindPaths(previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
                                 
                     std::stringstream ss2;
                     /* ss2 << "-> "; */
@@ -717,7 +714,7 @@ RESULT Engine::search(const std::string& problemLabel) {
                 sat.btToLevel(decisionLevel()-1);
 #ifdef HAS_PROFILER
                 if (doProfiling()) {
-                    rewindPaths(*profilerConnector, previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
+                    rewindPaths(previousDecisionLevel, decisionLevel(), (so.send_skipped ? REWIND_SEND_SKIPPED : REWIND_OMIT_SKIPPED), timeus);
                 }
 #endif
                 makeDecision(di, 1);
@@ -926,8 +923,9 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
 
 #ifdef HAS_PROFILER
     profilerConnector = new cpprofiler::Connector(so.cpprofiler_port);
-    if (so.cpprofiler_enabled)
-        profilerConnector->connect();
+    if (so.cpprofiler_enabled) {
+      profilerConnector->connect();
+    }
 #endif
 
     /* if (so.debug) { */
@@ -974,8 +972,12 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
     }
 
 #ifdef HAS_PROFILER
-    profilerConnector->done();
-    profilerConnector->disconnect();
+    if (doProfiling()) {
+        profilerConnector->done();
+        if (profilerConnector->connected()) {
+            profilerConnector->disconnect();
+        }
+    }
     delete profilerConnector;
 #endif
 
