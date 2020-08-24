@@ -157,7 +157,7 @@ endif()
 
 # ------------- FZN Chuffed -------------
 
-find_package(BISON)
+find_package(BISON 3.4)
 if(BISON_FOUND)
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/chuffed/flatzinc)
   bison_target(FZNParser

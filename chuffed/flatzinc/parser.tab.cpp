@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.6.4.  */
+/* A Bison parser, made by GNU Bison 3.7.1.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -49,7 +49,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.6.4"
+#define YYBISON_VERSION "3.7.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -442,108 +442,7 @@ namespace FlatZinc {
 #  endif
 # endif
 
-/* Use api.header.include to #include this header
-   instead of duplicating it here.  */
-#ifndef YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-# define YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    INT_LIT = 258,                 /* INT_LIT  */
-    BOOL_LIT = 259,                /* BOOL_LIT  */
-    FLOAT_LIT = 260,               /* FLOAT_LIT  */
-    ID = 261,                      /* ID  */
-    STRING_LIT = 262,              /* STRING_LIT  */
-    VAR = 263,                     /* VAR  */
-    PAR = 264,                     /* PAR  */
-    ANNOTATION = 265,              /* ANNOTATION  */
-    ANY = 266,                     /* ANY  */
-    ARRAY = 267,                   /* ARRAY  */
-    BOOLTOK = 268,                 /* BOOLTOK  */
-    CASE = 269,                    /* CASE  */
-    COLONCOLON = 270,              /* COLONCOLON  */
-    CONSTRAINT = 271,              /* CONSTRAINT  */
-    DEFAULT = 272,                 /* DEFAULT  */
-    DOTDOT = 273,                  /* DOTDOT  */
-    ELSE = 274,                    /* ELSE  */
-    ELSEIF = 275,                  /* ELSEIF  */
-    ENDIF = 276,                   /* ENDIF  */
-    ENUM = 277,                    /* ENUM  */
-    FLOATTOK = 278,                /* FLOATTOK  */
-    FUNCTION = 279,                /* FUNCTION  */
-    IF = 280,                      /* IF  */
-    INCLUDE = 281,                 /* INCLUDE  */
-    INTTOK = 282,                  /* INTTOK  */
-    LET = 283,                     /* LET  */
-    MAXIMIZE = 284,                /* MAXIMIZE  */
-    MINIMIZE = 285,                /* MINIMIZE  */
-    OF = 286,                      /* OF  */
-    SATISFY = 287,                 /* SATISFY  */
-    OUTPUT = 288,                  /* OUTPUT  */
-    PREDICATE = 289,               /* PREDICATE  */
-    RECORD = 290,                  /* RECORD  */
-    SET = 291,                     /* SET  */
-    SHOW = 292,                    /* SHOW  */
-    SHOWCOND = 293,                /* SHOWCOND  */
-    SOLVE = 294,                   /* SOLVE  */
-    STRING = 295,                  /* STRING  */
-    TEST = 296,                    /* TEST  */
-    THEN = 297,                    /* THEN  */
-    TUPLE = 298,                   /* TUPLE  */
-    TYPE = 299,                    /* TYPE  */
-    VARIANT_RECORD = 300,          /* VARIANT_RECORD  */
-    WHERE = 301                    /* WHERE  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
- 
-    int iValue; 
-    char* sValue; 
-    bool bValue; 
-    double dValue;
-    std::vector<int>* setValue;
-    FlatZinc::AST::SetLit* setLit;
-    std::vector<double>* floatSetValue;
-    std::vector<FlatZinc::AST::SetLit>* setValueList;
-    FlatZinc::Option<FlatZinc::AST::SetLit* > oSet;
-    FlatZinc::VarSpec* varSpec;
-    FlatZinc::Option<FlatZinc::AST::Node*> oArg;
-    std::vector<FlatZinc::VarSpec*>* varSpecVec;
-    FlatZinc::Option<std::vector<FlatZinc::VarSpec*>* > oVarSpecVec;
-    FlatZinc::AST::Node* arg;
-    FlatZinc::AST::Array* argVec;
-
-
-};
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-
-int yyparse (void *parm);
-
-#endif /* !YY_YY_USERS_JDEK0001_DROPBOX_DEVELOPMENT_CHUFFED_BUILD_CHUFFED_FLATZINC_PARSER_TAB_H_INCLUDED  */
+#include <chuffed/flatzinc/parser.tab.h>
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -991,6 +890,7 @@ union yyalloc
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  340
 
+/* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   301
 
 
@@ -1042,22 +942,22 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   484,   484,   486,   488,   491,   492,   496,   501,   509,
-     510,   514,   519,   527,   528,   535,   537,   539,   542,   543,
-     546,   549,   550,   551,   552,   555,   556,   557,   558,   561,
-     562,   565,   566,   573,   605,   636,   643,   675,   701,   711,
-     724,   781,   832,   840,   894,   907,   920,   928,   943,   947,
-     962,   986,   989,   995,  1000,  1006,  1008,  1011,  1017,  1021,
-    1036,  1060,  1063,  1069,  1074,  1081,  1087,  1091,  1106,  1130,
-    1133,  1139,  1144,  1151,  1154,  1158,  1173,  1197,  1200,  1206,
-    1211,  1218,  1225,  1228,  1235,  1238,  1245,  1248,  1255,  1258,
-    1264,  1282,  1303,  1326,  1334,  1351,  1355,  1359,  1365,  1369,
-    1383,  1384,  1391,  1395,  1404,  1407,  1413,  1418,  1426,  1429,
-    1435,  1440,  1448,  1451,  1457,  1462,  1470,  1473,  1479,  1485,
-    1497,  1501,  1508,  1512,  1519,  1522,  1528,  1532,  1536,  1540,
-    1544,  1593,  1607,  1610,  1616,  1620,  1631,  1652,  1682,  1704,
-    1705,  1713,  1716,  1722,  1726,  1733,  1738,  1744,  1748,  1755,
-    1759,  1765,  1769,  1773,  1777,  1781,  1824,  1835
+       0,   486,   486,   488,   490,   493,   494,   498,   503,   511,
+     512,   516,   521,   529,   530,   537,   539,   541,   544,   545,
+     548,   551,   552,   553,   554,   557,   558,   559,   560,   563,
+     564,   567,   568,   575,   607,   638,   645,   677,   703,   713,
+     726,   783,   834,   842,   896,   909,   922,   930,   945,   949,
+     964,   988,   991,   997,  1002,  1008,  1010,  1013,  1019,  1023,
+    1038,  1062,  1065,  1071,  1076,  1083,  1089,  1093,  1108,  1132,
+    1135,  1141,  1146,  1153,  1156,  1160,  1175,  1199,  1202,  1208,
+    1213,  1220,  1227,  1230,  1237,  1240,  1247,  1250,  1257,  1260,
+    1266,  1284,  1305,  1328,  1336,  1353,  1357,  1361,  1367,  1371,
+    1385,  1386,  1393,  1397,  1406,  1409,  1415,  1420,  1428,  1431,
+    1437,  1442,  1450,  1453,  1459,  1464,  1472,  1475,  1481,  1487,
+    1499,  1503,  1510,  1514,  1521,  1524,  1530,  1534,  1538,  1542,
+    1546,  1595,  1609,  1612,  1618,  1622,  1633,  1654,  1684,  1706,
+    1707,  1715,  1718,  1724,  1728,  1735,  1740,  1746,  1750,  1757,
+    1761,  1767,  1771,  1775,  1779,  1783,  1826,  1837
 };
 #endif
 
@@ -1892,7 +1792,7 @@ yydestruct (const char *yymsg,
 int
 yyparse (void *parm)
 {
-/* The lookahead symbol.  */
+/* Lookahead token kind.  */
 int yychar;
 
 
@@ -1903,36 +1803,32 @@ YY_INITIAL_VALUE (static YYSTYPE yyval_default;)
 YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
 
     /* Number of syntax errors so far.  */
-    int yynerrs;
+    int yynerrs = 0;
 
-    yy_state_fast_t yystate;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
+    int yyerrstatus = 0;
 
-    /* The stacks and their tools:
-       'yyss': related to states.
-       'yyvs': related to semantic values.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
+    /* Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
     /* Their size.  */
-    YYPTRDIFF_T yystacksize;
+    YYPTRDIFF_T yystacksize = YYINITDEPTH;
 
-    /* The state stack.  */
+    /* The state stack: array, bottom, top.  */
     yy_state_t yyssa[YYINITDEPTH];
-    yy_state_t *yyss;
-    yy_state_t *yyssp;
+    yy_state_t *yyss = yyssa;
+    yy_state_t *yyssp = yyss;
 
-    /* The semantic value stack.  */
+    /* The semantic value stack: array, bottom, top.  */
     YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
+    YYSTYPE *yyvs = yyvsa;
+    YYSTYPE *yyvsp = yyvs;
 
   int yyn;
   /* The return value of yyparse.  */
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
+  /* Lookahead symbol kind.  */
   yysymbol_kind_t yytoken = YYSYMBOL_YYEMPTY;
   /* The variables used to return semantic value and location from the
      action routines.  */
@@ -1948,15 +1844,6 @@ YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
-
-  yynerrs = 0;
-  yystate = 0;
-  yyerrstatus = 0;
-
-  yystacksize = YYINITDEPTH;
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
@@ -2158,7 +2045,7 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 7:
+  case 7: /* vardecl_items: %empty  */
         {
 #if !EXPOSE_INT_LITS
             initfg(static_cast<ParserState*>(parm));
@@ -2166,7 +2053,7 @@ yyreduce:
         }
     break;
 
-  case 8:
+  case 8: /* vardecl_items: vardecl_items_head  */
         {
 #if !EXPOSE_INT_LITS
             initfg(static_cast<ParserState*>(parm));
@@ -2174,7 +2061,7 @@ yyreduce:
         }
     break;
 
-  case 11:
+  case 11: /* constraint_items: %empty  */
         {
 #if EXPOSE_INT_LITS
             initfg(static_cast<ParserState*>(parm));
@@ -2182,7 +2069,7 @@ yyreduce:
         }
     break;
 
-  case 12:
+  case 12: /* constraint_items: constraint_items_head  */
         {
 #if EXPOSE_INT_LITS
             initfg(static_cast<ParserState*>(parm));
@@ -2190,7 +2077,7 @@ yyreduce:
         }
     break;
 
-  case 33:
+  case 33: /* vardecl_item: VAR int_ti_expr_tail ':' ID annotations non_array_expr_opt  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !(yyvsp[-4].oSet)() || !(yyvsp[-4].oSet).some()->empty(), "Empty var int domain.");
@@ -2224,7 +2111,7 @@ yyreduce:
         }
     break;
 
-  case 34:
+  case 34: /* vardecl_item: VAR bool_ti_expr_tail ':' ID annotations non_array_expr_opt  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("output_var");
@@ -2257,7 +2144,7 @@ yyreduce:
         }
     break;
 
-  case 35:
+  case 35: /* vardecl_item: VAR float_ti_expr_tail ':' ID annotations non_array_expr_opt  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, false, "Floats not supported.");
@@ -2266,7 +2153,7 @@ yyreduce:
         }
     break;
 
-  case 36:
+  case 36: /* vardecl_item: VAR SET OF int_ti_expr_tail ':' ID annotations non_array_expr_opt  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("output_var");
@@ -2300,7 +2187,7 @@ yyreduce:
         }
     break;
 
-  case 37:
+  case 37: /* vardecl_item: int_ti_expr_tail ':' ID annotations '=' non_array_expr  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !(yyvsp[-5].oSet)() || !(yyvsp[-5].oSet).some()->empty(), "Empty int domain.");
@@ -2328,7 +2215,7 @@ yyreduce:
         }
     break;
 
-  case 38:
+  case 38: /* vardecl_item: BOOLTOK ':' ID annotations '=' non_array_expr  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[0].arg)->isBool(), "Invalid bool initializer.");
@@ -2340,7 +2227,7 @@ yyreduce:
         }
     break;
 
-  case 39:
+  case 39: /* vardecl_item: SET OF int_ti_expr_tail ':' ID annotations '=' non_array_expr  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !(yyvsp[-5].oSet)() || !(yyvsp[-5].oSet).some()->empty(), "Empty set domain.");
@@ -2355,7 +2242,7 @@ yyreduce:
         }
     break;
 
-  case 40:
+  case 40: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF VAR int_ti_expr_tail ':' ID annotations vardecl_int_var_array_init  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[-10].iValue) == 1, "Arrays must start at 1");
@@ -2413,7 +2300,7 @@ yyreduce:
         }
     break;
 
-  case 41:
+  case 41: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF VAR bool_ti_expr_tail ':' ID annotations vardecl_bool_var_array_init  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
@@ -2465,7 +2352,7 @@ yyreduce:
         }
     break;
 
-  case 42:
+  case 42: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF VAR float_ti_expr_tail ':' ID annotations vardecl_float_var_array_init  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, false, "Floats not supported.");
@@ -2474,7 +2361,7 @@ yyreduce:
         }
     break;
 
-  case 43:
+  case 43: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF VAR SET OF int_ti_expr_tail ':' ID annotations vardecl_set_var_array_init  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
@@ -2529,7 +2416,7 @@ yyreduce:
         }
     break;
 
-  case 44:
+  case 44: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF int_ti_expr_tail ':' ID annotations '=' '[' int_list ']'  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[-12].iValue) == 1, "Arrays must start at 1");
@@ -2543,7 +2430,7 @@ yyreduce:
         }
     break;
 
-  case 45:
+  case 45: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF BOOLTOK ':' ID annotations '=' '[' bool_list ']'  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[-12].iValue) == 1, "Arrays must start at 1");
@@ -2557,7 +2444,7 @@ yyreduce:
         }
     break;
 
-  case 46:
+  case 46: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF FLOATTOK ':' ID annotations '=' '[' float_list ']'  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, false, "Floats not supported.");
@@ -2566,7 +2453,7 @@ yyreduce:
         }
     break;
 
-  case 47:
+  case 47: /* vardecl_item: ARRAY '[' INT_LIT DOTDOT INT_LIT ']' OF SET OF int_ti_expr_tail ':' ID annotations '=' '[' set_literal_list ']'  */
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, (yyvsp[-14].iValue) == 1, "Arrays must start at 1");
@@ -2580,13 +2467,13 @@ yyreduce:
         }
     break;
 
-  case 48:
+  case 48: /* int_init: INT_LIT  */
         { 
             (yyval.varSpec) = new IntVarSpec((yyvsp[0].iValue), false, true, false);
         }
     break;
 
-  case 49:
+  case 49: /* int_init: ID  */
         { 
             int v = 0;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2603,7 +2490,7 @@ yyreduce:
         }
     break;
 
-  case 50:
+  case 50: /* int_init: ID '[' INT_LIT ']'  */
         { 
             vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2626,45 +2513,45 @@ yyreduce:
         }
     break;
 
-  case 51:
+  case 51: /* int_init_list: %empty  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(0); 
         }
     break;
 
-  case 52:
+  case 52: /* int_init_list: int_init_list_head list_tail  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 53:
+  case 53: /* int_init_list_head: int_init  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
 
-  case 54:
+  case 54: /* int_init_list_head: int_init_list_head ',' int_init  */
         { 
             (yyval.varSpecVec) = (yyvsp[-2].varSpecVec); 
             (yyval.varSpecVec)->push_back((yyvsp[0].varSpec)); 
         }
     break;
 
-  case 57:
+  case 57: /* int_var_array_literal: '[' int_init_list ']'  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 58:
+  case 58: /* float_init: FLOAT_LIT  */
         { 
             (yyval.varSpec) = new FloatVarSpec((yyvsp[0].dValue),false,true,false); 
         }
     break;
 
-  case 59:
+  case 59: /* float_init: ID  */
         { 
             int v = 0;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2681,7 +2568,7 @@ yyreduce:
         }
     break;
 
-  case 60:
+  case 60: /* float_init: ID '[' INT_LIT ']'  */
         { 
             vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2704,45 +2591,45 @@ yyreduce:
         }
     break;
 
-  case 61:
+  case 61: /* float_init_list: %empty  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(0); 
         }
     break;
 
-  case 62:
+  case 62: /* float_init_list: float_init_list_head list_tail  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 63:
+  case 63: /* float_init_list_head: float_init  */
         {   
             (yyval.varSpecVec) = new vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
 
-  case 64:
+  case 64: /* float_init_list_head: float_init_list_head ',' float_init  */
         { 
             (yyval.varSpecVec) = (yyvsp[-2].varSpecVec); 
             (yyval.varSpecVec)->push_back((yyvsp[0].varSpec)); 
         }
     break;
 
-  case 65:
+  case 65: /* float_var_array_literal: '[' float_init_list ']'  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 66:
+  case 66: /* bool_init: BOOL_LIT  */
         { 
             (yyval.varSpec) = new BoolVarSpec((yyvsp[0].iValue),false,true,false); 
         }
     break;
 
-  case 67:
+  case 67: /* bool_init: ID  */
         { 
             int v = 0;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2759,7 +2646,7 @@ yyreduce:
         }
     break;
 
-  case 68:
+  case 68: /* bool_init: ID '[' INT_LIT ']'  */
         { 
             vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2782,43 +2669,43 @@ yyreduce:
         }
     break;
 
-  case 69:
+  case 69: /* bool_init_list: %empty  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(0); 
         }
     break;
 
-  case 70:
+  case 70: /* bool_init_list: bool_init_list_head list_tail  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 71:
+  case 71: /* bool_init_list_head: bool_init  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
 
-  case 72:
+  case 72: /* bool_init_list_head: bool_init_list_head ',' bool_init  */
         { 
             (yyval.varSpecVec) = (yyvsp[-2].varSpecVec); 
             (yyval.varSpecVec)->push_back((yyvsp[0].varSpec)); 
         }
     break;
 
-  case 73:
+  case 73: /* bool_var_array_literal: '[' bool_init_list ']'  */
                                { (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); }
     break;
 
-  case 74:
+  case 74: /* set_init: set_literal  */
         { 
             (yyval.varSpec) = new SetVarSpec(Option<AST::SetLit*>::some((yyvsp[0].setLit)),false,true,false); 
         }
     break;
 
-  case 75:
+  case 75: /* set_init: ID  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             int v = 0;
@@ -2835,7 +2722,7 @@ yyreduce:
         }
     break;
 
-  case 76:
+  case 76: /* set_init: ID '[' INT_LIT ']'  */
         { 
             vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -2858,87 +2745,87 @@ yyreduce:
         }
     break;
 
-  case 77:
+  case 77: /* set_init_list: %empty  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(0); 
         }
     break;
 
-  case 78:
+  case 78: /* set_init_list: set_init_list_head list_tail  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 79:
+  case 79: /* set_init_list_head: set_init  */
         { 
             (yyval.varSpecVec) = new vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
 
-  case 80:
+  case 80: /* set_init_list_head: set_init_list_head ',' set_init  */
         { 
             (yyval.varSpecVec) = (yyvsp[-2].varSpecVec); 
             (yyval.varSpecVec)->push_back((yyvsp[0].varSpec)); 
         }
     break;
 
-  case 81:
+  case 81: /* set_var_array_literal: '[' set_init_list ']'  */
         { 
             (yyval.varSpecVec) = (yyvsp[-1].varSpecVec); 
         }
     break;
 
-  case 82:
+  case 82: /* vardecl_int_var_array_init: %empty  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
         }
     break;
 
-  case 83:
+  case 83: /* vardecl_int_var_array_init: '=' int_var_array_literal  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
-  case 84:
+  case 84: /* vardecl_bool_var_array_init: %empty  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
         }
     break;
 
-  case 85:
+  case 85: /* vardecl_bool_var_array_init: '=' bool_var_array_literal  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
-  case 86:
+  case 86: /* vardecl_float_var_array_init: %empty  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
         }
     break;
 
-  case 87:
+  case 87: /* vardecl_float_var_array_init: '=' float_var_array_literal  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
-  case 88:
+  case 88: /* vardecl_set_var_array_init: %empty  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
         }
     break;
 
-  case 89:
+  case 89: /* vardecl_set_var_array_init: '=' set_var_array_literal  */
         { 
             (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
-  case 90:
+  case 90: /* constraint_item: CONSTRAINT ID '(' flat_expr_list ')' annotations  */
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
 #if EXPOSE_INT_LITS
@@ -2958,7 +2845,7 @@ yyreduce:
         }
     break;
 
-  case 91:
+  case 91: /* constraint_item: CONSTRAINT ID annotations  */
         {
             ParserState *pp = static_cast<ParserState*>(parm);
             AST::Array* args = new AST::Array(2);
@@ -2981,7 +2868,7 @@ yyreduce:
         }
     break;
 
-  case 92:
+  case 92: /* constraint_item: CONSTRAINT ID '[' INT_LIT ']' annotations  */
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
             AST::Array* args = new AST::Array(2);
@@ -3004,7 +2891,7 @@ yyreduce:
         }
     break;
 
-  case 93:
+  case 93: /* solve_item: SOLVE annotations SATISFY  */
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
             if (!pp->hadError) {
@@ -3014,7 +2901,7 @@ yyreduce:
         }
     break;
 
-  case 94:
+  case 94: /* solve_item: SOLVE annotations minmax solve_expr  */
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
             if (!pp->hadError) {
@@ -3027,31 +2914,31 @@ yyreduce:
         }
     break;
 
-  case 95:
+  case 95: /* int_ti_expr_tail: INTTOK  */
         { 
             (yyval.oSet) = Option<AST::SetLit* >::none(); 
         }
     break;
 
-  case 96:
+  case 96: /* int_ti_expr_tail: '{' int_list '}'  */
         { 
             (yyval.oSet) = Option<AST::SetLit* >::some(new AST::SetLit(*(yyvsp[-1].setValue))); 
         }
     break;
 
-  case 97:
+  case 97: /* int_ti_expr_tail: INT_LIT DOTDOT INT_LIT  */
         { 
             (yyval.oSet) = Option<AST::SetLit* >::some(new AST::SetLit((yyvsp[-2].iValue), (yyvsp[0].iValue)));
         }
     break;
 
-  case 98:
+  case 98: /* bool_ti_expr_tail: BOOLTOK  */
         { 
             (yyval.oSet) = Option<AST::SetLit* >::none(); 
         }
     break;
 
-  case 99:
+  case 99: /* bool_ti_expr_tail: '{' bool_list_head list_tail '}'  */
         { 
             bool haveTrue = false;
             bool haveFalse = false;
@@ -3065,109 +2952,109 @@ yyreduce:
         }
     break;
 
-  case 102:
+  case 102: /* set_literal: '{' int_list '}'  */
         { 
             (yyval.setLit) = new AST::SetLit(*(yyvsp[-1].setValue)); 
         }
     break;
 
-  case 103:
+  case 103: /* set_literal: INT_LIT DOTDOT INT_LIT  */
         { 
             (yyval.setLit) = new AST::SetLit((yyvsp[-2].iValue), (yyvsp[0].iValue)); 
         }
     break;
 
-  case 104:
+  case 104: /* int_list: %empty  */
         { 
             (yyval.setValue) = new vector<int>(0); 
         }
     break;
 
-  case 105:
+  case 105: /* int_list: int_list_head list_tail  */
         { 
             (yyval.setValue) = (yyvsp[-1].setValue); 
         }
     break;
 
-  case 106:
+  case 106: /* int_list_head: INT_LIT  */
         { 
             (yyval.setValue) = new vector<int>(1); 
             (*(yyval.setValue))[0] = (yyvsp[0].iValue); 
         }
     break;
 
-  case 107:
+  case 107: /* int_list_head: int_list_head ',' INT_LIT  */
         { 
             (yyval.setValue) = (yyvsp[-2].setValue); 
             (yyval.setValue)->push_back((yyvsp[0].iValue)); 
         }
     break;
 
-  case 108:
+  case 108: /* bool_list: %empty  */
         { 
             (yyval.setValue) = new vector<int>(0); 
         }
     break;
 
-  case 109:
+  case 109: /* bool_list: bool_list_head list_tail  */
         { 
             (yyval.setValue) = (yyvsp[-1].setValue); 
         }
     break;
 
-  case 110:
+  case 110: /* bool_list_head: BOOL_LIT  */
         { 
             (yyval.setValue) = new vector<int>(1); 
             (*(yyval.setValue))[0] = (yyvsp[0].iValue); 
         }
     break;
 
-  case 111:
+  case 111: /* bool_list_head: bool_list_head ',' BOOL_LIT  */
         { 
             (yyval.setValue) = (yyvsp[-2].setValue); 
             (yyval.setValue)->push_back((yyvsp[0].iValue)); 
         }
     break;
 
-  case 112:
+  case 112: /* float_list: %empty  */
         { 
             (yyval.floatSetValue) = new vector<double>(0); 
         }
     break;
 
-  case 113:
+  case 113: /* float_list: float_list_head list_tail  */
         { 
             (yyval.floatSetValue) = (yyvsp[-1].floatSetValue); 
         }
     break;
 
-  case 114:
+  case 114: /* float_list_head: FLOAT_LIT  */
         {
             (yyval.floatSetValue) = new vector<double>(1); 
             (*(yyval.floatSetValue))[0] = (yyvsp[0].dValue); 
         }
     break;
 
-  case 115:
+  case 115: /* float_list_head: float_list_head ',' FLOAT_LIT  */
         { 
             (yyval.floatSetValue) = (yyvsp[-2].floatSetValue); 
             (yyval.floatSetValue)->push_back((yyvsp[0].dValue)); 
         }
     break;
 
-  case 116:
+  case 116: /* set_literal_list: %empty  */
         { 
             (yyval.setValueList) = new vector<AST::SetLit>(0); 
         }
     break;
 
-  case 117:
+  case 117: /* set_literal_list: set_literal_list_head list_tail  */
         { 
             (yyval.setValueList) = (yyvsp[-1].setValueList); 
         }
     break;
 
-  case 118:
+  case 118: /* set_literal_list_head: set_literal  */
         { 
             (yyval.setValueList) = new vector<AST::SetLit>(1); 
             (*(yyval.setValueList))[0] = *(yyvsp[0].setLit); 
@@ -3175,7 +3062,7 @@ yyreduce:
         }
     break;
 
-  case 119:
+  case 119: /* set_literal_list_head: set_literal_list_head ',' set_literal  */
         { 
             (yyval.setValueList) = (yyvsp[-2].setValueList); 
             (yyval.setValueList)->push_back(*(yyvsp[0].setLit)); 
@@ -3183,68 +3070,68 @@ yyreduce:
         }
     break;
 
-  case 120:
+  case 120: /* flat_expr_list: flat_expr  */
         { 
             (yyval.argVec) = new AST::Array((yyvsp[0].arg)); 
         }
     break;
 
-  case 121:
+  case 121: /* flat_expr_list: flat_expr_list ',' flat_expr  */
         { 
             (yyval.argVec) = (yyvsp[-2].argVec); 
             (yyval.argVec)->append((yyvsp[0].arg)); 
         }
     break;
 
-  case 122:
+  case 122: /* flat_expr: non_array_expr  */
         { 
             (yyval.arg) = (yyvsp[0].arg); 
         }
     break;
 
-  case 123:
+  case 123: /* flat_expr: '[' non_array_expr_list ']'  */
         { 
             (yyval.arg) = (yyvsp[-1].argVec); 
         }
     break;
 
-  case 124:
+  case 124: /* non_array_expr_opt: %empty  */
         { 
             (yyval.oArg) = Option<AST::Node*>::none(); 
         }
     break;
 
-  case 125:
+  case 125: /* non_array_expr_opt: '=' non_array_expr  */
         { 
             (yyval.oArg) = Option<AST::Node*>::some((yyvsp[0].arg)); 
         }
     break;
 
-  case 126:
+  case 126: /* non_array_expr: BOOL_LIT  */
         { 
             (yyval.arg) = new AST::BoolLit((yyvsp[0].iValue)); 
         }
     break;
 
-  case 127:
+  case 127: /* non_array_expr: INT_LIT  */
         { 
             (yyval.arg) = new AST::IntLit((yyvsp[0].iValue)); 
         }
     break;
 
-  case 128:
+  case 128: /* non_array_expr: FLOAT_LIT  */
         { 
             (yyval.arg) = new AST::FloatLit((yyvsp[0].dValue)); 
         }
     break;
 
-  case 129:
+  case 129: /* non_array_expr: set_literal  */
         { 
             (yyval.arg) = (yyvsp[0].setLit); 
         }
     break;
 
-  case 130:
+  case 130: /* non_array_expr: ID  */
         { 
             vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -3295,7 +3182,7 @@ yyreduce:
         }
     break;
 
-  case 131:
+  case 131: /* non_array_expr: ID '[' non_array_expr ']'  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             int i = -1;
@@ -3308,32 +3195,32 @@ yyreduce:
         }
     break;
 
-  case 132:
+  case 132: /* non_array_expr_list: %empty  */
         { 
             (yyval.argVec) = new AST::Array(0); 
         }
     break;
 
-  case 133:
+  case 133: /* non_array_expr_list: non_array_expr_list_head list_tail  */
         { 
             (yyval.argVec) = (yyvsp[-1].argVec); 
         }
     break;
 
-  case 134:
+  case 134: /* non_array_expr_list_head: non_array_expr  */
         { 
             (yyval.argVec) = new AST::Array((yyvsp[0].arg)); 
         }
     break;
 
-  case 135:
+  case 135: /* non_array_expr_list_head: non_array_expr_list_head ',' non_array_expr  */
         { 
             (yyval.argVec) = (yyvsp[-2].argVec); 
             (yyval.argVec)->append((yyvsp[0].arg)); 
         }
     break;
 
-  case 136:
+  case 136: /* solve_expr: INT_LIT  */
         {
             ParserState *pp = static_cast<ParserState*>(parm);
             // Create a new variable in the parser and append at the end
@@ -3356,7 +3243,7 @@ yyreduce:
         }
     break;
 
-  case 137:
+  case 137: /* solve_expr: ID  */
         { 
             ParserState *pp = static_cast<ParserState*>(parm);
             int tmp = -1;
@@ -3388,7 +3275,7 @@ yyreduce:
         }
     break;
 
-  case 138:
+  case 138: /* solve_expr: ID '[' INT_LIT ']'  */
         {
             vector<int> tmp;
             ParserState *pp = static_cast<ParserState*>(parm);
@@ -3410,94 +3297,94 @@ yyreduce:
         }
     break;
 
-  case 141:
+  case 141: /* annotations: %empty  */
         { 
             (yyval.argVec) = NULL; 
         }
     break;
 
-  case 142:
+  case 142: /* annotations: annotations_head  */
         { 
             (yyval.argVec) = (yyvsp[0].argVec); 
         }
     break;
 
-  case 143:
+  case 143: /* annotations_head: COLONCOLON annotation  */
         { 
             (yyval.argVec) = new AST::Array((yyvsp[0].arg)); 
         }
     break;
 
-  case 144:
+  case 144: /* annotations_head: annotations_head COLONCOLON annotation  */
         { 
             (yyval.argVec) = (yyvsp[-2].argVec); 
             (yyval.argVec)->append((yyvsp[0].arg)); 
         }
     break;
 
-  case 145:
+  case 145: /* annotation: ID '(' annotation_list ')'  */
         { 
             (yyval.arg) = new AST::Call((yyvsp[-3].sValue), AST::extractSingleton((yyvsp[-1].arg))); 
             free((yyvsp[-3].sValue));
         }
     break;
 
-  case 146:
+  case 146: /* annotation: annotation_expr  */
         { 
             (yyval.arg) = (yyvsp[0].arg); 
         }
     break;
 
-  case 147:
+  case 147: /* annotation_list: annotation  */
         { 
             (yyval.arg) = new AST::Array((yyvsp[0].arg)); 
         }
     break;
 
-  case 148:
+  case 148: /* annotation_list: annotation_list ',' annotation  */
         { 
             (yyval.arg) = (yyvsp[-2].arg); 
             (yyval.arg)->append((yyvsp[0].arg)); 
         }
     break;
 
-  case 149:
+  case 149: /* annotation_expr: ann_non_array_expr  */
         { 
             (yyval.arg) = (yyvsp[0].arg); 
         }
     break;
 
-  case 150:
+  case 150: /* annotation_expr: '[' annotation_list ']'  */
         { 
             (yyval.arg) = (yyvsp[-1].arg); 
         }
     break;
 
-  case 151:
+  case 151: /* ann_non_array_expr: BOOL_LIT  */
         { 
             (yyval.arg) = new AST::BoolLit((yyvsp[0].iValue)); 
         }
     break;
 
-  case 152:
+  case 152: /* ann_non_array_expr: INT_LIT  */
         { 
             (yyval.arg) = new AST::IntLit((yyvsp[0].iValue)); 
         }
     break;
 
-  case 153:
+  case 153: /* ann_non_array_expr: FLOAT_LIT  */
         { 
             (yyval.arg) = new AST::FloatLit((yyvsp[0].dValue)); 
         }
     break;
 
-  case 154:
+  case 154: /* ann_non_array_expr: set_literal  */
         { 
             (yyval.arg) = (yyvsp[0].setLit); 
         }
     break;
 
-  case 155:
+  case 155: /* ann_non_array_expr: ID  */
         { 
             vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
@@ -3542,7 +3429,7 @@ yyreduce:
         }
     break;
 
-  case 156:
+  case 156: /* ann_non_array_expr: ID '[' ann_non_array_expr ']'  */
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             int i = -1;
@@ -3555,7 +3442,7 @@ yyreduce:
         }
     break;
 
-  case 157:
+  case 157: /* ann_non_array_expr: STRING_LIT  */
         {
             (yyval.arg) = new AST::String((yyvsp[0].sValue));
             free((yyvsp[0].sValue));
@@ -3752,13 +3639,13 @@ yyabortlab:
 yyexhaustedlab:
   yyerror (parm, YY_("memory exhausted"));
   yyresult = 2;
-  /* Fall through.  */
+  goto yyreturn;
 #endif
 
 
-/*-----------------------------------------------------.
-| yyreturn -- parsing is finished, return the result.  |
-`-----------------------------------------------------*/
+/*-------------------------------------------------------.
+| yyreturn -- parsing is finished, clean up and return.  |
+`-------------------------------------------------------*/
 yyreturn:
   if (yychar != YYEMPTY)
     {

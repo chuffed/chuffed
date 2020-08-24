@@ -20,7 +20,9 @@
  *
  */
 
-%pure-parser
+%define api.pure
+%define api.header.include {<chuffed/flatzinc/parser.tab.h>}
+
 %lex-param {YYLEX_PARAM}
 %parse-param {void *parm}
 %{
@@ -395,7 +397,7 @@ namespace FlatZinc {
     FlatZinc::AST::Array* argVec;
 }
 
-%error-verbose
+%define parse.error verbose
 
 %token <iValue> INT_LIT BOOL_LIT
 %token <dValue> FLOAT_LIT
