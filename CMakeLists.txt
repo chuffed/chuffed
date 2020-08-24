@@ -311,8 +311,11 @@ add_dependencies(examples
 )
 
 # ------------- TARGET install -------------
+include(GNUInstallDirs)
 
+file(RELATIVE_PATH REL_INSTALL_BINARY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/minizinc/chuffed/solvers ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/fzn-chuffed)
 configure_file(chuffed.msc.in chuffed.msc)
-install(TARGETS fzn-chuffed RUNTIME DESTINATION bin)
-install(DIRECTORY chuffed/flatzinc/mznlib DESTINATION share/chuffed)
-install(FILES ${CMAKE_BINARY_DIR}/chuffed.msc DESTINATION .)
+
+install(TARGETS fzn-chuffed RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(DIRECTORY chuffed/flatzinc/mznlib/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/minizinc/chuffed PATTERN "chuffed/flatzinc/mznlib/*")
+install(FILES ${CMAKE_BINARY_DIR}/chuffed.msc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/minizinc/solvers)
