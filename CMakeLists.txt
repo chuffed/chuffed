@@ -175,7 +175,7 @@ else()
 endif()
 
 find_package(FLEX)
-if(FLEX_FOUND)
+if(FLEX_FOUND AND BISON_FOUND)
   flex_target(FZNLexer
     ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.lxx
     ${PROJECT_BINARY_DIR}/lexer.yy.cpp
