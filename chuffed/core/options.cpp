@@ -609,14 +609,14 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
     } else if (cop.get("-s -S")) {
       so.verbosity = 1;
 #ifdef HAS_PROFILER
-    } else if (cop.get("-cpprofiler", &stringBuffer)) {
+    } else if (cop.get("--cp-profiler", &stringBuffer)) {
       std::stringstream ss(stringBuffer);
       char sep;
       ss >> so.cpprofiler_id >> sep >> so.cpprofiler_port;
       if (sep == ',' && ss.eof()) {
         so.cpprofiler_enabled = true;
       } else {
-        CHUFFED_ERROR("Invalid value for -cpprofiler.");
+        CHUFFED_ERROR("Invalid value for --cp-profiler.");
       }
 #endif
     } else if (argv[i][0] == '-') {
