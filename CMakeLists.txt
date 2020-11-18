@@ -134,6 +134,9 @@ add_library(chuffed
   chuffed/globals/regular.cpp
   chuffed/globals/lex.cpp
   chuffed/globals/table.cpp
+  chuffed/globals/edit_distance.cpp
+  chuffed/globals/EdExplFinder.cpp
+  chuffed/globals/EdExplFinder.h
   chuffed/mdd/MDD.cpp
   chuffed/mdd/mdd_prop.cpp
   chuffed/mdd/mdd_to_lgraph.cpp

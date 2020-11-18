@@ -773,7 +773,21 @@ namespace FlatZinc {
       vec<IntVar*> iv1; arg2intvarargs(iv1, ce[1]);
       lex(iv0, iv1, false);
     }
-  
+
+	void p_edit_distance(const ConExpr& ce, AST::Node* ann) {
+        vec<int> insertion_costs;
+        arg2intargs(insertion_costs, ce[1]);
+        vec<int> deletion_costs;
+        arg2intargs(deletion_costs, ce[2]);
+        vec<int> substitution_costs;
+        arg2intargs(substitution_costs, ce[3]);
+		vec<IntVar*> seq1;
+		arg2intvarargs(seq1, ce[4]);
+		vec<IntVar*> seq2;
+		arg2intvarargs(seq2, ce[5]);
+		edit_distance(ce[0]->getInt(), insertion_costs, deletion_costs, substitution_costs, seq1, seq2, getIntVar(ce[6]));
+	}
+
 		void var_sym( const ConExpr& ce, AST::Node* ann) {
       vec<IntVar*> iv0; arg2intvarargs(iv0, ce[0]);
 			var_sym_ldsb(iv0);
@@ -1118,6 +1132,7 @@ namespace FlatZinc {
 				registry().add("chuffed_maximum_arg_bool", &p_bool_arg_max);
 				registry().add("lex_less_int", &p_lex_less);
 				registry().add("lex_lesseq_int", &p_lex_lesseq);
+				registry().add("edit_distance", &p_edit_distance);
 
 				registry().add("variables_interchange", &var_sym);
 				registry().add("values_interchange", &val_sym);
