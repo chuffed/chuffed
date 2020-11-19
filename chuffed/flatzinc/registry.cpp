@@ -1132,7 +1132,7 @@ namespace FlatZinc {
 				registry().add("chuffed_maximum_arg_bool", &p_bool_arg_max);
 				registry().add("lex_less_int", &p_lex_less);
 				registry().add("lex_lesseq_int", &p_lex_lesseq);
-				registry().add("edit_distance", &p_edit_distance);
+				registry().add("chuffed_edit_distance", &p_edit_distance);
 
 				registry().add("variables_interchange", &var_sym);
 				registry().add("values_interchange", &val_sym);
