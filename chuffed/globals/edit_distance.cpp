@@ -140,7 +140,6 @@ public:
 #endif
 
           int ub = std::min(2 * seqSize * max_id_cost, lastBound + cellChanges * 2 * max_id_cost);
-//        int ub = 2 * seqSize * max_id_cost;
 
         updateDpMatrix(ub);
         cellChanges = 0;
@@ -159,13 +158,6 @@ public:
 
         // calc edit distance
         int editDistanceLB = getEditDistanceLB();
-
-#ifndef NDEBUG
-//        updateDpMatrix(2 * seqSize * max_id_cost);
-//        printCurrentDpMatrix();
-//        std::cout << "editDistanceDelta: " << editDistanceLB << " fullDelta: " << getEditDistanceLB() << std::endl;
-//        assert(editDistanceLB = getEditDistanceLB());
-#endif
 
         lastBound = editDistanceLB;
 
