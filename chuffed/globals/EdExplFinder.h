@@ -7,8 +7,8 @@
 
 #include <vector>
 #include <queue>
-#include <support/vec.h>
-#include <core/propagator.h>
+#include <chuffed/core/propagator.h>
+#include <chuffed/support/vec.h>
 
 /**
  * Class that will help to find variable inequalities used to explain propagation of lcs bounds
