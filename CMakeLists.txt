@@ -104,6 +104,12 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/protobuf")
 
 endif()
 
+# ---------- Support for impact branching -----------
+
+if(SUPPORT_VAR_BRANCH_IMPACT)
+  add_definitions(-DVAR_BRANCH_IMPACT=1)
+endif()
+
 # ------------- Main Chuffed Definition -------------
 
 add_library(chuffed
