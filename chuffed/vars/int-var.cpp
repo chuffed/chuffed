@@ -179,6 +179,10 @@ double IntVar::getScore(VarBranch vb) {
 		case VAR_REDUCED_COST  : return mip->getRC(this);
 		case VAR_ACTIVITY      : return activity;
                 case VAR_REGRET_MIN_MAX: return isFixed() ? 0 : (vals ? *++begin() - *begin() : 1);
+#if VAR_BRANCH_IMPACT
+		case VAR_IMPACT        : NOT_SUPPORTED; // return isFixed() ? 0 : 0.42;
+#endif
+
 		default: NOT_SUPPORTED;
 	}
 }
