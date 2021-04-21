@@ -7,8 +7,6 @@ constexpr double CLEARED_LOCAL = 0.42;
 constexpr double CLEARED_GLOBAL = 0.42;
 constexpr double CLEARED_REPARTITION = 0.42;
 
-#include <iostream>
-
 double processImpact(vec<int> const &previousSizes, vec<int> const &newSizes) {
 	int const n = newSizes.size();
 	if (!n || previousSizes.size() != n) NEVER;
