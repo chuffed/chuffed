@@ -30,6 +30,8 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
+  , impact(0.42)
+  , impact_count(0)
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
@@ -179,8 +181,8 @@ double IntVar::getScore(VarBranch vb) {
 		case VAR_REDUCED_COST  : return mip->getRC(this);
 		case VAR_ACTIVITY      : return activity;
                 case VAR_REGRET_MIN_MAX: return isFixed() ? 0 : (vals ? *++begin() - *begin() : 1);
-#if VAR_BRANCH_IMPACT
-		case VAR_IMPACT        : NOT_SUPPORTED; // return isFixed() ? 0 : 0.42;
+#ifdef HAS_VAR_IMPACT
+		case VAR_IMPACT        : return isFixed() ? 0 : impact;
 #endif
 
 		default: NOT_SUPPORTED;

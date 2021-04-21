@@ -26,7 +26,7 @@ enum VarBranch {
 	VAR_PSEUDO_COST,         // largest pseudo cost from MIP
 	VAR_ACTIVITY,            // largest vsids activity
 	VAR_RANDOM,              // random
-#if VAR_BRANCH_IMPACT
+#ifdef HAS_VAR_IMPACT
 	VAR_IMPACT,              // best filtering results so far
 #endif
 };

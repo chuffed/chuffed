@@ -30,6 +30,9 @@ public:
 
     // Problem setup
     vec<IntVar*> vars;              // List of int vars
+#ifdef HAS_VAR_IMPACT
+	vec<int> varsizes;              // List of int vars sizes
+#endif
     vec<Branching*> outputs;        // List of output vars
     vec<Propagator*> propagators;   // List of propagators
     vec<PseudoProp*> pseudo_props;  // List of pseudo propagators

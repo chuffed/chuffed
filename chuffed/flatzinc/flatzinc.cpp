@@ -47,7 +47,7 @@ namespace FlatZinc {
             if (s->id == "most_constrained") return VAR_SIZE_MIN;
             if (s->id == "max_regret") return VAR_REGRET_MIN_MAX;
             if (s->id == "random_order") return VAR_RANDOM;
-#if VAR_BRANCH_IMPACT
+#ifdef HAS_VAR_IMPACT
             if (s->id == "impact") return VAR_IMPACT;
 #endif
         }
