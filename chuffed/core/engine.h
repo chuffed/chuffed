@@ -31,7 +31,7 @@ public:
     // Problem setup
     vec<IntVar*> vars;              // List of int vars
 #ifdef HAS_VAR_IMPACT
-	vec<int> varsizes;              // List of int vars sizes
+	vec<int> var_sizes;              // List of int vars sizes
 #endif
     vec<Branching*> outputs;        // List of output vars
     vec<Propagator*> propagators;   // List of propagators
@@ -48,6 +48,9 @@ public:
     int best_sol;
     RESULT status;
     time_point time_out;
+#ifdef HAS_VAR_IMPACT
+	IntVar *last_int; // Int vat last branched on - for impact calculation
+#endif
 
     // Intermediate propagation state
     vec<IntVar*> v_queue;           // List of changed vars
@@ -89,6 +92,9 @@ private:
     void blockCurrentSol();
     unsigned int getRestartLimit(unsigned int i); // Return the restart limit for restart i
     void toggleVSIDS();
+#if HAS_VAR_IMPACT
+	vec<int> &getVarSizes(vec<int> &outVarSizes) const;
+#endif
 
 public:
 

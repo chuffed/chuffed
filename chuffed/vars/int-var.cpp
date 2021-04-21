@@ -194,7 +194,6 @@ DecInfo* IntVar::branch() {
 //	for (int i = min; i <= max; i++) if (indomain(i)) possible.push(i);
 //	return new DecInfo(this, possible[rand()%possible.size()], 1);
 
-
 	switch (preferred_val) {
 		case PV_MIN       : return new DecInfo(this, min, 1);
 		case PV_MAX       : return new DecInfo(this, max, 1);
