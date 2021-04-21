@@ -57,7 +57,7 @@ endif()
 
 # ---------- Support for impact branching -----------
 
-if(SUPPORT_VAR_BRANCH_IMPACT)
+if(SUPPORT_VAR_IMPACT)
   add_definitions(-DHAS_VAR_IMPACT)
 endif()
 

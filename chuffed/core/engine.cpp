@@ -12,6 +12,7 @@
 #include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
 #include <chuffed/branching/branching.h>
+#include <chuffed/branching/impact.h>
 #include <chuffed/mip/mip.h>
 #include <chuffed/parallel/parallel.h>
 #include <chuffed/ldsb/ldsb.h>
@@ -221,6 +222,9 @@ Engine::Engine()
     , solutions(0)
     , next_simp_db(0)
     , output_stream(&std::cout)
+#ifdef HAS_VAR_IMPACT
+	, last_int(nullptr)
+#endif
 {
     p_queue.growTo(num_queues);
     for (int i = 0; i < 64; i++) bit[i] = ((long long) 1 << i);
@@ -255,6 +259,11 @@ inline void Engine::doFixPointStuff() {
 inline void Engine::makeDecision(DecInfo& di, int alt) {
     ++nodes;
     altpath.push_back(alt);
+#ifdef HAS_VAR_IMPACT
+	vec<int> sizes(0);
+	if (last_int)
+		last_int->updateImpact(processImpact(var_sizes, getVarSizes(sizes)));
+#endif
     if (di.var) {
 #if DEBUG_VERBOSE
         std::cerr << "makeDecision: " << intVarString[(IntVar*)di.var] << " / " << di.val << " (" << alt << ")" << std::endl;
@@ -274,6 +283,13 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
             mostRecentLabel = ss.str();
         }
 #endif
+#ifdef HAS_VAR_IMPACT
+		last_int = (IntVar*) di.var;
+		if (sizes.size())
+			sizes.moveTo(var_sizes);
+		else
+			getVarSizes(var_sizes);
+#endif
         ((IntVar*) di.var)->set(di.val, di.type ^ alt);
     } else {
 #if DEBUG_VERBOSE
@@ -285,6 +301,9 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
             ss << getLitString(di.val^alt);
             mostRecentLabel = ss.str();
         }
+#endif
+#ifdef HAS_VAR_IMPACT
+		last_int = nullptr;
 #endif
         sat.enqueue(toLit(di.val ^ alt));
     }
@@ -411,6 +430,9 @@ void Engine::btToLevel(int level) {
         std::cerr << "trail_lim is now: " << showVec(trail_lim) << "\n";
     }
     dec_info.resize(level);
+#ifdef HAS_VAR_IMPACT
+	last_int = nullptr;
+#endif
 }
 
 
@@ -505,6 +527,18 @@ void Engine::toggleVSIDS() {
         so.vsids = false;
     }
 }
+
+#ifdef HAS_VAR_IMPACT
+vec<int> &Engine::getVarSizes(vec<int> &outVarSizes) const {
+	int const n = vars.size();
+	outVarSizes.growTo(n); // hopefully optimised by compiler
+	for (int i = 0; i < n; ++i) {
+		outVarSizes[i] = vars[i]->size();
+	}
+	return outVarSizes;
+}
+#endif
+
 
 RESULT Engine::search(const std::string& problemLabel) {
     unsigned int starts = 1;
@@ -904,6 +938,12 @@ RESULT Engine::search(const std::string& problemLabel) {
             }
 #endif
           
+#ifdef HAD_VAR_IMPACT
+			if (di->var) {
+				std::cerr << "Deciding on: ";
+				((IntVar*)di->var)->print();
+			}
+#endif
             makeDecision(*di, 0);
 
             delete di;
