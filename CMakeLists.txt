@@ -58,7 +58,7 @@ endif()
 # ---------- Support for impact branching -----------
 
 if(SUPPORT_VAR_BRANCH_IMPACT)
-  add_definitions(-DVAR_BRANCH_IMPACT=1)
+  add_definitions(-DHAS_VAR_IMPACT)
 endif()
 
 # ------------- Main Chuffed Definition -------------
@@ -111,6 +111,7 @@ add_library(chuffed
   chuffed/primitives/domain.cpp
   chuffed/primitives/binary.cpp
   chuffed/branching/branching.cpp
+  chuffed/branching/impact.cpp
   chuffed/core/init.cpp
   chuffed/core/stats.cpp
   chuffed/core/engine.cpp
