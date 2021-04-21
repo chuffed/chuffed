@@ -263,7 +263,11 @@ public:
 	reverse_iterator rend() const { return reverse_iterator(begin()); }
 
 	int size() const {
+#ifdef HAS_VAR_IMPACT
+		if (!vals) return max - min;
+#else
 		assert(vals);
+#endif
 #if INT_DOMAIN_LIST
 		return vals_count;
 #else

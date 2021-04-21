@@ -30,7 +30,7 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
-  , impact(0.42)
+  , impact(0.042)
   , impact_count(0)
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
