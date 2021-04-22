@@ -842,6 +842,10 @@ RESULT Engine::search(const std::string& problemLabel) {
                 //}
 #endif
                                     
+#ifdef HAS_VAR_IMPACT
+				if (last_int) last_int->updateImpact(solvedImpact(var_sizes));
+#endif
+
                 mostRecentLabel = "";
                 if (!opt_var) {
                     if (solutions == so.nof_solutions) return RES_SAT;

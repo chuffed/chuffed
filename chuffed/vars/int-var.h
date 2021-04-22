@@ -22,7 +22,7 @@
 // turning this off selects compatibility routines that scan value-by-value.
 #define INT_DOMAIN_LIST 0
 
-#define IMPACT_DAMPING  0.16
+#define IMPACT_DAMPING 58.00
 
 /*
 
