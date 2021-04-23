@@ -264,7 +264,7 @@ public:
 
 	int size() const {
 #ifdef HAS_VAR_IMPACT
-		if (!vals) return max - min;
+		if (!vals) return max + 1 - min;
 #else
 		assert(vals);
 #endif
