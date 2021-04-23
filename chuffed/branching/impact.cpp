@@ -1,11 +1,11 @@
 #include <chuffed/branching/impact.h>
 
 constexpr double WEIGHT_LOCAL = 420;
-constexpr double WEIGHT_GLOBAL = 420;
-constexpr double WEIGHT_REPARTITION =  42;
+constexpr double WEIGHT_GLOBAL = 42;
+constexpr double WEIGHT_REPARTITION = 420;
 constexpr double CLEARED_LOCAL = 0.42;
-constexpr double CLEARED_GLOBAL = 0.42;
-constexpr double CLEARED_REPARTITION = 1.00;
+constexpr double CLEARED_GLOBAL = 0.042;
+constexpr double CLEARED_REPARTITION = 1.00;;
 
 double processImpact(vec<int> const &previousSizes, vec<int> const &newSizes) {
 	int const n = newSizes.size();
