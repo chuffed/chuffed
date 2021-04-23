@@ -49,7 +49,7 @@ public:
     RESULT status;
     time_point time_out;
 #ifdef HAS_VAR_IMPACT
-	IntVar *last_int; // Int vat last branched on - for impact calculation
+	IntVar *last_int; // Int var last branched on - for impact calculation
 #endif
 
     // Intermediate propagation state
