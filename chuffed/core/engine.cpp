@@ -888,12 +888,6 @@ RESULT Engine::search(const std::string& problemLabel) {
             }
 #endif
           
-#ifdef HAD_VAR_IMPACT
-			if (di->var) {
-				std::cerr << "Deciding on: ";
-				((IntVar*)di->var)->print();
-			}
-#endif
             makeDecision(*di, 0);
 
             delete di;
