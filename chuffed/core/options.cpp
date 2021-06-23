@@ -665,6 +665,18 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
   if (so.vsids) engine.branching->add(&sat);
   
   if (so.learnt_stats_nogood) so.learnt_stats = true;
+
+// Warn user if SBPS is not used with an activity-based search and restarts
+    if (so.sbps) {
+        if (!(so.vsids || so.toggle_vsids || so.switch_to_vsids_after < 1000000000)) {
+            std::cerr << "WARNING: SBPS value selection must be used with an activity-based search to optimize its "
+                         "efficiency." << std::endl;
+        }
+        if (so.restart_type == NONE || so.restart_scale == 0) {
+            std::cerr << "WARNING: SBPS value selection must be used with restarts to optimize its "
+                         "efficiency." << std::endl;
+        }
+    }
   
 #ifndef PARALLEL
   if (so.parallel) {
