@@ -120,6 +120,14 @@ public:
 	void setPreferredVal(PreferredVal p) { preferred_val = p; }
 	DecInfo* branch();
 
+    // Solution-based phase saving
+    bool SBPSValueSelection;
+    int lastSolutionValue;
+    void saveCurrentValue() {
+        lastSolutionValue = getVal();
+        if (!SBPSValueSelection) SBPSValueSelection = true;
+    }
+
 //--------------------------------------------------
 // Type specialisation
 

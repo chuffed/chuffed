@@ -96,6 +96,9 @@ public:
     void btToPos(int pos);
     void btToLevel(int level);
 
+    // Solution-based phase saving
+    void saveCurrentSolution();
+
     // Interface methods
     RESULT search(const std::string& problemLabel = "chuffed");
     void solve(Problem *p, const std::string& problemLabel = "chuffed");

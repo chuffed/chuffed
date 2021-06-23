@@ -30,6 +30,8 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
+    , SBPSValueSelection(false)
+    , lastSolutionValue(-1)
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
@@ -188,6 +190,13 @@ DecInfo* IntVar::branch() {
 //	for (int i = min; i <= max; i++) if (indomain(i)) possible.push(i);
 //	return new DecInfo(this, possible[rand()%possible.size()], 1);
 
+    // Solution-based phase saving
+    if (SBPSValueSelection) {
+        // Check if we can branch on last solution value
+        if (indomain(lastSolutionValue)) {
+            return new DecInfo(this, lastSolutionValue, 1);
+        }
+    }
 
 	switch (preferred_val) {
 		case PV_MIN       : return new DecInfo(this, min, 1);

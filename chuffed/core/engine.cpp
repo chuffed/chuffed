@@ -303,6 +303,11 @@ inline bool Engine::constrain() {
     best_sol = opt_var->getVal();
     opt_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time) - init_time;
 
+    // Solution-based phase saving
+    if (so.sbps) {
+        saveCurrentSolution();
+    }
+
     sat.btToLevel(0);
     restart_count++;
     nodepath.resize(0);
@@ -334,6 +339,14 @@ inline bool Engine::constrain() {
 
     /* return (opt_type ? opt_var->setMin(best_sol+1) : opt_var->setMax(best_sol-1)); */
     return true;
+}
+
+// Solution-based phase saving
+void Engine::saveCurrentSolution() {
+    sat.saveCurrentPolarities();            // SAT vars
+    for (int i = 0; i < vars.size(); i++) { // Int vars
+        vars[i]->saveCurrentValue();
+    }
 }
 
 bool Engine::propagate() {

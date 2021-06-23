@@ -24,6 +24,7 @@ Options::Options() :
 	, branch_random(false)
 	, switch_to_vsids_after(1000000000)
 	, sat_polarity(0)
+	, sbps(false)
 
 	, prop_fifo(false)
 
@@ -306,6 +307,10 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --sat-polarity <n>\n"
   "     Selection of the polarity of Boolean variables\n"
   "     (0 = default, 1 = same, 2 = anti, 3 = random) (default " << def.sat_polarity << ").\n"
+  "  --sbps [on|off]\n"
+  "     Use Solution-based phase saving (SBPS) value selection for integer and SAT variables. When branching on a "
+  "     variable, it branches if possible on the value this variable had in the best solution so far. If not possible, "
+  "     value selection is the user-defined one. (default " << (def.sbps ? "on" : "off") << ").\n"
   "\n"
   "Learning Options:\n"
   "  --lazy [on|off], --no-lazy\n"
@@ -508,6 +513,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.switch_to_vsids_after = intBuffer;
     } else if (cop.get("--sat-polarity", &intBuffer)) {
       so.sat_polarity = intBuffer;
+    } else if (cop.getBool("--sbps", boolBuffer)) {
+        so.sbps = boolBuffer;
     } else if (cop.getBool("--prop-fifo", boolBuffer)) {
       so.prop_fifo = boolBuffer;
     } else if (cop.getBool("--disj-edge-find", boolBuffer)) {

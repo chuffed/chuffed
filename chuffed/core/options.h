@@ -35,6 +35,7 @@ public:
 	bool branch_random;              // Use randomization for tie-breaking
     int switch_to_vsids_after;       // Switch from search ann to vsids after a given number of conflicts
 	int sat_polarity;                // Polarity of bool var to choose (0 = default, 1 = same, 2 = anti, 3 = random)
+	bool sbps;                       // Use Solution-based phase saving
 
 	// Propagator options
 	bool prop_fifo;                  // Propagators are queued in FIFO, otherwise LIFO
