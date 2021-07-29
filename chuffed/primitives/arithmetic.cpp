@@ -335,11 +335,17 @@ public:
         else if (z_min > 0) {
             if (v_min == 0) {
                 // TODO Better explanation
-                setDom(v, setMin, 1, z.getMinLit());
+                Clause * reason = Reason_new(3);
+                (*reason)[1] = z.getMinLit();
+                (*reason)[2] = v.getMinLit();
+                setDom(v, setMin, 1, reason);
             }
             else if (v_max == 0) {
                 // TODO Better explanation
-                setDom(v, setMax, -1, z.getMinLit());
+                Clause * reason = Reason_new(3);
+                (*reason)[1] = z.getMinLit();
+                (*reason)[2] = v.getMaxLit();
+                setDom(v, setMax, -1, reason);
             }
             else {
                 if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max))
@@ -351,11 +357,17 @@ public:
         else if (z_max < 0) {
             if (v_min == 0) {
                 // TODO Better explanation
-                setDom(v, setMin, 1, z.getMaxLit());
+                Clause * reason = Reason_new(3);
+                (*reason)[1] = z.getMaxLit();
+                (*reason)[2] = v.getMinLit();
+                setDom(v, setMin, 1, reason);
             }
             else if (v_max == 0) {
                 // TODO Better explanation
-                setDom(v, setMax, -1, z.getMaxLit());
+                Clause * reason = Reason_new(3);
+                (*reason)[1] = z.getMaxLit();
+                (*reason)[2] = v.getMaxLit();
+                setDom(v, setMax, -1, reason);
             }
             else {
                 if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max))
