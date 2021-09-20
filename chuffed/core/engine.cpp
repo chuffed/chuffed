@@ -314,7 +314,7 @@ inline bool Engine::constrain() {
     }
 #endif
   
-    if (so.parallel) {
+    if (so.parallel && so.lazy) {
         Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
         vec<Lit> ps;
         ps.push(p);
@@ -326,9 +326,17 @@ inline bool Engine::constrain() {
     //  printf("opt_var = %d, opt_type = %d, best_sol = %d\n", opt_var->var_id, opt_type, best_sol);
 //  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
 
-    Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
-    assumptions.clear();
-    assumptions.push(toInt(p));
+    if (so.lazy) {
+        Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
+        assumptions.clear();
+        assumptions.push(toInt(p));
+    } else {
+        if (opt_type) { // maximize
+            if(!opt_var->setMin(best_sol+1)) return false;
+        } else {
+            if(!opt_var->setMax(best_sol-1)) return false;
+        }
+    }
 
     if (so.mip) mip->setObjective(best_sol);
 
