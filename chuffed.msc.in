@@ -6,7 +6,7 @@
   "mznlib": "../chuffed",
   "executable": "${REL_INSTALL_BINARY}",
   "tags": ["cp","lcg","int"],
-  "stdFlags": ["-a","-f","-n","-r","-s","-v","--cp-profiler"],
+  "stdFlags": ["-a","-f","-n","-r","-s","-t","-v","--cp-profiler"],
   "extraFlags": [
       ["--prop-fifo", "Use FIFO queues for propagation", "bool", "false"],
       ["--vsids", "Use activity-based search on the Boolean variables", "bool", "false"],
