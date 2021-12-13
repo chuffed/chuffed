@@ -1,10 +1,47 @@
 #include <cstdio>
+#include <csignal>
 #include <cstring>
 #include <chuffed/core/options.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/flatzinc/flatzinc.h>
 
-// #include "version.h"
+std::stringstream output_buffer;
+
+#ifdef WIN32
+    /// Handler for catching Ctrl-C
+    static BOOL SIGINT_handler(DWORD t) throw() {
+      if (t == CTRL_C_EVENT) {
+				if (so.thread_no == -1) {
+					fprintf(stderr, "*** INTERRUPTED ***\n");
+				} 
+				// Flush last solution
+				if(engine.opt_var && so.nof_solutions!=0) {
+						std::cout << output_buffer.str();
+				}
+				if (so.verbosity >= 1) {
+					engine.printStats();
+				}
+				SetConsoleCtrlHandler( (PHANDLER_ROUTINE) SIGINT_handler, false);
+      }
+      return false;
+    }
+#else
+	/// Handler for catching Ctrl-C
+	void SIGINT_handler(int signum) {
+		if (so.thread_no == -1) {
+			fprintf(stderr, "*** INTERRUPTED ***\n");
+		} 
+		// Flush last solution
+		if(engine.opt_var && so.nof_solutions!=0) {
+				std::cout << output_buffer.str();
+		}
+		if (so.verbosity >= 1) {
+			engine.printStats();
+		}
+		signal(SIGINT, SIG_DFL);
+		raise(SIGINT);
+	}
+#endif
 
 int main(int argc, char** argv) {
     // Make a copy of the arguments for posterity.
@@ -35,12 +72,17 @@ int main(int argc, char** argv) {
 		FlatZinc::solve(filename);
 	}
 
+	// Install signal handler
+#ifdef WIN32
+	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) SIGINT_handler, true);
+#else
+	std::signal(SIGINT, SIGINT_handler);
+#endif
+
   if (engine.opt_var && so.nof_solutions!=0) {
-    std::string os;
-    std::stringstream oss(os);
-    engine.setOutputStream(oss);
+    engine.setOutputStream(output_buffer);
     engine.solve(FlatZinc::s, commandLine);
-    std::cout << oss.str();
+    std::cout << output_buffer.str();
   } else {
     engine.solve(FlatZinc::s, commandLine);
   }
