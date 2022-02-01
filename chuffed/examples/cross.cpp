@@ -2,9 +2,9 @@
 #include <cassert>
 #include <iostream>
 #include <chuffed/core/engine.h>
-#include <core/propagator.h>
-#include <branching/branching.h>
-#include <globals/mddglobals.h>
+#include <chuffed/core/propagator.h>
+#include <chuffed/branching/branching.h>
+#include <chuffed/globals/mddglobals.h>
 
 
 static void skipComments(std::istream& i)
