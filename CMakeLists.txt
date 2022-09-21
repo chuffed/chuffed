@@ -59,6 +59,9 @@ endif()
 
 if(SUPPORT_VAR_IMPACT)
   add_definitions(-DHAS_VAR_IMPACT)
+  set(VAR_IMPACT_SOURCES
+    chuffed/branching/impact.cpp
+  )
 endif()
 
 # ------------- Main Chuffed Definition -------------
@@ -111,7 +114,6 @@ add_library(chuffed
   chuffed/primitives/domain.cpp
   chuffed/primitives/binary.cpp
   chuffed/branching/branching.cpp
-  chuffed/branching/impact.cpp
   chuffed/core/init.cpp
   chuffed/core/stats.cpp
   chuffed/core/engine.cpp
@@ -159,6 +161,7 @@ add_library(chuffed
   chuffed/core/options.h
   chuffed/core/propagator.h
   ${CHUFFED_PROFILER_SOURCES}
+  ${VAR_IMPACT_SOURCES}
 )
 
 if(CHUFFED_PROFILER_SOURCES)

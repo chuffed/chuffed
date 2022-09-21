@@ -30,8 +30,10 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
+#ifdef HAS_VAR_IMPACT
   , impact(0.042)
   , impact_count(0)
+#endif
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
