@@ -28,7 +28,7 @@ public:
 	int *lets;                                        // task no. sorted according to let in descending order
 
 	// Persistent trailed state
-	Tchar *old_est;                                   // est's before any propagations are made
+	Tint *old_est;                                   // est's before any propagations are made
 
 	vec<Pinfo> p_info;                                // memory for propagation info
 
@@ -39,7 +39,7 @@ public:
 		: x(_x), dur(_dur), pred(_pred), ests(_ests), lets(_lets) {
 		priority = 3;
 
-		old_est = (Tchar*) malloc(x.size() * sizeof(Tchar));
+		old_est = (Tint*) malloc(x.size() * sizeof(Tint));
 	}
 
 	Reason createReason(int var, int est) {
