@@ -16,7 +16,7 @@ map<int,IntVar*> ic_map;
 extern std::map<IntVar*, std::string> intVarString;
 
 IntVar::IntVar(int _min, int _max) :
-		var_id(engine.vars.size())
+        var_id(engine.vars.size())
 	, min(_min)
 	, max(_max)
 	, min0(_min)
@@ -30,8 +30,8 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
-    , SBPSValueSelection(false)
-    , lastSolutionValue(-1)
+    , sbps_value_selection(false)
+    , last_solution_value(-1)
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
@@ -191,10 +191,10 @@ DecInfo* IntVar::branch() {
 //	return new DecInfo(this, possible[rand()%possible.size()], 1);
 
     // Solution-based phase saving
-    if (SBPSValueSelection) {
+    if (sbps_value_selection) {
         // Check if we can branch on last solution value
-        if (indomain(lastSolutionValue)) {
-            return new DecInfo(this, lastSolutionValue, 1);
+        if (indomain(last_solution_value)) {
+            return new DecInfo(this, last_solution_value, 1);
         }
     }
 

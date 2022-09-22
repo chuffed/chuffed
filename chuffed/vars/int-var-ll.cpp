@@ -32,14 +32,14 @@ IntVarLL::IntVarLL(const IntVar& other) : IntVar(other), ld(2), li(0), hi(1) {
 
 DecInfo* IntVarLL::branch() {
     // Solution-based phase saving
-    if (SBPSValueSelection) {
+    if (sbps_value_selection) {
         // Check if we can branch on last solution value
-        if (indomain(lastSolutionValue)) {      // Lazy variables don't allow to use == decisions
-            if (setMinNotR(lastSolutionValue)) {
-                return new DecInfo(this, lastSolutionValue - 1, 2);
+        if (indomain(last_solution_value)) {      // Lazy variables don't allow to use == decisions
+            if (setMinNotR(last_solution_value)) {
+                return new DecInfo(this, last_solution_value - 1, 2);
             }
             else {
-                return new DecInfo(this, lastSolutionValue, 3);
+                return new DecInfo(this, last_solution_value, 3);
             }
         }
     }

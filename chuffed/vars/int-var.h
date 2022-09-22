@@ -121,11 +121,11 @@ public:
 	DecInfo* branch();
 
     // Solution-based phase saving
-    bool SBPSValueSelection;
-    int lastSolutionValue;
+    bool sbps_value_selection;
+    int last_solution_value;
     void saveCurrentValue() {
-        lastSolutionValue = getVal();
-        if (!SBPSValueSelection) SBPSValueSelection = true;
+        last_solution_value = getVal();
+        if (!sbps_value_selection) sbps_value_selection = true;
     }
 
 //--------------------------------------------------
