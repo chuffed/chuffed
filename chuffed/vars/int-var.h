@@ -131,6 +131,14 @@ public:
 	void setPreferredVal(PreferredVal p) { preferred_val = p; }
 	DecInfo* branch();
 
+    // Solution-based phase saving
+    bool sbps_value_selection;
+    int last_solution_value;
+    void saveCurrentValue() {
+        last_solution_value = getVal();
+        if (!sbps_value_selection) sbps_value_selection = true;
+    }
+
 //--------------------------------------------------
 // Type specialisation
 

@@ -43,6 +43,7 @@
       ["--ldsb", "Use lightweight dynamic symmetry breaking constraints '1UIP crippled'", "bool", "false"],
       ["--ldsbta", "Use lightweight dynamic symmetry breaking constraints '1UIP'", "bool", "false"],
       ["--ldsbad", "Use lightweight dynamic symmetry breaking constraints 'all decision clause'", "bool", "false"],
+	  ["--sbps", "Use Solution-based phase saving (SBPS) value selection heuristic", "bool", "false"],
   ],
   "supportsMzn": false,
   "supportsFzn": true,

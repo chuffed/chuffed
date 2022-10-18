@@ -24,6 +24,7 @@ Options::Options() :
 	, branch_random(false)
 	, switch_to_vsids_after(1000000000)
 	, sat_polarity(0)
+	, sbps(false)
 
 	, prop_fifo(false)
 
@@ -306,6 +307,10 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --sat-polarity <n>\n"
   "     Selection of the polarity of Boolean variables\n"
   "     (0 = default, 1 = same, 2 = anti, 3 = random) (default " << def.sat_polarity << ").\n"
+  "  --sbps [on|off]\n"
+  "     Use Solution-based phase saving (SBPS) value selection for integer and SAT variables. When branching on a "
+  "     variable, it branches if possible on the value this variable had in the best solution so far. If not possible, "
+  "     value selection is the user-defined one. (default " << (def.sbps ? "on" : "off") << ").\n"
   "\n"
   "Learning Options:\n"
   "  --lazy [on|off], --no-lazy\n"
@@ -508,6 +513,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.switch_to_vsids_after = intBuffer;
     } else if (cop.get("--sat-polarity", &intBuffer)) {
       so.sat_polarity = intBuffer;
+    } else if (cop.getBool("--sbps", boolBuffer)) {
+        so.sbps = boolBuffer;
     } else if (cop.getBool("--prop-fifo", boolBuffer)) {
       so.prop_fifo = boolBuffer;
     } else if (cop.getBool("--disj-edge-find", boolBuffer)) {
@@ -658,6 +665,18 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
   if (so.vsids) engine.branching->add(&sat);
   
   if (so.learnt_stats_nogood) so.learnt_stats = true;
+
+// Warn user if SBPS is not used with an activity-based search and restarts
+    if (so.sbps) {
+        if (!(so.vsids || so.toggle_vsids || so.switch_to_vsids_after < 1000000000)) {
+            std::cerr << "WARNING: SBPS value selection must be used with an activity-based search to optimize its "
+                         "efficiency." << std::endl;
+        }
+        if (so.restart_type == NONE || so.restart_scale == 0) {
+            std::cerr << "WARNING: SBPS value selection must be used with restarts to optimize its "
+                         "efficiency." << std::endl;
+        }
+    }
   
 #ifndef PARALLEL
   if (so.parallel) {

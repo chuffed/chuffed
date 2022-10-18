@@ -159,6 +159,18 @@ public:
 	double getScore(VarBranch vb) { NEVER; }
 	DecInfo* branch();
 
+    // Solution-based phase saving
+    void saveCurrentPolarities() {
+        for (int i = 0; i < assigns.size(); i++) {
+            if (assigns[i] == toInt(l_True)) {
+                polarity[i] = false; // False means to branch 'true' on this SAT variable
+            }
+            else if (assigns[i] == toInt(l_False)) {
+                polarity[i] = true; // True means to branch 'false' on this SAT variable
+            }
+        }
+    }
+
 	// Parallel methods
 
 	void convertToSClause(Clause& c);
