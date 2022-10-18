@@ -12,6 +12,7 @@
 #include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
 #include <chuffed/branching/branching.h>
+#include <chuffed/branching/impact.h>
 #include <chuffed/mip/mip.h>
 #include <chuffed/parallel/parallel.h>
 #include <chuffed/ldsb/ldsb.h>
@@ -221,6 +222,9 @@ Engine::Engine()
     , solutions(0)
     , next_simp_db(0)
     , output_stream(&std::cout)
+#ifdef HAS_VAR_IMPACT
+	, last_int(nullptr)
+#endif
 {
     p_queue.growTo(num_queues);
     for (int i = 0; i < 64; i++) bit[i] = ((long long) 1 << i);
@@ -255,6 +259,11 @@ inline void Engine::doFixPointStuff() {
 inline void Engine::makeDecision(DecInfo& di, int alt) {
     ++nodes;
     altpath.push_back(alt);
+#ifdef HAS_VAR_IMPACT
+	vec<int> sizes(0);
+	if (last_int)
+		last_int->updateImpact(processImpact(var_sizes, getVarSizes(sizes)));
+#endif
     if (di.var) {
 #if DEBUG_VERBOSE
         std::cerr << "makeDecision: " << intVarString[(IntVar*)di.var] << " / " << di.val << " (" << alt << ")" << std::endl;
@@ -274,6 +283,13 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
             mostRecentLabel = ss.str();
         }
 #endif
+#ifdef HAS_VAR_IMPACT
+		last_int = (IntVar*) di.var;
+		if (sizes.size())
+			sizes.moveTo(var_sizes);
+		else
+			getVarSizes(var_sizes);
+#endif
         ((IntVar*) di.var)->set(di.val, di.type ^ alt);
     } else {
 #if DEBUG_VERBOSE
@@ -285,6 +301,9 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
             ss << getLitString(di.val^alt);
             mostRecentLabel = ss.str();
         }
+#endif
+#ifdef HAS_VAR_IMPACT
+		last_int = nullptr;
 #endif
         sat.enqueue(toLit(di.val ^ alt));
     }
@@ -319,7 +338,7 @@ inline bool Engine::constrain() {
     }
 #endif
   
-    if (so.parallel) {
+    if (so.parallel && so.lazy) {
         Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
         vec<Lit> ps;
         ps.push(p);
@@ -331,9 +350,17 @@ inline bool Engine::constrain() {
     //  printf("opt_var = %d, opt_type = %d, best_sol = %d\n", opt_var->var_id, opt_type, best_sol);
 //  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
 
-    Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
-    assumptions.clear();
-    assumptions.push(toInt(p));
+    if (so.lazy) {
+        Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
+        assumptions.clear();
+        assumptions.push(toInt(p));
+    } else {
+        if (opt_type) { // maximize
+            if(!opt_var->setMin(best_sol+1)) return false;
+        } else {
+            if(!opt_var->setMax(best_sol-1)) return false;
+        }
+    }
 
     if (so.mip) mip->setObjective(best_sol);
 
@@ -416,6 +443,9 @@ void Engine::btToLevel(int level) {
         std::cerr << "trail_lim is now: " << showVec(trail_lim) << "\n";
     }
     dec_info.resize(level);
+#ifdef HAS_VAR_IMPACT
+	last_int = nullptr;
+#endif
 }
 
 
@@ -510,6 +540,18 @@ void Engine::toggleVSIDS() {
         so.vsids = false;
     }
 }
+
+#ifdef HAS_VAR_IMPACT
+vec<int> &Engine::getVarSizes(vec<int> &outVarSizes) const {
+	int const n = vars.size();
+	outVarSizes.growTo(n); // hopefully optimised by compiler
+	for (int i = 0; i < n; ++i) {
+		outVarSizes[i] = vars[i]->size();
+	}
+	return outVarSizes;
+}
+#endif
+
 
 RESULT Engine::search(const std::string& problemLabel) {
     unsigned int starts = 1;
@@ -866,6 +908,10 @@ RESULT Engine::search(const std::string& problemLabel) {
                 //}
 #endif
                                     
+#ifdef HAS_VAR_IMPACT
+				if (last_int) last_int->updateImpact(solvedImpact(var_sizes));
+#endif
+
                 mostRecentLabel = "";
                 if (!opt_var) {
                     if (solutions == so.nof_solutions) return RES_SAT;

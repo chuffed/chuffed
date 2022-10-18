@@ -47,6 +47,9 @@ namespace FlatZinc {
             if (s->id == "most_constrained") return VAR_SIZE_MIN;
             if (s->id == "max_regret") return VAR_REGRET_MIN_MAX;
             if (s->id == "random_order") return VAR_RANDOM;
+#ifdef HAS_VAR_IMPACT
+            if (s->id == "impact") return VAR_IMPACT;
+#endif
         }
         cerr << "% Warning: Unknown or not support variable selection annotation '";
         ann->print(cerr);

@@ -291,11 +291,14 @@ public:
 
         if (z_min_new > IntVar::min_limit) {
             // TODO Better explanation
-            Clause * reason = Reason_new(5);
-            (*reason)[1] = x.getMinLit();
-            (*reason)[2] = x.getMaxLit();
-            (*reason)[3] = y.getMinLit();
-            (*reason)[4] = y.getMaxLit();
+            Clause * reason = nullptr;
+            if (so.lazy) {
+              reason = Reason_new(5);
+              (*reason)[1] = x.getMinLit();
+              (*reason)[2] = x.getMaxLit();
+              (*reason)[3] = y.getMinLit();
+              (*reason)[4] = y.getMaxLit();
+            }
             setDom(z, setMin, z_min_new, reason);
         }
         
@@ -306,11 +309,14 @@ public:
         
         if (z_max_new < IntVar::max_limit) {
             // TODO Better explanation
-            Clause * reason = Reason_new(5);
-            (*reason)[1] = x.getMinLit();
-            (*reason)[2] = x.getMaxLit();
-            (*reason)[3] = y.getMinLit();
-            (*reason)[4] = y.getMaxLit();
+            Clause * reason = nullptr;
+            if (so.lazy) {
+              reason = Reason_new(5);
+              (*reason)[1] = x.getMinLit();
+              (*reason)[2] = x.getMaxLit();
+              (*reason)[3] = y.getMinLit();
+              (*reason)[4] = y.getMaxLit();
+            }
             setDom(z, setMax, z_max_new, reason);
         }
 
@@ -323,11 +329,14 @@ public:
             // The product z equals to 0. Then x must equal to 0 too if y cannot be 0.
             if (v_min > 0 || v_max < 0) {
                 // TODO Better explanation
-                Clause * reason = Reason_new(5);
-                (*reason)[1] = v.getMinLit();
-                (*reason)[2] = v.getMaxLit();
-                (*reason)[3] = z.getMinLit();
-                (*reason)[4] = z.getMaxLit();
+                Clause * reason = nullptr;
+                if (so.lazy) {
+                  reason = Reason_new(5);
+                  (*reason)[1] = v.getMinLit();
+                  (*reason)[2] = v.getMaxLit();
+                  (*reason)[3] = z.getMinLit();
+                  (*reason)[4] = z.getMaxLit();
+                }
                 setDom(u, setMin, 0, reason);
                 setDom(u, setMax, 0, reason);
             }
@@ -335,11 +344,23 @@ public:
         else if (z_min > 0) {
             if (v_min == 0) {
                 // TODO Better explanation
-                setDom(v, setMin, 1, z.getMinLit());
+                Clause * reason = nullptr;
+                if (so.lazy) {
+                  reason = Reason_new(3);
+                  (*reason)[1] = z.getMinLit();
+                  (*reason)[2] = v.getMinLit();
+                }
+                setDom(v, setMin, 1, reason);
             }
             else if (v_max == 0) {
                 // TODO Better explanation
-                setDom(v, setMax, -1, z.getMinLit());
+                Clause * reason = nullptr;
+                if (so.lazy) {
+                  reason = Reason_new(3);
+                  (*reason)[1] = z.getMinLit();
+                  (*reason)[2] = v.getMaxLit();
+                }
+                setDom(v, setMax, -1, reason);
             }
             else {
                 if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max))
@@ -351,11 +372,23 @@ public:
         else if (z_max < 0) {
             if (v_min == 0) {
                 // TODO Better explanation
-                setDom(v, setMin, 1, z.getMaxLit());
+                Clause * reason = nullptr;
+                if (so.lazy) {
+                  reason = Reason_new(3);
+                  (*reason)[1] = z.getMaxLit();
+                  (*reason)[2] = v.getMinLit();
+                }
+                setDom(v, setMin, 1, reason);
             }
             else if (v_max == 0) {
                 // TODO Better explanation
-                setDom(v, setMax, -1, z.getMaxLit());
+                Clause * reason = nullptr;
+                if (so.lazy) {
+                  reason = Reason_new(3);
+                  (*reason)[1] = z.getMaxLit();
+                  (*reason)[2] = v.getMaxLit();
+                }
+                setDom(v, setMax, -1, reason);
             }
             else {
                 if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max))
@@ -405,11 +438,14 @@ public:
 
         if (u_min_new > u.getMin()) {
             // TODO Better explanation
-            Clause * reason = Reason_new(5);
-            (*reason)[1] = v.getMinLit();
-            (*reason)[2] = v.getMaxLit();
-            (*reason)[3] = z.getMinLit();
-            (*reason)[4] = z.getMaxLit();
+            Clause * reason = nullptr;
+            if (so.lazy) {
+              reason = Reason_new(5);
+              (*reason)[1] = v.getMinLit();
+              (*reason)[2] = v.getMaxLit();
+              (*reason)[3] = z.getMinLit();
+              (*reason)[4] = z.getMaxLit();
+            }
             setDom(u, setMin, (u_min_new == 0 ? 1 : u_min_new), reason);
         }
 
@@ -435,11 +471,14 @@ public:
 
         if (u_max_new < u.getMax()) {
             // TODO Better explanation
-            Clause * reason = Reason_new(5);
-            (*reason)[1] = v.getMinLit();
-            (*reason)[2] = v.getMaxLit();
-            (*reason)[3] = z.getMinLit();
-            (*reason)[4] = z.getMaxLit();
+            Clause * reason = nullptr;
+            if (so.lazy) {
+              reason = Reason_new(5);
+              (*reason)[1] = v.getMinLit();
+              (*reason)[2] = v.getMaxLit();
+              (*reason)[3] = z.getMinLit();
+              (*reason)[4] = z.getMaxLit();
+            }
             setDom(u, setMax, (u_max_new == 0 ? -1 : u_max_new), reason);
         }
 

@@ -16,7 +16,7 @@ map<int,IntVar*> ic_map;
 extern std::map<IntVar*, std::string> intVarString;
 
 IntVar::IntVar(int _min, int _max) :
-        var_id(engine.vars.size())
+    var_id(engine.vars.size())
 	, min(_min)
 	, max(_max)
 	, min0(_min)
@@ -30,8 +30,12 @@ IntVar::IntVar(int _min, int _max) :
   , preferred_val(PV_MIN)
   , activity(0)
   , in_queue(false)
-    , sbps_value_selection(false)
-    , last_solution_value(-1)
+  , sbps_value_selection(false)
+  , last_solution_value(-1)
+#ifdef HAS_VAR_IMPACT
+  , impact(0.042)
+  , impact_count(0)
+#endif
 {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
@@ -55,11 +59,11 @@ IntVar* getConstant(int v) {
 	if (it != ic_map.end()) return it->second;
 	IntVar *var = newIntVar(v,v);
 
-        std::stringstream ss;
-        ss << "constant_" << v;
-        intVarString[var] = ss.str();
+  std::stringstream ss;
+  ss << "constant_" << v;
+  intVarString[var] = ss.str();
 
-        var->specialiseToEL();
+  var->specialiseToEL();
 	ic_map.insert(pair<int,IntVar*>(v, var));
 
         
@@ -103,7 +107,7 @@ void IntVar::specialiseToSL(vec<int>& values) {
 
 	// determine whether it is sparse or dense
 	if (v.last()-v[0] >= v.size() * mylog2(v.size())) {
-//		fprintf(stderr, "SL\n");
+    //fprintf(stderr, "SL\n");
 		new (this) IntVarSL(*((IntVar*) this), v);
 	} else {
 		new (this) IntVarEL(*((IntVar*) this));
@@ -181,6 +185,10 @@ double IntVar::getScore(VarBranch vb) {
 		case VAR_REDUCED_COST  : return mip->getRC(this);
 		case VAR_ACTIVITY      : return activity;
                 case VAR_REGRET_MIN_MAX: return isFixed() ? 0 : (vals ? *++begin() - *begin() : 1);
+#ifdef HAS_VAR_IMPACT
+		case VAR_IMPACT        : return isFixed() ? 0 : impact;
+#endif
+
 		default: NOT_SUPPORTED;
 	}
 }
@@ -190,13 +198,13 @@ DecInfo* IntVar::branch() {
 //	for (int i = min; i <= max; i++) if (indomain(i)) possible.push(i);
 //	return new DecInfo(this, possible[rand()%possible.size()], 1);
 
-    // Solution-based phase saving
-    if (sbps_value_selection) {
-        // Check if we can branch on last solution value
-        if (indomain(last_solution_value)) {
-            return new DecInfo(this, last_solution_value, 1);
-        }
+  // Solution-based phase saving
+  if (sbps_value_selection) {
+    // Check if we can branch on last solution value
+    if (indomain(last_solution_value)) {
+      return new DecInfo(this, last_solution_value, 1);
     }
+  }
 
 	switch (preferred_val) {
 		case PV_MIN       : return new DecInfo(this, min, 1);

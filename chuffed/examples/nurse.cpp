@@ -15,7 +15,7 @@
 #include <chuffed/vars/modelling.h>
 #include <chuffed/globals/mddglobals.h>
 // #include <globals/circglobals.h>
-#include <mdd/circ_fns.h>
+#include <chuffed/mdd/circ_fns.h>
 
 #define HORIZON 28
 

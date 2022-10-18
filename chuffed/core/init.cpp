@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cassert>
-#include <signal.h>
 #include <iostream>
 #include <chuffed/core/options.h>
 #include <chuffed/core/engine.h>
@@ -13,20 +12,10 @@
 
 void process_ircs();
 
-void SIGINT_handler(int signum) {
-	if (so.thread_no == -1) fprintf(stderr, "*** INTERRUPTED ***\n");
-	engine.printStats();
-	exit(1);
-}
-
 void Engine::init() {
-	signal(SIGINT,SIGINT_handler);
-	//	signal(SIGHUP,SIGINT_handler);
-
 	if (so.parallel) master.initMPI();
 
 	// Get the vars ready
-
 	for (int i = 0; i < vars.size(); i++) {
 		IntVar *v = vars[i];
 		if (v->pinfo.size() == 0) v->in_queue = true;

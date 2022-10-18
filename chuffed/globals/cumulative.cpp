@@ -1837,8 +1837,6 @@ CumulativeProp::ttef_update_bounds(
 					}
 						// Lifting from the remainder
 					int en_lift = min_usage(task) - 1 - (en_avail % min_usage(task));
-						// Lifting from 'expl_lb'
-					en_lift += min_usage(task) * (expl_lb + min_dur(task) - (begin + dur_avail + 1));
 					assert(expl_lb + min_dur(task) - (begin + dur_avail + 1) >= 0);
 					assert(en_lift >= 0);
 
@@ -1900,8 +1898,6 @@ CumulativeProp::ttef_update_bounds(
 						// Lifting from the remainder
                         // XXX Is min_usage correct
 					int en_lift = min_usage(task) - 1 - (en_avail % min_usage(task));
-						// Lifting from 'expl_ub'
-					en_lift += min_usage(task) * (end - dur_avail - 1 - expl_ub);
 					assert(end - dur_avail - 1 - expl_ub >= 0);
 					assert(en_lift >= 0);
 

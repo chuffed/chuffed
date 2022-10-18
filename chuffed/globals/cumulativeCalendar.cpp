@@ -2490,7 +2490,6 @@ CumulativeCalProp::ttef_explanation_for_update_lb(
 
 	// Calculating the lifting energy for the remainder
 	int en_lift = min_usage(task) - 1 - (en_avail % min_usage(task));
-	en_lift += min_usage(task) * (expl_wdays_in - wdays_avail - 1);
 
 	// More consistency checks
 	assert(expl_lb <= est_2[task]);
@@ -2566,7 +2565,6 @@ CumulativeCalProp::ttef_explanation_for_update_ub(
 
 	// Calculating the lifting energy for the remainder
 	int en_lift = min_usage(task) - 1 - (en_avail % min_usage(task));
-	en_lift += min_usage(task) * (expl_wdays_in - wdays_avail - 1);
 
 	// More consistency checks
 	assert(expl_ub >= lst_2[task]);

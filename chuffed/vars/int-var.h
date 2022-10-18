@@ -22,6 +22,7 @@
 // turning this off selects compatibility routines that scan value-by-value.
 #define INT_DOMAIN_LIST 0
 
+#define IMPACT_DAMPING  0.16
 /*
 
 IntVar descriptions
@@ -69,6 +70,10 @@ public:
 	PreferredVal preferred_val;
 
 	double activity;
+#ifdef HAS_VAR_IMPACT
+	double impact;
+	int impact_count;
+#endif
 
 	IntVar(int min, int max);
 
@@ -117,6 +122,12 @@ public:
 
 	bool finished() { return isFixed(); }
 	double getScore(VarBranch vb);
+#ifdef HAS_VAR_IMPACT
+	double updateImpact(double const newImpact) {
+		double const weight = (1 - IMPACT_DAMPING) * impact_count++;
+		return impact = (weight * impact + newImpact) / (weight + 1);
+	}
+#endif
 	void setPreferredVal(PreferredVal p) { preferred_val = p; }
 	DecInfo* branch();
 
@@ -259,7 +270,11 @@ public:
 	reverse_iterator rend() const { return reverse_iterator(begin()); }
 
 	int size() const {
+#ifdef HAS_VAR_IMPACT
+		if (!vals) return max + 1 - min;
+#else
 		assert(vals);
+#endif
 #if INT_DOMAIN_LIST
 		return vals_count;
 #else
@@ -360,6 +375,8 @@ inline void IntVar::printLit(int val, int type) {
 inline void IntVar::print() {
 	fprintf(stderr, "v%d: min = %d, max = %d\n", var_id, (int) min, (int) max);
 }
+
+#undef IMPACT_DAMPING
 
 
 #include <chuffed/vars/int-var-el.h>
