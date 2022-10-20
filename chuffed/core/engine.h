@@ -3,6 +3,7 @@
 
 #include <chuffed/support/misc.h>
 #include <string>
+#include <functional>
 
 #define DEBUG 0
 
@@ -74,6 +75,7 @@ public:
     int restart_count;
 
     std::ostream* output_stream;
+    std::function<void(Problem* p)> solution_callback;
 private:
 
     // Init
@@ -127,6 +129,9 @@ public:
         output_stream = &os;
     }
     
+    void setSolutionCallback(std::function<void(Problem*)> f) {
+        solution_callback = std::move(f);
+    }
 };
 
 extern Engine engine;

@@ -222,6 +222,7 @@ Engine::Engine()
     , solutions(0)
     , next_simp_db(0)
     , output_stream(&std::cout)
+    , solution_callback(nullptr)
 #ifdef HAS_VAR_IMPACT
 	, last_int(nullptr)
 #endif
@@ -851,6 +852,9 @@ RESULT Engine::search(const std::string& problemLabel) {
                     problem->print(*output_stream);
                     (*output_stream) << "\n----------\n";
                     output_stream->flush();
+                }
+                if (solution_callback) {
+                    solution_callback(problem);
                 }
 #if DEBUG_VERBOSE
                 std::cerr << "solution\n";
