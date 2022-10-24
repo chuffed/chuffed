@@ -330,5 +330,39 @@ file(RELATIVE_PATH REL_INSTALL_BINARY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DA
 configure_file(chuffed.msc.in chuffed.msc)
 
 install(TARGETS fzn-chuffed RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(
+  TARGETS chuffed chuffed_fzn
+  EXPORT chuffed-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(
+  DIRECTORY chuffed
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  FILES_MATCHING PATTERN "*.h"
+)
 install(DIRECTORY chuffed/flatzinc/mznlib/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/minizinc/chuffed PATTERN "chuffed/flatzinc/mznlib/*")
 install(FILES ${CMAKE_BINARY_DIR}/chuffed.msc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/minizinc/solvers)
+
+# ------------- CMake export configuration -------------
+include(CMakePackageConfigHelpers)
+
+export(EXPORT chuffed-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/chuffed-targets.cmake)
+
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/chuffed-config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/chuffed
+)
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config-version.cmake"
+  VERSION "${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+install(EXPORT chuffed-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/chuffed)
+install(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config.cmake"
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config-version.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/chuffed
+)
