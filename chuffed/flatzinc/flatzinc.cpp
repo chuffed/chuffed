@@ -131,7 +131,7 @@ namespace FlatZinc {
 
     void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
         // Resizing of the vectors if required
-        if (boolVarCount == iv.size()) {
+        if (boolVarCount == bv.size()) {
             const int newSize = boolVarCount > 0 ? 2 * boolVarCount : 1;
             bv.growTo(newSize);
             bv_introduced.resize(newSize);
