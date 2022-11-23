@@ -6,7 +6,7 @@
 % - forall i, d[i] >= 0 and r[i] >= 0
 %-----------------------------------------------------------------------------%
 
-predicate cumulative(array[int] of var int: s,
+predicate fzn_cumulative(array[int] of var int: s,
                      array[int] of var int: d,
                      array[int] of var int: r, var int: b) =
     assert(

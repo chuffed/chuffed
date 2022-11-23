@@ -4,7 +4,7 @@
 % XXX: currently the values in 'value' need not be distinct.  Perhaps they
 %      should be?
 %-----------------------------------------------------------------------------%
-predicate distribute(array[int] of var int: card,
+predicate fzn_distribute(array[int] of var int: card,
                      array[int] of var int: value,
                      array[int] of var int: base) =
     assert(index_set(card) == index_set(value),
