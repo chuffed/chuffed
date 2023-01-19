@@ -106,16 +106,6 @@ public:
 	// Well founded semantics options
 	bool well_founded;
 
-	// Parallel options
-	bool parallel;                   // Running in parallel mode
-	int num_threads;                 // Number of worker threads
-	int thread_no;                   // Thread number of this thread
-	double share_param;              // Parameter for controlling which clauses are shared
-	double bandwidth;                // How many lits per second we can share, counting all threads
-	int trial_size;                  // Number of shared clauses put on trial (temp. immune to pruning)
-	int share_act;                   // How to share clause activities between threads (0 = none, 1 = act, 2 = react)
-	int num_cores;                   // Number of cpu cores in machine
-
 	// Experimental
 	int saved_clauses;
 	bool use_uiv;

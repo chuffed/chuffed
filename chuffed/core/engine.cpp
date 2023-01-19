@@ -14,7 +14,6 @@
 #include <chuffed/branching/branching.h>
 #include <chuffed/branching/impact.h>
 #include <chuffed/mip/mip.h>
-#include <chuffed/parallel/parallel.h>
 #include <chuffed/ldsb/ldsb.h>
 
 #include <chuffed/flatzinc/flatzinc.h>
@@ -338,15 +337,6 @@ inline bool Engine::constrain() {
       profilerConnector->restart(restart_count);
     }
 #endif
-  
-    if (so.parallel && so.lazy) {
-        Lit p = opt_type ? opt_var->getLit(best_sol+1, 2) : opt_var->getLit(best_sol-1, 3);
-        vec<Lit> ps;
-        ps.push(p);
-        Clause *c = Clause_new(ps, true);
-        slave.shareClause(*c);
-        free(c);
-    }
 
     //  printf("opt_var = %d, opt_type = %d, best_sol = %d\n", opt_var->var_id, opt_type, best_sol);
 //  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
@@ -593,8 +583,6 @@ RESULT Engine::search(const std::string& problemLabel) {
     /* boost::posix_time::ptime start_time = boost::posix_time::microsec_clock::universal_time(); */
 
     while (true) {
-        if (so.parallel && slave.checkMessages()) return RES_UNK;
-
         int nodeid = nextnodeid;
         nextnodeid++;
         int parent = (nodepath.size() == 0) ? (-1) : (nodepath[nodepath.size()-1]);
@@ -1005,20 +993,13 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
         learntStatsStream << ",rawActivity\n";
     }
 
-    if (!so.parallel) {
-        // sequential
-        status = search(problemLabel);
-        if (status == RES_GUN || status == RES_LUN) {
-            if (solutions > 0)
-                (*output_stream) << "==========\n";
-            else
-                (*output_stream) << "=====UNSATISFIABLE=====\n";
-        }
-    } else {
-        // parallel
-        if (so.thread_no == -1) master.solve();
-        else slave.solve();
-        if (so.thread_no == -1 && master.status == RES_GUN) (*output_stream) << "==========\n";
+    // sequential
+    status = search(problemLabel);
+    if (status == RES_GUN || status == RES_LUN) {
+        if (solutions > 0)
+            (*output_stream) << "==========\n";
+        else
+            (*output_stream) << "=====UNSATISFIABLE=====\n";
     }
 
     if (so.learnt_stats) {
@@ -1045,6 +1026,4 @@ void Engine::solve(Problem *p, const std::string& problemLabel) {
 #endif
 
     if (so.verbosity >= 1) printStats();
-
-    if (so.parallel) master.finalizeMPI();
 }

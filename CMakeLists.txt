@@ -73,8 +73,6 @@ add_library(chuffed
   chuffed/vars/int-var-sl.cpp
   chuffed/vars/bool-view.cpp
   chuffed/vars/int-var-ll.cpp
-  chuffed/parallel/master.cpp
-  chuffed/parallel/slave.cpp
   chuffed/ldsb/ldsb.cpp
   chuffed/globals/subcircuit.cpp
   chuffed/globals/mddglobals.cpp
@@ -128,7 +126,6 @@ add_library(chuffed
   chuffed/vars/int-var-el.h
   chuffed/vars/modelling.h
   chuffed/vars/bool-view.h
-  chuffed/parallel/parallel.h
   chuffed/support/BVec.h
   chuffed/support/ParseUtils.h
   chuffed/support/vec.h
