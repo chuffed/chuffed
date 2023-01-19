@@ -7,14 +7,11 @@
 #include <chuffed/core/propagator.h>
 #include <chuffed/branching/branching.h>
 #include <chuffed/mip/mip.h>
-#include <chuffed/parallel/parallel.h>
 #include <chuffed/ldsb/ldsb.h>
 
 void process_ircs();
 
 void Engine::init() {
-	if (so.parallel) master.initMPI();
-
 	// Get the vars ready
 	for (int i = 0; i < vars.size(); i++) {
 		IntVar *v = vars[i];

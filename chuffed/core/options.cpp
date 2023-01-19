@@ -79,15 +79,6 @@ Options::Options() :
 	, ldsbta(false)
 	, ldsbad(false)
 
-	, parallel(false)
-	, num_threads(-1)
-	, thread_no(-1)
-	, share_param(10)
-	, bandwidth(3000000)
-	, trial_size(50000)
-	, share_act(0)
-	, num_cores(1)
-
 	, saved_clauses(0)
 	, use_uiv(false)
 
@@ -365,25 +356,6 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "  --sat-simplify [on|off], --no-sat-simplify\n"
   "     Removal of clauses that are satisfied globally default " << (def.sat_simplify ? "on" : "off") << ").\n"
   "\n"
-#ifdef PARALLEL
-  "Parallel Options:\n"
-  "  --parallel [on|off], --no-parallel\n"
-  "     Run Chuffed in parallel mode (default " << (def.parallel ? "on" : "off") << ").\n"
-  "  -p <n>\n"
-  "     Number of CPU cores in the machine (default " << def.num_cores << ").\n"
-  "  --share-param <n>\n"
-  "     Default: " << def.share_param << "\n"
-  "  --bandwidth <n>\n"
-  "     The total number of literals that can be shared between all threads per second\n"
-  "     (default " << def.bandwidth << ").\n"
-  "  --trial-size <n>\n"
-  "     The maximal number of clauses on trial, i.e., temporary immune for pruning\n"
-  "     (default " << def.trial_size << ").\n"
-  "  --share-act <n>\n"
-  "     How to share clause activities between threads (0 = none, 1 = act, 2 = react)\n"
-  "     (default " << def.share_act << ").\n"
-  "\n"
-#endif
   "Propagator Options:\n"
   "  --cumu-global [on|off], --no-cumu-global\n"
   "     Use the global cumulative propagator if possible (default " << (def.cumu_global ? "on" : "off") << ").\n"
@@ -593,26 +565,11 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.ldsbad = boolBuffer;
     } else if (cop.getBool("--well-founded", boolBuffer)) {
       so.well_founded = boolBuffer;
-#ifdef PARALLEL
-    } else if (cop.getBool("--parallel", boolBuffer)) {
-      so.parallel = boolBuffer;
-    } else if (cop.get("--share-param", &intBuffer)) {
-      so.share_param = intBuffer;
-    } else if (cop.get("--bandwidth", &intBuffer)) {
-      so.bandwidth = intBuffer;
-    } else if (cop.get("--trial-size", &intBuffer)) {
-      so.trial_size = intBuffer;
-    } else if (cop.get("--share-act", &intBuffer)) {
-      so.share_act = intBuffer;
-#endif
     } else if (cop.get("-a")) {
       so.nof_solutions = 0;
     } else if (cop.get("-f")) {
       so.toggle_vsids = true;
       so.restart_scale = 100;
-    } else if (cop.get("-p", &intBuffer)) {
-      so.parallel = true;
-      so.num_cores = intBuffer;
     } else if (cop.get("-s -S")) {
       so.verbosity = 1;
 #ifdef HAS_PROFILER
@@ -677,12 +634,4 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
                          "efficiency." << std::endl;
         }
     }
-  
-#ifndef PARALLEL
-  if (so.parallel) {
-    fprintf(stderr, "Parallel solving not supported! Please recompile with PARALLEL=true.\n");
-    rassert(false);
-  }
-#endif
-  
 }

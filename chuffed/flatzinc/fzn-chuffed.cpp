@@ -11,9 +11,7 @@ std::stringstream output_buffer;
     /// Handler for catching Ctrl-C
     static BOOL SIGINT_handler(DWORD t) throw() {
       if (t == CTRL_C_EVENT) {
-				if (so.thread_no == -1) {
-					fprintf(stderr, "*** INTERRUPTED ***\n");
-				} 
+				fprintf(stderr, "*** INTERRUPTED ***\n");
 				// Flush last solution
 				if(engine.opt_var && so.nof_solutions!=0) {
 						std::cout << output_buffer.str();
@@ -28,9 +26,7 @@ std::stringstream output_buffer;
 #else
 	/// Handler for catching Ctrl-C
 	void SIGINT_handler(int signum) {
-		if (so.thread_no == -1) {
-			fprintf(stderr, "*** INTERRUPTED ***\n");
-		} 
+		fprintf(stderr, "*** INTERRUPTED ***\n");
 		// Flush last solution
 		if(engine.opt_var && so.nof_solutions!=0) {
 				std::cout << output_buffer.str();

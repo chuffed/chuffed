@@ -3,14 +3,11 @@
 #include <chuffed/core/options.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/core/sat.h>
-#include <chuffed/parallel/parallel.h>
 #include <chuffed/mip/mip.h>
 #include <chuffed/ldsb/ldsb.h>
 
 
 void Engine::printStats() {
-	if (so.thread_no != -1) return;
-
 	auto total_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time);
 	duration search_time = total_time - init_time;
 
@@ -61,9 +58,6 @@ void Engine::printStats() {
 
 		if (so.ldsb) {
 			printf("%%%%%%mzn-stat: ldsbTime=%.3f\n", to_sec(ldsb.ldsb_time));
-		}
-		if (so.parallel) {
-			master.printStats();
 		}
 		sat.printStats();
 		/* sat.printLearntStats(); */

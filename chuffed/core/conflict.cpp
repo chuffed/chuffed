@@ -5,7 +5,6 @@
 #include <chuffed/core/engine.h>
 #include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
-#include <chuffed/parallel/parallel.h>
 #include <chuffed/ldsb/ldsb.h>
 
 #include <iostream>
@@ -151,9 +150,6 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 
 	learntLenBumpActivity(c->size());
 
-	if (so.parallel && so.learn && c->size()-(rand()/RAND_MAX) <= so.share_param) {
-		slave.shareClause(*c);
-	}
 
         /* std::cerr << "conflict found clause of length " << c->size() << "\n"; */
 
@@ -172,7 +168,6 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 	if (PRINT_ANALYSIS) printClause(*c);
 
 	if (so.ldsbad) {
-		assert(!so.parallel);
 		vec<Lit> out_learnt2;
 		out_learnt2.push(out_learnt[0]);
 		for (int i = 0; i < decisionLevel(); i++) out_learnt2.push(~decLit(decisionLevel()-i));

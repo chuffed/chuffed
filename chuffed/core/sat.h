@@ -171,13 +171,6 @@ public:
         }
     }
 
-	// Parallel methods
-
-	void convertToSClause(Clause& c);
-	void convertToClause(SClause& sc);
-	void addLearnt();
-	void updateShareParam();
-
 	// Conflict methods
 
 	void analyze(int nodeid, std::set<int>& contributingNogoods);

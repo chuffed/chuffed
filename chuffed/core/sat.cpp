@@ -6,7 +6,6 @@
 #include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
 #include <chuffed/mip/mip.h>
-#include <chuffed/parallel/parallel.h>
 
 #include <iostream>
 #include <sstream>
@@ -597,29 +596,4 @@ DecInfo* SAT::branch() {
 	assert(flags[next].decidable);
 
 	return new DecInfo(NULL, 2*next+polarity[next]);
-}
-
-//-----
-// Parallel methods
-
-void SAT::updateShareParam() {
-	so.share_param = 16;
-/*
-	double bmax = so.bandwidth / so.num_threads;
-	double bsum = 0;
-//	printf("Update share param\n");
-	double factor = learnt_len_el * (ll_inc-0.5);
-	for (int i = 0; i < MAX_SHARE_LEN; i++) {
-		double lps = learnt_len_occ[i]/factor*i;
-//		printf("%.3f, ", lps);
-		if (bsum + lps > bmax) {
-			so.share_param = i-1 + (bmax - bsum) / lps;
-			if (so.share_param < 1) so.share_param = 1;
-			return;
-		}
-		bsum += lps;
-	}
-	so.share_param = MAX_SHARE_LEN;
-//	if (rand()%100 == 0) printf("share param = %.1f\n", so.share_param);
-*/
 }
