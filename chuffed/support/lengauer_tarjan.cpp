@@ -1,4 +1,4 @@
-#include "lengauer_tarjan.h"
+#include <chuffed/support/lengauer_tarjan.h>
 #include <iostream>
 #include <set>
 

@@ -1,8 +1,8 @@
-#include "dijkstra.h"
+#include <chuffed/support/dijkstra.h>
 
 #include <map>
 #include <iostream>
-#include "../support/set_finder.h"
+#include <chuffed/support/set_finder.h>
 
 
 

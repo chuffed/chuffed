@@ -1,4 +1,4 @@
-#include "union_find.h"
+#include <chuffed/support/union_find.h>
 #include <cassert>
 #include <vector>
 #include <iostream>

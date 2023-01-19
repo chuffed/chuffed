@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
-#include "branching/branching.h"
+#include <chuffed/branching/branching.h>
 
 class UnionFind {
 public:

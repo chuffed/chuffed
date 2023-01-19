@@ -17,8 +17,8 @@
 #include <chuffed/vars/modelling.h>
 
 #include <chuffed/support/ParseUtils.h>
-// #include "hlist.h"
-// #include "hlutils.h"
+// #include <chuffed/hlist.h>
+// #include <chuffed/hlutils.h>
 
 #define ROTATE 1
 #define REFLECT 2

@@ -1,7 +1,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "kosaraju_scc.h"
+#include <chuffed/support/kosaraju_scc.h>
 using namespace std;
  
 KosarajuSCC::KosarajuSCC(int v, vector< vector<int> > out,

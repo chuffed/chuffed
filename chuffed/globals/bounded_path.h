@@ -1,9 +1,9 @@
 #ifndef BOUNDED_PATH_H
 #define BOUNDED_PATH_H
 
-#include "graph.h"
-#include "support/union_find.h"
-#include "support/lengauer_tarjan.h"
+#include <chuffed/globals/graph.h>
+#include <chuffed/support/union_find.h>
+#include <chuffed/support/lengauer_tarjan.h>
 #include <map>
 #include <iostream>
 #include <set>
@@ -11,8 +11,8 @@
 #include <queue>
 #include <vector>
 
-#include "support/dijkstra.h"
-#include "support/dynamic_kmeans.h"
+#include <chuffed/support/dijkstra.h>
+#include <chuffed/support/dynamic_kmeans.h>
 
 class ShortestPathSearch;
 
