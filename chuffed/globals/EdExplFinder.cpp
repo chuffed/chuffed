@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "EdExplFinder.h"
+#include <chuffed/globals/EdExplFinder.h>
 
 EdExplFinder::EdExplFinder() : max_char(0), insertion_cost(nullptr), deletion_cost(nullptr), substitution_cost(nullptr),
                                seq2(nullptr),

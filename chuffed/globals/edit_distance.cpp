@@ -1,6 +1,6 @@
 #include <chuffed/core/propagator.h>
 #include <iostream>
-#include "EdExplFinder.h"
+#include <chuffed/globals/EdExplFinder.h>
 
 class EditDistance : public Propagator {
 public:

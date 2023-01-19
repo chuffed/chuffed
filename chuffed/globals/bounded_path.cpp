@@ -1,4 +1,4 @@
-#include "bounded_path.h"
+#include <chuffed/globals/bounded_path.h>
 
 #include <iostream>
 

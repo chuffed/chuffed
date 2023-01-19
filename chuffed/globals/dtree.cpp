@@ -1,4 +1,4 @@
-#include "dtree.h"
+#include <chuffed/globals/dtree.h>
 
 #include <stack>
 #include <iostream>

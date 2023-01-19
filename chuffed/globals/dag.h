@@ -1,8 +1,8 @@
 #ifndef DAGPROPAGATOR_H
 #define DAGPROPAGATOR_H
 
-#include "dconnected.h"
-#include "support/trailed_cst_list.h"
+#include <chuffed/globals/dconnected.h>
+#include <chuffed/support/trailed_cst_list.h>
 
 class DAGPropagator : public DReachabilityPropagator {
 

@@ -1,9 +1,9 @@
 #ifndef DIRECTED_REACHABILITY_H
 #define DIRECTED_REACHABILITY_H
 
-#include "graph.h"
-#include "support/union_find.h"
-#include "support/lengauer_tarjan.h"
+#include <chuffed/globals/graph.h>
+#include <chuffed/support/union_find.h>
+#include <chuffed/support/lengauer_tarjan.h>
 #include <map>
 #include <set>
 #include <stack>

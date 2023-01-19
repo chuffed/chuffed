@@ -1,4 +1,4 @@
-#include "graph.h"
+#include <chuffed/globals/graph.h>
 #include <iostream>
 using namespace std;
 

@@ -1,7 +1,7 @@
 #ifndef TRAILED_CST_LIST_H
 #define TRAILED_CST_LIST_H
 
-#include "branching/branching.h"
+#include <chuffed/branching/branching.h>
 
 #include <cassert>
 #include <vector>

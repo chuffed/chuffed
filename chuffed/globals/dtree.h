@@ -1,8 +1,8 @@
 #ifndef DTREE_H
 #define DTREE_H
 
-#include "dconnected.h"
-#include "support/union_find.h"
+#include <chuffed/globals/dconnected.h>
+#include <chuffed/support/union_find.h>
 
 #include <map>
 

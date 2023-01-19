@@ -1,10 +1,9 @@
-#include "core/propagator.h"
-#include "support/union_find.h"
+#include <chuffed/core/propagator.h>
+#include <chuffed/support/union_find.h>
 #include <iostream>
-#include "tree.h"
-#include <set> 
-#include <queue> 
-
+#include <chuffed/globals/tree.h>
+#include <set>
+#include <queue>
 
 /**
  *  Given a graph G, ensure its a tree.

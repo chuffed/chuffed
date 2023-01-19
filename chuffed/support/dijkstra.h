@@ -7,11 +7,11 @@
 #include <boost/unordered_map.hpp>
 #include <bitset>
 #include <functional> //For std::hash
-#include "../core/propagator.h" //For Tint
+#include <chuffed/core/propagator.h> //For Tint
 #include <cassert>
-#include "kosaraju_scc.h"
-#include "dynamic_kmeans.h"
 #include <boost/heap/priority_queue.hpp>
+#include <chuffed/support/kosaraju_scc.h>
+#include <chuffed/support/dynamic_kmeans.h>
 
 
 class Dijkstra  {

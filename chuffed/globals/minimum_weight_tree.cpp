@@ -1,11 +1,11 @@
-#include "core/propagator.h"
-#include "support/union_find.h"
+#include <chuffed/core/propagator.h>
+#include <chuffed/support/union_find.h>
 #include <queue> 
 #include <iostream>
 #include <set>
 #include <vector>
 #include <stack> 
-#include "tree.h"
+#include <chuffed/globals/tree.h>
 
 
 #define CPLEX_AVAILABLE 0

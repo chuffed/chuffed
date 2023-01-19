@@ -1,4 +1,4 @@
-#include "dag.h"
+#include <chuffed/globals/dag.h>
 
 #include <iostream>
 

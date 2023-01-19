@@ -2,7 +2,7 @@
 #define DYNAMICKMEANS_H
 
 #include <algorithm>
-#include "support/floyd_warshall.h"
+#include <chuffed/support/floyd_warshall.h>
 #define MIN(a,b) ((a < b) ? a : b)
 
 template<typename T>
