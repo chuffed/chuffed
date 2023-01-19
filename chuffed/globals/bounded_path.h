@@ -406,7 +406,7 @@ class BoundedPathPropagator : public GraphPropagator{
 protected:
 
 
-    enum VType{IN, OUT, UNK};
+    enum VType{VT_IN, VT_OUT, UNK};
     Tint* last_state_e;
 
     std::set<int> rem_edge;

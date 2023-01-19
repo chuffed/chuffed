@@ -301,7 +301,7 @@ void BoundedPathPropagator::wakeup(int i, int c) {
         //Changes in max distance.
         pushInQueue();
     } else if (i >= 0 && i < nbEdges()) {
-        if (getEdgeVar(i).isFalse() && last_state_e[i] != OUT) {
+        if (getEdgeVar(i).isFalse() && last_state_e[i] != VT_OUT) {
             rem_edge.insert(i);
             if (was_shortest[i]) {
                 addToExplanation(i);
@@ -311,8 +311,8 @@ void BoundedPathPropagator::wakeup(int i, int c) {
 
     } else {
         int u = i - nbEdges();
-        if (getNodeVar(u).isTrue() && last_state_n[u] != IN) {
-            last_state_n[u] = IN;
+        if (getNodeVar(u).isTrue() && last_state_n[u] != VT_IN) {
+            last_state_n[u] = VT_IN;
             in_nodes_tsize++;
             in_nodes_size++;
             in_nodes_list.push_back(u);
@@ -403,7 +403,7 @@ bool BoundedPathPropagator::falseOrFail(int e, Clause*& r) {
         }
         getEdgeVar(e).setVal(false,r);
         rem_edge.insert(e);
-        last_state_e[e] = OUT;
+        last_state_e[e] = VT_OUT;
     } else if (getEdgeVar(e).isTrue()) {
         if (so.lazy) {
             vector<Lit> lits;
@@ -702,7 +702,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
                     r = ReasonNew(lits);
                 }
                 getNodeVar(u).setVal(false,r);
-                last_state_n[u] = OUT;
+                last_state_n[u] = VT_OUT;
                 if (!GraphPropagator::coherence_outedges(u))
                     return false;
                 removed_nodes.push_back(u);
@@ -736,7 +736,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
                     r = ReasonNew(lits);
                 }
                 getNodeVar(u).setVal(false,r);
-                last_state_n[u] = OUT;
+                last_state_n[u] = VT_OUT;
                 if (!GraphPropagator::coherence_outedges(u))
                     return false;
                 removed_nodes.push_back(u);
@@ -787,7 +787,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
 #endif
                 }
                 getNodeVar(u).setVal(false,r);
-                last_state_n[u] = OUT;
+                last_state_n[u] = VT_OUT;
                 if (!GraphPropagator::coherence_outedges(u))
                     return false;
                 removed_nodes.push_back(u);
@@ -840,7 +840,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
         vector<int> removed_e;
         coherence_outedges(u,removed_e);
         for (unsigned int i = 0; i < removed_e.size(); i++) {
-            last_state_e[removed_e[i]] = OUT;
+            last_state_e[removed_e[i]] = VT_OUT;
         }
     }//*/
     //return true;
@@ -924,7 +924,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
             if (!falseOrFail(e,r)) {
                 return false;
             }
-            last_state_e[e] = OUT;
+            last_state_e[e] = VT_OUT;
         } else {
             //Can use e to go form s to d and still get to d in time.
             was_shortest[e] |= 1;

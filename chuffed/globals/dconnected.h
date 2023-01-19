@@ -47,7 +47,7 @@ protected:
     virtual bool correctDominator(int r, std::vector<bool>& v, int avoid); //DEBUG
     std::vector<int> in_nodes_list;
 
-    enum VType{IN, OUT, UNK};
+    enum VType{VT_IN, VT_OUT, UNK};
     Tint* last_state_n;
     Tint* last_state_e;
 

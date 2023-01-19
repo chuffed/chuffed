@@ -148,8 +148,7 @@ public:
         {
             UF<int> uf(nbNodes());
             RerootedUnionFind<int> ruf(nbNodes());
-            bool already[nbEdges()];
-            std::memset(already,false,sizeof(bool)*nbEdges());
+            std::vector<bool> already(nbEdges(), false);
             int in = 0;
             for (int i = 0; i < nbEdges(); i++) {
                 if (getEdgeVar(i).isTrue()) {

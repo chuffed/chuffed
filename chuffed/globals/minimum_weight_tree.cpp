@@ -41,13 +41,13 @@ protected:
     Tint mw;
     Tint splb;
 
-    Tint* spTo; //To whom is this the shortest path
-    Tint* spC;  //What is the cost of it
+    std::vector<Tint> spTo; //To whom is this the shortest path
+    std::vector<Tint> spC;  //What is the cost of it
 
-    Tint** eInSP; //eInSP[n][e] <=> e is in the sp from n to anyone
+    std::vector<std::vector<Tint>> eInSP; //eInSP[n][e] <=> e is in the sp from n to anyone
 
-    Tint* e_already_counted;
-    Tint* n_already_counted;
+    std::vector<Tint> e_already_counted;
+    std::vector<Tint> n_already_counted;
     vec<Lit> explvf;
     vec<Lit> explvp;
     Tint explv_sz;
@@ -349,22 +349,22 @@ public:
             w->setMax(ub);
 
 
-        eInSP = new Tint*[nbNodes()];
-        spTo = new Tint[nbNodes()];
-        spC = new Tint[nbNodes()];
+        eInSP.resize(nbNodes());
+        spTo.resize(nbNodes());
+        spC.resize(nbNodes());
         for (int i = 0; i < nbNodes(); i++) {
-            eInSP[i] = new Tint[nbEdges()];
+            eInSP[i].resize(nbEdges());
             clearPathData(i);
             spTo[i] = -1;
             spC[i] = -1;
         }
 
-        e_already_counted = new Tint[nbEdges()];
-        for (uint i = 0; i < nbEdges(); i++) {
+        e_already_counted.resize(nbEdges());
+        for (int i = 0; i < nbEdges(); i++) {
             e_already_counted[i] = 0;
         }
-        n_already_counted = new Tint[nbNodes()];
-        for (uint i = 0; i < nbNodes(); i++) {
+        n_already_counted.resize(nbNodes());
+        for (int i = 0; i < nbNodes(); i++) {
             n_already_counted[i] = 0;
         }
         
@@ -916,7 +916,7 @@ public:
      * res[]: for each node, cost and predecor info
      * n: number of nodes in the graph
      */
-    int Dijkstra(int s, DijkstraInfo res[], bool cc[], int n) {
+    int Dijkstra(int s, DijkstraInfo res[], std::vector<bool>& cc, int n) {
         for (int i = 0; i < n; i++) {
             res[i].cost = INT_MAX;
         }
@@ -924,8 +924,7 @@ public:
         std::priority_queue<std::pair<int,int>, 
                             std::vector< std::pair<int,int> >, 
                             comp> q; //priority key: cost
-        bool visited[n];
-        std::memset(visited,false,sizeof(bool)*n);
+        std::vector<bool> visited(n, false);
         int count = 0;
         res[s].prev = s;
         res[s].cost = 0;
@@ -988,8 +987,7 @@ public:
         std::priority_queue<std::pair<int,int>, 
                             std::vector< std::pair<int,int> >, 
                             comp> q; //priority key: cost
-        bool visited[n];
-        std::memset(visited,false,sizeof(bool)*n);
+        std::vector<bool> visited(n, false);
         int count = 0;
         res[s].prev = s;
         res[s].cost = 0;
@@ -1052,12 +1050,11 @@ public:
             if(TREEPROP_DEBUG)
                 cout <<"elementary update of #" <<i<<" (isRoot:"<<ruf.isRoot(i)<<endl;
             int rep = i;
-            DijkstraInfo dijkstraPath[nbNodes()];
+            std::vector<DijkstraInfo> dijkstraPath(nbNodes());
             struct CC cc;
-            bool ccvisited[nbNodes()];
-            std::memset(ccvisited,false,sizeof(bool)*nbNodes());
+            std::vector<bool> ccvisited(nbNodes(), false);
             getCC(rep, ccvisited, &cc);
-            int other = Dijkstra(rep, dijkstraPath,ccvisited,nbNodes());
+            int other = Dijkstra(rep, dijkstraPath.data(), ccvisited, nbNodes());
             // other can be three things:
             // -another terminal in another CC (interesting case)
             // -another terminal in the same CC as n (same as next case)
@@ -1080,8 +1077,7 @@ public:
 
                     int prev1 = other;
                     int prev2 = dijkstraPath[prev1].prev;
-                    int tmp[nbEdges()];
-                    std::memset(tmp,0,sizeof(Tint)*nbEdges());
+                    std::vector<int> tmp(nbEdges(), 0);
                     //std::memset(shortestPathsEdges[repN],0,sizeof(Tint)*nbEdges());
                     int count = 0;
                     while (prev1 != rep) {
@@ -1155,11 +1151,10 @@ public:
             return false;
 
         int repN = ruf.find(n);
-        DijkstraInfo dijkstraPath[nbNodes()];
+        std::vector<DijkstraInfo> dijkstraPath(nbNodes());
         //int end = fullDijkstra(repN, dijkstraPath,nbNodes());
         struct CC cc;
-        bool ccvisited[nbNodes()];
-        std::memset(ccvisited,false,sizeof(bool)*nbNodes());
+        std::vector<bool> ccvisited(nbNodes(), false);
         getCC(repN, ccvisited, &cc);
         int min = -1;
         int argmin = -1;

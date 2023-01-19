@@ -209,7 +209,7 @@ void DTreePropagator::prevent_cycle(int e) {
                 r = Reason_new(pathe);
             }
             getEdgeVar(e).setVal(false,r);
-            //last_state_e[e] = OUT; //Can't cause a failure in reachability
+            //last_state_e[e] = VT_OUT; //Can't cause a failure in reachability
             rem_edge.insert(e);
         }
     }
@@ -232,7 +232,7 @@ bool DTreePropagator::propagate() {
                 return false;
             }
             processed_e[*it] = true;
-            last_state_e[*it] = IN;
+            last_state_e[*it] = VT_IN;
         }
     }
     
@@ -242,7 +242,7 @@ bool DTreePropagator::propagate() {
                 return false;
             }
             processed_n[*it] = true;
-            last_state_n[*it] = IN;
+            last_state_n[*it] = VT_IN;
         }
     }
     assert(test_ruf());
@@ -301,11 +301,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
         for (int val = 0; val < nbNodes(); val++) {
             equalities.push(parents[i]->getLit(val,1)); //parents[i] == val
             equalities.last().attach(this, count, EVENT_LU);
-#if __cplusplus <= 199711L
-            event2parrel[count] = std::make_pair<int,int>(i,val);
-#else
             event2parrel[count] = std::make_pair(i,val);
-#endif
             count++;
         }
     }
@@ -552,7 +548,7 @@ bool DTreeParenthoodPropagator::propagate() {
             return false;
         }
         dom_size[getHead(*it)] = parents[getHead(*it)]->size();
-        if (last_state_e[*it] != IN) {
+        if (last_state_e[*it] != VT_IN) {
             assert(getHead(*it) == getTail(*it) || getEdgeVar(*it).isFixed());
             assert(getHead(*it) == getTail(*it) || getEdgeVar(*it).isTrue());
             if (getEdgeVar(*it).isFixed() && getEdgeVar(*it).isTrue())
@@ -566,7 +562,7 @@ bool DTreeParenthoodPropagator::propagate() {
             return false;
         }
         dom_size[getHead(*it)] = parents[getHead(*it)]->size();
-        if (last_state_e[*it] != OUT) {
+        if (last_state_e[*it] != VT_OUT) {
             assert(getEdgeVar(*it).isFixed());
             assert(getEdgeVar(*it).isFalse());
             rem_edge.insert(*it);
@@ -872,7 +868,7 @@ void DTreeParenthoodPropagator::clearPropState() {
 //             return false;
 //         }
 //         dom_size[getHead(*it)] = parents[getHead(*it)]->size();
-//         if (last_state_e[*it] != IN) {
+//         if (last_state_e[*it] != VT_IN) {
 //             assert(getEdgeVar(*it).isFixed());
 //             assert(getEdgeVar(*it).isTrue());
 //             new_edge.insert(*it);
@@ -885,7 +881,7 @@ void DTreeParenthoodPropagator::clearPropState() {
 //             return false;
 //         }
 //         dom_size[getHead(*it)] = parents[getHead(*it)]->size();
-//         if (last_state_e[*it] != OUT) {
+//         if (last_state_e[*it] != VT_OUT) {
 //             assert(getEdgeVar(*it).isFixed());
 //             assert(getEdgeVar(*it).isFalse());
 //             rem_edge.insert(*it);

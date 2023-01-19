@@ -35,7 +35,6 @@ public:
         int node;
         int cost;
     };
-    typedef struct Dijkstra::tuple tuple;
     class Priority {
     public:
         bool operator() (const tuple& lhs, const tuple&rhs) const {

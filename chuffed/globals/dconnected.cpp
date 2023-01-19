@@ -137,7 +137,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
             getEdgeVar(last_seen).setVal(true,r);
             if (!propagateNewEdge(last_seen))
                 return false;
-            last_state_e[last_seen] = IN;
+            last_state_e[last_seen] = VT_IN;
             new_edge.insert(last_seen);
             if(DEBUG) cout <<"Edge in "<<last_seen<<endl;
             // Propagate New Edge already does this.
@@ -151,7 +151,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
                     r = Reason_new(ps);
                 }
                 getNodeVar(getHead(last_seen)).setVal(true,r);
-                last_state_n[getHead(last_seen)] = IN;
+                last_state_n[getHead(last_seen)] = VT_IN;
                 add_innode(getHead(last_seen));
                 new_node.insert(getHead(last_seen));
                 if(DEBUG) cout <<"Node in "<<getHead(last_seen)<<endl;
@@ -215,7 +215,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
             getNodeVar(u).setVal(false,r);
             if(!propagateRemNode(u))
                 return false;
-            last_state_n[u] = OUT;
+            last_state_n[u] = VT_OUT;
             rem_node.insert(u);
             if(DEBUG) cout <<"Node out "<<u<<endl;
             //*
@@ -235,7 +235,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
                 //*
                 if (!getEdgeVar(oe).isFixed()) {
                     getEdgeVar(oe).setVal(false,r);
-                    last_state_e[oe] = OUT;
+                    last_state_e[oe] = VT_OUT;
                     rem_edge.insert(oe);
                     if(DEBUG) cout <<"Edge out "<<oe<<endl;
 
@@ -344,7 +344,7 @@ DReachabilityPropagator::DReachabilityPropagator(int _r,
     } else if(getNodeVar(root).isFalse()){
         return; //Will fail anyway beacause of unreachability.
     }
-    last_state_n[root] = IN;
+    last_state_n[root] = VT_IN;
     add_innode(root);
 
     for (int i = 0; i < nbNodes(); i++) {
@@ -365,13 +365,13 @@ void DReachabilityPropagator::wakeup(int i, int c) {
     if(DEBUG) cout <<"Wake up "<<i<<endl;
     if (i >= 0 && i < nbNodes()){
         assert(getNodeVar(i).isFixed());
-        if (getNodeVar(i).isTrue() && last_state_n[i] != IN) {
+        if (getNodeVar(i).isTrue() && last_state_n[i] != VT_IN) {
             if(DEBUG) cout <<"WakeUp Add node "<<i<<endl;
             if(DEBUG) cout <<"Adding in "<<__FILE__<<__LINE__<<endl;
             add_innode(i);
             new_node.insert(i);
             ignore = false;
-        } else if (getNodeVar(i).isFalse() && last_state_n[i] != OUT) {
+        } else if (getNodeVar(i).isFalse() && last_state_n[i] != VT_OUT) {
             if(DEBUG)cout <<"WakeUp Rem node "<<i<<endl;
             rem_node.insert(i);
             ignore = false;
@@ -383,11 +383,11 @@ void DReachabilityPropagator::wakeup(int i, int c) {
     if(i >= nbNodes() && i < nbNodes() + nbEdges()) { 
         i = i - nbNodes();
         assert(getEdgeVar(i).isFixed());
-        if (getEdgeVar(i).isTrue() && last_state_e[i] != IN) {
+        if (getEdgeVar(i).isTrue() && last_state_e[i] != VT_IN) {
             if(DEBUG) cout <<"WakeUp Add edge"<<i<<endl;
             new_edge.insert(i);
             ignore = false;
-        } else if (getEdgeVar(i).isFalse() && last_state_e[i] != OUT) {
+        } else if (getEdgeVar(i).isFalse() && last_state_e[i] != VT_OUT) {
             if(DEBUG) cout <<"WakeUp Rem edge "<<i<<endl;
             rem_edge.insert(i);
             ignore = false;
@@ -418,7 +418,7 @@ bool DReachabilityPropagator::propagate() {
             if(DEBUG) cout <<"False "<<__FILE__<<__LINE__<<endl;
             return false;
         }
-        last_state_e[*it] = IN;
+        last_state_e[*it] = VT_IN;
     }
 
     for (it = rem_node.begin(); it != rem_node.end(); ++it) {
@@ -426,7 +426,7 @@ bool DReachabilityPropagator::propagate() {
             if(DEBUG) cout <<"False "<<__FILE__<<__LINE__<<endl;
             return false;
         }
-        last_state_n[*it] = OUT;
+        last_state_n[*it] = VT_OUT;
     }
 
     //In this class, nothing happens here, but this way inheriting classes
@@ -436,7 +436,7 @@ bool DReachabilityPropagator::propagate() {
             if(DEBUG) cout <<"False "<<__FILE__<<__LINE__<<endl;
             return false;
         }
-        last_state_n[*it] = IN;
+        last_state_n[*it] = VT_IN;
     }    
 
     for (it = rem_edge.begin(); it != rem_edge.end(); ++it) {
@@ -444,7 +444,7 @@ bool DReachabilityPropagator::propagate() {
             if(DEBUG) cout <<"False "<<__FILE__<<__LINE__<<endl;
             return false;
         }
-        last_state_e[*it] = OUT;
+        last_state_e[*it] = VT_OUT;
     }
 
     if (!new_node.empty() || !rem_edge.empty()) {
@@ -493,7 +493,7 @@ bool DReachabilityPropagator::propagateNewEdge(int edge) {
     }
     for (unsigned int i = 0; i < added_nodes.size(); i++) {
         if(DEBUG) cout <<"Adding in "<<__FILE__<<__LINE__<<endl;
-        last_state_n[added_nodes[i]] = IN;
+        last_state_n[added_nodes[i]] = VT_IN;
         add_innode(added_nodes[i]);
         new_node.insert(added_nodes[i]);
     }
@@ -516,7 +516,7 @@ bool DReachabilityPropagator::propagateRemNode(int node) {
     if (!ok)
         return false;
     for (unsigned int i = 0; i < remvd_edges.size(); i++) {
-        last_state_e[remvd_edges[i]] = OUT;
+        last_state_e[remvd_edges[i]] = VT_OUT;
         rem_edge.insert(remvd_edges[i]);
     }
     return true;
@@ -571,7 +571,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
             if (local) {
                 if(!propagateRemNode(i))
                     return false;
-                last_state_n[i] = OUT;
+                last_state_n[i] = VT_OUT;
             }
         }
     }//*/
@@ -629,7 +629,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
                 add_innode(dom_u);
                 if(!propagateNewNode(dom_u))
                     return false;
-                last_state_n[dom_u] = IN;
+                last_state_n[dom_u] = VT_IN;
                 new_node.insert(dom_u);
             }
             //*/
@@ -665,7 +665,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
                                    <<__FILE__<<__LINE__<< "("<<dom_u
                                    <<" dominates "<<u<<")"<<endl;
                     new_edge.insert(last_incident);
-                    last_state_e[last_incident] = IN;
+                    last_state_e[last_incident] = VT_IN;
                 }
                 //*/
             }

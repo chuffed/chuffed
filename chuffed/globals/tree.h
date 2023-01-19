@@ -18,6 +18,12 @@ typedef int edge_id;
 typedef int node_id;
 
 
+struct partialExpl {
+    edge_id bridge;
+    node_id cause1;
+    node_id cause2;
+    partialExpl():cause2(-1){}
+};
 
 class TreePropagator : public GraphPropagator{
 public:
@@ -47,30 +53,30 @@ protected:
     int in_edges_size;
 
 
-    enum VType{IN, OUT, UNK};
-    Tint* last_state_n;
-    Tint* last_state_e;
+    enum VType{VT_IN, VT_OUT, UNK};
+    std::vector<Tint> last_state_n;
+    std::vector<Tint> last_state_e;
 
 
     edge_id findEdge(int u, int v, int idx = 0);
     void moveInEdgeToFront(int e);
     void _findAndBuildBridges(int u, int& count, std::stack<edge_id>& s,
-                              int depth[], int low[], bool visited[],
+                              int depth[], int low[], std::vector<bool>& visited,
                               int parent[], 
                               std::stack<node_id>& hits, 
                               std::vector< std::pair<edge_id, node_id> >& semiExpl,
-                              std::vector< struct partialExpl>& bridgeExpl,
-                              std::vector< struct partialExpl>& articuExpl);
+                              std::vector< partialExpl >& bridgeExpl,
+                              std::vector< partialExpl >& articuExpl);
 
-    int articulations(int n, bool visited[], int& count);
-    bool reachable(int n, bool blue[], bool doDFS = false);
+    int articulations(int n, std::vector<bool>& visited, int& count);
+    bool reachable(int n, std::vector<bool>& blue, bool doDFS = false);
     void unite(int u, int v);
     bool cycle_detect(int edge);
     void precycle_detect(int unk_edge);
     int newNodeCompleteCheckup_Count;
     bool newNodeCompleteCheckup;
 
-    //std::vector<struct CC> keys;
+    //std::vector<CC> keys;
 
 public:
     TreePropagator(vec<BoolView>& _vs, vec<BoolView>& _es, 
@@ -81,19 +87,19 @@ public:
     virtual void clearPropState();
 
     //Walks only on fixed edges == 1
-    void getCC(int node, bool visited[], struct CC* cc);
-    void getAvailableCC(int node, bool visited[], struct CC* cc);
+    void getCC(int node, std::vector<bool>& visited, CC* cc);
+    void getAvailableCC(int node, std::vector<bool>& visited, CC* cc);
     virtual bool propagateNewNode(int node);
     virtual bool propagateRemNode(int node);
     virtual bool propagateNewEdge(int edge);
     virtual bool propagateRemEdge(int edge);
-    void getUnkEdgesInCC(int r, bool visited[], std::unordered_set<edge_id>& unk);
-    void DFSBlue(int r, bool visited[], int& count);
-    void DFSPink(int r, bool visited[], bool blue[], std::unordered_set<int>& badEdges);
-    void walkIsland(int r, bool visited[], int avoidBridge, bool isArt = false,
+    void getUnkEdgesInCC(int r, std::vector<bool>& visited, std::unordered_set<edge_id>& unk);
+    void DFSBlue(int r, std::vector<bool>& visited, int& count);
+    void DFSPink(int r, std::vector<bool>& visited, std::vector<bool>& blue, std::unordered_set<int>& badEdges);
+    void walkIsland(int r, std::vector<bool>& visited, int avoidBridge, bool isArt = false,
                     int parent = -1);
-    void walkBrokenBridges(int r, bool reachable[], bool walked[],
-                           bool visited[], int avoidBridge,
+    void walkBrokenBridges(int r, std::vector<bool>& reachable, std::vector<bool>& walked,
+                           std::vector<bool>& visited, int avoidBridge,
                            std::vector<edge_id>& bridges, bool isArt = false,
                            int parent = -1);
 

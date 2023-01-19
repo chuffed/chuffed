@@ -16,21 +16,14 @@ using namespace std;
 
 
 #define MIN(a,b) (a<b? a:b)
-struct partialExpl{
-    edge_id bridge;
-    node_id cause1;
-    node_id cause2;
-    partialExpl():cause2(-1){}
-};
-
 
 /**
  * Detect that whe cannot reach some otehr node from 'node'
  * return true if no conflict, false otherwise (explanation built inside)
  */
-bool TreePropagator::reachable(int node, bool blue[], bool doDFS) {
+bool TreePropagator::reachable(int node, std::vector<bool>& blue, bool doDFS) {
     if (doDFS) {
-        std::memset(blue,false,sizeof(bool)*nbNodes());
+        blue = std::vector<bool>(nbNodes(), false);
         int count = 0;
         DFSBlue(node,blue,count);
     }
@@ -40,8 +33,7 @@ bool TreePropagator::reachable(int node, bool blue[], bool doDFS) {
 
             if (so.lazy) {
                 std::unordered_set<edge_id> badEdges;
-                bool pink[nbNodes()];
-                std::memset(pink,false,sizeof(bool)*nbNodes());
+                std::vector<bool> pink(nbNodes(), false);
                 DFSPink(i, pink, blue, badEdges);
                 //REASON: 0<i<n visited[i] /\ any-fixed-not-visited => fail
 
@@ -66,8 +58,7 @@ bool TreePropagator::reachable(int node, bool blue[], bool doDFS) {
             Clause* r = NULL;
             if (so.lazy) {                
                 std::unordered_set<edge_id> badEdges;
-                bool pink[nbNodes()];
-                std::memset(pink,false,sizeof(bool)*nbNodes());
+                std::vector<bool> pink(nbNodes(), false);
                 DFSPink(i, pink, blue, badEdges);
                 //REASON: 0<i<n visited[i] => unfixed-not-visited = false
                 
@@ -84,7 +75,7 @@ bool TreePropagator::reachable(int node, bool blue[], bool doDFS) {
             }
             //cout << "REACHABLE (N) "<<i<<endl;
             getNodeVar(i).setVal2(false,r);
-            last_state_n[i] = OUT;
+            last_state_n[i] = VT_OUT;
         }
     }
     return true;
@@ -94,19 +85,12 @@ bool TreePropagator::reachable(int node, bool blue[], bool doDFS) {
  * Detect bridges and articulations and build them (with explanations)
  * return the number of bridges+articulations built
  */
-int TreePropagator::articulations(int n, bool reachable[], int& count) {
-    std::memset(reachable, false, sizeof(bool)*nbNodes());
-
-
-    int parent[nbNodes()];
-    std::memset(parent, -1, sizeof(int)*nbNodes());
-
-    int depth[nbNodes()];
-    std::memset(depth, -1, sizeof(int)*nbNodes());
-
-    int low[nbNodes()];
-    std::memset(low, -1,sizeof(int)*nbNodes());
-
+int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& count) {
+    reachable = std::vector<bool>(nbNodes(), false);
+    
+    std::vector<int> parent(nbNodes(), -1);
+    std::vector<int> depth(nbNodes(), -1);
+    std::vector<int> low_(nbNodes(), -1);
     
     std::stack<node_id> hits;
     hits.push(-1);
@@ -116,10 +100,10 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
 
 
     std::vector< std::pair<edge_id, node_id> > tmpExpl;
-    std::vector< struct partialExpl> bridgeExpl;
-    std::vector< struct partialExpl> articuExpl;
+    std::vector< partialExpl> bridgeExpl;
+    std::vector< partialExpl> articuExpl;
 
-    _findAndBuildBridges(n,count,s,depth,low,reachable,parent,hits,
+    _findAndBuildBridges(n,count,s,depth.data(),low_.data(),reachable,parent.data(),hits,
                          tmpExpl,bridgeExpl,articuExpl);
 
     int nbBridgesBuilt = 0;
@@ -127,12 +111,11 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
     bridgeExpl.insert(bridgeExpl.end(),articuExpl.begin(),articuExpl.end());
 
     std::map<node_id,node_id> memory;
-    int toBePropagated[nbNodes()];
-    std::memset(toBePropagated, -1, sizeof(int)*nbNodes());
+    std::vector<int> toBePropagated(nbNodes(), -1);
     if (bridgeExpl.size() > 0) {
 
         
-        std::vector<struct partialExpl >::iterator it;
+        std::vector< partialExpl >::iterator it;
         for (it = bridgeExpl.begin(); it != bridgeExpl.end(); it++){
             Clause* r = NULL;
             int cause1 = it->cause1;
@@ -166,7 +149,7 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
                 }
                 //cout << "Arti (N) "<<a<<endl;
                 getNodeVar(a).setVal2(true,r);
-                last_state_n[a] = IN;
+                last_state_n[a] = VT_IN;
                 continue;
             }
 
@@ -174,19 +157,16 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
                 std::vector<int>reasons;
 
 
-                bool walk1[nbNodes()];
-                std::memset(walk1, false, sizeof(bool)*nbNodes());
+                std::vector<bool> walk1(nbNodes(), false);
                 walkIsland(cause1, walk1, bridge, isArt);
-                bool walk2[nbNodes()];
-                std::memset(walk2, false, sizeof(bool)*nbNodes());
+                std::vector<bool> walk2(nbNodes(), false);
                 walkBrokenBridges(cause1, reachable, walk1, walk2, bridge,reasons,isArt);
                 vec<Lit> ps;
                 ps.push();
                 if (!isTerminal[cause1]) {
                     if (memory.find(cause1) == memory.end()){
                         struct CC cc;
-                        bool tmpV[nbNodes()];
-                        std::memset(tmpV, false, sizeof(bool)*nbNodes());
+                        std::vector<bool> tmpV(nbNodes(), false);
                         getCC(cause1, tmpV, &cc);
                         int term = cause1;
                         for (int tt = 0; tt < nbNodes(); tt++){
@@ -204,8 +184,7 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
                 if (!isTerminal[cause2]) {
                     if (memory.find(cause2) == memory.end()){
                         struct CC cc;
-                        bool tmpV[nbNodes()];
-                        std::memset(tmpV, false, sizeof(bool)*nbNodes());
+                        std::vector<bool> tmpV(nbNodes(), false);
                         getCC(cause2, tmpV, &cc);
                         int term = cause2;
                         for (int tt = 0; tt < nbNodes(); tt++){
@@ -240,14 +219,14 @@ int TreePropagator::articulations(int n, bool reachable[], int& count) {
             if (isArt) {
                 //cout << "Bridge (N) "<<bridge<<endl;
                 getNodeVar(bridge).setVal2(true,r);
-                last_state_n[bridge] = IN;
+                last_state_n[bridge] = VT_IN;
             } else {
                 assert(!getEdgeVar(bridge).isFalse());
                 if (TREEPROP_DEBUG) 
                     cout << "BRIDGE "<<bridge<<endl;
                 //cout << "Bridge (E) "<<bridge<<endl;
                 getEdgeVar(bridge).setVal2(true,r);
-                last_state_e[bridge] = IN;
+                last_state_e[bridge] = VT_IN;
                 moveInEdgeToFront(bridge);
                 toBePropagated[getEndnode(bridge,0)] = bridge;
                 toBePropagated[getEndnode(bridge,1)] = bridge;
@@ -327,7 +306,7 @@ void TreePropagator::precycle_detect(int unk_edge) {
             cout << "PRECYCLE "<<unk_edge<<endl;
         //cout << "Precycle (E) "<<unk_edge<<endl;
         getEdgeVar(unk_edge).setVal2(false,r);
-        last_state_e[unk_edge] = OUT;
+        last_state_e[unk_edge] = VT_OUT;
     }
 }
 
@@ -349,12 +328,12 @@ void TreePropagator::unite(int u, int v) {
 
 
 void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>& s,
-                                          int depth[], int low[], bool visited[],
+                                          int depth[], int low[], std::vector<bool>& visited,
                                           int parent[], 
                                           std::stack<node_id>& hits,
                                           std::vector< std::pair<edge_id, node_id> >& semiExpl,
-                                          std::vector< struct partialExpl>& bridgeExpl,
-                                          std::vector< struct partialExpl>& articuExpl) {
+                                          std::vector< partialExpl>& bridgeExpl,
+                                          std::vector< partialExpl>& articuExpl) {
     visited[u] = true;
     count++;
     depth[u] = count;
@@ -427,7 +406,7 @@ void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>
         }
         for (unsigned int i = 0; i < semiExpl.size(); i++) {
             
-            struct partialExpl pE;
+            partialExpl pE;
             pE.bridge = semiExpl[i].first;
             pE.cause1 = semiExpl[i].second;
             pE.cause2 = u;
@@ -526,12 +505,12 @@ TreePropagator::TreePropagator(vec<BoolView>& _vs, vec<BoolView>& _es,
     in_edges_tsize = 0;
     in_edges_size = 0;
 
-    last_state_n = new Tint[nbNodes()];
-    for (uint i = 0; i < nbNodes(); i++) {
+    last_state_n.resize(nbNodes());
+    for (int i = 0; i < nbNodes(); i++) {
         last_state_n[i] = UNK;
     }
-    last_state_e = new Tint[nbEdges()];
-    for (uint i = 0; i < nbEdges(); i++) {
+    last_state_e.resize(nbEdges());
+    for (int i = 0; i < nbEdges(); i++) {
         last_state_e[i] = UNK;
     }
 
@@ -618,7 +597,7 @@ bool TreePropagator::propagate() {
 
 
 //Walks only on fixed edges == 1
-void TreePropagator::getCC(int node, bool visited[], struct CC* cc) {
+void TreePropagator::getCC(int node, std::vector<bool>& visited, CC* cc) {
     visited[node] = true;        
     cc->count++;
     cc->nodesIds.push_back(node);
@@ -643,7 +622,7 @@ bool TreePropagator::propagateNewNode(int node) {
       4) Reachable
      */
     
-    bool blue[nbNodes()];
+    std::vector<bool> blue(nbNodes());
     bool didBlueDFS = false;
     int& count = newNodeCompleteCheckup_Count;
     if (newNodeCompleteCheckup) {
@@ -709,14 +688,13 @@ bool TreePropagator::propagateNewEdge(int edge) {
 
 
     //Put the new edge int he first position of nodes2edge so it can be faster
-    // to wlak through in-edges for cycle detection:
+    // to walk through in-edges for cycle detection:
     moveInEdgeToFront(edge);
 
-    //Doesn't make much difference in numbr of nodes but is good
+    //Doesn't make much difference in number of nodes but is good
     //Remove possible cycles
     unordered_set<edge_id> unk;
-    bool blue[nbNodes()];
-    std::memset(blue,false,sizeof(bool)*nbNodes());
+    std::vector<bool> blue(nbNodes(), false);
     getUnkEdgesInCC(u,blue,unk);    
     unordered_set<edge_id>::iterator it = unk.begin();
     for ( ; it != unk.end(); ++it) {
@@ -819,7 +797,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
                     }
                     //cout << "RemEdge (N) "<<node<<endl;
                     getNodeVar(node).setVal2(false,r);                        
-                    last_state_n[node] = OUT;
+                    last_state_n[node] = VT_OUT;
                     //newFixedN.push(node);
                 }
             }
@@ -846,7 +824,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
         //    continue;
 
 
-        bool blue[nbNodes()];
+        std::vector<bool> blue(nbNodes());
         bool didBlueDFS = false;
         int& count = newNodeCompleteCheckup_Count;
         if (newNodeCompleteCheckup) {
@@ -883,7 +861,7 @@ void TreePropagator::clearPropState() {
     
 }
 
-void TreePropagator::getUnkEdgesInCC(int r, bool visited[], unordered_set<edge_id>& unk) {
+void TreePropagator::getUnkEdgesInCC(int r, std::vector<bool>& visited, unordered_set<edge_id>& unk) {
     visited[r] = true;
     for(int i = 0; i < adj[r].size(); i++) {
         int e = adj[r][i];
@@ -905,7 +883,7 @@ void TreePropagator::getUnkEdgesInCC(int r, bool visited[], unordered_set<edge_i
 /**
  * Goes through in and unknown edges.
  */
-void TreePropagator::DFSBlue(int r, bool visited[], int& count) {
+void TreePropagator::DFSBlue(int r, std::vector<bool>& visited, int& count) {
     visited[r] = true;
     count++;
     for(int i = 0; i < adj[r].size(); i++) {
@@ -927,7 +905,7 @@ void TreePropagator::DFSBlue(int r, bool visited[], int& count) {
  * Goes through all edges until it hits a 'blue' node.
  * badEdges is the set of edges with one node pink and one node blue.
  */
-void TreePropagator::DFSPink(int r, bool visited[], bool blue[], 
+void TreePropagator::DFSPink(int r, std::vector<bool>& visited, std::vector<bool>& blue, 
                              std::unordered_set<edge_id>& badEdges) {
     visited[r] = true;
     for(int i = 0; i < adj[r].size(); i++) {
@@ -952,7 +930,7 @@ void TreePropagator::DFSPink(int r, bool visited[], bool blue[],
 /**
  * Goes through in and unkown edges. Avoid 'avoidBridge'
  */
-void TreePropagator::walkIsland(int r, bool visited[], int avoidBridge, 
+void TreePropagator::walkIsland(int r, std::vector<bool>& visited, int avoidBridge, 
                                 bool isArt, int parent){
     //cout << "Walking my island.... :" << r<<endl;
     visited[r] = true;
@@ -980,8 +958,8 @@ void TreePropagator::walkIsland(int r, bool visited[], int avoidBridge,
  * Bridges is the seat of edges that could bring us from visited to a 
  * walked and reachable node.
  */
-void TreePropagator::walkBrokenBridges(int r, bool reachable[], bool walked[],
-                                       bool visited[], int avoidBridge,
+void TreePropagator::walkBrokenBridges(int r, std::vector<bool>& reachable, std::vector<bool>& walked,
+                                       std::vector<bool>& visited, int avoidBridge,
                                        std::vector<edge_id>& bridges, 
                                        bool isArt, int parent){
     //cout << "Walking my island again.... :" << r<<" "<<avoidBridge<<endl;
