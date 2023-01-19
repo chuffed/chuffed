@@ -7,7 +7,7 @@
 using namespace std;
 
 vector<int> child;
-vector<int> size;
+vector<int> size_;
 
 vector< vector<int> > preds;
 vector< vector<int> > succs;
@@ -71,7 +71,7 @@ void LengauerTarjan::init() {
     label    = vector<int>(n,-1);
 
     child = vector<int>(n,root);
-    size = vector<int>(n,0);
+    size_ = vector<int>(n,0);
 }
 
 //*

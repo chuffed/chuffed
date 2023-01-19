@@ -94,20 +94,20 @@ class UFRootInfo : public UF<T> {
 };
 
 template<typename T>
-class RerootedUnionFind : public UnionFind{
+class RerootedUnionFind : public UnionFind {
 
  private:
     int const size;
     T* parents;
     T nbCC;
 
-    struct fancyFindInfo{
+    struct fancyFindInfo {
         int lengthUntilRoot;
         int repr;
     };
     
 
-    struct fancyFindInfo fancyFind(int val) const;
+    fancyFindInfo fancyFind(int val) const;
     void makeRoot(int u);
 public:
 
@@ -196,7 +196,7 @@ bool UFRootInfo<T>::isRoot(int n) {
 
 
 template <typename T>
-struct RerootedUnionFind<T>::fancyFindInfo RerootedUnionFind<T>::fancyFind(int val) const {
+typename RerootedUnionFind<T>::fancyFindInfo RerootedUnionFind<T>::fancyFind(int val) const {
     assert(val >= 0);
     assert(val < size);
     int i = val;
@@ -205,7 +205,7 @@ struct RerootedUnionFind<T>::fancyFindInfo RerootedUnionFind<T>::fancyFind(int v
         i = parents[i];
         count++;
     }
-    struct fancyFindInfo v;
+    fancyFindInfo v;
     v.lengthUntilRoot = count;
     v.repr = i;
     return v;
@@ -291,8 +291,8 @@ bool RerootedUnionFind<T>::isRoot(int i) {
 template <typename T>
 std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
     std::vector<int> path;
-    //struct fancyFindInfo uinfo = fancyFind(u);
-    //struct fancyFindInfo vinfo = fancyFind(v);
+    //fancyFindInfo uinfo = fancyFind(u);
+    //fancyFindInfo vinfo = fancyFind(v);
     //if(uinfo.repr != vinfo.repr)
     //    return path;
     if(u==v)
@@ -300,8 +300,7 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
     int i = v;//(uinfo.lengthUntilRoot > vinfo.lengthUntilRoot) ? u : v;
     int limit = (i==u) ? v : u;
       
-    int seen[size];
-    std::memset(seen, -1, size*sizeof(int));
+    std::vector<int> seen(size, -1);
     while (i != limit && i != parents[i]) { //We stop at the root
         path.push_back(i);
         seen[i] = path.size() -1;
