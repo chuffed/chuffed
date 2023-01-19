@@ -87,7 +87,7 @@ explained by some combination of the literals in the SAT solver. An explanation
 is of the form a_1 /\ ... /\ a_n -> d, where a_i represent domain restrictions
 which are currently true, and d represents the domain change that is implied.
 e.g. Suppose z >= x + y, and we have x >= 3, y >= 2. Then the propagator would
-propagate x >= 5 with explanation clause x >= 3 /\ y >= 2 -> z >= 5.
+propagate z >= 5 with explanation clause x >= 3 /\ y >= 2 -> z >= 5.
 
 The explanations for each propagation form an implication graph. This allows us
 to do three very important things. Firstly, we can derive a nogood to explain
