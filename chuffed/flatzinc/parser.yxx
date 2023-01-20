@@ -474,7 +474,7 @@ namespace FlatZinc {
 %type <bValue> minmax
 
 %type <argVec> annotations annotations_head
-%type <arg> annotation annotation_list
+%type <arg> annotation annotation_list annotation_olist
 
 %%
 
@@ -1753,12 +1753,22 @@ annotation_list :
             $$->append($3); 
         }
 
+annotation_olist:
+        /* empty */
+        {
+            $$ = new AST::Array(0);
+        }
+    |   annotation_list
+        {
+            $$ = $1;
+        }
+
 annotation_expr :
         ann_non_array_expr
         { 
             $$ = $1; 
         }
-    |   '[' annotation_list ']'
+    |   '[' annotation_olist ']'
         { 
             $$ = $2; 
         }
