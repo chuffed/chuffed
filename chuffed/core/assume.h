@@ -46,15 +46,15 @@ void pushback_reason(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
       Lit q(out_nogood[i]);
       if(is_extractable(q)) continue;
       assert(!sat.reason[var(q)].isLazy());
-      Clause& c = *sat.getExpl(~q);
-      assert(&c != nullptr);
+      Clause* c = sat.getExpl(~q);
+      assert(c != nullptr);
       removed.push(q);
       out_nogood[i] = out_nogood.last();
       out_nogood.pop();
       --i;
 
-      for(int j = 1; j < c.size(); j++) {
-        Lit r(c[j]);
+      for(int j = 1; j < c->size(); j++) {
+        Lit r((*c)[j]);
         if(!(sat.seen[var(r)]&1)) {
           sat.seen[var(r)] |= 1;
           if(sat.trailpos[var(r)] < 0)

@@ -42,63 +42,63 @@ std::stringstream output_buffer;
 
 const char* irel_str[] = { " = ", " != ", " <= ", " > " };
  
-std::string get_bv_string(BoolView b) {
+std::string get_bv_string(BoolView b, bool tryIntDom) {
   std::string s;
   
-#if 0  
-  // Alternate version: prioritise intvars.
-  Lit l(b.getLit(true));
-  ChannelInfo ci(sat.c_info[var(l)]);
-  if(ci.cons_type == 1 && !(s = intVarString[engine.vars[ci.cons_id]]).empty()) {
-    // Int literal
-    std::stringstream ss;
-    ss << s;
-    ss << irel_str[2 * ci.cons_type + b.getSign()];
-    ss << ci.val;
-    return ss.str();
+  if (tryIntDom) {
+    // Alternate version: prioritise intvars.
+    Lit l(b.getLit(true));
+    ChannelInfo ci(sat.c_info[var(l)]);
+    if(ci.cons_type == 1 && !(s = intVarString[engine.vars[ci.cons_id]]).empty()) {
+      // Int literal
+      std::stringstream ss;
+      ss << s;
+      ss << irel_str[2 * ci.cons_type + b.getSign()];
+      ss << ci.val;
+      return ss.str();
+    } else {
+      s = boolVarString[b];
+      if(s.empty()) {
+        BoolView o(b);
+        o.setSign(!o.getSign());
+        std::string ostring = boolVarString[o];
+        if(!ostring.empty()) {
+          s = "~ " + ostring;
+        } else {
+          s = "<UNKNOWN>";
+        }
+      }
+      return s;
+    }
   } else {
-    s = boolVarString[b];
-    if(s.empty()) {
+    // See if b or ~b have names.
+    std::string bvstring = boolVarString[b];
+    if(bvstring.empty()) {
       BoolView o(b);
       o.setSign(!o.getSign());
       std::string ostring = boolVarString[o];
-      if(!ostring.empty()) {
-        s = "~ " + ostring;
+      if (ostring.empty()) {
+        // Maybe it's attached to a (named) intvar.
+        Lit l(b.getLit(true));
+        ChannelInfo ci(sat.c_info[var(l)]);
+        std::string ivstring;
+        if(ci.cons_type == 1 && !(ivstring = intVarString[engine.vars[ci.cons_id]]).empty()) {
+          // If it is, return the denotation of b.
+          std::stringstream ss;
+          ss << ivstring;
+          ss << irel_str[2 * ci.cons_type + b.getSign()];
+          ss << ci.val;
+          return ss.str();
+        } else {
+          return "<UNKNOWN>";
+        }
       } else {
-        s = "<UNKNOWN>";
-      }
-    }
-    return s;
-  }
-#else
-  // See if b or ~b have names.
-  std::string bvstring = boolVarString[b];
-  if(bvstring.empty()) {
-    BoolView o(b);
-    o.setSign(!o.getSign());
-    std::string ostring = boolVarString[o];
-    if (ostring.empty()) {
-      // Maybe it's attached to a (named) intvar.
-      Lit l(b.getLit(true));
-      ChannelInfo ci(sat.c_info[var(l)]);
-      std::string ivstring;
-      if(ci.cons_type == 1 && !(ivstring = intVarString[engine.vars[ci.cons_id]]).empty()) {
-        // If it is, return the denotation of b.
-        std::stringstream ss;
-        ss << ivstring;
-        ss << irel_str[2 * ci.cons_type + b.getSign()];
-        ss << ci.val;
-        return ss.str();
-      } else {
-        return "<UNKNOWN>";
+        return "~ " + ostring;
       }
     } else {
-      return "~ " + ostring;
+      return bvstring;
     }
-  } else {
-    return bvstring;
   }
-#endif
 }
 
 int main(int argc, char** argv) {
@@ -151,9 +151,9 @@ int main(int argc, char** argv) {
     engine.retrieve_assumption_nogood(ng);
     std::cout << "% [";
     if(ng.size() > 0) {
-      std::cout << get_bv_string(ng[0]);
+      std::cout << get_bv_string(ng[0], so.assump_int);
       for(int ii = 1; ii < ng.size(); ii++) {
-        std::cout << ", " << get_bv_string(ng[ii]);
+        std::cout << ", " << get_bv_string(ng[ii], so.assump_int);
       }
     }
     std::cout << "]" << std::endl;
