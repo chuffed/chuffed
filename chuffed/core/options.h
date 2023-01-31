@@ -135,6 +135,8 @@ public:
 	bool alldiff_cheat;              // if n vars over n vals, enforce that all vals are taken
 	bool alldiff_stage;              // if bounds or domain consistency, put value propagator too
 
+    bool assump_int;                 // Try and convert assumptions back to integer domain expressions.
+
 #ifdef HAS_PROFILER
   // CP Profiler
   bool cpprofiler_enabled;

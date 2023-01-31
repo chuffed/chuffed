@@ -27,6 +27,7 @@
     ["--sort-learnt-level", "Sort literals in a learnt clause based on their decision level", "bool", "false"],
     ["--one-watch", "Watch only one literal in a learn clause", "bool:on:off", "true"],
     ["--bin-clause-opt", "Optimise learnt clauses of length 2", "bool:on:off", "true"],
+    ["--assump-int", "Try and convert assumptions from the assumption interface back to integer domain expressions", "bool:on:off", "false"],
     ["--introduced-heuristic", "Decide if variable is introduced based on its name", "bool", "false"],
     ["--use-var-is-introduced", "Decide if variable is introduced based on var_is_introduced annotation", "bool", "false"],
     ["--exclude-introduced", "Exclude introduced variables from learnt clauses", "bool", "false"],

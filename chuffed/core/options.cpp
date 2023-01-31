@@ -94,6 +94,7 @@ Options::Options() :
 
 	, alldiff_cheat(true)
 	, alldiff_stage(true)
+  , assump_int(false)
 #ifdef HAS_PROFILER
   , cpprofiler_enabled(false)
   , cpprofiler_id(-1)
@@ -335,6 +336,8 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
   "     Watch only one literal in a learn clause (default " << (def.one_watch ? "on" : "off") << ").\n"
   "  --bin-clause-opt [on|off], --no-bin-clause-opt\n"
   "     Optimise learnt clauses of length 2 (default " << (def.bin_clause_opt ? "on" : "off") << ").\n"
+  "  --assump-int [on|off], --no-assump-int\n"
+  "     Try and convert assumptions from the assumption interface back to integer domain expressions (default " << (def.assump_int ? "on" : "off") << ").\n"
   "\n"
   "Introduced Variable Options:\n"
   "  --introduced-heuristic [on|off], --no-introduced-heuristic\n"
@@ -539,6 +542,8 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
       so.exhaustive_activity = boolBuffer;
     } else if (cop.getBool("--bin-clause-opt", boolBuffer)) {
       so.bin_clause_opt = boolBuffer;
+    } else if (cop.getBool("--assump-int", boolBuffer)) {
+      so.assump_int = boolBuffer;
     } else if (cop.get("--eager-limit", &intBuffer)) {
       so.eager_limit = intBuffer;
     } else if (cop.get("--sat-var-limit", &intBuffer)) {
