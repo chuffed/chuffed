@@ -6,4 +6,5 @@ check_required_components(chuffed chuffed_fzn)
 
 set(CHUFFED_LIBRARIES chuffed chuffed_fzn)
 set(CHUFFED_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/../../../${CMAKE_INSTALL_INCLUDEDIR})
+set(CHUFFED_SHARE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR})
 set(CHUFFED_FOUND TRUE)
