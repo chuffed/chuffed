@@ -310,33 +310,42 @@ namespace FlatZinc {
 
     void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
         vec<Lit> decs;
-        AST::Call *call = elemAnn->getCall("warm_start_int");
-        /*
-        AST::Array* vars = call->args->getArray();
-        for(int ii = 0; ii < vars->a.size(); ii++)
-        decs.push(bv[vars->a[ii]->getBoolVar()].getLit(1));
-        */
-        AST::Array* args = call->getArgs(2);
-        AST::Array* vars = args->a[0]->getArray();
-        AST::Array* vals = args->a[1]->getArray();
-        if(vars->a.size() != vals->a.size()) {
-            fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
-        }
-        int sz = min(vars->a.size(), vals->a.size());
-        for(int ii = 0; ii < sz; ii++) {
-            IntVar* x(iv[vars->a[ii]->getIntVar()]);
-            int k(vals->a[ii]->getInt());
-            switch(x->getType()) {
-                case INT_VAR_EL:
-                case INT_VAR_SL:
-                    decs.push(x->getLit(k, 1));
-                    break;
-                default:
-                    // Fallback. TODO: Do something nicer here.
-                    BoolView r = ::newBoolVar();
-                    int_rel_reif(x, IRT_EQ, k, r);
-                    decs.push(r.getLit(true));
-                    break;
+        if (elemAnn->isCall("warm_start_bool")) {
+            AST::Call *call = elemAnn->getCall("warm_start_bool");
+            AST::Array* args = call->getArgs(2);
+            AST::Array* vars = args->a[0]->getArray();
+            AST::Array* vals = args->a[1]->getArray();
+            if(vars->a.size() != vals->a.size()) {
+                fprintf(stderr, "WARNING: length mismatch in warm_start_bool annotation.\n");
+            }
+            int sz = min(vars->a.size(), vals->a.size());
+            for(int ii = 0; ii < sz; ii++) {
+                decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
+            }
+        } else {
+            AST::Call *call = elemAnn->getCall("warm_start_int");
+            AST::Array* args = call->getArgs(2);
+            AST::Array* vars = args->a[0]->getArray();
+            AST::Array* vals = args->a[1]->getArray();
+            if(vars->a.size() != vals->a.size()) {
+                fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
+            }
+            int sz = min(vars->a.size(), vals->a.size());
+            for(int ii = 0; ii < sz; ii++) {
+                IntVar* x(iv[vars->a[ii]->getIntVar()]);
+                int k(vals->a[ii]->getInt());
+                switch(x->getType()) {
+                    case INT_VAR_EL:
+                    case INT_VAR_SL:
+                        decs.push(x->getLit(k, 1));
+                        break;
+                    default:
+                        // Fallback. TODO: Do something nicer here.
+                        BoolView r = ::newBoolVar();
+                        int_rel_reif(x, IRT_EQ, k, r);
+                        decs.push(r.getLit(true));
+                        break;
+                }
             }
         }
         branching->add(new WarmStartBrancher(decs));
@@ -351,7 +360,7 @@ namespace FlatZinc {
         }
         else if (elemAnn->isCall("priority_search")) {
             parseSolveAnnPrioritySearch(elemAnn, branching, nbNonEmptySearchAnnotations);    
-        } else if (elemAnn->isCall("warm_start_int")) {
+        } else if (elemAnn->isCall("warm_start_int") || elemAnn->isCall("warm_start_bool")) {
             parseSolveAnnWarmStart(elemAnn, branching, nbNonEmptySearchAnnotations);
         }
         else {

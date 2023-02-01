@@ -100,9 +100,8 @@ predicate int_lt_imp(var int: a, var int: b, var bool: r);
 % `warm_start` annotation is overloaded on the FlatZinc level, the following
 % definitions disambiguate these annotations within Chuffed.
 
-%%% TODO: Directly support warm start on Booleans!
-% annotation warm_start_bool(array[int] of var bool: x, array[int] of bool: v);
-annotation warm_start(array[int] of var bool: x, array[int] of bool: v) = warm_start_int([bool2int(xi) | xi in x], [bool2int(vi) | vi in v]);
+annotation warm_start_bool(array[int] of var bool: x, array[int] of bool: v);
+annotation warm_start(array[int] of var bool: x, array[int] of bool: v) = warm_start_bool(x, v);
 annotation warm_start_int(array[int] of var int: x, array[int] of int: v);
 annotation warm_start(array[int] of var int: x, array[int] of int: v) = warm_start_int(x, v);
 annotation warm_start_float(array[int] of var float: x, array[int] of float: v);
