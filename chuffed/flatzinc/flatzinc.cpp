@@ -310,7 +310,7 @@ namespace FlatZinc {
 
     void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* branching, int& nbNonEmptySearchAnnotations) {
         vec<Lit> decs;
-        AST::Call *call = elemAnn->getCall("warm_start");
+        AST::Call *call = elemAnn->getCall("warm_start_int");
         /*
         AST::Array* vars = call->args->getArray();
         for(int ii = 0; ii < vars->a.size(); ii++)
@@ -320,7 +320,7 @@ namespace FlatZinc {
         AST::Array* vars = args->a[0]->getArray();
         AST::Array* vals = args->a[1]->getArray();
         if(vars->a.size() != vals->a.size()) {
-            fprintf(stderr, "WARNING: length mismatch in warm_start annotation.\n");
+            fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
         }
         int sz = min(vars->a.size(), vals->a.size());
         for(int ii = 0; ii < sz; ii++) {
@@ -351,7 +351,7 @@ namespace FlatZinc {
         }
         else if (elemAnn->isCall("priority_search")) {
             parseSolveAnnPrioritySearch(elemAnn, branching, nbNonEmptySearchAnnotations);    
-        } else if (elemAnn->isCall("warm_start")) {
+        } else if (elemAnn->isCall("warm_start_int")) {
             parseSolveAnnWarmStart(elemAnn, branching, nbNonEmptySearchAnnotations);
         }
         else {
