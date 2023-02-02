@@ -60,6 +60,7 @@ public:
 
       if(!x->indomain(s) && !x->indomain(t))
         continue;
+      xs.push(x);
 
       if(x->isFixed() && x->getVal() == t) {
         t_seen = true;
