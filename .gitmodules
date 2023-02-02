@@ -1,3 +1,0 @@
-[submodule "cp-profiler-integration"]
-	path = submodules/cp-profiler-integration
-	url = https://gitlab.com/minizinc/cp-profiler-integration.git
