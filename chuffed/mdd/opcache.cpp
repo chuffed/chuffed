@@ -2,7 +2,7 @@
 #include <climits>
 #include <chuffed/mdd/opcache.h>
 
-#include <chuffed/mdd/MurmurHash3.h>
+#include <thirdparty/MurmurHash3/MurmurHash3.h>
 
 #define USE_MURMURHASH
 

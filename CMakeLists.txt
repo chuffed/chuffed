@@ -104,7 +104,6 @@ add_library(chuffed
   chuffed/mdd/MDD.cpp
   chuffed/mdd/mdd_prop.cpp
   chuffed/mdd/mdd_to_lgraph.cpp
-  chuffed/mdd/MurmurHash3.cpp
   chuffed/mdd/opcache.cpp
   chuffed/mdd/weighted_dfa.cpp
   chuffed/mdd/wmdd_prop.cpp
@@ -160,7 +159,6 @@ add_library(chuffed
   chuffed/mdd/MDD.h
   chuffed/mdd/mdd_prop.h
   chuffed/mdd/mdd_to_lgraph.h
-  chuffed/mdd/MurmurHash3.h
   chuffed/mdd/opcache.h
   chuffed/mdd/opts.h
   chuffed/mdd/sorters.h
@@ -175,6 +173,8 @@ add_library(chuffed
   chuffed/core/sat-types.h
   chuffed/core/options.h
   chuffed/core/propagator.h
+  thirdparty/MurmurHash3/MurmurHash3.cpp
+  thirdparty/MurmurHash3/MurmurHash3.h
   ${CHUFFED_PROFILER_SOURCES}
   ${VAR_IMPACT_SOURCES}
 )

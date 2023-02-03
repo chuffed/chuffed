@@ -1,6 +1,5 @@
 #ifndef __WEIGHTED_DFA_H__
 #define __WEIGHTED_DFA_H__
-#include <chuffed/mdd/MurmurHash3.h>
 #include <chuffed/support/vec.h>
 #include <unordered_map>
 #include <memory>
@@ -128,26 +127,7 @@ protected:
 
   struct hashnode
   {
-     unsigned int operator()(const NodeRef a1) const
-     {
-        unsigned int hash = 5381;
-        
-        hash = ((hash << 5) + hash) + a1->var; 
-        hash = ((hash << 5) + hash) + a1->sz;
-#if 0
-        for(unsigned int ii = 0; ii < a1->sz; ii++)
-        {
-           hash = ((hash << 5) + hash) + a1->edges[ii].val;
-           hash = ((hash << 5) + hash) + a1->edges[ii].weight;
-           hash = ((hash << 5) + hash) + a1->edges[ii].dest;
-        }
-        return (hash & 0x7FFFFFFF);
-#else
-        uint32_t ret;
-        MurmurHash3_x86_32(&(a1->edges), sizeof(EInfo)*a1->sz, hash, &ret);
-        return ret;
-#endif
-     }
+     unsigned int operator()(const NodeRef a1) const;
   };
 
   typedef std::unordered_map<const NodeRef, NodeID, hashnode, eqnode> NodeCache;
