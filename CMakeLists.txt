@@ -191,14 +191,14 @@ if(BISON_FOUND)
   bison_target(FZNParser
     ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
     ${PROJECT_BINARY_DIR}/parser.tab.cpp
-    DEFINES_FILE ${PROJECT_BINARY_DIR}/chuffed/flatzinc/parser.tab.h
+    DEFINES_FILE ${PROJECT_BINARY_DIR}/chuffed/flatzinc/generated_parser/parser.tab.h
     COMPILE_FLAGS "-l"
   )
 else()
   message(WARNING "Bison cannot be run. Using cached file, which may be out of date.")
   set(BISON_FZNParser_OUTPUTS
-    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.cpp
-    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.tab.h
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/parser.tab.cpp
+    ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/parser.tab.h
   )
 endif()
 
@@ -212,7 +212,7 @@ if(FLEX_FOUND AND BISON_FOUND)
   add_flex_bison_dependency(FZNLexer FZNParser)
 else()
   message(WARNING "Flex cannot be run. Using cached file, which may be out of date.")
-  set(FLEX_FZNLexer_OUTPUTS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/lexer.yy.cpp)
+  set(FLEX_FZNLexer_OUTPUTS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/lexer.yy.cpp)
 endif()
 
 add_library(chuffed_fzn

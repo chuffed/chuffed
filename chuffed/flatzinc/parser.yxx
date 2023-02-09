@@ -21,7 +21,7 @@
  */
 
 %define api.pure
-%define api.header.include {<chuffed/flatzinc/parser.tab.h>}
+%define api.header.include {<chuffed/flatzinc/generated_parser/parser.tab.h>}
 
 %lex-param {YYLEX_PARAM}
 %parse-param {void *parm}
@@ -34,7 +34,7 @@
 #include <sstream>
 
 #include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/flatzinc/parser.tab.h>
+#include <chuffed/flatzinc/generated_parser/parser.tab.h>
 
 #ifdef HAVE_MMAP
 #include <stdio.h>

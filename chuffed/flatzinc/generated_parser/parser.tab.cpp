@@ -76,7 +76,7 @@
 #include <sstream>
 
 #include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/flatzinc/parser.tab.h>
+#include <chuffed/flatzinc/generated_parser/parser.tab.h>
 
 #ifdef HAVE_MMAP
 #include <stdio.h>
@@ -442,7 +442,7 @@ namespace FlatZinc {
 #  endif
 # endif
 
-#include <chuffed/flatzinc/parser.tab.h>
+#include <chuffed/flatzinc/generated_parser/parser.tab.h>
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
