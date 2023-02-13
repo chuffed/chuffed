@@ -86,15 +86,19 @@ inline Lit IntVarLL::getGELit(int v) {
 	if (v > max) return getMaxLit(); 
 	assert(v >= min);
 	int ni = li;
-	while (ld[ni].val < v-1) { ni = ld[ni].next; assert(0 <= ni && ni < ld.size()); }
-	if (ld[ni].val == v-1) return Lit(ld[ni].var, 1);
+	int prev = prevDomVal(v);
+	if(vals && !vals[v]) {
+		v = nextDomVal(v);
+	}
+	while (ld[ni].val < prev) { ni = ld[ni].next; assert(0 <= ni && ni < ld.size()); }
+	if (ld[ni].val == prev) return Lit(ld[ni].var, 1);
 	// overshot, create new var and insert before ni
 	int mi = getLitNode();
 #if DEBUG_VERBOSE
-        std::cerr << "created new literal: " << mi << ": " << this << " >= " << v << "\n";
+        std::cerr << "created new literal: " << mi << ": " << varLabel << "(" << this << ") >= " << v << " || "  << varLabel << "(" << this << ") <= " << prev << "\n";
 #endif
-	ld[mi].var = sat.getLazyVar(ChannelInfo(var_id, 1, 1, v-1));
-	ld[mi].val = v-1;
+	ld[mi].var = sat.getLazyVar(ChannelInfo(var_id, 1, 1, prev));
+	ld[mi].val = prev;
 	ld[mi].next = ni;
 	ld[mi].prev = ld[ni].prev;
 	ld[ni].prev = mi;
@@ -104,7 +108,7 @@ inline Lit IntVarLL::getGELit(int v) {
         ss << varLabel << ">=" << v;
         litString.insert(make_pair(ld[mi].var*2+1, ss.str()));
         ss.str("");
-        ss << varLabel << "<=" << v-1;
+        ss << varLabel << "<=" << prev;
         litString.insert(make_pair(ld[mi].var*2, ss.str()));
 
 	return Lit(ld[mi].var, 1);
@@ -112,27 +116,7 @@ inline Lit IntVarLL::getGELit(int v) {
 
 inline Lit IntVarLL::getLELit(int v) {
 	if (v < min) return getMinLit(); 
-	assert(v <= max);
-	int ni = hi;
-	while (ld[ni].val > v) { ni = ld[ni].prev; assert(0 <= ni && ni < ld.size()); }
-	if (ld[ni].val == v) return Lit(ld[ni].var, 0);
-	// overshot, create new var and insert before ni
-	int mi = getLitNode();
-	ld[mi].var = sat.getLazyVar(ChannelInfo(var_id, 1, 1, v));
-	ld[mi].val = v;
-	ld[mi].prev = ni;
-	ld[mi].next = ld[ni].next;
-	ld[ni].next = mi;
-	ld[ld[mi].next].prev = mi;
-
-        std::stringstream ss;
-        ss << varLabel << ">=" << v+1;
-        litString.insert(make_pair(ld[mi].var*2+1, ss.str()));
-        ss.str("");
-        ss << varLabel << "<=" << v;
-        litString.insert(make_pair(ld[mi].var*2, ss.str()));
-
-        return Lit(ld[mi].var, 0);
+	return ~getGELit(v+1);
 }
 
 Lit IntVarLL::getLit(int64_t v, int t) {
@@ -150,10 +134,11 @@ Lit IntVarLL::getLit(int64_t v, int t) {
 inline void IntVarLL::channelMin(int v, Lit p) {
 	Reason r(~p);
 	int ni;
-	for (ni = ld[li].next; ld[ni].val < v-1; ni = ld[ni].next) {
+	int prev = prevDomVal(v);
+	for (ni = ld[li].next; ld[ni].val < prev; ni = ld[ni].next) {
 		sat.cEnqueue(Lit(ld[ni].var, 1), r);
 	}
-	assert(ld[ni].val == v-1);
+	assert(ld[ni].val == prev);
 	li = ni;
 }
 
@@ -161,6 +146,7 @@ inline void IntVarLL::channelMin(int v, Lit p) {
 inline void IntVarLL::channelMax(int v, Lit p) {
 	Reason r(~p);
 	int ni;
+	assert(!vals || vals[v]);
 	for (ni = ld[hi].prev; ld[ni].val > v; ni = ld[ni].prev) {
 		sat.cEnqueue(Lit(ld[ni].var, 0), r);
 	}
@@ -178,10 +164,8 @@ inline void IntVarLL::updateFixed() {
 
 bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
-	if (vals) {
-		while (!vals[v] && v <= max) {
-			v++;
-		}
+	if (vals && !vals[v]) {
+		v = nextDomVal(v);
 	}
 	Lit p = getGELit(v);
 	if (channel) sat.cEnqueue(p, r);
@@ -195,10 +179,8 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 
 bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
-	if (vals) {
-		while (!vals[v] && v >= min) {
-			v--;
-		}
+	if (vals && !vals[v]) {
+		v = prevDomVal(v);
 	}
 	Lit p = getLELit(v);
 	if (channel) sat.cEnqueue(p, r);
