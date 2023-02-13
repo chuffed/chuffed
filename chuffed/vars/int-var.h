@@ -167,6 +167,24 @@ public:
 	bool indomain(int64_t v) const {
 		return v >= min && v <= max && (!vals || vals[v]);
 	}
+	int64_t nextDomVal(int64_t v) const {
+		v++;
+		if (vals) {
+			while(!vals[v] && v <= max) {
+				v++;
+			}
+		}
+		return v;
+	}
+	int64_t prevDomVal(int64_t v) const {
+		v--;
+		if (vals) {
+			while(!vals[v] && v >= min) {
+				v--;
+			}
+		}
+		return v;
+	}
 
 	class iterator {
 		const IntVar* var;
