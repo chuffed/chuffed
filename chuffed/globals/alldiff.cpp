@@ -865,15 +865,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		if (x[i]->getMax() > max) max = x[i]->getMax();
 	}
 	int range = max + 1 - min;
-	if (cl == CL_BND) {
-		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i],1,-min));
-		if (min == 0) new AllDiffBounds<0>(u, range);
-		else          new AllDiffBounds<4>(u, range);
-		if (!so.alldiff_stage)
-			return;
-	}
-	else if (cl == CL_DOM) {
+	if (cl == CL_DOM) {
 		vec<IntView<> > u;
 		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i],1,-min));
 		if (min == 0) new AllDiffDomain<0>(u, range);
@@ -881,6 +873,19 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		if (!so.alldiff_stage)
 			return;
 	}
+    else {
+        // NOTE that the bounds propagator will be posted temporarily, unless the
+        // consistency level is specified as "domain". There is an issue with the
+        // value propagator in the case "IntVarLL" integer variables are involved
+        // (see Issue #10). In the future, it needs to be decided how to 
+        // permamently fix this issue.
+		vec<IntView<> > u;
+		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i],1,-min));
+		if (min == 0) new AllDiffBounds<0>(u, range);
+		else          new AllDiffBounds<4>(u, range);
+		if (!so.alldiff_stage && cl == CL_BND)
+			return;
+    }
 	vec<IntView<> > u;
 	for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i],1,-min));
 	if (min == 0) new AllDiffValue<0>(u, range);

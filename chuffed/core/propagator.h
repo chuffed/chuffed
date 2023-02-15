@@ -28,6 +28,8 @@ Assumptions:
 #include <chuffed/core/sat.h>
 //#include "core/prop-group.h"
 
+// Propagation onsistency levels for, e.g., alldifferent: 
+//      default, value, bound, domain
 enum ConLevel { CL_DEF, CL_VAL, CL_BND, CL_DOM };
 
 class Propagator {
