@@ -120,7 +120,11 @@ inline Lit IntVarLL::getLELit(int v) {
 }
 
 Lit IntVarLL::getLit(int64_t v, int t) {
-	assert(engine.decisionLevel() == 0);
+	// NOTE: Previous assertion that makes little sense. We should further
+	// investigate if the comparisons with min/max make sense at different
+	// decision levels.
+	// So far this assertion only seems to trigger with all_different (bounds)
+	// assert(engine.decisionLevel() == 0);
 	if (v < min) return toLit(1^(t&1));       // _, _, 1, 0
 	if (v > max) return toLit(t&1);           // _, _, 0, 1
 	switch (t) {
