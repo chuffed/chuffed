@@ -281,9 +281,9 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
     //    vector<SetFinder<BITSET_SIZE> >(nb_nodes, SetFinder<BITSET_SIZE>());
     
 #if BITSET_SIZE > 50
-    table = vector<boost::unordered_map<size_t,tuple> >(nb_nodes, boost::unordered_map<size_t,tuple>());
+    table = vector<std::unordered_map<size_t,tuple> >(nb_nodes, std::unordered_map<size_t,tuple>());
 #else
-    table = vector<boost::unordered_map<ulong,tuple> >(nb_nodes, boost::unordered_map<ulong,tuple>());
+    table = vector<std::unordered_map<ulong,tuple> >(nb_nodes, std::unordered_map<ulong,tuple>());
 #endif
 
     if (!use_set_target) { //Create the target bitset here
@@ -361,9 +361,8 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
     table[source][hash_fn(mandS)] = initial;
     //tries[source].add(mandS,duration(source));
 
-    q = boost::heap::priority_queue<tuple, boost::heap::compare<DijkstraMandatory::Priority> >();
-    //q = std::priority_queue<tuple, std::vector<tuple>, 
-    //                        DijkstraMandatory::Priority>();
+    q = std::priority_queue<tuple, std::vector<tuple>, 
+                           DijkstraMandatory::Priority>();
     q.push(initial);
 
     int minToDest = -1;

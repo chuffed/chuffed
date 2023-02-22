@@ -537,7 +537,7 @@ protected:
     }
 
     bool _check_expl_mand(std::vector<int> forbidden, int limit) {
-        std::vector<boost::unordered_map<size_t,DijkstraMandatory::tuple> > table;
+        std::vector<std::unordered_map<size_t,DijkstraMandatory::tuple> > table;
 
         std::vector<bool> is_forbidden = std::vector<bool>(nbEdges(), false);
         for (unsigned int i = 0; i < forbidden.size(); i++) {            
@@ -551,7 +551,7 @@ protected:
 
         table.clear();
         for (int i = 0; i < nbNodes(); i++){
-            table.push_back(boost::unordered_map<size_t,DijkstraMandatory::tuple>());
+            table.push_back(std::unordered_map<size_t,DijkstraMandatory::tuple>());
         }
         std::bitset<BITSET_SIZE> target;
         for (int i = 0; i < nbNodes(); i++) {
@@ -591,7 +591,7 @@ protected:
                 bool was_mand_other = top.mand[other];
                 if (target[other])
                     top.mand[other] = 1;
-                boost::unordered_map<size_t,DijkstraMandatory::tuple>::const_iterator it 
+                std::unordered_map<size_t,DijkstraMandatory::tuple>::const_iterator it 
                     = table[other].find(DijkstraMandatory::hash_fn(top.mand)/*.to_ulong()*/);
                 if (it != table[other].end()){
                     if ((it->second).cost <= top.cost + ws[e]) {
@@ -645,7 +645,7 @@ protected:
                 std::cout<<ct<<std::endl;
                 std::cout<<target<<std::endl;
                 std::cout<< minToDest<<" "<<limit<<std::endl;
-                boost::unordered_map<size_t,DijkstraMandatory::tuple>::const_iterator it = table[dest].begin();
+                std::unordered_map<size_t,DijkstraMandatory::tuple>::const_iterator it = table[dest].begin();
                 for ( ; it != table[dest].end(); ++it) {
                     std::cout << (it->second).node <<" "
                               << (it->second).path<< " "

@@ -102,8 +102,8 @@ void KosarajuSCC::__set_levels(int start, int sink) {
     std::vector< std::vector<int> > matrix = 
         std::vector< std::vector<int> >(nb_sccs(), std::vector<int>(nb_sccs(),0) );
 
-    level2mandscc = boost::unordered_map<int,int>();
-    mandscc2somenode = boost::unordered_map<int,int>();
+    level2mandscc = std::unordered_map<int,int>();
+    mandscc2somenode = std::unordered_map<int,int>();
     int edges = 0;
     int mand_sccs = 0;
     while (!s.empty()) {
@@ -195,8 +195,8 @@ void KosarajuSCC::topological_sort(int u, std::vector< std::vector<int> >& out,
     sort.push(u);
 }
 
-void KosarajuSCC::_set_levels(int u, bool vis[], 
-                 boost::unordered_map<int,bool>& mscc,
+void KosarajuSCC::_set_levels(int u, bool vis[],
+                 std::unordered_map<int,bool>& mscc,
                  int parent,
                  std::string des){
     // std::cout<<des;
@@ -226,7 +226,7 @@ void KosarajuSCC::_set_levels(int u, bool vis[],
             if (levels[scc_of(v)] <= levels[my_scc]) {
                 //std::cout<<des<<"levels < "<<u<<" "<<v<<std::endl;
                 bool is_mand = false;
-                boost::unordered_map<int,bool>::const_iterator it 
+                std::unordered_map<int,bool>::const_iterator it 
                     = mscc.find(my_scc);
                 if (it == mscc.end()) { 
                     std::vector<int> scc = get_scc(my_scc);
@@ -257,7 +257,7 @@ void KosarajuSCC::set_levels(int start, int sink) {
     //memset(visited,false , nb_nodes*sizeof(bool));
 
 
-    boost::unordered_map<int,bool> mand_sccs;
+    std::unordered_map<int,bool> mand_sccs;
     //levels[scc_of(sink)] = nb_nodes;
     //_set_levels(start,visited,mand_sccs);
     __set_levels(start,sink);
