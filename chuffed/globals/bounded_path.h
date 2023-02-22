@@ -290,7 +290,11 @@ class BoundedPathPropagator : public GraphPropagator{
             it = p->initial_mandatory_sp->table[here].begin();
 
             for ( ; it != p->initial_mandatory_sp->table[here].end(); ++it) {
-                if ((current.mand | (it->second).mand) == target) { //Union
+                std::vector<bool> mand_union(current.mand.size());
+                for (size_t i = 0; i < mand_union.size(); i++) {
+                    mand_union[i] = current.mand[i] | (it->second).mand[i];
+                }
+                if (mand_union == target) { //Union
                     int d = (it->second).cost;
                     if (d + cost_to_here > lim) {
                         return true;
@@ -330,7 +334,11 @@ class BoundedPathPropagator : public GraphPropagator{
 
                 DijkstraMandatory::table_iterator it = back->table[hd].begin();
                 for ( ; it != back->table[hd].end(); ++it) {
-                    if ((current.mand | (it->second).mand) == target) { //Union
+                    std::vector<bool> mand_union(current.mand.size());
+                    for (size_t i = 0; i < mand_union.size(); i++) {
+                        mand_union[i] = current.mand[i] | (it->second).mand[i];
+                    }
+                    if (mand_union == target) {
                         int d_hd = (it->second).cost; //inlcudes time spent in hd
                         int w_e = weight(e);
 
@@ -553,13 +561,13 @@ protected:
         for (int i = 0; i < nbNodes(); i++){
             table.push_back(std::unordered_map<size_t,DijkstraMandatory::tuple>());
         }
-        std::bitset<BITSET_SIZE> target;
+        std::vector<bool> target(nbNodes(), false);
         for (int i = 0; i < nbNodes(); i++) {
             target[i] = getNodeVar(i).isFixed() && getNodeVar(i).isTrue();
         }
         //Initialize Queue:
-        std::bitset<BITSET_SIZE> pathS; pathS[source] = 1;
-        std::bitset<BITSET_SIZE> mandS; mandS[source] = 1;
+        std::vector<bool> pathS(nbNodes(), false); pathS[source] = 1;
+        std::vector<bool> mandS(nbNodes(), false); mandS[source] = 1;
         DijkstraMandatory::tuple initial(source,0, pathS,mandS);
         table[source][DijkstraMandatory::hash_fn(mandS)/*.to_ulong()*/] = initial;
 
@@ -643,13 +651,22 @@ protected:
                 }
                 std::cout<<"Checked explanation::"<<std::endl;
                 std::cout<<ct<<std::endl;
-                std::cout<<target<<std::endl;
+                for (bool b : target){
+                    std::cout << b;
+                }
+                std::cout << std::endl;
                 std::cout<< minToDest<<" "<<limit<<std::endl;
                 std::unordered_map<size_t,DijkstraMandatory::tuple>::const_iterator it = table[dest].begin();
                 for ( ; it != table[dest].end(); ++it) {
-                    std::cout << (it->second).node <<" "
-                              << (it->second).path<< " "
-                              << (it->second).mand <<" " 
+                    std::cout << (it->second).node <<" ";
+                    for (bool b : (it->second).path){
+                        std::cout << b;
+                    }
+                    std::cout << " ";
+                    for (bool b : (it->second).mand){
+                        std::cout << b;
+                    }
+                    std::cout << " " 
                               << (it->second).cost<<std::endl;
                 }   
                 std::cout<<"::"<<std::endl;

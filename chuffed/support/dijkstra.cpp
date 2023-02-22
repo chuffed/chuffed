@@ -280,16 +280,12 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
     //vector<SetFinder<BITSET_SIZE> > tries = 
     //    vector<SetFinder<BITSET_SIZE> >(nb_nodes, SetFinder<BITSET_SIZE>());
     
-#if BITSET_SIZE > 50
     table = vector<std::unordered_map<size_t,tuple> >(nb_nodes, std::unordered_map<size_t,tuple>());
-#else
-    table = vector<std::unordered_map<ulong,tuple> >(nb_nodes, std::unordered_map<ulong,tuple>());
-#endif
 
     if (!use_set_target) { //Create the target bitset here
 
 
-        target.reset();
+        target = std::vector<bool>(target.size(), false);
         vector<int>& mands = mandatory_nodes();
 
 #ifdef CLUSTERING
@@ -346,8 +342,8 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
     target[source] = 1;
     target[dest] = 1;
 #ifdef SCC_REASONING
-    vector<std::bitset<BITSET_SIZE> > target_sccs 
-        = vector<std::bitset<BITSET_SIZE> >(nb_nodes+1,std::bitset<BITSET_SIZE>());
+    vector<std::vector<bool> > target_sccs 
+        = vector<std::vector<bool> >(nb_nodes+1,std::vector<bool>(nb_nodes, false));
     for (int i = 0; i < nb_nodes; i++) {
         target_sccs[sccs->level_of_scc(sccs->scc_of(i))][i] = target[i]; 
     }
@@ -355,8 +351,8 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 #endif
 
     //Initialize Queue:
-    std::bitset<BITSET_SIZE> pathS; pathS[source] = 1;
-    std::bitset<BITSET_SIZE> mandS; mandS[source] = 1;
+    std::vector<bool> pathS(nb_nodes, false); pathS[source] = 1;
+    std::vector<bool> mandS(nb_nodes, false); mandS[source] = 1;
     tuple initial(source,duration(source), pathS,mandS);
     table[source][hash_fn(mandS)] = initial;
     //tries[source].add(mandS,duration(source));
@@ -434,7 +430,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 
             
             /*//TODO! Find cheapest superset in sfs[other], if cheaper than me, dont enqueu
-            vector<std::bitset<BITSET_SIZE> > supersets;
+            vector<std::vector<bool> > supersets;
             vector<int > costs;
             if (_enqueue) {
                 tries[other].supersets(top.mand,supersets,costs);
@@ -462,7 +458,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
                 copy.node = other;
                 /*//TODO !Find all subsets in sfs[other]. If more expensive, mark them -1 on the table
                 // to not explore them. Remove them from sfs[other].
-                vector<std::bitset<BITSET_SIZE> > subsets;
+                vector<std::vector<bool> > subsets;
                 costs.clear();
                 tries[other].subsets(top.mand,subsets,costs,true, copy.cost);
                 if (subsets.size() > 0) {

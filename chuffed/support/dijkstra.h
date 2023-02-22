@@ -82,11 +82,6 @@ public:
 };
 
 
-#include <bitset>
-
-
-// Needs to be the numbr of nodes in the graph. 
-#define BITSET_SIZE 21
 // Use new SCC knowledge at each iteration to skip edges. This only
 // works with basic explanations.
 //#define INCREMENTAL_SCC_REASONING
@@ -123,14 +118,14 @@ public:
     struct tuple {
         tuple() : node(-1), cost(-1){
         }
-        tuple(int _node,int _cost, std::bitset<BITSET_SIZE> _path, std::bitset<BITSET_SIZE> _mand)
+        tuple(int _node,int _cost, std::vector<bool> _path, std::vector<bool> _mand)
             : node(_node), cost(_cost), path(_path), mand(_mand) {
             assert(cost>=0);
         }
         int node;
         int cost;
-        std::bitset<BITSET_SIZE> path;
-        std::bitset<BITSET_SIZE> mand;
+        std::vector<bool> path;
+        std::vector<bool> mand;
     };
     typedef DijkstraMandatory::tuple tuple;
 
@@ -167,26 +162,16 @@ private:
 
 
 protected:
-    std::bitset<BITSET_SIZE> target;
+    std::vector<bool> target;
     inline tuple& current_iteration() {return top;}
     std::priority_queue<tuple, std::vector<tuple>, 
                        DijkstraMandatory::Priority> q;
 public:
-#if BITSET_SIZE > 50
     std::vector< std::unordered_map<size_t,tuple> > table;
     typedef std::unordered_map<size_t,tuple> map_type;
-    static std::hash<std::bitset<BITSET_SIZE> > hash_fn;
+    static inline unsigned long hash_fn(std::vector<bool>& b) {std::hash<std::vector<bool>> h; return h(b); }
     typedef std::unordered_map<size_t,tuple>::const_iterator table_iterator;
-#else
-    typedef unsigned long ulong;
-    std::vector< std::unordered_map<ulong,tuple> > table;
-    typedef std::unordered_map<ulong,tuple> map_type;
-    static inline ulong hash_fn(std::bitset<BITSET_SIZE>& b) {return b.to_ulong();}
-    typedef std::unordered_map<ulong,tuple>::const_iterator table_iterator;
-#endif
     typedef std::vector< map_type > table_type;
-
-
 
     DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
                       std::vector<int> _ws);
@@ -230,18 +215,17 @@ public:
         return job.size()? job[n] : 0;
     }
 
-    inline void set_target(std::vector<int> tar) { 
-        target.reset();
+    inline void set_target(const std::vector<int>& tar) { 
+        target = std::vector<bool>(tar.size(), false);
         for (unsigned int i = 0; i < tar.size(); i++)
             target[tar[i]] = 1;
     }
-    inline void set_target(std::vector<bool> tar) { 
-        target.reset();
+    inline void set_target(const std::vector<bool>& tar) { 
+        target = std::vector<bool>(tar.size(), false);
         for (unsigned int i = 0; i < tar.size(); i++)
             target[i] = tar[i];
     }
-    inline void set_target(std::bitset<BITSET_SIZE> tar) { target = tar; }
-    inline std::bitset<BITSET_SIZE> get_target() { return target; }
+    inline const std::vector<bool>& get_target() { return target; }
 
 
     //Clustering features
