@@ -4,7 +4,7 @@
 #include <stack>
 #include <vector>
 #include <queue>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 class KosarajuSCC {
 protected:
@@ -16,8 +16,8 @@ protected:
     std::vector<int> scc;
     std::vector< std::vector<int> > sccs;
     std::vector<bool> is_mand;
-    boost::unordered_map<int,int> level2mandscc;
-    boost::unordered_map<int,int> mandscc2somenode;
+    std::unordered_map<int,int> level2mandscc;
+    std::unordered_map<int,int> mandscc2somenode;
     // Fills Stack with vertices (in increasing order of finishing
     // times). The top element of stack has the maximum finishing 
     // time
@@ -56,7 +56,7 @@ public:
                           std::queue<int>& sort,
                           std::vector<bool>& seen);
     void _set_levels(int u, bool vis[], 
-                     boost::unordered_map<int,bool>& mscc,
+                     std::unordered_map<int,bool>& mscc,
                      int parent = -1,
                      std::string dges = "");
     void set_levels(int start, int sink);

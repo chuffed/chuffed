@@ -24,7 +24,6 @@
 #include <submodules/cp-profiler-integration/message.hpp>
 #endif
 
-// #include <boost/date_time/posix_time/posix_time.hpp>
 
 Engine engine;
 
@@ -622,7 +621,6 @@ RESULT Engine::search(const std::string& problemLabel) {
   
     decisionLevelTip.push_back(1);
 
-    /* boost::posix_time::ptime start_time = boost::posix_time::microsec_clock::universal_time(); */
 
     while (true) {
         int nodeid = nextnodeid;
@@ -650,8 +648,6 @@ RESULT Engine::search(const std::string& problemLabel) {
         int previousDecisionLevel = decisionLevel();
 
         bool propResult = propagate();
-        /* boost::posix_time::ptime current_time = boost::posix_time::microsec_clock::universal_time(); */
-        /* boost::posix_time::time_duration dur = current_time - start_time; */
         long timeus = 0;
         //        long timeus = dur.total_microseconds();
         if (!propResult) {

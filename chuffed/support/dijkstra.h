@@ -4,12 +4,10 @@
 #include <vector>
 #include <queue> 
 #include <map> 
-#include <boost/unordered_map.hpp>
 #include <bitset>
 #include <functional> //For std::hash
 #include <chuffed/core/propagator.h> //For Tint
 #include <cassert>
-#include <boost/heap/priority_queue.hpp>
 #include <chuffed/support/kosaraju_scc.h>
 #include <chuffed/support/dynamic_kmeans.h>
 
@@ -85,7 +83,6 @@ public:
 };
 
 
-#include <boost/dynamic_bitset.hpp>
 #include <bitset>
 
 
@@ -173,21 +170,20 @@ private:
 protected:
     std::bitset<BITSET_SIZE> target;
     inline tuple& current_iteration() {return top;}
-    boost::heap::priority_queue<tuple, boost::heap::compare<DijkstraMandatory::Priority> > q;
-    //std::priority_queue<tuple, std::vector<tuple>, 
-    //                    DijkstraMandatory::Priority> q;
+    std::priority_queue<tuple, std::vector<tuple>, 
+                       DijkstraMandatory::Priority> q;
 public:
 #if BITSET_SIZE > 50
-    std::vector< boost::unordered_map<size_t,tuple> > table;
-    typedef boost::unordered_map<size_t,tuple> map_type;
+    std::vector< std::unordered_map<size_t,tuple> > table;
+    typedef std::unordered_map<size_t,tuple> map_type;
     static std::hash<std::bitset<BITSET_SIZE> > hash_fn;
-    typedef boost::unordered_map<size_t,tuple>::const_iterator table_iterator;
+    typedef std::unordered_map<size_t,tuple>::const_iterator table_iterator;
 #else
     typedef unsigned long ulong;
-    std::vector< boost::unordered_map<ulong,tuple> > table;
-    typedef boost::unordered_map<ulong,tuple> map_type;
+    std::vector< std::unordered_map<ulong,tuple> > table;
+    typedef std::unordered_map<ulong,tuple> map_type;
     static inline ulong hash_fn(std::bitset<BITSET_SIZE>& b) {return b.to_ulong();}
-    typedef boost::unordered_map<ulong,tuple>::const_iterator table_iterator;
+    typedef std::unordered_map<ulong,tuple>::const_iterator table_iterator;
 #endif
     typedef std::vector< map_type > table_type;
 
