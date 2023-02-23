@@ -22,6 +22,30 @@ function var int: range_size(var int: x) =
 
 predicate range_size_fzn(var int: x, var int: rs);
 
+
+/** @group chuffed 
+    Constrains the subgraph \a vs and \a es of a given directed graph to be a minimal spanning tree with weight \a K.
+
+    @param N: the number of nodes in the given graph
+    @param E: the number of edges in the given graph
+    @param from: the leaving node 1..\a N for each edge
+    @param to: the entering node 1..\a N for each edge
+    @param w: the weight of each edge
+    @param vs: a Boolean for each node whether it is in the subgraph
+    @param es: a Boolean for each edge whether it is in the subgraph
+    @param K: the cost of the edges in the minimal spanning tree
+*/
+predicate chuffed_minimal_spanning_tree(
+    int: N,
+    int: E,
+    array[int] of int: from,
+    array[int] of int: to,
+    array[int] of int: w,
+    array[int] of var bool: vs,
+    array[int] of var bool: es,
+    var int: K,
+);
+
 /***
  @groupdef chuffed.annotations Additional Chuffed search annotations
 */

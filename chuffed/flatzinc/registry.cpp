@@ -1845,14 +1845,14 @@ namespace FlatZinc {
 				registry().add("bool_lin_gt_reif", &p_bool_lin_gt_reif);
 */
 
-                               registry().add("fzn_tree", &p_tree_new);
-                               registry().add("fzn_connected", &p_connected_new);
-                               registry().add("fzn_steiner", &p_steiner_tree_new);
-                               registry().add("fzn_mst", &p_mst_new);
-                               registry().add("fzn_dtree", &p_dtree_new);
-                               registry().add("fzn_dpath", &p_path_new);
-                               registry().add("fzn_dag", &p_dag_new);
-                               registry().add("fzn_bounded_dpath", &p_bounded_path_new);
+                registry().add("chuffed_tree", &p_tree_new);
+                registry().add("chuffed_connected", &p_connected_new);
+                registry().add("chuffed_steiner", &p_steiner_tree_new);
+                registry().add("chuffed_minimal_spanning_tree", &p_mst_new);
+                registry().add("chuffed_dtree", &p_dtree_new);
+                registry().add("chuffed_dpath", &p_path_new);
+                registry().add("chuffed_dag", &p_dag_new);
+                registry().add("chuffed_bounded_dpath", &p_bounded_path_new);
 			}
 		};
 		IntPoster __int_poster;
