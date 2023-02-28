@@ -8,7 +8,8 @@ set(chuffed_VERSION_PATCH 0)
 
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
-
+option(CP_PROFILER "Build with the CP Profiler Integration" ON)
+option(SUPPORT_VAR_IMPACT "Build with support for impact branching" OFF)
 # ------------- Compiler Configuration -------------
 
 if(STATIC)
@@ -46,14 +47,10 @@ endif()
 
 # ------------- CP Profiler Integration -------------
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/connector.hpp")
-  set(CHUFFED_PROFILER_SOURCES
-    ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/connector.hpp
-    ${CMAKE_SOURCE_DIR}/submodules/cp-profiler-integration/message.hpp
-  )
-else()
-  message("Configuring without CP Profiler support.")
-endif()
+set(CHUFFED_PROFILER_SOURCES
+  ${CMAKE_SOURCE_DIR}/thirdparty/cp-profiler-integration/connector.hpp
+  ${CMAKE_SOURCE_DIR}/thirdparty/cp-profiler-integration/message.hpp
+)
 
 # ---------- Support for impact branching -----------
 
@@ -182,7 +179,7 @@ add_library(chuffed
   ${VAR_IMPACT_SOURCES}
 )
 
-if(CHUFFED_PROFILER_SOURCES)
+if(CP_PROFILER)
   target_compile_definitions(chuffed PRIVATE HAS_PROFILER)
 endif()
 
@@ -384,3 +381,29 @@ install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config-version.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/chuffed
 )
+
+# ------------- TARGET format -------------
+if (NOT CLANG_FORMAT_EXECUTABLE)
+  find_program(CLANG_FORMAT_EXECUTABLE NAMES clang-format clang-format-11 clang-format-10 clang-format-9)
+endif()
+
+set(CLANG_FORMAT_FLAGS "-i" CACHE STRING "Flags passed to the clang-format executable")
+
+if (CLANG_FORMAT_EXECUTABLE)
+  file(GLOB_RECURSE FORMAT_FILES
+    ${PROJECT_SOURCE_DIR}/*.c
+    ${PROJECT_SOURCE_DIR}/*.cpp
+    ${PROJECT_SOURCE_DIR}/*.h
+    ${PROJECT_SOURCE_DIR}/*.hh
+    ${PROJECT_SOURCE_DIR}/*.hpp
+  )
+  list(FILTER FORMAT_FILES EXCLUDE REGEX ${PROJECT_BINARY_DIR}/*)
+  list(FILTER FORMAT_FILES EXCLUDE REGEX ${PROJECT_SOURCE_DIR}/thirdparty/*)
+  list(FILTER FORMAT_FILES EXCLUDE REGEX ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/*)
+
+  separate_arguments(CLANG_FORMAT_FLAGS_LIST NATIVE_COMMAND ${CLANG_FORMAT_FLAGS})
+  add_custom_target(format
+    COMMAND ${CLANG_FORMAT_EXECUTABLE} ${CLANG_FORMAT_FLAGS_LIST} ${FORMAT_FILES}
+    COMMENT "Running ${CLANG_FORMAT_EXECUTABLE} on all source files"
+  )
+endif()

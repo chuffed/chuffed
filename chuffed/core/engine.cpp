@@ -20,8 +20,8 @@
 #include <chuffed/core/assume.h>
 
 #ifdef HAS_PROFILER
-#include <submodules/cp-profiler-integration/connector.hpp>
-#include <submodules/cp-profiler-integration/message.hpp>
+#include <thirdparty/cp-profiler-integration/connector.hpp>
+#include <thirdparty/cp-profiler-integration/message.hpp>
 #endif
 
 
