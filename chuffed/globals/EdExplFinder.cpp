@@ -2,329 +2,332 @@
 // Created by Felix Winter on 08.04.2019.
 //
 
-#include <iostream>
 #include <chuffed/globals/EdExplFinder.h>
 
-EdExplFinder::EdExplFinder() : max_char(0), insertion_cost(nullptr), deletion_cost(nullptr), substitution_cost(nullptr),
-                               seq2(nullptr),
-                               seqSize(-1), lb(-1), dpMatrix(nullptr),
-                               seq1ExcludedCharacters(nullptr),
-                               seq2ExcludedCharacters(nullptr), min_id_cost(0) {}
+#include <iostream>
 
-Clause *
+EdExplFinder::EdExplFinder()
+		: max_char(0),
+			insertion_cost(nullptr),
+			deletion_cost(nullptr),
+			substitution_cost(nullptr),
+			seq2(nullptr),
+			seqSize(-1),
+			lb(-1),
+			dpMatrix(nullptr),
+			seq1ExcludedCharacters(nullptr),
+			seq2ExcludedCharacters(nullptr),
+			min_id_cost(0) {}
 
-EdExplFinder::FindEdExplanation(int _max_char, const vec<int> *_insertion_cost, const vec<int> *_deletion_cost,
-                                const vec<int> *_substitution_cost, IntView<> *const _seq1, IntView<> *const _seq2,
-                                const vec<int> *_dpMatrix, int _lb, int _seqSize, int _min_id_cost) {
-    max_char = _max_char;
-    insertion_cost = _insertion_cost;
-    deletion_cost = _deletion_cost;
-    substitution_cost = _substitution_cost;
-    seq1 = _seq1;
-    seq2 = _seq2;
-    seqSize = _seqSize;
-    lb = _lb;
-    min_id_cost = _min_id_cost;
-    dpMatrix = _dpMatrix;
+Clause*
 
-    seq1ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
-    seq2ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
+EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
+																const vec<int>* _deletion_cost, const vec<int>* _substitution_cost,
+																IntView<>* const _seq1, IntView<>* const _seq2,
+																const vec<int>* _dpMatrix, int _lb, int _seqSize,
+																int _min_id_cost) {
+	max_char = _max_char;
+	insertion_cost = _insertion_cost;
+	deletion_cost = _deletion_cost;
+	substitution_cost = _substitution_cost;
+	seq1 = _seq1;
+	seq2 = _seq2;
+	seqSize = _seqSize;
+	lb = _lb;
+	min_id_cost = _min_id_cost;
+	dpMatrix = _dpMatrix;
 
-    // do breadth first search fill inequality vector
-    bfs_shortest_path();
+	seq1ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
+	seq2ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
 
-    std::vector<Lit> litVector;
+	// do breadth first search fill inequality vector
+	bfs_shortest_path();
 
-    // create literals for seq1 restrictions
-    for (int i = 0; i < seqSize; i++) {
-        int l = 0;
-        for (int c1 = 0; c1 <= max_char; c1++) {
-            if (!(*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
-                break;
-            }
-            l++;
-        }
-        int u = max_char;
-        for (int c1 = max_char; c1 >= 0; c1--) {
-            if (!(*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
-                break;
-            }
-            u--;
-        }
-        // create x_i >= l
-        if (l > 0) {
-            // we insert x_i <= l-1, as we have to actually negate the inequality
+	std::vector<Lit> litVector;
+
+	// create literals for seq1 restrictions
+	for (int i = 0; i < seqSize; i++) {
+		int l = 0;
+		for (int c1 = 0; c1 <= max_char; c1++) {
+			if (!(*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
+				break;
+			}
+			l++;
+		}
+		int u = max_char;
+		for (int c1 = max_char; c1 >= 0; c1--) {
+			if (!(*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
+				break;
+			}
+			u--;
+		}
+		// create x_i >= l
+		if (l > 0) {
+			// we insert x_i <= l-1, as we have to actually negate the inequality
 #ifndef NDEBUG
-            std::cout << "x_" << i << " >= " << l << std::endl;
+			std::cout << "x_" << i << " >= " << l << std::endl;
 #endif
-            litVector.push_back(seq1[i].getLit(l - 1, 3));
-        }
+			litVector.push_back(seq1[i].getLit(l - 1, 3));
+		}
 
-        // create x_i <= u
-        if (u < max_char && l <= u) {
-            // we insert x_i >= u+1, as we have to actually negate the inequality
+		// create x_i <= u
+		if (u < max_char && l <= u) {
+			// we insert x_i >= u+1, as we have to actually negate the inequality
 #ifndef NDEBUG
-            std::cout << "x_" << i << " <= " << u << std::endl;
+			std::cout << "x_" << i << " <= " << u << std::endl;
 #endif
-            litVector.push_back(seq1[i].getLit(u + 1, 2));
-        }
+			litVector.push_back(seq1[i].getLit(u + 1, 2));
+		}
 
-        // create remaining inequalities (x_i != c1)
-        for (int c1 = l; c1 <= u; c1++) {
-            if ((*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
+		// create remaining inequalities (x_i != c1)
+		for (int c1 = l; c1 <= u; c1++) {
+			if ((*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
 #ifndef NDEBUG
-                std::cout << "x_" << i << " != " << c1 << std::endl;
+				std::cout << "x_" << i << " != " << c1 << std::endl;
 #endif
-                // we insert x_i = c1, as we have to actually negate the inequality
-                litVector.push_back(seq1[i].getLit(c1, 1));
-            }
-        }
-    }
+				// we insert x_i = c1, as we have to actually negate the inequality
+				litVector.push_back(seq1[i].getLit(c1, 1));
+			}
+		}
+	}
 
-    // create literals for seq2 restrictions
-    for (int j = 0; j < seqSize; j++) {
-        int l = 0;
-        for (int c1 = 0; c1 <= max_char; c1++) {
-            if (!(*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
-                break;
-            }
-            l++;
-        }
-        int u = max_char;
-        for (int c1 = max_char; c1 >= 0; c1--) {
-            if (!(*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
-                break;
-            }
-            u--;
-        }
-        // create y_i >= l
-        if (l > 0) {
+	// create literals for seq2 restrictions
+	for (int j = 0; j < seqSize; j++) {
+		int l = 0;
+		for (int c1 = 0; c1 <= max_char; c1++) {
+			if (!(*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
+				break;
+			}
+			l++;
+		}
+		int u = max_char;
+		for (int c1 = max_char; c1 >= 0; c1--) {
+			if (!(*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
+				break;
+			}
+			u--;
+		}
+		// create y_i >= l
+		if (l > 0) {
 #ifndef NDEBUG
-            std::cout << "y_" << j << " >= " << l << std::endl;
+			std::cout << "y_" << j << " >= " << l << std::endl;
 #endif
-            // we insert y_i <= l-1, as we have to actually negate the inequality
-            litVector.push_back(seq2[j].getLit(l - 1, 3));
-        }
-        // create y_i <= u
-        if (u < max_char && l <= u) {
+			// we insert y_i <= l-1, as we have to actually negate the inequality
+			litVector.push_back(seq2[j].getLit(l - 1, 3));
+		}
+		// create y_i <= u
+		if (u < max_char && l <= u) {
 #ifndef NDEBUG
-            std::cout << "y_" << j << " <= " << u << std::endl;
+			std::cout << "y_" << j << " <= " << u << std::endl;
 #endif
-            // we insert y_i >= u+1, as we have to actually negate the inequality
-            litVector.push_back(seq2[j].getLit(u + 1, 2));
-        }
+			// we insert y_i >= u+1, as we have to actually negate the inequality
+			litVector.push_back(seq2[j].getLit(u + 1, 2));
+		}
 
-        // create remaining inequalities (y_i != c1)
-        for (int c1 = l; c1 <= u; c1++) {
-            if ((*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
+		// create remaining inequalities (y_i != c1)
+		for (int c1 = l; c1 <= u; c1++) {
+			if ((*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
 #ifndef NDEBUG
-                std::cout << "y_" << j << " != " << c1 << std::endl;
+				std::cout << "y_" << j << " != " << c1 << std::endl;
 #endif
-                // we insert y_i = c1, as we have to actually negate the inequality
-                litVector.push_back(seq2[j].getLit(c1, 1));
-            }
-        }
-    }
+				// we insert y_i = c1, as we have to actually negate the inequality
+				litVector.push_back(seq2[j].getLit(c1, 1));
+			}
+		}
+	}
 
-    int totalClauseLength = litVector.size();
+	int totalClauseLength = litVector.size();
 
-    // generate full clause
-    Clause *r = Reason_new(totalClauseLength + 1);
+	// generate full clause
+	Clause* r = Reason_new(totalClauseLength + 1);
 
-    int offset = 1;
-    for (auto &it : litVector) {
-        (*r)[offset] = it;
-        offset++;
-    }
+	int offset = 1;
+	for (auto& it : litVector) {
+		(*r)[offset] = it;
+		offset++;
+	}
 
-    return r;
+	return r;
 }
 
-int EdExplFinder::matrixCoord(int i, int j) const {
-    return i * (seqSize + 1) + j;
-}
+int EdExplFinder::matrixCoord(int i, int j) const { return i * (seqSize + 1) + j; }
 
-int EdExplFinder::excludedCharCoord(int i, int c) const {
-    return i * (max_char + 1) + c;
-}
+int EdExplFinder::excludedCharCoord(int i, int c) const { return i * (max_char + 1) + c; }
 
-int EdExplFinder::substCoord(int c1, int c2) const {
-    return (c1 - 1) * max_char + (c2 - 1);
-}
+int EdExplFinder::substCoord(int c1, int c2) const { return (c1 - 1) * max_char + (c2 - 1); }
 
 void EdExplFinder::bfs_shortest_path() {
-    auto shortestPathMatrix = new std::vector<int>(((seqSize + 1) * (seqSize + 1)), lb + 1);
-    // set shortest path for bottom right position to 0 cost
-    (*shortestPathMatrix)[matrixCoord(seqSize, seqSize)] = 0;
+	auto shortestPathMatrix = new std::vector<int>(((seqSize + 1) * (seqSize + 1)), lb + 1);
+	// set shortest path for bottom right position to 0 cost
+	(*shortestPathMatrix)[matrixCoord(seqSize, seqSize)] = 0;
 
-    auto nodeQueue = new std::queue<std::pair<int, int> >();
-    std::set<std::pair<int, int> > node_set;
-    // start with bottom right position
-    std::pair<int, int> start_node = std::pair<int, int>(seqSize, seqSize);
-    nodeQueue->push(start_node);
-    node_set.insert(start_node);
+	auto nodeQueue = new std::queue<std::pair<int, int> >();
+	std::set<std::pair<int, int> > node_set;
+	// start with bottom right position
+	std::pair<int, int> start_node = std::pair<int, int>(seqSize, seqSize);
+	nodeQueue->push(start_node);
+	node_set.insert(start_node);
 
-    // d = distance to diagonal that should be calculated in the matrix
-    int d = lb / min_id_cost;
+	// d = distance to diagonal that should be calculated in the matrix
+	int d = lb / min_id_cost;
 
-    while (!nodeQueue->empty()) {
+	while (!nodeQueue->empty()) {
+		std::pair<int, int> currentNode = nodeQueue->front();
+		nodeQueue->pop();
+		node_set.erase(currentNode);
 
-        std::pair<int, int> currentNode = nodeQueue->front();
-        nodeQueue->pop();
-        node_set.erase(currentNode);
+		int i = currentNode.first;
+		int j = currentNode.second;
 
-        int i = currentNode.first;
-        int j = currentNode.second;
+		int s_ij = (*shortestPathMatrix)[matrixCoord(i, j)];
 
-        int s_ij = (*shortestPathMatrix)[matrixCoord(i, j)];
+		if (s_ij >= lb) {
+			continue;
+		}
 
-        if (s_ij >= lb) {
-            continue;
-        }
+		//
+		// process move to the left
+		//
+		if (j - 1 >= 0 && j - 1 >= i - d) {
+			// check if 0 is forbidden in any sequence position that is larger or equal than the current
+			// position
+			int cj_start = 0;
+			for (int k = j - 1; k < seqSize; k++) {
+				if ((*seq2ExcludedCharacters)[excludedCharCoord(k, 0)]) {
+					// if 0 is forbidden, we do not need to include it in the explanation
+					cj_start = 1;
+					break;
+				}
+			}
+			for (int c = cj_start; c <= max_char; c++) {
+				int ins_cost = c == 0 ? 0 : (*insertion_cost)[c - 1];
+				int d_ij_minus_1 = (*dpMatrix)[matrixCoord(i, j - 1)];
+				if (d_ij_minus_1 + ins_cost + s_ij < lb) {
+					// exclude character for position in explanation if a cheaper path could be established
+					(*seq2ExcludedCharacters)[excludedCharCoord(j - 1, c)] = true;
+				} else {
+					// update costs and push node to queue
+					int s_ij_minus_1 = (*shortestPathMatrix)[matrixCoord(i, j - 1)];
+					(*shortestPathMatrix)[matrixCoord(i, j - 1)] = std::min(s_ij_minus_1, s_ij + ins_cost);
 
-        //
-        // process move to the left
-        //
-        if (j - 1 >= 0 && j - 1 >= i - d) {
-            // check if 0 is forbidden in any sequence position that is larger or equal than the current position
-            int cj_start = 0;
-            for (int k = j-1; k < seqSize; k++) {
-                if ((*seq2ExcludedCharacters)[excludedCharCoord(k, 0)]) {
-                    // if 0 is forbidden, we do not need to include it in the explanation
-                    cj_start = 1;
-                    break;
-                }
-            }
-            for (int c = cj_start; c <= max_char; c++) {
-                int ins_cost = c == 0 ? 0 : (*insertion_cost)[c - 1];
-                int d_ij_minus_1 = (*dpMatrix)[matrixCoord(i, j - 1)];
-                if (d_ij_minus_1 + ins_cost + s_ij < lb) {
-                    // exclude character for position in explanation if a cheaper path could be established
-                    (*seq2ExcludedCharacters)[excludedCharCoord(j - 1, c)] = true;
-                } else {
-                    // update costs and push node to queue
-                    int s_ij_minus_1 = (*shortestPathMatrix)[matrixCoord(i, j - 1)];
-                    (*shortestPathMatrix)[matrixCoord(i, j - 1)] = std::min(s_ij_minus_1, s_ij + ins_cost);
+					std::pair<int, int> node = std::pair<int, int>(i, j - 1);
+					if (node_set.count(node) == 0) {
+						nodeQueue->push(node);
+						node_set.insert(node);
+					}
+				}
+			}
+		}
 
-                    std::pair<int, int> node = std::pair<int, int>(i, j - 1);
-                    if (node_set.count(node) == 0) {
-                        nodeQueue->push(node);
-                        node_set.insert(node);
-                    }
-                }
-            }
-        }
+		//
+		// process upwards move
+		//
+		if (i - 1 >= 0 && j < i + d) {
+			int ci_start = 0;
+			// check if 0 is forbidden in any sequence position that is larger or equal than the current
+			// position
+			for (int k = i - 1; k < seqSize; k++) {
+				if ((*seq1ExcludedCharacters)[excludedCharCoord(k, 0)]) {
+					// if 0 is forbidden, we do not need to include it in the explanation
+					ci_start = 1;
+					break;
+				}
+			}
+			for (int c = ci_start; c <= max_char; c++) {
+				int del_cost = c == 0 ? 0 : (*deletion_cost)[c - 1];
+				int d_i_minus_1_j = (*dpMatrix)[matrixCoord(i - 1, j)];
+				if (d_i_minus_1_j + del_cost + s_ij < lb) {
+					// exclude character for position in explanation if a cheaper path could be established
+					(*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c)] = true;
+				} else {
+					// update costs and push node to queue
+					int s_i_minus_1_j = (*shortestPathMatrix)[matrixCoord(i - 1, j)];
+					(*shortestPathMatrix)[matrixCoord(i - 1, j)] = std::min(s_i_minus_1_j, s_ij + del_cost);
 
-        //
-        // process upwards move
-        //
-        if (i - 1 >= 0 && j < i + d ) {
-            int ci_start = 0;
-            // check if 0 is forbidden in any sequence position that is larger or equal than the current position
-            for (int k = i-1; k < seqSize; k++) {
-                if ((*seq1ExcludedCharacters)[excludedCharCoord(k, 0)]) {
-                    // if 0 is forbidden, we do not need to include it in the explanation
-                    ci_start = 1;
-                    break;
-                }
-            }
-            for (int c = ci_start; c <= max_char; c++) {
-                int del_cost = c == 0 ? 0 : (*deletion_cost)[c - 1];
-                int d_i_minus_1_j = (*dpMatrix)[matrixCoord(i - 1, j)];
-                if (d_i_minus_1_j + del_cost + s_ij < lb) {
-                    // exclude character for position in explanation if a cheaper path could be established
-                    (*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c)] = true;
-                } else {
-                    // update costs and push node to queue
-                    int s_i_minus_1_j = (*shortestPathMatrix)[matrixCoord(i - 1, j)];
-                    (*shortestPathMatrix)[matrixCoord(i - 1, j)] = std::min(s_i_minus_1_j, s_ij + del_cost);
+					std::pair<int, int> node = std::pair<int, int>(i - 1, j);
+					if (node_set.count(node) == 0) {
+						nodeQueue->push(node);
+						node_set.insert(node);
+					}
+				}
+			}
+		}
 
-                    std::pair<int, int> node = std::pair<int, int>(i - 1, j);
-                    if (node_set.count(node) == 0) {
-                        nodeQueue->push(node);
-                        node_set.insert(node);
-                    }
-                }
-            }
-        }
+		//
+		// process diagonal move
+		//
+		if (i - 1 >= 0 && j - 1 >= 0) {
+			for (int c1 = 1; c1 <= max_char; c1++) {
+				for (int c2 = 1; c2 <= max_char; c2++) {
+					int d_i_minus_1_j_minus_1 = (*dpMatrix)[matrixCoord(i - 1, j - 1)];
+					int subst_cost = (*substitution_cost)[substCoord(c1, c2)];
 
-        //
-        // process diagonal move
-        //
-        if (i - 1 >= 0 && j - 1 >= 0) {
-            for (int c1 = 1; c1 <= max_char; c1++) {
-                for (int c2 = 1; c2 <= max_char; c2++) {
-                    int d_i_minus_1_j_minus_1 = (*dpMatrix)[matrixCoord(i - 1, j - 1)];
-                    int subst_cost = (*substitution_cost)[substCoord(c1, c2)];
+					if (d_i_minus_1_j_minus_1 + subst_cost + s_ij < lb) {
+						// we can either exclude the character for seq1 or seq2
+						if (seq1[i - 1].indomain(c1)) {
+							// if seq1 contains c1, we exclude c2 from seq2
+							(*seq2ExcludedCharacters)[excludedCharCoord(j - 1, c2)] = true;
+						} else {
+							// if seq2 contains c2, or neither seq1/seq2 contain c1/c2 we exclude c1 from seq1
+							(*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c1)] = true;
+						}
+					} else {
+						int s_i_minus_1_j_minus_1 = (*shortestPathMatrix)[matrixCoord(i - 1, j - 1)];
+						(*shortestPathMatrix)[matrixCoord(i - 1, j - 1)] =
+								std::min(s_i_minus_1_j_minus_1, s_ij + subst_cost);
 
-                    if (d_i_minus_1_j_minus_1 + subst_cost + s_ij < lb) {
-                        // we can either exclude the character for seq1 or seq2
-                        if (seq1[i - 1].indomain(c1)) {
-                            // if seq1 contains c1, we exclude c2 from seq2
-                            (*seq2ExcludedCharacters)[excludedCharCoord(j - 1, c2)] = true;
-                        } else {
-                            // if seq2 contains c2, or neither seq1/seq2 contain c1/c2 we exclude c1 from seq1
-                            (*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c1)] = true;
-                        }
-                    } else {
-                        int s_i_minus_1_j_minus_1 = (*shortestPathMatrix)[matrixCoord(i - 1, j - 1)];
-                        (*shortestPathMatrix)[matrixCoord(i - 1, j - 1)] = std::min(s_i_minus_1_j_minus_1,
-                                                                                    s_ij + subst_cost);
-
-                        std::pair<int, int> node = std::pair<int, int>(i - 1, j - 1);
-                        if (node_set.count(node) == 0) {
-                            nodeQueue->push(node);
-                            node_set.insert(node);
-                        }
-                    }
-                }
-            }
-        }
-    }
+						std::pair<int, int> node = std::pair<int, int>(i - 1, j - 1);
+						if (node_set.count(node) == 0) {
+							nodeQueue->push(node);
+							node_set.insert(node);
+						}
+					}
+				}
+			}
+		}
+	}
 
 #ifndef NDEBUG
-    debug_print(shortestPathMatrix);
+	debug_print(shortestPathMatrix);
 #endif
 
-    delete shortestPathMatrix;
-    delete nodeQueue;
+	delete shortestPathMatrix;
+	delete nodeQueue;
 }
 
-EdExplFinder::~EdExplFinder() {
-    clean_data_structures();
-}
+EdExplFinder::~EdExplFinder() { clean_data_structures(); }
 
 void EdExplFinder::clean_data_structures() {
-    delete seq1ExcludedCharacters;
-    delete seq2ExcludedCharacters;
+	delete seq1ExcludedCharacters;
+	delete seq2ExcludedCharacters;
 }
 
-void EdExplFinder::debug_print(std::vector<int> *shortestPathMatrix) const {
-    std::cout << "***************************************************************" << std::endl;
+void EdExplFinder::debug_print(std::vector<int>* shortestPathMatrix) const {
+	std::cout << "***************************************************************" << std::endl;
 
-    std::cout << "shortest path matrix:" << std::endl;
+	std::cout << "shortest path matrix:" << std::endl;
 
-    std::cout << "   ";
-    for (int i = 0; i < seqSize + 1; i++) {
-        printf("%2d ", i);
-    }
-    std::cout << std::endl;
+	std::cout << "   ";
+	for (int i = 0; i < seqSize + 1; i++) {
+		printf("%2d ", i);
+	}
+	std::cout << std::endl;
 
-    for (int i = 0; i < seqSize + 2; i++) {
-        std::cout << "---";
-    }
-    std::cout << std::endl;
+	for (int i = 0; i < seqSize + 2; i++) {
+		std::cout << "---";
+	}
+	std::cout << std::endl;
 
-    for (int i = 0; i < seqSize + 1; i++) {
-        for (int j = -1; j < seqSize + 1; j++) {
-            if (j == -1) {
-                printf("%2d|", i);
-            } else {
-                printf("%2d ", (*shortestPathMatrix)[matrixCoord(i, j)]);
-            }
-        }
-        std::cout << std::endl;
-    }
+	for (int i = 0; i < seqSize + 1; i++) {
+		for (int j = -1; j < seqSize + 1; j++) {
+			if (j == -1) {
+				printf("%2d|", i);
+			} else {
+				printf("%2d ", (*shortestPathMatrix)[matrixCoord(i, j)]);
+			}
+		}
+		std::cout << std::endl;
+	}
 
-    std::cout << "***************************************************************" << std::endl;
+	std::cout << "***************************************************************" << std::endl;
 }

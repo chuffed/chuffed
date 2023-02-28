@@ -26,7 +26,7 @@ public:
 	bool propagate() {
 		int y_max = y.getMax();
 
-		if (ones > y_max) ones = y_max+1;
+		if (ones > y_max) ones = y_max + 1;
 
 		setDom2(y, setMin, ones, 1);
 
@@ -40,22 +40,19 @@ public:
 	}
 
 	Clause* explain(Lit p, int inf_id) {
-		ps.clear(); ps.growTo(ones+1);
+		ps.clear();
+		ps.growTo(ones + 1);
 		for (int i = 0, j = 1; j <= ones; i++) {
 			if (x[i].isTrue()) ps[j++] = ~x[i];
 		}
 		if (inf_id == 0) ps.push(y.getMaxLit());
 		return Reason_new(ps);
 	}
-
 };
-
-
-
 
 //-----
 
-// sum x_i (=, <=, <, >=, >) y 
+// sum x_i (=, <=, <, >=, >) y
 
 void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y) {
 	vec<BoolView> x2;
@@ -64,7 +61,7 @@ void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y) {
 		case IRT_EQ:
 			// sum x_i = y <=> sum x_i <= y /\ sum (1-x_i) <= (-y+x.size())
 			new BoolLinearLE<0>(x, IntView<0>(y));
-			new BoolLinearLE<5>(x2, IntView<5>(y,1,x.size()));
+			new BoolLinearLE<5>(x2, IntView<5>(y, 1, x.size()));
 			break;
 		case IRT_LE:
 			// sum x_i <= y
@@ -72,18 +69,17 @@ void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y) {
 			break;
 		case IRT_LT:
 			// sum x_i < y <=> sum x_i <= (y-1)
-			new BoolLinearLE<4>(x, IntView<4>(y,1,-1));
+			new BoolLinearLE<4>(x, IntView<4>(y, 1, -1));
 			break;
 		case IRT_GE:
 			// sum x_i >= y <=> sum (1-x_i) <= (-y+x.size())
-			new BoolLinearLE<5>(x2, IntView<5>(y,1,x.size()));
+			new BoolLinearLE<5>(x2, IntView<5>(y, 1, x.size()));
 			break;
 		case IRT_GT:
 			// sum x_i > y <=> sum (1-x_i) <= (-y+x.size()-1)
-			new BoolLinearLE<5>(x2, IntView<5>(y,1,x.size()-1));
+			new BoolLinearLE<5>(x2, IntView<5>(y, 1, x.size() - 1));
 			break;
 		default:
 			CHUFFED_ERROR("Unknown IntRelType %d\n", t);
 	}
 }
-

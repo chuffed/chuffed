@@ -1,10 +1,11 @@
 #ifndef mip_h
 #define mip_h
 
-#include <map>
-#include <set>
 #include <chuffed/core/propagator.h>
 #include <chuffed/support/misc.h>
+
+#include <map>
+#include <set>
 
 using namespace std;
 
@@ -21,26 +22,29 @@ struct LinearIneq {
 };
 
 struct BoundChange {
-	int v;                 // which original variable
-	int w;                 // 0 = lower bound, 1 = upper bound
-	int d;                 // how much it increased by
+	int v;  // which original variable
+	int w;  // 0 = lower bound, 1 = upper bound
+	int d;  // how much it increased by
 	BoundChange(int _v, int _w, int _d) : v(_v), w(_w), d(_d) {}
 };
 
-
 class MIP : public Propagator {
-	enum SimplexStatus { SIMPLEX_OPTIMAL, SIMPLEX_GOOD_ENOUGH, SIMPLEX_IN_PROGRESS, SIMPLEX_UNBOUNDED };
+	enum SimplexStatus {
+		SIMPLEX_OPTIMAL,
+		SIMPLEX_GOOD_ENOUGH,
+		SIMPLEX_IN_PROGRESS,
+		SIMPLEX_UNBOUNDED
+	};
 
 public:
 	set<IntVar*> var_set;
-	map<IntVar*,int> var_map;
+	map<IntVar*, int> var_map;
 	vec<IntVar*> vars;
 	vec<LinearIneq> ineqs;
 
 	vec<long double> RL;
 	vec<Lit> ps;
 	vec<int> place;
-
 
 	vec<BoundChange> bctrail;
 	vec<int> bctrail_lim;
@@ -52,7 +56,7 @@ public:
 
 	duration simplex_time;
 
-	VarGroup *toplevelgroup;
+	VarGroup* toplevelgroup;
 
 	// temp data
 	vec<int> new_bc;
@@ -73,27 +77,27 @@ public:
 	void printStats();
 
 	// Main propagator methods
-	
+
 	void wakeup(int i, int c);
 	bool propagate();
 	void clearPropState();
 
 	// LP methods
 
-	int  getLimit();
+	int getLimit();
 	void updateBounds();
-	int  doSimplex();
+	int doSimplex();
 	void unboundedFailure();
 	bool propagateAllBounds();
-	template<int T>	bool propagateBound(int i, long double s);
+	template <int T>
+	bool propagateBound(int i, long double s);
 	long double objVarBound();
 
 	// Inline functions
 
 	inline int decisionLevel() { return bctrail_lim.size(); }
-
 };
 
-extern MIP *mip;
+extern MIP* mip;
 
 #endif

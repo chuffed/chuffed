@@ -1,18 +1,18 @@
-#include <cstdio>
-#include <cassert>
+#include <chuffed/branching/branching.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/core/propagator.h>
-#include <chuffed/branching/branching.h>
-#include <chuffed/vars/modelling.h>
 #include <chuffed/ldsb/ldsb.h>
+#include <chuffed/vars/modelling.h>
+
+#include <cassert>
+#include <cstdio>
 
 class LatinSquare : public Problem {
 public:
 	int const n;
-	vec<vec<IntVar*> > x;                           // squares labels
+	vec<vec<IntVar*> > x;  // squares labels
 
 	LatinSquare(int _n) : n(_n) {
-
 		createVars(x, n, n, 1, n);
 
 		vec<vec<IntVar*> > xt;
@@ -27,7 +27,7 @@ public:
 		flatten(x, s);
 
 		branch(s, VAR_INORDER, VAL_MIN);
-//		branch(s, VAR_SIZE_MIN, VAL_MIN);
+		//		branch(s, VAR_SIZE_MIN, VAL_MIN);
 
 		output_vars(s);
 
@@ -47,13 +47,12 @@ public:
 
 		} else if (so.sym_static) {
 			for (int i = 0; i < n; i++) {
-				int_rel(x[0][i], IRT_EQ, i+1);
+				int_rel(x[0][i], IRT_EQ, i + 1);
 			}
 			for (int i = 1; i < n; i++) {
-				int_rel(x[i][0], IRT_EQ, i+1);
+				int_rel(x[i][0], IRT_EQ, i + 1);
 			}
 		}
-
 	}
 
 	void restrict_learnable() {
@@ -62,13 +61,13 @@ public:
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				assert(x[i][j]->getType() == INT_VAR_EL);
-				((IntVarEL*) x[i][j])->setVLearnable();
-				((IntVarEL*) x[i][j])->setVDecidable(true);
+				((IntVarEL*)x[i][j])->setVLearnable();
+				((IntVarEL*)x[i][j])->setVDecidable(true);
 			}
 		}
 	}
 
-  void print(std::ostream& os) {
+	void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				os << x[i][j]->getVal() << ", ";
@@ -77,7 +76,6 @@ public:
 		}
 		os << "\n";
 	}
-
 };
 
 int main(int argc, char** argv) {
@@ -92,6 +90,3 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
-
-

@@ -1,6 +1,7 @@
+#include <chuffed/core/propagator.h>
+
 #include <map>
 #include <utility>
-#include <chuffed/core/propagator.h>
 
 #define DEBUG 0
 #define PREPROCESS 1
@@ -24,7 +25,6 @@ public:
 	}
 
 	inline bool isFalse() { return sat.value(body_lit) == l_False; }
-
 };
 
 ConjRule* ConjRule_new(int h, vec<int>& b, Lit bl) {
@@ -41,18 +41,18 @@ public:
 	vec<vec<BoolView> > raw_negb;
 	vec<BoolView> raw_bl;
 
-	vec<Lit> lits;                         // Boolean variable corresponding to the index
+	vec<Lit> lits;  // Boolean variable corresponding to the index
 	vec<ConjRule*> rules;
 	vec<int> scc_ids;
 
-	multimap<int,int> raw_head_to_body;
+	multimap<int, int> raw_head_to_body;
 
-	map<int,int> lit_to_index;
-	map<int,ConjRule*> body_lit_to_rule;
+	map<int, int> lit_to_index;
+	map<int, ConjRule*> body_lit_to_rule;
 
-	vec<vec<ConjRule*> > head_occ_rules;   // occurences in rule head
-	vec<vec<ConjRule*> > body_occ_rules;   // occurences in rule body
-	vec<vec<ConjRule*> > watches;          // rules where it is being watched
+	vec<vec<ConjRule*> > head_occ_rules;  // occurences in rule head
+	vec<vec<ConjRule*> > body_occ_rules;  // occurences in rule body
+	vec<vec<ConjRule*> > watches;         // rules where it is being watched
 
 	// SCC calc stuff
 
@@ -63,10 +63,7 @@ public:
 	vec<int> lowlink;
 	vec<vec<int> > sccs;
 
-
-
 	// Persistent trailed state
-
 
 	// Persistent non-trailed state
 
@@ -74,7 +71,7 @@ public:
 
 	// Intermediate state
 
-	vec<vec<int> > no_support;             // set of non-false literals which has lost support
+	vec<vec<int> > no_support;  // set of non-false literals which has lost support
 	vec<bool> no_support_bool;
 	vec<int> ushead;
 	vec<int> pufhead;
@@ -83,19 +80,19 @@ public:
 
 	// Local variables
 
-	vec<int> ufset;                        // the unfounded set we are constructing
+	vec<int> ufset;  // the unfounded set we are constructing
 	vec<bool> ufset_bool;
-	vec<int> nfset;                        // the resupported literals
+	vec<int> nfset;  // the resupported literals
 
 public:
-
 	WellFounded() {
 		// set priority
-		priority = 3; 
+		priority = 3;
 	}
 
 	int getId(Lit l) {
-		pair<map<int,int>::iterator,bool> p = lit_to_index.insert(pair<int,int>(toInt(l), lits.size()));
+		pair<map<int, int>::iterator, bool> p =
+				lit_to_index.insert(pair<int, int>(toInt(l), lits.size()));
 		if (p.second) lits.push(l);
 		return p.first->second;
 	}
@@ -111,13 +108,13 @@ public:
 
 	void preprocess() {
 		for (int i = 0; i < raw_heads.size(); i++) {
-			raw_head_to_body.insert(pair<int,int>(toInt((Lit) raw_heads[i]), i));
+			raw_head_to_body.insert(pair<int, int>(toInt((Lit)raw_heads[i]), i));
 		}
 
 		for (int i = 0; i < raw_heads.size(); i++) {
 			if (raw_posb[i].size() == 1 && raw_negb[i].size() == 0) {
-				if (raw_head_to_body.count(toInt((Lit) raw_posb[i][0])) == 1) {
-					int r = raw_head_to_body.find(toInt((Lit) raw_posb[i][0]))->second;
+				if (raw_head_to_body.count(toInt((Lit)raw_posb[i][0])) == 1) {
+					int r = raw_head_to_body.find(toInt((Lit)raw_posb[i][0]))->second;
 					raw_bl[i] = raw_posb[i][0];
 					raw_posb[r].copyTo(raw_posb[i]);
 					raw_negb[r].copyTo(raw_negb[i]);
@@ -130,45 +127,44 @@ public:
 			if (raw_heads[i] == bv_false) continue;
 			getId(raw_heads[i]);
 		}
-
 	}
 
-/*
-	void strongconnect(int v) {
-		indices[v] = index;
-		lowlink[v] = index;
-		index++;
-		S.push(v);
-		in_S[v] = true;
+	/*
+		void strongconnect(int v) {
+			indices[v] = index;
+			lowlink[v] = index;
+			index++;
+			S.push(v);
+			in_S[v] = true;
 
-		for (int i = 0; i < head_occ_rules[v].size(); i++) {
-			ConjRule& r = *head_occ_rules[v][i];
-			for (int j = 0; j < r.sz; j++) {
-				int w = r.body[j];
-				if (indices[w] == -1) {
-					strongconnect(w);
-					if (lowlink[w] < lowlink[v]) lowlink[v] = lowlink[w];
-				} else if (in_S[w]) {
-					if (indices[w] < lowlink[v]) lowlink[v] = indices[w];
+			for (int i = 0; i < head_occ_rules[v].size(); i++) {
+				ConjRule& r = *head_occ_rules[v][i];
+				for (int j = 0; j < r.sz; j++) {
+					int w = r.body[j];
+					if (indices[w] == -1) {
+						strongconnect(w);
+						if (lowlink[w] < lowlink[v]) lowlink[v] = lowlink[w];
+					} else if (in_S[w]) {
+						if (indices[w] < lowlink[v]) lowlink[v] = indices[w];
+					}
 				}
 			}
-		}
 
-    if (lowlink[v] == indices[v]) {
-//			printf("SCC %d: ", scc_id);
-			while (true) {
-				int w = S.last();
-				S.pop();
-				in_S[w] = false;
-				scc_ids[w] = scc_id;
-//				printf("%d ", w);
-				if (w == v) break;
+			if (lowlink[v] == indices[v]) {
+	//			printf("SCC %d: ", scc_id);
+				while (true) {
+					int w = S.last();
+					S.pop();
+					in_S[w] = false;
+					scc_ids[w] = scc_id;
+	//				printf("%d ", w);
+					if (w == v) break;
+				}
+	//			printf("\n");
+				scc_id++;
 			}
-//			printf("\n");
-			scc_id++;
 		}
-	}
-*/
+	*/
 
 	static void getStaticEdges(WellFounded* wf, int v, vec<int>& edges) {
 		edges.clear();
@@ -187,12 +183,10 @@ public:
 			if (r.isFalse()) continue;
 			edges.push(r.body[r.w]);
 		}
-//		fprintf(stderr, "%d: ", v);
-//		for (int i = 0; i < edges.size(); i++) fprintf(stderr, "%d ", edges[i]);
-//		fprintf(stderr, "\n");
+		//		fprintf(stderr, "%d: ", v);
+		//		for (int i = 0; i < edges.size(); i++) fprintf(stderr, "%d ", edges[i]);
+		//		fprintf(stderr, "\n");
 	}
-
-
 
 	void strongconnect(int v, void (*getEdges)(WellFounded*, int, vec<int>&)) {
 		indices[v] = index;
@@ -213,13 +207,14 @@ public:
 				if (indices[w] < lowlink[v]) lowlink[v] = indices[w];
 			}
 		}
-//		printf("%d: indices = %d, lowlink = %d\n", v, indices[v], lowlink[v]);
+		//		printf("%d: indices = %d, lowlink = %d\n", v, indices[v], lowlink[v]);
 
-    if (lowlink[v] == indices[v]) {
+		if (lowlink[v] == indices[v]) {
 			if (DEBUG) printf("SCC %d: ", sccs.size());
 			sccs.push();
 			while (true) {
-				int w = S.last(); S.pop();
+				int w = S.last();
+				S.pop();
 				in_S[w] = false;
 				sccs.last().push(w);
 				if (DEBUG) printf("%d ", w);
@@ -229,14 +224,12 @@ public:
 		}
 	}
 
-
 	void init() {
-
-		if (PREPROCESS) preprocess();
+		if (PREPROCESS)
+			preprocess();
 		else {
 			for (int i = 0; i < raw_heads.size(); i++) getId(raw_heads[i]);
 		}
-
 
 		in_S.growTo(lits.size(), false);
 		scc_ids.growTo(lits.size(), -1);
@@ -268,11 +261,11 @@ public:
 
 			vec<int> b;
 			for (int j = 0; j < raw_posb[i].size(); j++) {
-				map<int,int>::iterator it = lit_to_index.find(toInt((Lit) raw_posb[i][j]));
+				map<int, int>::iterator it = lit_to_index.find(toInt((Lit)raw_posb[i][j]));
 				if (it == lit_to_index.end()) continue;
 				b.push(it->second);
 			}
-			ConjRule *r = ConjRule_new(getId(raw_heads[i]), b, raw_bl[i]);
+			ConjRule* r = ConjRule_new(getId(raw_heads[i]), b, raw_bl[i]);
 			rules.push(r);
 		}
 
@@ -290,7 +283,8 @@ public:
 			vec<BoolView> b;
 			for (int j = 0; j < head_occ_rules[i].size(); j++) {
 				b.push(BoolView(head_occ_rules[i][j]->body_lit));
-				if (!COMPLETE) bool_rel(~BoolView(head_occ_rules[i][j]->body_lit), BRT_OR, BoolView(lits[i]));
+				if (!COMPLETE)
+					bool_rel(~BoolView(head_occ_rules[i][j]->body_lit), BRT_OR, BoolView(lits[i]));
 			}
 			if (COMPLETE) array_bool_or(b, BoolView(lits[i]));
 		}
@@ -307,9 +301,9 @@ public:
 
 			for (int i = 0; i < lits.size(); i++) {
 				if (indices[i] == -1) {
-//					printf("SCC root: %d\n", i);
+					//					printf("SCC root: %d\n", i);
 					strongconnect(i, &getStaticEdges);
-//					printf("num scc's: %d\n", scc_id);
+					//					printf("num scc's: %d\n", scc_id);
 				}
 			}
 			assert(S.size() == 0);
@@ -335,30 +329,28 @@ public:
 			if (BoolView(lits[i]).isFalse()) continue;
 			assert(scc_ids[i] >= 0);
 			assert(scc_ids[i] < no_support.size());
-//			fprintf(stderr, "%d ", scc_ids[i]);
+			//			fprintf(stderr, "%d ", scc_ids[i]);
 			no_support[scc_ids[i]].push(i);
 			no_support_bool[i] = true;
 		}
 
+		//		if (DEBUG) {
+		printf("Lits: %d\n", lits.size());
+		printf("Rules: %d\n", rules.size());
+		printf("SCCs: %d\n", sccs.size());
+		//		}
 
-//		if (DEBUG) {
-			printf("Lits: %d\n", lits.size());
-			printf("Rules: %d\n", rules.size());
-			printf("SCCs: %d\n", sccs.size());
-//		}
-
-		if (DEBUG) for (int i = 0; i < rules.size(); i++) {
-			ConjRule& r = *rules[i];
-			printf("Rule %d: ", i);
-			printf("%d <- ", r.head);
-			for (int j = 0; j < r.sz; j++) printf("%d ", r.body[j]);
-			printf("\n");
-		}
+		if (DEBUG)
+			for (int i = 0; i < rules.size(); i++) {
+				ConjRule& r = *rules[i];
+				printf("Rule %d: ", i);
+				printf("%d <- ", r.head);
+				for (int j = 0; j < r.sz; j++) printf("%d ", r.body[j]);
+				printf("\n");
+			}
 
 		if (so.well_founded) pushInQueue();
-
 	}
-
 
 	void wakeup(int i, int c) {
 		if (DEBUG) printf("wake up from rule %d\n", i);
@@ -366,7 +358,7 @@ public:
 		pushInQueue();
 	}
 
-	void killSupport(ConjRule *r) {
+	void killSupport(ConjRule* r) {
 		int h = r->head;
 		if (support[h] != r) return;
 		if (BoolView(lits[h]).isFalse()) return;
@@ -380,7 +372,7 @@ public:
 		if (DEBUG) printf("propagating\n");
 
 		for (int i = 0; i < dead_rules.size(); i++) killSupport(rules[dead_rules[i]]);
-		
+
 		for (int i = 0; i < no_support.size(); i++) {
 			while (ushead[i] < no_support[i].size()) {
 				int x = no_support[i][ushead[i]++];
@@ -393,17 +385,18 @@ public:
 		if (DEBUG) printf("Decision level: %d\n", engine.decisionLevel());
 
 		if (DEBUG) printf("No support: ");
-		if (DEBUG) for (int i = 0; i < no_support.size(); i++) {
-			for (int j = 0; j < no_support[i].size(); j++) {
-				printf("%d, ", no_support[i][j]);
+		if (DEBUG)
+			for (int i = 0; i < no_support.size(); i++) {
+				for (int j = 0; j < no_support[i].size(); j++) {
+					printf("%d, ", no_support[i][j]);
+				}
 			}
-		}
 		if (DEBUG) printf("\n");
 
 		int start = -1;
 		// pick one to start building unfounded set
 		for (int i = 0; i < no_support.size(); i++) {
-			for ( ; pufhead[i] < no_support[i].size(); pufhead[i]++) {
+			for (; pufhead[i] < no_support[i].size(); pufhead[i]++) {
 				int x = no_support[i][pufhead[i]];
 				if (no_support_bool[x] && !BoolView(lits[x]).isFalse()) {
 					start = x;
@@ -446,19 +439,19 @@ public:
 			// add rules with h as head
 			for (int i = 0; i < head_occ_rules[h].size(); i++) {
 				if (DEBUG) printf("checking %dth rule for %d\n", i, h);
-				ConjRule *r = head_occ_rules[h][i];
+				ConjRule* r = head_occ_rules[h][i];
 				if (r->isFalse()) continue;
-				r->w = r->sz-1;
+				r->w = r->sz - 1;
 				if (DEBUG) printf("proping rule\n");
 				if (propRule(*r)) break;
 			}
-				
+
 			// propagate nfset
 
 			while (nfshead < nfset.size()) {
 				int x = nfset[nfshead++];
 				for (int i = 0; i < watches[x].size(); i++) {
-					ConjRule *r = watches[x][i];
+					ConjRule* r = watches[x][i];
 					// if head already founded by another rule, ignore
 					if (!no_support_bool[r->head]) continue;
 					if (r->isFalse()) continue;
@@ -474,7 +467,7 @@ public:
 		// if empty, should jump straight back up!
 
 		// calc dynamic SCC
-//		fprintf(stderr, "calc Dyn SCC\n");
+		//		fprintf(stderr, "calc Dyn SCC\n");
 
 		index = 0;
 		assert(S.size() == 0);
@@ -488,13 +481,13 @@ public:
 			int h = ufset[i];
 			if (!no_support_bool[h]) continue;
 			if (indices[h] != -1) continue;
-//			fprintf(stderr, "root %d ", h);
+			//			fprintf(stderr, "root %d ", h);
 			strongconnect(h, &getDynamicEdges);
 		}
 
 		assert(S.size() == 0);
 
-//		if (sccs.size() > 0) fprintf(stderr, "d %d ", sccs.size());
+		//		if (sccs.size() > 0) fprintf(stderr, "d %d ", sccs.size());
 
 		// create an explanation
 
@@ -506,15 +499,14 @@ public:
 			int h = ufset[i];
 			if (!no_support_bool[h]) continue;
 			for (int i = 0; i < head_occ_rules[h].size(); i++) {
-				ConjRule *r = head_occ_rules[h][i];
+				ConjRule* r = head_occ_rules[h][i];
 				if (r->isFalse()) {
 					ps.push(r->body_lit);
 				}
 			}
 		}
 
-
-		Clause *expl = Reason_new(ps.size());
+		Clause* expl = Reason_new(ps.size());
 		for (int i = 1; i < ps.size(); i++) (*expl)[i] = ps[i];
 		for (int i = 0; i < ufset.size(); i++) {
 			int h = ufset[i];
@@ -538,7 +530,7 @@ public:
 	}
 
 	bool propRule(ConjRule& r) {
-		for ( ; r.w >= 0; r.w--) {
+		for (; r.w >= 0; r.w--) {
 			if (no_support_bool[r.body[r.w]]) break;
 		}
 		if (r.w < 0) {
@@ -564,7 +556,7 @@ public:
 		dead_rules.clear();
 		if (sat.confl) {
 			for (int i = 0; i < no_support.size(); i++) {
-				for ( ; pufhead[i] < no_support[i].size(); pufhead[i]++) {
+				for (; pufhead[i] < no_support[i].size(); pufhead[i]++) {
 					no_support_bool[no_support[i][pufhead[i]]] = false;
 				}
 				no_support[i].clear();
@@ -573,18 +565,16 @@ public:
 			}
 		}
 	}
-
 };
 
 vec<WellFounded> wf_props;
 
 void add_inductive_rule(BoolView hl, vec<BoolView>& posb, vec<BoolView>& negb, int wf_id) {
 	wf_props.growTo(wf_id);
-	wf_props[wf_id-1].addRule(hl, posb, negb);
+	wf_props[wf_id - 1].addRule(hl, posb, negb);
 }
 
 void wf_init() {
 	for (int i = 0; i < wf_props.size(); i++) wf_props[i].init();
-//	exit(0);
+	//	exit(0);
 }
-

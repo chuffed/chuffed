@@ -7,7 +7,7 @@ constexpr double CLEARED_LOCAL = 0.42;
 constexpr double CLEARED_GLOBAL = 0.042;
 constexpr double CLEARED_REPARTITION = 1.00;
 
-double processImpact(vec<int> const &previousSizes, vec<int> const &newSizes) {
+double processImpact(vec<int> const& previousSizes, vec<int> const& newSizes) {
 	int const n = newSizes.size();
 	if (!n || previousSizes.size() != n) NEVER;
 
@@ -25,20 +25,19 @@ double processImpact(vec<int> const &previousSizes, vec<int> const &newSizes) {
 			repartition += CLEARED_REPARTITION;
 		} else {
 			int const fi = ti - newSizes[i];
-			if (fi) {			
+			if (fi) {
 				local += fi / ti;
 				global += fi;
 				++repartition;
 			}
 		}
 	}
-	return (  WEIGHT_LOCAL * local / n
-			+ WEIGHT_GLOBAL * global / total
-			+ WEIGHT_REPARTITION * repartition / n
-		) / (WEIGHT_LOCAL + WEIGHT_GLOBAL + WEIGHT_REPARTITION);
+	return (WEIGHT_LOCAL * local / n + WEIGHT_GLOBAL * global / total +
+					WEIGHT_REPARTITION * repartition / n) /
+				 (WEIGHT_LOCAL + WEIGHT_GLOBAL + WEIGHT_REPARTITION);
 }
 
-double solvedImpact(vec<int> const &previousSizes) {
+double solvedImpact(vec<int> const& previousSizes) {
 	int const n = previousSizes.size();
 	if (!n) NEVER;
 
@@ -56,15 +55,14 @@ double solvedImpact(vec<int> const &previousSizes) {
 			repartition += CLEARED_REPARTITION;
 		} else {
 			int const fi = ti - 1;
-			if (fi) {			
+			if (fi) {
 				local += fi / ti;
 				global += fi;
 				++repartition;
 			}
 		}
 	}
-	return (  WEIGHT_LOCAL * local / n
-			+ WEIGHT_GLOBAL * global / total
-			+ WEIGHT_REPARTITION * repartition / n
-		) / (WEIGHT_LOCAL + WEIGHT_GLOBAL + WEIGHT_REPARTITION);
+	return (WEIGHT_LOCAL * local / n + WEIGHT_GLOBAL * global / total +
+					WEIGHT_REPARTITION * repartition / n) /
+				 (WEIGHT_LOCAL + WEIGHT_GLOBAL + WEIGHT_REPARTITION);
 }

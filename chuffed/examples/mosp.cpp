@@ -1,15 +1,16 @@
-#include <cstdio>
-#include <cassert>
+#include <chuffed/branching/branching.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/core/propagator.h>
-#include <chuffed/branching/branching.h>
 #include <chuffed/vars/modelling.h>
+
+#include <cassert>
+#include <cstdio>
 
 class MOSP : public Problem {
 public:
 	int n;
 	int m;
-	bool **a;
+	bool** a;
 	vec<IntVar*> s;
 	vec<IntVar*> e;
 	vec<vec<BoolView> > sb;
@@ -19,11 +20,10 @@ public:
 	IntVar* stacks;
 
 	MOSP(int _n, int _m) : n(_n), m(_m) {
-
 		generateInstance();
 
-		createVars(s, n, 0, n-1);
-		createVars(e, n, 0, n-1);
+		createVars(s, n, 0, n - 1);
+		createVars(e, n, 0, n - 1);
 		createVars(sb, n, n);
 		createVars(eb, n, n);
 		createVars(o, n, n);
@@ -49,7 +49,8 @@ public:
 		// Min constraints on s[i]
 		for (int i = 0; i < n; i++) {
 			vec<IntVar*> x;
-			for (int j = 0; j < n; j++) if (g[i][j]) x.push(e[j]);
+			for (int j = 0; j < n; j++)
+				if (g[i][j]) x.push(e[j]);
 			minimum(x, s[i]);
 		}
 
@@ -78,7 +79,8 @@ public:
 		for (int t = 0; t < n; t++) {
 			for (int i = 0; i < n; i++) {
 				vec<BoolView> a;
-				for (int j = 0; j < n; j++) if (g[i][j]) a.push(sb[j][t]);
+				for (int j = 0; j < n; j++)
+					if (g[i][j]) a.push(sb[j][t]);
 				a.push(eb[i][t]);
 				array_bool_and(a, r[i][t]);
 			}
@@ -86,12 +88,12 @@ public:
 
 		// If none of the lex better stacks can instantly close
 		// and this one can, close it now
-		for (int t = 0; t < n-1; t++) {
+		for (int t = 0; t < n - 1; t++) {
 			for (int i = 0; i < n; i++) {
 				vec<BoolView> a, b;
 				for (int j = 0; j < i; j++) a.push(r[j][t]);
 				b.push(r[i][t]);
-				b.push(eb[i][t+1]);
+				b.push(eb[i][t + 1]);
 				bool_clause(a, b);
 			}
 		}
@@ -101,17 +103,16 @@ public:
 
 		// set optimization target
 		optimize(stacks, OPT_MIN);
-
 	}
 
 	void generateInstance() {
 		srand(so.rnd_seed);
 
-		int cust_per_prod = rand()%4 + 2;
-		double density = (double) cust_per_prod / n;
+		int cust_per_prod = rand() % 4 + 2;
+		double density = (double)cust_per_prod / n;
 
-		a = (bool**) malloc(n * sizeof(bool*));
-		for (int i = 0; i < n; i++) a[i] = (bool*) malloc(m * sizeof(bool));
+		a = (bool**)malloc(n * sizeof(bool*));
+		for (int i = 0; i < n; i++) a[i] = (bool*)malloc(m * sizeof(bool));
 
 		while (true) {
 			int b[m];
@@ -121,11 +122,12 @@ public:
 			for (int j = 0; j < n; j++) {
 				int sum = 0;
 				for (int k = 0; k < m; k++) {
-					if (rand() < RAND_MAX*density) {
+					if (rand() < RAND_MAX * density) {
 						a[j][k] = 1;
 						b[k]++;
 						sum++;
-					} else a[j][k] = 0;
+					} else
+						a[j][k] = 0;
 				}
 				if (!sum) {
 					j--;
@@ -135,7 +137,7 @@ public:
 
 			for (int j = 0; j < m; j++) {
 				while (b[j] < 2) {
-					int r = rand()%n;
+					int r = rand() % n;
 					if (a[r][j] == 1) continue;
 					a[r][j] = 1;
 					b[j]++;
@@ -151,12 +153,14 @@ public:
 			}
 
 			for (int j = 0; j < m; j++) {
-				for (int k = 0; k < n; k++) if (a[k][j]) {
-					for (int l = k; l < n; l++) if (a[l][j]) {
-						cross[l][k] = 1;
-						cross[k][l] = 1;
+				for (int k = 0; k < n; k++)
+					if (a[k][j]) {
+						for (int l = k; l < n; l++)
+							if (a[l][j]) {
+								cross[l][k] = 1;
+								cross[k][l] = 1;
+							}
 					}
-				}
 			}
 
 			int connected[n];
@@ -175,27 +179,25 @@ public:
 				int c = connected[qhead++];
 				assert(c >= 0);
 				assert(c < n);
-				for (int j = 0; j < n; j++) if (cross[c][j] && !seen[j]) {
-					connected[num_connected++] = j;
-					seen[j] = 1;
-				}
+				for (int j = 0; j < n; j++)
+					if (cross[c][j] && !seen[j]) {
+						connected[num_connected++] = j;
+						seen[j] = 1;
+					}
 			}
 
 			if (num_connected == n) break;
 		}
-
 	}
 
-
-  void print(std::ostream& os) {
+	void print(std::ostream& os) {
 		for (int i = 0; i < n; i++) {
 			int m = e[i]->getVal();
-      os << "e_" << i << " = " << m << ", ";
+			os << "e_" << i << " = " << m << ", ";
 		}
 		os << "\n";
 		os << "Stacks = " << stacks->getVal() << "\n\n";
 	}
-
 };
 /*
 void readData(char *filename, char name[], int& n, int& m, bool*& a) {
@@ -203,7 +205,7 @@ void readData(char *filename, char name[], int& n, int& m, bool*& a) {
 	assert(fp);
 
 	fscanf(fp, "%[^\n]\n", name);
-  fscanf(fp, "%d %d", &n, &m);
+	fscanf(fp, "%d %d", &n, &m);
 
 	if (n > 64) {
 		printf("Too many customers! %d\n", n);
@@ -227,10 +229,7 @@ int main(int argc, char** argv) {
 
 	assert(argc == 3);
 
-	engine.solve(new MOSP(atoi(argv[1]),atoi(argv[2])));
+	engine.solve(new MOSP(atoi(argv[1]), atoi(argv[2])));
 
 	return 0;
 }
-
-
-

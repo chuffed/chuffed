@@ -1,8 +1,8 @@
 #ifndef __BITVEC_H__
 #define __BITVEC_H__
 
-#include <cstdlib>
 #include <cassert>
+#include <cstdlib>
 /************************************************
  * Classes for bit-vector and k-width bit-vector.
  * Warning: doesn't do any bounds checking.
@@ -10,192 +10,136 @@
  * Since pop doesn't reset the value, successive growTo
  * calls may leave some ghost elements.
  ************************************************/
-template<unsigned int B>
-struct BitMask
-{
-    enum { value = 2*BitMask<B-1>::value + 1 };
+template <unsigned int B>
+struct BitMask {
+	enum { value = 2 * BitMask<B - 1>::value + 1 };
 };
 
-template<>
-struct BitMask<0>
-{
-    enum { value = 0 };
+template <>
+struct BitMask<0> {
+	enum { value = 0 };
 };
 
-template<class T = unsigned int, unsigned int B = 1>
+template <class T = unsigned int, unsigned int B = 1>
 class ValVec {
 public:
-    static const unsigned int eltsT = (8*sizeof(T))/B;
-    static const unsigned int mask = BitMask<B>::value;
+	static const unsigned int eltsT = (8 * sizeof(T)) / B;
+	static const unsigned int mask = BitMask<B>::value;
 
-    ValVec(unsigned int i = 0)
-        : elts(i),
-          sz( 1 + (i/eltsT) ),
-          data( (T*) malloc( sizeof(T)*sz ) )
-    {
-        for( unsigned int ii = 0; ii < sz; ii++ )
-        {
-            data[ii] = 0;
-        }
-    }
+	ValVec(unsigned int i = 0) : elts(i), sz(1 + (i / eltsT)), data((T*)malloc(sizeof(T) * sz)) {
+		for (unsigned int ii = 0; ii < sz; ii++) {
+			data[ii] = 0;
+		}
+	}
 
-    ~ValVec(void)
-    {
-        free(data);
-    }
-    
-    unsigned int operator[](unsigned int el)
-    {
-        unsigned int shift = B*(el%eltsT);
-        return (data[el/eltsT]&(mask<<shift))>>shift;
-    }
-    
-    bool elem(unsigned int el)
-    {
-        return data[el/eltsT]&(mask<<(B*(el%eltsT)));
-    }
+	~ValVec(void) { free(data); }
 
-    void set(unsigned int el, unsigned int val)
-    {
-        T Smask = ~(mask<<(B*(el%eltsT)));
-        data[el/eltsT] = (data[el/eltsT]&Smask) | val<<(B*(el%eltsT));
-    }
+	unsigned int operator[](unsigned int el) {
+		unsigned int shift = B * (el % eltsT);
+		return (data[el / eltsT] & (mask << shift)) >> shift;
+	}
 
-    void push(unsigned int val)
-    {
-        if( elts + 1 >= sz*eltsT )
-        {
-            unsigned int newsz = 2*sz;
-            data = (T*) realloc(data,sizeof(T)*sz);
-            for( ; sz < newsz; sz++ )
-                data[sz] = 0;
-        }
+	bool elem(unsigned int el) { return data[el / eltsT] & (mask << (B * (el % eltsT))); }
 
-        set(elts,val);
-        elts++;
-    }
+	void set(unsigned int el, unsigned int val) {
+		T Smask = ~(mask << (B * (el % eltsT)));
+		data[el / eltsT] = (data[el / eltsT] & Smask) | val << (B * (el % eltsT));
+	}
 
-    unsigned int pop(void)
-    {
-        assert( elts > 0 );
-        elts--;
-        return (*this)[elts];
-    }
+	void push(unsigned int val) {
+		if (elts + 1 >= sz * eltsT) {
+			unsigned int newsz = 2 * sz;
+			data = (T*)realloc(data, sizeof(T) * sz);
+			for (; sz < newsz; sz++) data[sz] = 0;
+		}
 
-    unsigned int size(void)
-    {
-        return elts;
-    }
+		set(elts, val);
+		elts++;
+	}
+
+	unsigned int pop(void) {
+		assert(elts > 0);
+		elts--;
+		return (*this)[elts];
+	}
+
+	unsigned int size(void) { return elts; }
+
 protected:
-    unsigned int elts;
-    unsigned int sz;
-    T* data; 
+	unsigned int elts;
+	unsigned int sz;
+	T* data;
 };
 
-template<class T = unsigned int>
+template <class T = unsigned int>
 class BitVec {
 public:
-    static const unsigned int eltsT = 8*sizeof(T);
+	static const unsigned int eltsT = 8 * sizeof(T);
 
-    BitVec(unsigned int i = 0)
-        : elts(i),
-          sz( 1 + (i/eltsT) ),
-          data( (T*) malloc( sizeof(T)*sz ) )
-    {
-        for( unsigned int ii = 0; ii < sz; ii++ )
-        {
-            data[ii] = 0;
-        }
-    }
+	BitVec(unsigned int i = 0) : elts(i), sz(1 + (i / eltsT)), data((T*)malloc(sizeof(T) * sz)) {
+		for (unsigned int ii = 0; ii < sz; ii++) {
+			data[ii] = 0;
+		}
+	}
 
-    ~BitVec(void)
-    {
-        free(data);
-    }
-    
-    bool operator[](unsigned int el)
-    {
-        return elem(el);
-    }
+	~BitVec(void) { free(data); }
 
+	bool operator[](unsigned int el) { return elem(el); }
 
-    bool elem(unsigned int el)
-    {
-        return data[el/eltsT]&(1<<(el%eltsT));
-    }
+	bool elem(unsigned int el) { return data[el / eltsT] & (1 << (el % eltsT)); }
 
-    void insert(unsigned int el)
-    {
-        data[el/eltsT] |= 1<<(el%eltsT);
-    }
+	void insert(unsigned int el) { data[el / eltsT] |= 1 << (el % eltsT); }
 
-    void remove(unsigned int el)
-    {
-        data[el/eltsT] &= ~(1<<(el%eltsT));
-    }
+	void remove(unsigned int el) { data[el / eltsT] &= ~(1 << (el % eltsT)); }
 
-    void push(bool val)
-    {
-        if( elts + 1 >= sz*eltsT )
-        {
-            unsigned int newsz = sz*2;
-            data = (T*) realloc(data,sizeof(T)*newsz);
-            for( ; sz < newsz; sz++ )
-            {
-                data[sz] = 0;
-            }
-        }
+	void push(bool val) {
+		if (elts + 1 >= sz * eltsT) {
+			unsigned int newsz = sz * 2;
+			data = (T*)realloc(data, sizeof(T) * newsz);
+			for (; sz < newsz; sz++) {
+				data[sz] = 0;
+			}
+		}
 
-        if( val )
-        {
-            insert(elts);
-        } else {
-            remove(elts);
-        }
-        elts++;
-    }
+		if (val) {
+			insert(elts);
+		} else {
+			remove(elts);
+		}
+		elts++;
+	}
 
-    void growTo(unsigned int newsz)
-    {
-        if( newsz > sz*eltsT )
-        {
-            sz = 1 + newsz/eltsT;
-            data = (T*) realloc(data,sizeof(T)*sz);
-        }
-    }
+	void growTo(unsigned int newsz) {
+		if (newsz > sz * eltsT) {
+			sz = 1 + newsz / eltsT;
+			data = (T*)realloc(data, sizeof(T) * sz);
+		}
+	}
 
-    bool pop(void)
-    {
-        assert( elts > 0 );
+	bool pop(void) {
+		assert(elts > 0);
 
-        elts--;
-        return elem(elts);
-    }
+		elts--;
+		return elem(elts);
+	}
 
-    unsigned int size(void)
-    {
-        return elts;
-    }
+	unsigned int size(void) { return elts; }
 
 protected:
-    unsigned int elts;
-    unsigned int sz;
-    T* data; 
+	unsigned int elts;
+	unsigned int sz;
+	T* data;
 };
 
 // Trailed variant of the bit-vector.
 // template<class T = unsigned int>
 class TBitVec : public BitVec<unsigned int> {
 public:
-    TBitVec(unsigned int i = 0) : BitVec<unsigned int>(i)
-    {
+	TBitVec(unsigned int i = 0) : BitVec<unsigned int>(i) {}
 
-    }
-
-    void insert(unsigned int el)
-    {
-      trailChange(data[el/eltsT], data[el/eltsT] | 1<<(el%eltsT)); 
-    }
+	void insert(unsigned int el) {
+		trailChange(data[el / eltsT], data[el / eltsT] | 1 << (el % eltsT));
+	}
 };
 
 #endif

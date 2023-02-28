@@ -79,8 +79,8 @@
 #include <chuffed/flatzinc/generated_parser/parser.tab.h>
 
 #ifdef HAVE_MMAP
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>

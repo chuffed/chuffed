@@ -1,22 +1,25 @@
-#include <cstdio>
-#include <cassert>
-#include <iostream>
-#include <chuffed/core/options.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/core/propagator.h>
 #include <chuffed/branching/branching.h>
-#include <chuffed/mip/mip.h>
+#include <chuffed/core/engine.h>
+#include <chuffed/core/options.h>
+#include <chuffed/core/propagator.h>
+#include <chuffed/core/sat.h>
 #include <chuffed/ldsb/ldsb.h>
+#include <chuffed/mip/mip.h>
+
+#include <cassert>
+#include <cstdio>
+#include <iostream>
 
 void process_ircs();
 
 void Engine::init() {
 	// Get the vars ready
 	for (int i = 0; i < vars.size(); i++) {
-		IntVar *v = vars[i];
-		if (v->pinfo.size() == 0) v->in_queue = true;
-		else v->pushInQueue();
+		IntVar* v = vars[i];
+		if (v->pinfo.size() == 0)
+			v->in_queue = true;
+		else
+			v->pushInQueue();
 	}
 
 	if (so.lazy) {
@@ -24,8 +27,7 @@ void Engine::init() {
 			if (vars[i]->getMax() - vars[i]->getMin() <= so.eager_limit) {
 				vars[i]->specialiseToEL();
 			} else {
-        if (so.verbosity >= 2)
-          std::cerr << "using lazy literal\n";
+				if (so.verbosity >= 2) std::cerr << "using lazy literal\n";
 				vars[i]->specialiseToLL();
 			}
 		}

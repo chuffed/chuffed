@@ -4,7 +4,9 @@
 class IntVarLL : public IntVar {
 	static const bool ll_dec = true;
 
-	struct LitNode { int var, val, prev, next; };
+	struct LitNode {
+		int var, val, prev, next;
+	};
 
 	vec<LitNode> ld;
 	vec<int> freelist;
@@ -13,7 +15,7 @@ class IntVarLL : public IntVar {
 
 	Lit valLit;
 
-        std::string varLabel;
+	std::string varLabel;
 
 	Lit getGELit(int v);
 	Lit getLELit(int v);
@@ -23,7 +25,6 @@ class IntVarLL : public IntVar {
 	void updateFixed();
 
 public:
-
 	IntVarLL(const IntVar& other);
 
 	VarType getType() { return INT_VAR_LL; }
@@ -39,7 +40,10 @@ public:
 
 	Lit getMinLit() const { return Lit(ld[li].var, 0); }
 	Lit getMaxLit() const { return Lit(ld[hi].var, 1); }
-	Lit getValLit() const { assert(isFixed()); return ~valLit; }
+	Lit getValLit() const {
+		assert(isFixed());
+		return ~valLit;
+	}
 	Lit getFMinLit(int64_t v) { return getMinLit(); }
 	Lit getFMaxLit(int64_t v) { return getMaxLit(); }
 

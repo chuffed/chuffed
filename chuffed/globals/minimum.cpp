@@ -7,7 +7,7 @@ template <int U>
 class Minimum : public Propagator, public Checker {
 public:
 	int const sz;
-	IntView<U> * const x;
+	IntView<U>* const x;
 	IntView<U> const y;
 
 	// Persistent state
@@ -18,9 +18,14 @@ public:
 	// Intermediate state
 	bool lower_change;
 
-	Minimum(vec<IntView<U> > _x, IntView<U> _y)	:
-		sz(_x.size()), x(_x.release()), y(_y), min_max_var(-1), min_max(INT_MAX),
-		min_fixed(INT_MAX), lower_change(false) {
+	Minimum(vec<IntView<U> > _x, IntView<U> _y)
+			: sz(_x.size()),
+				x(_x.release()),
+				y(_y),
+				min_max_var(-1),
+				min_max(INT_MAX),
+				min_fixed(INT_MAX),
+				lower_change(false) {
 		priority = 1;
 		for (int i = 0; i < sz; i++) x[i].attach(this, i, EVENT_LU);
 		y.attach(this, sz, EVENT_L);
@@ -48,39 +53,38 @@ public:
 	}
 
 	bool propagate() {
-
 		// make a less than or equal to min(max(x_i))
 		setDom(y, setMax, min_max, x[min_max_var].getMaxLit());
 
 		if (lower_change) {
-
 			// make a greater than or equal to min(min(b_i))
-			int64_t m = INT64_MAX; 
+			int64_t m = INT64_MAX;
 			for (int i = 0; i < sz; i++) {
 				int64_t t = x[i].getMin();
 				if (t < m) m = t;
 			}
 			if (y.setMinNotR(m)) {
-				Clause *r = NULL;
+				Clause* r = NULL;
 				if (so.lazy) {
-					r = Reason_new(sz+1);
+					r = Reason_new(sz + 1);
 					// Finesse lower bounds
-					// Add reason ![y <= m-1] \/ [x_1 <= m-1] \/ ... \/ [x_n <= m-1] 
-					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getFMinLit(m);
-//					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getLit(m-1, 3);
+					// Add reason ![y <= m-1] \/ [x_1 <= m-1] \/ ... \/ [x_n <= m-1]
+					for (int i = 0; i < sz; i++) (*r)[i + 1] = x[i].getFMinLit(m);
+					//					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getLit(m-1, 3);
 				}
 				if (!y.setMin(m, r)) return false;
 			}
 
 			// make b_i greater than or equal to min(a)
 			m = y.getMin();
-			Clause *r = NULL;
+			Clause* r = NULL;
 			if (so.lazy) {
 				r = Reason_new(2);
 				(*r)[1] = y.getMinLit();
-			}				
+			}
 			for (int i = 0; i < sz; i++) {
-				if (x[i].setMinNotR(m)) if (!x[i].setMin(m, r)) return false;
+				if (x[i].setMinNotR(m))
+					if (!x[i].setMin(m, r)) return false;
 			}
 		}
 
@@ -98,7 +102,8 @@ public:
 
 	bool check() {
 		int min = INT_MAX;
-		for (int i = 0; i < sz; i++) if (x[i].getShadowVal() < min) min = x[i].getShadowVal();
+		for (int i = 0; i < sz; i++)
+			if (x[i].getShadowVal() < min) min = x[i].getShadowVal();
 		return (y.getShadowVal() == min);
 	}
 
@@ -107,7 +112,6 @@ public:
 		if (y.getMin() == min_max) satisfied = true;
 		return 2;
 	}
-
 };
 
 void minimum(vec<IntVar*>& x, IntVar* y) {
@@ -121,4 +125,3 @@ void maximum(vec<IntVar*>& x, IntVar* y) {
 	for (int i = 0; i < x.size(); i++) w.push(IntView<>(x[i]));
 	new Minimum<1>(w, IntView<>(y));
 }
-

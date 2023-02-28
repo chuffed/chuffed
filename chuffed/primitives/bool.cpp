@@ -1,7 +1,7 @@
 #include <chuffed/core/propagator.h>
 
 void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
-//	NOT_SUPPORTED;
+	//	NOT_SUPPORTED;
 	BoolView v[3] = {x, y, z};
 	int u = 0;
 
@@ -14,19 +14,20 @@ void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
 				for (int k = 0; k < 8; k++) {
 					bool pass = true;
 					for (int m = 0; m < 3; m++) {
-						if ((i & (1<<m)) == 0) continue;
-						if (((k^j) & (1<<m)) == 0) pass = false;
+						if ((i & (1 << m)) == 0) continue;
+						if (((k ^ j) & (1 << m)) == 0) pass = false;
 					}
-					if (pass) flags |= (1<<k);
+					if (pass) flags |= (1 << k);
 				}
 				if (t & flags) continue;
 				if ((flags & ~u) == 0) continue;
 				vec<Lit> ps;
 				for (int m = 0; m < 3; m++) {
-					if ((i & (1<<m)) == 0) continue;
-					bool p = (j>>m)&1;
+					if ((i & (1 << m)) == 0) continue;
+					bool p = (j >> m) & 1;
 					if (l == 1) {
-						if (v[m].setValNotR(p)) if (!v[m].setVal(p)) TL_FAIL();
+						if (v[m].setValNotR(p))
+							if (!v[m].setVal(p)) TL_FAIL();
 					}
 					ps.push(v[m].getLit(p));
 				}
@@ -53,7 +54,6 @@ void bool_clause(vec<BoolView>& x) {
 	bool_clause(x, b);
 }
 
-
 //-----
 
 // \/ x_i \/ !y_i <-> z
@@ -76,12 +76,9 @@ void array_bool_or(vec<BoolView>& x, BoolView z) {
 }
 
 // /\ x_i /\ !y_i <-> z
-void array_bool_and(vec<BoolView>& x, vec<BoolView>& y, BoolView z) {
-	array_bool_or(y, x, ~z);
-}
+void array_bool_and(vec<BoolView>& x, vec<BoolView>& y, BoolView z) { array_bool_or(y, x, ~z); }
 
 void array_bool_and(vec<BoolView>& x, BoolView z) {
 	vec<BoolView> y;
 	array_bool_and(x, y, z);
 }
-

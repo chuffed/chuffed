@@ -2,8 +2,8 @@
 #define modelling_h
 
 #include <chuffed/support/misc.h>
-#include <chuffed/vars/int-var.h>
 #include <chuffed/vars/bool-view.h>
+#include <chuffed/vars/int-var.h>
 
 void createVar(IntVar*& x, int min, int max, bool el = false);
 void createVars(vec<IntVar*>& x, int n, int min, int max, bool el = false);
@@ -28,10 +28,10 @@ template <class U>
 void flatten(vec<vec<U> >& x, vec<U>& y) {
 	assert(y.size() == 0);
 	int n = x.size(), m = x[0].size();
-	y.growTo(n*m);
+	y.growTo(n * m);
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {
-			y[i*m+j] = x[i][j];
+			y[i * m + j] = x[i][j];
 		}
 	}
 }

@@ -6,18 +6,17 @@
 // Integer variable with sparse domains.
 
 class IntVarSL : public IntVar {
-	vec<int> values;          // values that the var can take in ascending order
-	IntVarEL *el;
+	vec<int> values;  // values that the var can take in ascending order
+	IntVarEL* el;
 
 	// transform value into index, type determines return value when a hole is encountered
 	// 0: round down, 1: round up, 2: -1
 	int transform(int v, int type);
 
 public:
-
 	IntVarSL(const IntVar& other, vec<int>& values);
 
-	void attach(Propagator *p, int pos, int eflags);
+	void attach(Propagator* p, int pos, int eflags);
 
 	VarType getType() { return INT_VAR_SL; }
 
@@ -27,8 +26,12 @@ public:
 	Lit getMinLit() const { return el->getMinLit(); }
 	Lit getMaxLit() const { return el->getMaxLit(); }
 	Lit getValLit() const { return el->getValLit(); }
-	Lit getFMinLit(int64_t v) { return so.finesse ? ~el->getLit(transform(v, 0), 2) : el->getMinLit(); }
-	Lit getFMaxLit(int64_t v) { return so.finesse ? ~el->getLit(transform(v, 1), 3) : el->getMaxLit(); }
+	Lit getFMinLit(int64_t v) {
+		return so.finesse ? ~el->getLit(transform(v, 0), 2) : el->getMinLit();
+	}
+	Lit getFMaxLit(int64_t v) {
+		return so.finesse ? ~el->getLit(transform(v, 1), 3) : el->getMaxLit();
+	}
 
 	bool setMin(int64_t v, Reason r = NULL, bool channel = true);
 	bool setMax(int64_t v, Reason r = NULL, bool channel = true);
@@ -38,6 +41,5 @@ public:
 	void channel(int val, int val_type, int sign);
 	void debug();
 };
-
 
 #endif

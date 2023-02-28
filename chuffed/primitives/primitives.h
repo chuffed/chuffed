@@ -1,61 +1,72 @@
 #ifndef primitives_h
 #define primitives_h
 
-
 enum IntRelType {
-	IRT_EQ,		// =	Equal to
-	IRT_NE,		// <> 	Not equal to
-	IRT_LE,		// <= 	Less than or equal to
-	IRT_LT,		// < 	Less than
-	IRT_GE,		// >=	Greater than or equal to
-	IRT_GT		// >	Greater than
+	IRT_EQ,  // =	Equal to
+	IRT_NE,  // <> 	Not equal to
+	IRT_LE,  // <= 	Less than or equal to
+	IRT_LT,  // < 	Less than
+	IRT_GE,  // >=	Greater than or equal to
+	IRT_GT   // >	Greater than
 };
 
 inline IntRelType operator!(IntRelType t) {
 	switch (t) {
-		case IRT_EQ: return IRT_NE;
-		case IRT_NE: return IRT_EQ;
-		case IRT_LE: return IRT_GT;
-		case IRT_LT: return IRT_GE;
-		case IRT_GE: return IRT_LT;
-		case IRT_GT: return IRT_LE;
-		default: NEVER;
+		case IRT_EQ:
+			return IRT_NE;
+		case IRT_NE:
+			return IRT_EQ;
+		case IRT_LE:
+			return IRT_GT;
+		case IRT_LT:
+			return IRT_GE;
+		case IRT_GE:
+			return IRT_LT;
+		case IRT_GT:
+			return IRT_LE;
+		default:
+			NEVER;
 	}
 }
 
 inline IntRelType operator-(IntRelType t) {
 	switch (t) {
-		case IRT_LE: return IRT_GE;
-		case IRT_LT: return IRT_GT;
-		case IRT_GE: return IRT_LE;
-		case IRT_GT: return IRT_LT;
-		default: return t;
+		case IRT_LE:
+			return IRT_GE;
+		case IRT_LT:
+			return IRT_GT;
+		case IRT_GE:
+			return IRT_LE;
+		case IRT_GT:
+			return IRT_LT;
+		default:
+			return t;
 	}
 }
 
 enum BoolRelType {
-	BRT_AND     = 0x87,
-	BRT_NOT     = 0x66,
-	BRT_OR      = 0xe1,
-	BRT_XOR     = 0x69,
-	BRT_EQ      = 0x99,
+	BRT_AND = 0x87,
+	BRT_NOT = 0x66,
+	BRT_OR = 0xe1,
+	BRT_XOR = 0x69,
+	BRT_EQ = 0x99,
 	BRT_EQ_REIF = 0x96,
-	BRT_NE      = 0x66,
+	BRT_NE = 0x66,
 	BRT_NE_REIF = 0x69,
-	BRT_LE      = 0xdd,
+	BRT_LE = 0xdd,
 	BRT_LE_REIF = 0xd2,
-	BRT_LT      = 0x44,
+	BRT_LT = 0x44,
 	BRT_LT_REIF = 0x4b,
-	BRT_GE      = 0xbb,
+	BRT_GE = 0xbb,
 	BRT_GE_REIF = 0xb4,
-	BRT_GT      = 0x22,
+	BRT_GT = 0x22,
 	BRT_GT_REIF = 0x2d,
-	BRT_L_IMPL  = 0xb4,
-	BRT_R_IMPL  = 0xd2
+	BRT_L_IMPL = 0xb4,
+	BRT_R_IMPL = 0xd2
 };
 
-
 #include <chuffed/core/propagator.h>
+#include <chuffed/vars/bool-view.h>
 
 // bool.c
 
@@ -140,8 +151,8 @@ void array_var_bool_element(IntVar* x, vec<BoolView>& a, BoolView y, int offset 
 // y = a[x-offset]
 void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
 void array_var_int_element_dom(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
-void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
-
+void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y,
+																		 int offset = 0);
 
 // domain.c
 

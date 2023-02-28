@@ -1,27 +1,27 @@
-#include <cstdio>
-#include <cassert>
+#include <chuffed/branching/branching.h>
 #include <chuffed/core/engine.h>
 #include <chuffed/core/propagator.h>
-#include <chuffed/branching/branching.h>
-#include <chuffed/vars/modelling.h>
 #include <chuffed/ldsb/ldsb.h>
+#include <chuffed/vars/modelling.h>
+
+#include <cassert>
+#include <cstdio>
 
 class GraphColouringSym : public Problem {
 public:
 	// Constants
-	int v;                                          // Number of vertices
+	int v;  // Number of vertices
 	int p;
 
 	// Core variables
 
-	vec<IntVar*> x;                                 // Vectex labels
-	IntVar* colours;                                // Number of colours
+	vec<IntVar*> x;   // Vectex labels
+	IntVar* colours;  // Number of colours
 
 	vec<vec<IntVar*> > partitions;
 
 	GraphColouringSym(char* filename) {
-
-		FILE *fp = fopen(filename, "r");
+		FILE* fp = fopen(filename, "r");
 		int temp, temp2;
 
 		rassert(fscanf(fp, "%d\n", &v) == 1);
@@ -37,8 +37,8 @@ public:
 			}
 			if (temp2 == 1) {
 				for (int j = 0; j < temp; j++) {
-					for (int k = j+1; k < temp; k++) {
-						int_rel(x[x_size+j], IRT_NE, x[x_size+k]);
+					for (int k = j + 1; k < temp; k++) {
+						int_rel(x[x_size + j], IRT_NE, x[x_size + k]);
 					}
 				}
 			}
@@ -92,7 +92,6 @@ public:
 				var_sym_break(partitions[i]);
 			}
 		}
-
 	}
 
 	void restrict_learnable() {
@@ -100,14 +99,14 @@ public:
 		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
-			((IntVarEL*) x[i])->setVLearnable();
-			((IntVarEL*) x[i])->setVDecidable(true);
+			((IntVarEL*)x[i])->setVLearnable();
+			((IntVarEL*)x[i])->setVDecidable(true);
 		}
 	}
 
 	// Function to print out solution
 
-  void print(std::ostream& os) {
+	void print(std::ostream& os) {
 		for (int i = 0; i < p; i++) {
 			os << "|P" << i << ": ";
 			for (int j = 0; j < partitions[i].size(); j++) {
@@ -115,15 +114,14 @@ public:
 			}
 		}
 		os << "\n";
-//		fprintf(stderr, "Objective = %d\n", colours->getVal());
+		//		fprintf(stderr, "Objective = %d\n", colours->getVal());
 		// hack for this problem
 		if (so.ldsb) {
-			int *a = (int*) ldsb.symmetries[0];
-//			for (int i = 0; i < 6; i++) printf("%d ", a[i]); printf("\n");
-			a[5] = colours->getVal()-1;
+			int* a = (int*)ldsb.symmetries[0];
+			//			for (int i = 0; i < 6; i++) printf("%d ", a[i]); printf("\n");
+			a[5] = colours->getVal() - 1;
 		}
 	}
-
 };
 
 int main(int argc, char** argv) {
@@ -135,6 +133,3 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
-
-

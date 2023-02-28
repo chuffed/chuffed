@@ -1,46 +1,51 @@
-#include <chuffed/vars/int-var.h>
-#include <chuffed/core/sat.h>
 #include <chuffed/core/propagator.h>
+#include <chuffed/core/sat.h>
+#include <chuffed/vars/int-var.h>
 
 extern std::map<IntVar*, std::string> intVarString;
 
-IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values)
-	: IntVar(other), values(_values) {
-
+IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), values(_values) {
 	initVals();
 
 	// handle min, max and vals
 	int l = 0;
-	while (values[l] < min) if (++l == values.size()) TL_FAIL();
-	while (!vals[values[l]]) if (++l == values.size()) TL_FAIL();
+	while (values[l] < min)
+		if (++l == values.size()) TL_FAIL();
+	while (!vals[values[l]])
+		if (++l == values.size()) TL_FAIL();
 	min = values[l];
 
-//	printf("l = %d\n", l);
+	//	printf("l = %d\n", l);
 
-	int u = values.size()-1;
-	while (values[u] > max) if (u-- == 0) TL_FAIL();
-	while (!vals[values[u]]) if (u-- == 0) TL_FAIL();
+	int u = values.size() - 1;
+	while (values[u] > max)
+		if (u-- == 0) TL_FAIL();
+	while (!vals[values[u]])
+		if (u-- == 0) TL_FAIL();
 	max = values[u];
 
-//	printf("u = %d\n", u);
+	//	printf("u = %d\n", u);
 
 	for (int i = min, k = l; i <= max; i++) {
-		if (i == values[k]) { k++; continue; }
+		if (i == values[k]) {
+			k++;
+			continue;
+		}
 		vals[i] = false;
 	}
 
-	for (int i = l; i <= u; i++) values[i-l] = values[i];
-	values.resize(u-l+1);
+	for (int i = l; i <= u; i++) values[i - l] = values[i];
+	values.resize(u - l + 1);
 
-//	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
-//	printf("\n");
+	//	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
+	//	printf("\n");
 
 	// create the IntVarEL
-	IntVar *v = newIntVar(0, values.size()-1);
-        // inherit the name from this SL
-        intVarString[v] = intVarString[this];
+	IntVar* v = newIntVar(0, values.size() - 1);
+	// inherit the name from this SL
+	intVarString[v] = intVarString[this];
 	v->specialiseToEL();
-	el = (IntVarEL*) v;
+	el = (IntVarEL*)v;
 
 	// rechannel channel info
 	for (int i = 0; i < values.size(); i++) {
@@ -59,25 +64,34 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values)
 	pinfo.clear(true);
 }
 
-void IntVarSL::attach(Propagator *p, int pos, int eflags) {
-	if (isFixed()) p->wakeup(pos, eflags);
-	else el->pinfo.push(PropInfo(p, pos, eflags));
+void IntVarSL::attach(Propagator* p, int pos, int eflags) {
+	if (isFixed())
+		p->wakeup(pos, eflags);
+	else
+		el->pinfo.push(PropInfo(p, pos, eflags));
 }
 
 int IntVarSL::transform(int v, int type) {
-	int l = 0, u = values.size()-1, m;
+	int l = 0, u = values.size() - 1, m;
 	while (true) {
-		m = (l+u)/2;
-		if (values[m] == v) return m;
-		else if (values[m] < v) l = m+1;
-		else u = m-1;
+		m = (l + u) / 2;
+		if (values[m] == v)
+			return m;
+		else if (values[m] < v)
+			l = m + 1;
+		else
+			u = m - 1;
 		if (u < l) break;
 	}
 	switch (type) {
-		case 0: return u;
-		case 1: return l;
-		case 2: return -1;
-		default: NEVER;
+		case 0:
+			return u;
+		case 1:
+			return l;
+		case 2:
+			return -1;
+		default:
+			NEVER;
 	}
 }
 
@@ -91,27 +105,28 @@ Lit IntVarSL::getLit(int64_t v, int t) {
 		case 1:
 			u = transform(v, 2);
 			return (u == -1 ? lit_False : el->getLit(u, 1));
-		case 2: return el->getLit(transform(v, 1), 2);
-		case 3: return el->getLit(transform(v, 0), 3);
-		default: NEVER;
+		case 2:
+			return el->getLit(transform(v, 1), 2);
+		case 3:
+			return el->getLit(transform(v, 0), 3);
+		default:
+			NEVER;
 	}
 }
 
-
 bool IntVarSL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
-//	debug();
-//	printf("setMin: v = %d, u = %d\n", v, transform(v, 0));
+	//	debug();
+	//	printf("setMin: v = %d, u = %d\n", v, transform(v, 0));
 	if (!el->setMin(transform(v, 1), r, channel)) return false;
 	min = values[el->min];
 	return true;
 }
 
-
 bool IntVarSL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
-//	debug();
-//	printf("setMax: v = %d, u = %d\n", v, transform(v, 0));
+	//	debug();
+	//	printf("setMax: v = %d, u = %d\n", v, transform(v, 0));
 	if (!el->setMax(transform(v, 0), r, channel)) return false;
 	max = values[el->max];
 	return true;
@@ -143,7 +158,7 @@ bool IntVarSL::remVal(int64_t v, Reason r, bool channel) {
 }
 
 void IntVarSL::channel(int val, int val_type, int sign) {
-//	fprintf(stderr, "funny channel\n");
+	//	fprintf(stderr, "funny channel\n");
 	int type = val_type * 3 ^ sign;
 	el->set(val, type, false);
 	if (type == 0) vals[values[val]] = false;
@@ -152,8 +167,8 @@ void IntVarSL::channel(int val, int val_type, int sign) {
 }
 
 void IntVarSL::debug() {
-	printf("min = %d, max = %d, el->min = %d, el->max = %d\n", (int) min, (int) max, (int) el->min, (int) el->max);
+	printf("min = %d, max = %d, el->min = %d, el->max = %d\n", (int)min, (int)max, (int)el->min,
+				 (int)el->max);
 	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
 	printf("\n");
 }
-

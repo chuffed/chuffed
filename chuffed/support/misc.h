@@ -1,11 +1,11 @@
 #ifndef misc_h
 #define misc_h
 
-#include <cstdio>
 #include <cassert>
 #include <chrono>
-#include <ctime>
+#include <cstdio>
 #include <cstring>
+#include <ctime>
 
 #ifdef WIN32
 #ifdef HAS_PROFILER
@@ -19,15 +19,16 @@
 #define __SEP__ '/'
 #endif
 
-#include <stdint.h>
 #include <chuffed/support/vec.h>
+
+#include <cstdint>
 
 extern uint64_t bit[65];
 
-#define low(s) ((int) (s))
-#define high(s) ((int) ((s) >> 32))
-#define inSet(i,s) (bit[(i)] & (s))
-#define getbit(i,s) (((s) >> (i)) & 1)
+#define low(s) ((int)(s))
+#define high(s) ((int)((s) >> 32))
+#define inSet(i, s) (bit[(i)] & (s))
+#define getbit(i, s) (((s) >> (i)) & 1)
 
 //------
 #ifdef NDEBUG
@@ -35,40 +36,54 @@ extern uint64_t bit[65];
 #else
 #define __FILENAME__ __FILE__
 #endif
-#define CHUFFED_ERROR(...) do {                                                            \
-	fprintf(stderr, "%s:%d: ", __FILENAME__, __LINE__);         \
-	fprintf(stderr, __VA_ARGS__);                                                    \
-	abort();                                                                         \
-} while (0)
+#define CHUFFED_ERROR(...)                              \
+	do {                                                  \
+		fprintf(stderr, "%s:%d: ", __FILENAME__, __LINE__); \
+		fprintf(stderr, __VA_ARGS__);                       \
+		abort();                                            \
+	} while (0)
 
 #define NOT_SUPPORTED CHUFFED_ERROR("Not yet supported\n")
 #define NEVER CHUFFED_ERROR("Assertion failed.\n")
 
 // Run time assert
-#define rassert(expr) do { if (!(expr)) CHUFFED_ERROR("Assertion `%s' failed.\n", #expr); } while (0)
+#define rassert(expr)                                              \
+	do {                                                             \
+		if (!(expr)) CHUFFED_ERROR("Assertion `%s' failed.\n", #expr); \
+	} while (0)
 
 // Compile time assert, adapted from Boost library
-template <int x> struct static_assert_test{};
-template <bool b> struct STATIC_ASSERTION_FAILURE;
-template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
-#define BOOST_JOIN( X, Y ) BOOST_DO_JOIN( X, Y )
-#define BOOST_DO_JOIN( X, Y ) BOOST_DO_JOIN2(X,Y)
-#define BOOST_DO_JOIN2( X, Y ) X##Y
-#define cassert(expr)                                                         \
-  typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE<(bool) (expr)>)> \
-	BOOST_JOIN(boost_static_assert_typedef_, __LINE__)
+template <int x>
+struct static_assert_test {};
+template <bool b>
+struct STATIC_ASSERTION_FAILURE;
+template <>
+struct STATIC_ASSERTION_FAILURE<true> {
+	enum { value = 1 };
+};
+#define BOOST_JOIN(X, Y) BOOST_DO_JOIN(X, Y)
+#define BOOST_DO_JOIN(X, Y) BOOST_DO_JOIN2(X, Y)
+#define BOOST_DO_JOIN2(X, Y) X##Y
+#define cassert(expr)                                                                    \
+	typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE<(bool)(expr)>)> BOOST_JOIN( \
+			boost_static_assert_typedef_, __LINE__)
 
-#define TL_FAIL() do { printf("=====UNSATISFIABLE=====\n"); printf("%% Top level failure!\n"); exit(0); } while (0)
+#define TL_FAIL()                        \
+	do {                                   \
+		printf("=====UNSATISFIABLE=====\n"); \
+		printf("%% Top level failure!\n");   \
+		exit(0);                             \
+	} while (0)
 
 //------
 
 #define MYRAND_MAX 4294967296.0
 
 static inline unsigned int myrand(int& rseed) {
-	return (rseed = (long long) 1103515245 * rseed + 12345);
+	return (rseed = (long long)1103515245 * rseed + 12345);
 }
 
-#define irand(n) ((int) floor(myrand(so.rnd_seed) / MYRAND_MAX * n))
+#define irand(n) ((int)floor(myrand(so.rnd_seed) / MYRAND_MAX * n))
 
 //------
 
@@ -83,29 +98,32 @@ static inline double to_sec(duration d) {
 template <class T>
 static inline int bitcount(T s) {
 	int c = 0;
-	while (s) {	s &= s-1;	c++; }
+	while (s) {
+		s &= s - 1;
+		c++;
+	}
 	return c;
 }
 
 static inline double wallClockTime() {
 #ifdef WIN32
-  static const unsigned __int64 epoch = ((unsigned __int64) 116444736000000000ULL);
-  FILETIME    file_time;
-  SYSTEMTIME  system_time;
-  ULARGE_INTEGER ularge;
-  
-  GetSystemTime(&system_time);
-  SystemTimeToFileTime(&system_time, &file_time);
-  ularge.LowPart = file_time.dwLowDateTime;
-  ularge.HighPart = file_time.dwHighDateTime;
+	static const unsigned __int64 epoch = ((unsigned __int64)116444736000000000ULL);
+	FILETIME file_time;
+	SYSTEMTIME system_time;
+	ULARGE_INTEGER ularge;
 
-  long sec = (ularge.QuadPart - epoch) / 10000000L;
-  long msec = system_time.wMilliseconds;
-  return (double) sec + (double) msec/1000;
+	GetSystemTime(&system_time);
+	SystemTimeToFileTime(&system_time, &file_time);
+	ularge.LowPart = file_time.dwLowDateTime;
+	ularge.HighPart = file_time.dwHighDateTime;
+
+	long sec = (ularge.QuadPart - epoch) / 10000000L;
+	long msec = system_time.wMilliseconds;
+	return (double)sec + (double)msec / 1000;
 #else
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return (double) tp.tv_sec + (double) tp.tv_usec/1000000;
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	return (double)tp.tv_sec + (double)tp.tv_usec / 1000000;
 #endif
 }
 
@@ -115,14 +133,17 @@ static inline double wallClockTime() {
 }
 */
 
-static int mylog2 (int val) {
+static int mylog2(int val) {
 	int ret = -1;
-	while (val != 0) { val >>= 1; ret++; }
+	while (val != 0) {
+		val >>= 1;
+		ret++;
+	}
 	return ret;
 }
 
 static double memUsed() {
-  return 0;
+	return 0;
 	/* char name[256]; */
 	/* sprintf(name, "/proc/%d/statm", getpid()); */
 	/* FILE* in = fopen(name, "rb"); */
@@ -136,20 +157,19 @@ static double memUsed() {
 template <class T>
 static T** new2d(int n, int m) {
 	T** a = new T*[n];
-	T* b = new T[n*m];
+	T* b = new T[n * m];
 	for (int i = 0; i < n; i++) {
 		a[i] = b + i * m;
 	}
 	return a;
 }
 
-template<class T, class U>
-  T conv(const U& x) {
-  static_assert(sizeof(T) == sizeof(U),
-		"Must bit-cast between values of equal size.");
-  T ret;
-  memcpy(&ret, &x, sizeof(U));
-  return ret;
+template <class T, class U>
+T conv(const U& x) {
+	static_assert(sizeof(T) == sizeof(U), "Must bit-cast between values of equal size.");
+	T ret;
+	memcpy(&ret, &x, sizeof(U));
+	return ret;
 }
 
 #endif

@@ -3,88 +3,75 @@
 #include <algorithm>
 
 // Convert a MDD into a edge-valued layer graph according to an array of costs.
-EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& costs)
-{
-  MDDTable& t(*r.table);
-  _MDD root = r.val;
-  root = t.expand(0, root);
+EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& costs) {
+	MDDTable& t(*r.table);
+	_MDD root = r.val;
+	root = t.expand(0, root);
 
-  const std::vector<MDDNode>& nodes(t.getNodes());
-  std::vector<int>& status(t.getStatus());
+	const std::vector<MDDNode>& nodes(t.getNodes());
+	std::vector<int>& status(t.getStatus());
 
-  // Mark T and F as seen.
-  status[0] = 1;
-  status[1] = 1;
-  
-  vec<int> node_queue;
+	// Mark T and F as seen.
+	status[0] = 1;
+	status[1] = 1;
 
-  status[root] = 1;
-  node_queue.push(root);
+	vec<int> node_queue;
 
-  // Compute the set of edges.
-  // We're assuming they're collected in topological order.
-  int qhead = 0;
-  while(qhead < node_queue.size())
-  {
-    int nID = node_queue[qhead];
-        
-    MDDNode nodeptr = nodes[nID];
-    for( unsigned int j = 0; j < nodeptr->sz; j++ )
-    {
-      if( status[nodeptr->edges[j].dest] == 0 )
-      {
-        node_queue.push(nodeptr->edges[j].dest);
-        status[nodeptr->edges[j].dest] = 1;
-      }
-    }
-    qhead++;
-  }
+	status[root] = 1;
+	node_queue.push(root);
 
-  // Assign the terminal states.
-  status[0] = EVLayerGraph::EVFalse;
-  status[1] = EVLayerGraph::EVTrue;
+	// Compute the set of edges.
+	// We're assuming they're collected in topological order.
+	int qhead = 0;
+	while (qhead < node_queue.size()) {
+		int nID = node_queue[qhead];
 
-  // Scan the nodes in reverse topological order, and
-  // construct the corresponding ev-node.
-  for(qhead = node_queue.size()-1; qhead >= 0; qhead--)
-  {
-    int nID = node_queue[qhead];
-    MDDNode nodeptr = nodes[nID];
-    int vv = nodeptr->var;
+		MDDNode nodeptr = nodes[nID];
+		for (unsigned int j = 0; j < nodeptr->sz; j++) {
+			if (status[nodeptr->edges[j].dest] == 0) {
+				node_queue.push(nodeptr->edges[j].dest);
+				status[nodeptr->edges[j].dest] = 1;
+			}
+		}
+		qhead++;
+	}
 
-    vec<EVLayerGraph::EInfo> edges;
-    for(unsigned int j = 0; j < nodeptr->sz; j++)
-    {
-      if(nodeptr->edges[j].val > costs.size())
-        break;
+	// Assign the terminal states.
+	status[0] = EVLayerGraph::EVFalse;
+	status[1] = EVLayerGraph::EVTrue;
 
-      if(nodeptr->edges[j].dest != MDDFALSE)
-      {
-        EVLayerGraph::NodeID dest = status[nodeptr->edges[j].dest];
-        unsigned int start = std::max(0, nodeptr->edges[j].val);
-        unsigned int end = (j+1 < nodeptr->sz && nodeptr->edges[j+1].val <= costs.size())
-                                  ? nodeptr->edges[j+1].val : costs.size();
-        for( unsigned int k = start; k < end; k++ )
-        {
-          EVLayerGraph::EInfo einfo = {
-            static_cast<int>(k),
-            costs[k],
-            dest 
-          };
-          edges.push(einfo);
-        }
-      }
-    }
-    status[nID] = graph.insert(vv, edges);
-  }
+	// Scan the nodes in reverse topological order, and
+	// construct the corresponding ev-node.
+	for (qhead = node_queue.size() - 1; qhead >= 0; qhead--) {
+		int nID = node_queue[qhead];
+		MDDNode nodeptr = nodes[nID];
+		int vv = nodeptr->var;
 
-  EVLayerGraph::NodeID ret = status[root];
+		vec<EVLayerGraph::EInfo> edges;
+		for (unsigned int j = 0; j < nodeptr->sz; j++) {
+			if (nodeptr->edges[j].val > costs.size()) break;
 
-  // Clear the status flags.
-  status[0] = 0;
-  status[1] = 0;
-  for(qhead = 0; qhead < node_queue.size(); qhead++)
-    status[node_queue[qhead]] = 0;
+			if (nodeptr->edges[j].dest != MDDFALSE) {
+				EVLayerGraph::NodeID dest = status[nodeptr->edges[j].dest];
+				unsigned int start = std::max(0, nodeptr->edges[j].val);
+				unsigned int end = (j + 1 < nodeptr->sz && nodeptr->edges[j + 1].val <= costs.size())
+															 ? nodeptr->edges[j + 1].val
+															 : costs.size();
+				for (unsigned int k = start; k < end; k++) {
+					EVLayerGraph::EInfo einfo = {static_cast<int>(k), costs[k], dest};
+					edges.push(einfo);
+				}
+			}
+		}
+		status[nID] = graph.insert(vv, edges);
+	}
 
-  return ret;
+	EVLayerGraph::NodeID ret = status[root];
+
+	// Clear the status flags.
+	status[0] = 0;
+	status[1] = 0;
+	for (qhead = 0; qhead < node_queue.size(); qhead++) status[node_queue[qhead]] = 0;
+
+	return ret;
 }

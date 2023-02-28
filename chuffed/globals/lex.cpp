@@ -15,10 +15,10 @@ void lex(vec<IntVar*>& x, vec<IntVar*>& y, bool strict) {
 	for (int i = 1; i < x.size(); i++) b.push(newBoolVar());
 	b.push(bv_false);
 	for (int i = 0; i < x.size(); i++) r.push(newBoolVar());
-	
-	for (int i = 0; i < x.size()-1+strict; i++) {
-		bool_rel(r[i], BRT_OR, b[i+1], b[i]);
-		newBinGE(IntView<>(y[i]), IntView<>(x[i],1,1), r[i]);
+
+	for (int i = 0; i < x.size() - 1 + strict; i++) {
+		bool_rel(r[i], BRT_OR, b[i + 1], b[i]);
+		newBinGE(IntView<>(y[i]), IntView<>(x[i], 1, 1), r[i]);
 	}
 	for (int i = 0; i < x.size(); i++) {
 		newBinGE(IntView<>(y[i]), IntView<>(x[i]), b[i]);

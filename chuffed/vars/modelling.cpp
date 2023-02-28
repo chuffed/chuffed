@@ -26,7 +26,6 @@ void createVars(vec<vec<IntVar*> >& x, int n, int m, int min, int max, bool el) 
 	}
 }
 
-
 void createVars(vec<BoolView>& x, int n) {
 	assert(x.size() == 0);
 	x.growTo(n);
