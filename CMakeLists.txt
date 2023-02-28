@@ -187,7 +187,7 @@ endif()
 
 find_package(BISON 3.4)
 if(BISON_FOUND)
-  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/chuffed/flatzinc)
+  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/chuffed/flatzinc/generated_parser)
   bison_target(FZNParser
     ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/parser.yxx
     ${PROJECT_BINARY_DIR}/parser.tab.cpp
