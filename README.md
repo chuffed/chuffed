@@ -48,28 +48,35 @@ Chuffed can be compiled on Windows, macOS and Linux.
 
 You need a recent C++ compiler that supports C++11 (e.g. Microsoft Visual Studio
 2013, gcc 4.8, clang), as well as the CMake build tool (at least version 3.1).
+To automatically format the Chuffed source code, the `clang-format` executable
+must be available.
 
 #### CMake & Co
 
-To build the `fzn-chuffed` executable:
+To initialize the CMake build environment, using `build` as the build directory,
+use the following command:
 
-    mkdir build
-    cd build
-    cmake ..
-    cmake --build .
+    cmake -B build -S .
 
-To install `fzn-chuffed` run the following command in the build directory:
-`cmake --build . --target install`. The installation directory can be chosen by
-appending `-DCMAKE_INSTALL_PREFIX=$LOCATION` with the chosen location to the
-initial CMake command.
+To then build the `fzn-chuffed` executable run:
+
+    cmake --build build
+
+To install `fzn-chuffed` run the following command: 
+
+    cmake --build build --target install
+    
+The installation directory can be chosen by appending
+`-DCMAKE_INSTALL_PREFIX=$LOCATION` with the chosen location to the initial CMake
+command.
 
 To build the C++ examples:
 
-    mkdir build
-    cd build
-    cmake ..
-    cmake --build . --target examples
+    cmake --build build --target examples
 
+To format the Chuffed source files
+
+    cmake --build build --target format
 
 ## Description
 
