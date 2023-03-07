@@ -1,0 +1,26 @@
+---
+Checks: '-*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-sizeof-expression,
+  -bugprone-undefined-memory-manipulation,
+  modernize-deprecated-headers,
+  modernize-loop-convert,
+  modernize-pass-by-value,
+  modernize-redundant-void-arg,
+  modernize-use-auto,
+  modernize-use-emplace,
+  modernize-use-nullptr,
+  modernize-use-override,
+  performace-*,
+  readability-*,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-simplify-boolean-expr,
+  -readability-suspicious-call-argument,
+'
+WarningsAsErrors:  '*'
+HeaderFilterRegex: 'chuffed/(branching|core|examples|flatzinc|globals|ldsb|mdd|mip|primitives|support|vars)'
+FormatStyle: file

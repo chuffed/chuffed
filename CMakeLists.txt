@@ -47,9 +47,13 @@ endif()
 
 # ------------- CP Profiler Integration -------------
 
-set(CHUFFED_PROFILER_SOURCES
-  ${CMAKE_SOURCE_DIR}/thirdparty/cp-profiler-integration/connector.hpp
-  ${CMAKE_SOURCE_DIR}/thirdparty/cp-profiler-integration/message.hpp
+add_library(thirdparty_cp_profiler OBJECT
+  thirdparty/cp-profiler-integration/connector.hpp
+  thirdparty/cp-profiler-integration/message.hpp
+)
+set_target_properties(thirdparty_cp_profiler PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(thirdparty_cp_profiler PROPERTIES
+  CXX_CLANG_TIDY ""
 )
 
 # ---------- Support for impact branching -----------
@@ -60,6 +64,16 @@ if(SUPPORT_VAR_IMPACT)
     chuffed/branching/impact.cpp
   )
 endif()
+
+# ------------- Murmur Hash 3 -------------
+
+add_library(thirdparty_murmur OBJECT
+  thirdparty/MurmurHash3/MurmurHash3.cpp
+  thirdparty/MurmurHash3/MurmurHash3.h
+)
+set_target_properties(thirdparty_murmur PROPERTIES
+  CXX_CLANG_TIDY ""
+)
 
 # ------------- Main Chuffed Definition -------------
 
@@ -173,10 +187,10 @@ add_library(chuffed
   chuffed/core/sat-types.h
   chuffed/core/options.h
   chuffed/core/propagator.h
-  thirdparty/MurmurHash3/MurmurHash3.cpp
-  thirdparty/MurmurHash3/MurmurHash3.h
-  ${CHUFFED_PROFILER_SOURCES}
   ${VAR_IMPACT_SOURCES}
+
+  $<TARGET_OBJECTS:thirdparty_cp_profiler>
+  $<TARGET_OBJECTS:thirdparty_murmur>
 )
 
 if(CP_PROFILER)
@@ -215,13 +229,21 @@ else()
   set(FLEX_FZNLexer_OUTPUTS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/lexer.yy.cpp)
 endif()
 
+add_library(flatzinc_parser OBJECT
+  ${FLEX_FZNLexer_OUTPUTS}
+  ${BISON_FZNParser_OUTPUTS}
+)
+set_target_properties(flatzinc_parser PROPERTIES
+  CXX_CLANG_TIDY ""
+)
+
 add_library(chuffed_fzn
   chuffed/flatzinc/registry.cpp
   chuffed/flatzinc/flatzinc.cpp
-  ${FLEX_FZNLexer_OUTPUTS}
-  ${BISON_FZNParser_OUTPUTS}
   chuffed/flatzinc/flatzinc.h
   chuffed/flatzinc/ast.h
+
+  $<TARGET_OBJECTS:flatzinc_parser>
 )
 
 add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
