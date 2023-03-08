@@ -31,13 +31,13 @@
 
 namespace FlatZinc {
 
-Registry& registry(void) {
+Registry& registry() {
 	static Registry r;
 	return r;
 }
 
 void Registry::post(const ConExpr& ce, AST::Node* ann) {
-	std::map<std::string, poster>::iterator i = r.find(ce.id);
+	auto i = r.find(ce.id);
 	if (i == r.end()) {
 		throw FlatZinc::Error("Registry", std::string("Constraint ") + ce.id + " not found");
 	}
@@ -49,12 +49,17 @@ void Registry::add(const std::string& id, poster p) { r[id] = p; }
 namespace {
 
 ConLevel ann2icl(AST::Node* ann) {
-	if (ann) {
-		if (ann && ann->hasAtom("val")) return CL_VAL;
-		if (ann && (ann->hasAtom("bounds") || ann->hasAtom("boundsR") || ann->hasAtom("boundsD") ||
-								ann->hasAtom("boundsZ")))
+	if (ann != nullptr) {
+		if ((ann != nullptr) && ann->hasAtom("val")) {
+			return CL_VAL;
+		}
+		if ((ann != nullptr) && (ann->hasAtom("bounds") || ann->hasAtom("boundsR") ||
+														 ann->hasAtom("boundsD") || ann->hasAtom("boundsZ"))) {
 			return CL_BND;
-		if (ann && ann->hasAtom("domain")) return CL_DOM;
+		}
+		if ((ann != nullptr) && ann->hasAtom("domain")) {
+			return CL_DOM;
+		}
 	}
 	return CL_DEF;
 }
@@ -62,19 +67,23 @@ ConLevel ann2icl(AST::Node* ann) {
 inline void arg2intargs(vec<int>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
 	ia.growTo(a->a.size());
-	for (int i = a->a.size(); i--;) ia[i] = a->a[i]->getInt();
+	for (int i = a->a.size(); (i--) != 0;) {
+		ia[i] = a->a[i]->getInt();
+	}
 }
 
 inline void arg2boolargs(vec<bool>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
 	ia.growTo(a->a.size());
-	for (int i = a->a.size(); i--;) ia[i] = a->a[i]->getBool();
+	for (int i = a->a.size(); (i--) != 0;) {
+		ia[i] = a->a[i]->getBool();
+	}
 }
 
 inline void arg2intvarargs(vec<IntVar*>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
 	ia.growTo(a->a.size());
-	for (int i = a->a.size(); i--;) {
+	for (int i = a->a.size(); (i--) != 0;) {
 		if (a->a[i]->isIntVar()) {
 			ia[i] = s->iv[a->a[i]->getIntVar()];
 		} else {
@@ -87,23 +96,25 @@ inline void arg2intvarargs(vec<IntVar*>& ia, AST::Node* arg) {
 inline void arg2BoolVarArgs(vec<BoolView>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
 	ia.growTo(a->a.size());
-	for (int i = a->a.size(); i--;) {
+	for (int i = a->a.size(); (i--) != 0;) {
 		if (a->a[i]->isBoolVar()) {
 			ia[i] = s->bv[a->a[i]->getBoolVar()];
 		} else {
 			bool value = a->a[i]->getBool();
-			ia[i] = newBoolVar(value, value);
+			ia[i] = newBoolVar(static_cast<int>(value), static_cast<int>(value));
 		}
 	}
 }
 
 inline MDDOpts getMDDOpts(AST::Node* ann) {
 	MDDOpts mopts;
-	if (ann) {
+	if (ann != nullptr) {
 		if (ann->hasCall("mdd")) {
 			AST::Array* args(ann->getCall("mdd")->getArray());
-			for (unsigned int i = 0; i < args->a.size(); i++) {
-				if (AST::Atom* at = dynamic_cast<AST::Atom*>(args->a[i])) mopts.parse_arg(at->id);
+			for (auto& i : args->a) {
+				if (auto* at = dynamic_cast<AST::Atom*>(i)) {
+					mopts.parse_arg(at->id);
+				}
 			}
 		}
 	}
@@ -112,24 +123,27 @@ inline MDDOpts getMDDOpts(AST::Node* ann) {
 
 std::list<string> getCumulativeOptions(AST::Node* ann) {
 	std::list<string> opt;
-	if (ann) {
+	if (ann != nullptr) {
 		if (ann->hasCall("tt_filt")) {
-			if (ann->getCall("tt_filt")->args->getBool())
-				opt.push_back("tt_filt_on");
-			else
-				opt.push_back("tt_filt_off");
+			if (ann->getCall("tt_filt")->args->getBool()) {
+				opt.emplace_back("tt_filt_on");
+			} else {
+				opt.emplace_back("tt_filt_off");
+			}
 		}
 		if (ann->hasCall("ttef_check")) {
-			if (ann->getCall("ttef_check")->args->getBool())
-				opt.push_back("ttef_check_on");
-			else
-				opt.push_back("ttef_check_off");
+			if (ann->getCall("ttef_check")->args->getBool()) {
+				opt.emplace_back("ttef_check_on");
+			} else {
+				opt.emplace_back("ttef_check_off");
+			}
 		}
 		if (ann->hasCall("ttef_filt")) {
-			if (ann->getCall("ttef_filt")->args->getBool())
-				opt.push_back("ttef_filt_on");
-			else
-				opt.push_back("ttef_filt_off");
+			if (ann->getCall("ttef_filt")->args->getBool()) {
+				opt.emplace_back("ttef_filt_on");
+			} else {
+				opt.emplace_back("ttef_filt_off");
+			}
 		}
 		if (ann->hasCall("name")) {
 			opt.push_back("__name__" + ann->getCall("name")->args->getString());
@@ -141,9 +155,8 @@ std::list<string> getCumulativeOptions(AST::Node* ann) {
 BoolView getBoolVar(AST::Node* n) {
 	if (n->isBoolVar()) {
 		return s->bv[n->getBoolVar()];
-	} else {
-		return newBoolVar(n->getBool(), n->getBool());
 	}
+	return newBoolVar(static_cast<int>(n->getBool()), static_cast<int>(n->getBool()));
 }
 
 IntVar* getIntVar(AST::Node* n) {
@@ -448,16 +461,24 @@ void p_array_var_bool_element(const ConExpr& ce, AST::Node* ann) {
 	array_var_bool_element(sel, bv, getBoolVar(ce[2]), 1);
 }
 
-void p_set_in(const ConExpr& ce, AST::Node*) {
-	if (ce[1]->isSetVar()) CHUFFED_ERROR("Cannot handle set vars\n");
+void p_set_in(const ConExpr& ce, AST::Node* /*unused*/) {
+	if (ce[1]->isSetVar()) {
+		CHUFFED_ERROR("Cannot handle set vars\n");
+	}
 	AST::SetLit* sl = ce[1]->getSet();
 	if (ce[0]->isBoolVar()) {
 		assert(sl->interval);
 		BoolView v = getBoolVar(ce[0]);
-		if (sl->min >= 1)
-			if (!v.setVal(1)) TL_FAIL();
-		if (sl->max <= 0)
-			if (!v.setVal(0)) TL_FAIL();
+		if (sl->min >= 1) {
+			if (!v.setVal(true)) {
+				TL_FAIL();
+			}
+		}
+		if (sl->max <= 0) {
+			if (!v.setVal(false)) {
+				TL_FAIL();
+			}
+		}
 		return;
 	}
 	IntVar* v = getIntVar(ce[0]);
@@ -466,13 +487,19 @@ void p_set_in(const ConExpr& ce, AST::Node*) {
 		int_rel(v, IRT_LE, sl->max);
 	} else {
 		vec<int> is(sl->s.size());
-		for (unsigned int i = 0; i < sl->s.size(); i++) is[i] = sl->s[i];
-		if (!v->allowSet(is)) TL_FAIL();
+		for (unsigned int i = 0; i < sl->s.size(); i++) {
+			is[i] = sl->s[i];
+		}
+		if (!v->allowSet(is)) {
+			TL_FAIL();
+		}
 	}
 }
 
-void p_set_in_reif(const ConExpr& ce, AST::Node*) {
-	if (ce[1]->isSetVar()) CHUFFED_ERROR("Cannot handle set vars\n");
+void p_set_in_reif(const ConExpr& ce, AST::Node* /*unused*/) {
+	if (ce[1]->isSetVar()) {
+		CHUFFED_ERROR("Cannot handle set vars\n");
+	}
 	assert(ce[0]->isIntVar() || ce[0]->isInt());
 	assert(ce[2]->isBoolVar());
 	AST::SetLit* sl = ce[1]->getSet();
@@ -486,9 +513,9 @@ void p_set_in_reif(const ConExpr& ce, AST::Node*) {
 		bool_rel(r1, BRT_AND, r2, r);
 	} else {
 		vec<BoolView> rs;
-		for (unsigned int i = 0; i < sl->s.size(); i++) {
+		for (int i : sl->s) {
 			rs.push(newBoolVar());
-			int_rel_reif(v, IRT_EQ, sl->s[i], rs.last());
+			int_rel_reif(v, IRT_EQ, i, rs.last());
 		}
 		array_bool_or(rs, r);
 	}
@@ -537,10 +564,11 @@ void p_table_int(const ConExpr& ce, AST::Node* ann) {
 			ts.last().push(tuples[i * noOfVars + j]);
 		}
 	}
-	if (ann && (ann->hasAtom("mdd") || ann->hasCall("mdd")))
+	if ((ann != nullptr) && (ann->hasAtom("mdd") || ann->hasCall("mdd"))) {
 		mdd_table(x, ts, getMDDOpts(ann));
-	else
+	} else {
 		table(x, ts);
+	}
 }
 
 void p_regular(const ConExpr& ce, AST::Node* ann) {
@@ -566,15 +594,20 @@ void p_regular(const ConExpr& ce, AST::Node* ann) {
 	AST::SetLit* sl = ce[5]->getSet();
 	vec<int> f;
 	if (sl->interval) {
-		for (int i = sl->min; i <= sl->max; i++) f.push(i);
+		for (int i = sl->min; i <= sl->max; i++) {
+			f.push(i);
+		}
 	} else {
-		for (unsigned int i = 0; i < sl->s.size(); i++) f.push(sl->s[i]);
+		for (int& i : sl->s) {
+			f.push(i);
+		}
 	}
 
-	if (ann && ann->hasAtom("mdd"))
+	if ((ann != nullptr) && ann->hasAtom("mdd")) {
 		mdd_regular(iv, q, s, d, q0, f, true, getMDDOpts(ann));
-	else
+	} else {
 		regular(iv, q, s, d, q0, f);
+	}
 }
 
 void p_cost_regular(const ConExpr& ce, AST::Node* ann) {
@@ -615,9 +648,13 @@ void p_cost_regular(const ConExpr& ce, AST::Node* ann) {
 	AST::SetLit* sl = ce[6]->getSet();
 	vec<int> f;
 	if (sl->interval) {
-		for (int i = sl->min; i <= sl->max; i++) f.push(i);
+		for (int i = sl->min; i <= sl->max; i++) {
+			f.push(i);
+		}
 	} else {
-		for (unsigned int i = 0; i < sl->s.size(); i++) f.push(sl->s[i]);
+		for (int& i : sl->s) {
+			f.push(i);
+		}
 	}
 
 	IntVar* cost = getIntVar(ce[7]);
@@ -1013,7 +1050,9 @@ void p_tree(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ad_flat[i * es.size() + j]) ad[i].push(j);
+			if (ad_flat[i * es.size() + j]) {
+				ad[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1035,12 +1074,13 @@ void p_tree(const ConExpr& ce, AST::Node* ann) {
 			en.push(vec<int>());
 			int check = 0;
 			for (int j = 0; j < vs.size(); j++) {
-				if (en_flat[i * vs.size() + j]) {
+				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
 			}
-			if (en[i].size() == 1)  // Self loops
+			if (en[i].size() == 1) {  // Self loops
 				en[i].push(en[i][0]);
+			}
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
@@ -1096,7 +1136,9 @@ void p_connected(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ad_flat[i * es.size() + j]) ad[i].push(j);
+			if (ad_flat[i * es.size() + j]) {
+				ad[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1118,12 +1160,13 @@ void p_connected(const ConExpr& ce, AST::Node* ann) {
 			en.push(vec<int>());
 			int check = 0;
 			for (int j = 0; j < vs.size(); j++) {
-				if (en_flat[i * vs.size() + j]) {
+				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
 			}
-			if (en[i].size() == 1)  // Self loops
+			if (en[i].size() == 1) {  // Self loops
 				en[i].push(en[i][0]);
+			}
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
@@ -1183,7 +1226,9 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ad_flat[i * es.size() + j]) ad[i].push(j);
+			if (ad_flat[i * es.size() + j]) {
+				ad[i].push(j);
+			}
 		}
 	}
 
@@ -1206,12 +1251,13 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* ann) {
 			en.push(vec<int>());
 			int check = 0;
 			for (int j = 0; j < vs.size(); j++) {
-				if (en_flat[i * vs.size() + j]) {
+				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
 			}
-			if (en[i].size() == 1)  // Self loops
+			if (en[i].size() == 1) {  // Self loops
 				en[i].push(en[i][0]);
+			}
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
@@ -1272,7 +1318,9 @@ void p_mst(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ad_flat[i * es.size() + j]) ad[i].push(j);
+			if (ad_flat[i * es.size() + j]) {
+				ad[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1294,12 +1342,13 @@ void p_mst(const ConExpr& ce, AST::Node* ann) {
 			en.push(vec<int>());
 			int check = 0;
 			for (int j = 0; j < vs.size(); j++) {
-				if (en_flat[i * vs.size() + j]) {
+				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
 			}
-			if (en[i].size() == 1)  // Self loops
+			if (en[i].size() == 1) {  // Self loops
 				en[i].push(en[i][0]);
+			}
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
@@ -1364,7 +1413,9 @@ void p_dtree(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (in_flat[i * es.size() + j]) in[i].push(j);
+			if (in_flat[i * es.size() + j]) {
+				in[i].push(j);
+			}
 		}
 	}
 	vec<bool> ou_flat;
@@ -1374,7 +1425,9 @@ void p_dtree(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ou_flat[i * es.size() + j]) ou[i].push(j);
+			if (ou_flat[i * es.size() + j]) {
+				ou[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1439,7 +1492,9 @@ void p_dag(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (in_flat[i * es.size() + j]) in[i].push(j);
+			if (in_flat[i * es.size() + j]) {
+				in[i].push(j);
+			}
 		}
 	}
 	vec<bool> ou_flat;
@@ -1449,7 +1504,9 @@ void p_dag(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ou_flat[i * es.size() + j]) ou[i].push(j);
+			if (ou_flat[i * es.size() + j]) {
+				ou[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1522,7 +1579,9 @@ void p_path(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (in_flat[i * es.size() + j]) in[i].push(j);
+			if (in_flat[i * es.size() + j]) {
+				in[i].push(j);
+			}
 		}
 	}
 	vec<bool> ou_flat;
@@ -1532,7 +1591,9 @@ void p_path(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (ou_flat[i * es.size() + j]) ou[i].push(j);
+			if (ou_flat[i * es.size() + j]) {
+				ou[i].push(j);
+			}
 		}
 	}
 	vec<int> en_flat;
@@ -1600,7 +1661,9 @@ void p_bounded_path(const ConExpr& ce, AST::Node* ann) {
 	for (int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (int j = 0; j < es.size(); j++) {
-			if (in_flat[i * es.size() + j]) in[i].push(j);
+			if (in_flat[i * es.size() + j]) {
+				in[i].push(j);
+			}
 		}
 	}
 	vec<bool> ou_flat;
@@ -1632,7 +1695,9 @@ void p_bounded_path(const ConExpr& ce, AST::Node* ann) {
 	IntVar* w = getIntVar(ce[8]);
 
 	vec<int> ds;
-	for (int i = 0; i < vs.size(); i++) ds.push(0);
+	for (int i = 0; i < vs.size(); i++) {
+		ds.push(0);
+	}
 
 	vec<vec<int> > ws2;
 	for (int i = 0; i < ws.size(); i++) {
@@ -1694,7 +1759,7 @@ void p_bounded_path_new(const ConExpr& ce, AST::Node* ann) {
 
 class IntPoster {
 public:
-	IntPoster(void) {
+	IntPoster() {
 		registry().add("int_eq", &p_int_eq);
 		registry().add("int_ne", &p_int_ne);
 		registry().add("int_ge", &p_int_ge);
@@ -1839,7 +1904,7 @@ public:
 		registry().add("chuffed_bounded_dpath", &p_bounded_path_new);
 	}
 };
-IntPoster __int_poster;
+IntPoster _int_poster;
 
 }  // namespace
 

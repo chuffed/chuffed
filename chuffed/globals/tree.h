@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <vector>
 
-#define OTHER(o1, o2, a) ((a == o1) ? o2 : o1)
+#define OTHER(o1, o2, a) (((a) == (o1)) ? (o2) : (o1))
 
 // #define INFINITY 10000
 
@@ -63,7 +63,7 @@ protected:
 														std::vector<partialExpl>& bridgeExpl,
 														std::vector<partialExpl>& articuExpl);
 
-	int articulations(int n, std::vector<bool>& visited, int& count);
+	int articulations(int n, std::vector<bool>& reachable, int& count);
 	bool reachable(int n, std::vector<bool>& blue, bool doDFS = false);
 	void unite(int u, int v);
 	bool cycle_detect(int edge);
@@ -76,10 +76,10 @@ protected:
 public:
 	TreePropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj,
 								 vec<vec<int> >& _en);
-	virtual ~TreePropagator();
-	virtual void wakeup(int i, int c);
-	virtual bool propagate();
-	virtual void clearPropState();
+	~TreePropagator() override;
+	void wakeup(int i, int c) override;
+	bool propagate() override;
+	void clearPropState() override;
 
 	// Walks only on fixed edges == 1
 	void getCC(int node, std::vector<bool>& visited, CC* cc);
@@ -113,14 +113,14 @@ public:
 
 class ConnectedPropagator : public TreePropagator {
 protected:
-	bool cycle_detect(int edge) { return true; }
+	static bool cycle_detect(int edge) { return true; }
 	void precycle_detect(int unk_edge) {}
 
 public:
 	ConnectedPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj,
 											vec<vec<int> >& _en)
 			: TreePropagator(_vs, _es, _adj, _en) {}
-	virtual bool checkFinalSatisfied() { return true; /*TODO*/ }
+	bool checkFinalSatisfied() override { return true; /*TODO*/ }
 };
 
 #endif

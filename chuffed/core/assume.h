@@ -30,43 +30,51 @@ void pushback_reason(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
 		// tautological clause.
 		out_nogood.push(p);
 		return;
-	} else {
-		// Otherwise, fill in the reason for ~p...
-		for (int i = 1; i < cp->size(); i++) {
-			Lit q((*cp)[i]);
-			if (sat.trailpos[var(q)] < 0) continue;
-			out_nogood.push(q);
-			// Only look at the first bit of seen, because
-			// we're using the second bit for assumption-ness.
-			sat.seen[var(q)] |= 1;
+	}  // Otherwise, fill in the reason for ~p...
+	for (int i = 1; i < cp->size(); i++) {
+		Lit q((*cp)[i]);
+		if (sat.trailpos[var(q)] < 0) {
+			continue;
 		}
-		// then push it back to assumptions.
-		for (int i = 1; i < out_nogood.size(); i++) {
-			Lit q(out_nogood[i]);
-			if (is_extractable(q)) continue;
-			assert(!sat.reason[var(q)].isLazy());
-			Clause* c = sat.getExpl(~q);
-			assert(c != nullptr);
-			removed.push(q);
-			out_nogood[i] = out_nogood.last();
-			out_nogood.pop();
-			--i;
+		out_nogood.push(q);
+		// Only look at the first bit of seen, because
+		// we're using the second bit for assumption-ness.
+		sat.seen[var(q)] |= 1;
+	}
+	// then push it back to assumptions.
+	for (int i = 1; i < out_nogood.size(); i++) {
+		Lit q(out_nogood[i]);
+		if (is_extractable(q)) {
+			continue;
+		}
+		assert(!sat.reason[var(q)].isLazy());
+		Clause* c = sat.getExpl(~q);
+		assert(c != nullptr);
+		removed.push(q);
+		out_nogood[i] = out_nogood.last();
+		out_nogood.pop();
+		--i;
 
-			for (int j = 1; j < c->size(); j++) {
-				Lit r((*c)[j]);
-				if (!(sat.seen[var(r)] & 1)) {
-					sat.seen[var(r)] |= 1;
-					if (sat.trailpos[var(r)] < 0)
-						removed.push(r);
-					else
-						out_nogood.push(r);
+		for (int j = 1; j < c->size(); j++) {
+			Lit r((*c)[j]);
+			if (!(sat.seen[var(r)] & 1)) {
+				sat.seen[var(r)] |= 1;
+				if (sat.trailpos[var(r)] < 0) {
+					removed.push(r);
+				} else {
+					out_nogood.push(r);
 				}
 			}
 		}
 	}
+
 	// Clear the 'seen' bit.
-	for (int i = 0; i < removed.size(); i++) sat.seen[var(removed[i])] &= (~1);
-	for (int i = 1; i < out_nogood.size(); i++) sat.seen[var(out_nogood[i])] &= (~1);
+	for (int i = 0; i < removed.size(); i++) {
+		sat.seen[var(removed[i])] &= (~1);
+	}
+	for (int i = 1; i < out_nogood.size(); i++) {
+		sat.seen[var(out_nogood[i])] &= (~1);
+	}
 }
 
 // General version, which permits lazy explanations.
@@ -109,7 +117,9 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 		}
 	}
 	assert(pending > 0);
-	if (pending == 0) return;
+	if (pending == 0) {
+		return;
+	}
 
 	// Process the levels in order.
 	Reason last_reason = sat.reason[var(p)];
@@ -123,7 +133,9 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 		index = ctrail.size();
 		while (index) {
 			// Skip variables we haven't seen
-			if (!(sat.seen[var(ctrail[--index])] & 1)) continue;
+			if (!(sat.seen[var(ctrail[--index])] & 1)) {
+				continue;
+			}
 
 			// Found the next literal.
 			Lit p(ctrail[index]);
@@ -150,7 +162,9 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 				}
 			processed_assump:
 				// Have we seen enough?
-				if (!pending) goto pushback_finished;
+				if (!pending) {
+					goto pushback_finished;
+				}
 				continue;
 			}
 
@@ -160,7 +174,9 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 			// Sign doesn't really matter here; just the var.
 			removed.push(p);
 
-			if (last_reason == sat.reason[var(p)]) continue;
+			if (last_reason == sat.reason[var(p)]) {
+				continue;
+			}
 			last_reason = sat.reason[var(p)];
 
 			Clause& c = *sat.getExpl(p);
@@ -192,8 +208,12 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 pushback_finished:
 	assert(pending == 0);
 
-	for (int i = 0; i < removed.size(); i++) sat.seen[var(removed[i])] &= (~1);
-	for (int i = 0; i < out_nogood.size(); i++) sat.seen[var(out_nogood[i])] &= (~1);
+	for (int i = 0; i < removed.size(); i++) {
+		sat.seen[var(removed[i])] &= (~1);
+	}
+	for (int i = 0; i < out_nogood.size(); i++) {
+		sat.seen[var(out_nogood[i])] &= (~1);
+	}
 }
 
 #endif

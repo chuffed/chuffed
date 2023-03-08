@@ -27,7 +27,7 @@ IntVar::IntVar(int _min, int _max)
 			all_in_scip(true),
 			should_be_learnable(true),
 			should_be_decidable(true),
-			vals(NULL),
+			vals(nullptr),
 			preferred_val(PV_MIN),
 			activity(0),
 			in_queue(false),
@@ -42,23 +42,33 @@ IntVar::IntVar(int _min, int _max)
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
 	changes = EVENT_C | EVENT_L | EVENT_U;
-	if (isFixed()) changes |= EVENT_F;
+	if (isFixed()) {
+		changes |= EVENT_F;
+	}
 }
 
 // Allocate enough memory to specialise IntVar later using the same memory block
 IntVar* newIntVar(int min, int max) {
 	size_t size = sizeof(IntVar);
-	if (sizeof(IntVarEL) > size) size = sizeof(IntVarEL);
-	if (sizeof(IntVarLL) > size) size = sizeof(IntVarLL);
-	if (sizeof(IntVarSL) > size) size = sizeof(IntVarSL);
+	if (sizeof(IntVarEL) > size) {
+		size = sizeof(IntVarEL);
+	}
+	if (sizeof(IntVarLL) > size) {
+		size = sizeof(IntVarLL);
+	}
+	if (sizeof(IntVarSL) > size) {
+		size = sizeof(IntVarSL);
+	}
 	void* mem = malloc(size);
-	IntVar* var = new (mem) IntVar(min, max);
+	auto* var = new (mem) IntVar(min, max);
 	return var;
 }
 
 IntVar* getConstant(int v) {
-	map<int, IntVar*>::iterator it = ic_map.find(v);
-	if (it != ic_map.end()) return it->second;
+	auto it = ic_map.find(v);
+	if (it != ic_map.end()) {
+		return it->second;
+	}
 	IntVar* var = newIntVar(v, v);
 
 	std::stringstream ss;
@@ -74,7 +84,6 @@ IntVar* getConstant(int v) {
 void IntVar::specialiseToEL() {
 	switch (getType()) {
 		case INT_VAR_EL:
-			return;
 		case INT_VAR_SL:
 			return;
 		case INT_VAR:
@@ -88,7 +97,6 @@ void IntVar::specialiseToEL() {
 void IntVar::specialiseToLL() {
 	switch (getType()) {
 		case INT_VAR_EL:
-			return;
 		case INT_VAR_SL:
 			return;
 		case INT_VAR:
@@ -100,15 +108,22 @@ void IntVar::specialiseToLL() {
 }
 
 void IntVar::specialiseToSL(vec<int>& values) {
-	if (getType() == INT_VAR_EL) return;
-	if (getType() == INT_VAR_SL) return;
+	if (getType() == INT_VAR_EL) {
+		return;
+	}
+	if (getType() == INT_VAR_SL) {
+		return;
+	}
 	assert(getType() == INT_VAR);
 
 	vec<int> v = values;
 	std::sort((int*)v, (int*)v + v.size());
-	int i, j;
+	int i;
+	int j;
 	for (i = j = 0; i < v.size(); i++) {
-		if (i == 0 || v[i] != v[i - 1]) v[j++] = v[i];
+		if (i == 0 || v[i] != v[i - 1]) {
+			v[j++] = v[i];
+		}
 	}
 	v.resize(j);
 
@@ -121,23 +136,32 @@ void IntVar::specialiseToSL(vec<int>& values) {
 		new (this) IntVarSL(*((IntVar*)this), v);
 	} else {
 		new (this) IntVarEL(*((IntVar*)this));
-		if (!allowSet(v)) TL_FAIL();
+		if (!allowSet(v)) {
+			TL_FAIL();
+		}
 	}
 }
 
 void IntVar::initVals(bool optional) {
-	if (vals) return;
+	if (vals != nullptr) {
+		return;
+	}
 	if (min == min_limit || max == max_limit) {
-		if (optional) return;
+		if (optional) {
+			return;
+		}
 		CHUFFED_ERROR("Cannot initialise vals in unbounded IntVar\n");
 	}
 	vals = (Tchar*)malloc((max - min + 2) * sizeof(Tchar));
-	if (!vals) {
+	if (vals == nullptr) {
 		perror("malloc()");
 		exit(1);
 	}
 	memset(vals, 1, max - min + 2);
-	if (!(vals -= min)) vals++;  // Hack to make vals != NULL whenever it's allocated
+	vals -= min;
+	if (vals == nullptr) {
+		vals++;  // Hack to make vals != NULL whenever it's allocated
+	}
 #if INT_DOMAIN_LIST
 	vals_list = (Tint*)malloc(2 * (max - min) * sizeof(Tint));
 	if (!vals_list) {
@@ -154,27 +178,37 @@ void IntVar::initVals(bool optional) {
 }
 
 void IntVar::attach(Propagator* p, int pos, int eflags) {
-	if (isFixed())
+	if (isFixed()) {
 		p->wakeup(pos, eflags);
-	else
+	} else {
 		pinfo.push(PropInfo(p, pos, eflags));
+	}
 }
 
 void IntVar::wakePropagators() {
-	for (int i = pinfo.size(); i--;) {
+	for (int i = pinfo.size(); (i--) != 0;) {
 		PropInfo& pi = pinfo[i];
-		if ((pi.eflags & changes) == 0) continue;
-		if (pi.p->satisfied) continue;
-		if (pi.p == engine.last_prop) continue;
+		if ((pi.eflags & changes) == 0) {
+			continue;
+		}
+		if (pi.p->satisfied != 0) {
+			continue;
+		}
+		if (pi.p == engine.last_prop) {
+			continue;
+		}
 		pi.p->wakeup(pi.pos, changes);
 	}
 	clearPropState();
 }
 
 int IntVar::simplifyWatches() {
-	int i, j;
+	int i;
+	int j;
 	for (i = j = 0; i < pinfo.size(); i++) {
-		if (!pinfo[i].p->satisfied) pinfo[j++] = pinfo[i];
+		if (pinfo[i].p->satisfied == 0) {
+			pinfo[j++] = pinfo[i];
+		}
 	}
 	pinfo.resize(j);
 	return j;
@@ -215,7 +249,7 @@ double IntVar::getScore(VarBranch vb) {
 		case VAR_ACTIVITY:
 			return activity;
 		case VAR_REGRET_MIN_MAX:
-			return isFixed() ? 0 : (vals ? *++begin() - *begin() : 1);
+			return isFixed() ? 0 : (vals != nullptr ? *++begin() - *begin() : 1);
 #ifdef HAS_VAR_IMPACT
 		case VAR_IMPACT:
 			return isFixed() ? 0 : impact;
@@ -275,12 +309,14 @@ DecInfo* IntVar::branch() {
 		case PV_SPLIT_MAX:
 			return new DecInfo(this, min + (max - min) / 2, 2);
 		case PV_MEDIAN:
-			if (!vals) {
+			if (vals == nullptr) {
 				CHUFFED_ERROR("Median value selection is not supported this variable.\n");
 			} else {
 				int values = (size() - 1) / 2;
 				iterator j = begin();
-				for (int i = 0; i < values; ++i) ++j;
+				for (int i = 0; i < values; ++i) {
+					++j;
+				}
 				return new DecInfo(this, *j, 1);
 			}
 #endif
@@ -295,8 +331,10 @@ DecInfo* IntVar::branch() {
 #if !INT_DOMAIN_LIST
 inline void IntVar::updateMin() {
 	int v = min;
-	if (!vals[v]) {
-		while (!vals[v]) v++;
+	if (vals[v] == 0) {
+		while (vals[v] == 0) {
+			v++;
+		}
 		min = v;
 		changes |= EVENT_C | EVENT_L;
 	}
@@ -304,8 +342,10 @@ inline void IntVar::updateMin() {
 
 inline void IntVar::updateMax() {
 	int v = max;
-	if (!vals[v]) {
-		while (!vals[v]) v--;
+	if (vals[v] == 0) {
+		while (vals[v] == 0) {
+			v--;
+		}
 		max = v;
 		changes |= EVENT_C | EVENT_U;
 	}
@@ -313,12 +353,16 @@ inline void IntVar::updateMax() {
 #endif
 
 inline void IntVar::updateFixed() {
-	if (isFixed()) changes |= EVENT_F;
+	if (isFixed()) {
+		changes |= EVENT_F;
+	}
 }
 
 bool IntVar::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
-	if (v > max) return false;
+	if (v > max) {
+		return false;
+	}
 #if INT_DOMAIN_LIST
 	if (vals) {
 		int i;
@@ -332,7 +376,9 @@ bool IntVar::setMin(int64_t v, Reason r, bool channel) {
 #else
 	min = v;
 	changes |= EVENT_C | EVENT_L;
-	if (vals) updateMin();
+	if (vals != nullptr) {
+		updateMin();
+	}
 #endif
 	updateFixed();
 	pushInQueue();
@@ -341,7 +387,9 @@ bool IntVar::setMin(int64_t v, Reason r, bool channel) {
 
 bool IntVar::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
-	if (v < min) return false;
+	if (v < min) {
+		return false;
+	}
 #if INT_DOMAIN_LIST
 	if (vals) {
 		int i;
@@ -355,7 +403,9 @@ bool IntVar::setMax(int64_t v, Reason r, bool channel) {
 #else
 	max = v;
 	changes |= EVENT_C | EVENT_U;
-	if (vals) updateMax();
+	if (vals != nullptr) {
+		updateMax();
+	}
 #endif
 	updateFixed();
 	pushInQueue();
@@ -364,7 +414,9 @@ bool IntVar::setMax(int64_t v, Reason r, bool channel) {
 
 bool IntVar::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
-	if (!indomain(v)) return false;
+	if (!indomain(v)) {
+		return false;
+	}
 	if (min < v) {
 		min = v;
 		changes |= EVENT_C | EVENT_L | EVENT_F;
@@ -382,9 +434,13 @@ bool IntVar::setVal(int64_t v, Reason r, bool channel) {
 
 bool IntVar::remVal(int64_t v, Reason r, bool channel) {
 	assert(remValNotR(v));
-	if (isFixed()) return false;
-	if (!vals) {
-		if (!engine.finished_init) NEVER;
+	if (isFixed()) {
+		return false;
+	}
+	if (vals == nullptr) {
+		if (!engine.finished_init) {
+			NEVER;
+		}
 		return true;
 	}
 #if INT_DOMAIN_LIST
@@ -415,21 +471,33 @@ bool IntVar::remVal(int64_t v, Reason r, bool channel) {
 // Assumes v is sorted
 bool IntVar::allowSet(vec<int>& v, Reason r, bool channel) {
 	initVals();
-	if (!vals && !engine.finished_init) NOT_SUPPORTED;
+	if ((vals == nullptr) && !engine.finished_init) {
+		NOT_SUPPORTED;
+	}
 	int i = 0;
 	int m = min;
-	while (i < v.size() && v[i] < m) i++;
+	while (i < v.size() && v[i] < m) {
+		i++;
+	}
 	for (; i < v.size(); i++) {
 		for (; m < v[i]; m++) {
-			if (m > max) return true;
-			if (remValNotR(m))
-				if (!remVal(m, r, channel)) return false;
+			if (m > max) {
+				return true;
+			}
+			if (remValNotR(m)) {
+				if (!remVal(m, r, channel)) {
+					return false;
+				}
+			}
 		}
 		m = v[i] + 1;
 	}
 	for (; m <= max; m++) {
-		if (remValNotR(m))
-			if (!remVal(m, r, channel)) return false;
+		if (remValNotR(m)) {
+			if (!remVal(m, r, channel)) {
+				return false;
+			}
+		}
 	}
 	return true;
 }

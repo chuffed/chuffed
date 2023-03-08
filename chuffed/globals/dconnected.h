@@ -9,6 +9,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <utility>
 #include <vector>
 
 class FilteredLT : public LengauerTarjan {
@@ -16,15 +17,15 @@ class FilteredLT : public LengauerTarjan {
 	int visited_innodes;
 
 protected:
-	virtual void DFS(int r);
+	void DFS(int r) override;
 
 public:
 	FilteredLT(GraphPropagator* _p, int _r, std::vector<std::vector<int> > _en,
 						 std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou);
-	int get_visited_innodes();
-	virtual void init();
-	virtual bool ignore_node(int u);
-	virtual bool ignore_edge(int e);
+	int get_visited_innodes() const;
+	void init() override;
+	bool ignore_node(int u) override;
+	bool ignore_edge(int e) override;
 };
 
 class DReachabilityPropagator : public GraphPropagator {
@@ -56,7 +57,7 @@ protected:
 	std::vector<std::vector<edge_id> > ou;
 
 	int get_some_innode_not(int other_than);
-	int get_root_idx();
+	int get_root_idx() const;
 	void add_innode(int i);
 	void update_innodes();
 
@@ -66,10 +67,10 @@ protected:
 public:
 	DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 													vec<vec<edge_id> >& _out, vec<vec<int> >& _en);
-	virtual ~DReachabilityPropagator();
-	virtual void wakeup(int i, int c);
-	virtual bool propagate();
-	virtual void clearPropState();
+	~DReachabilityPropagator() override;
+	void wakeup(int i, int c) override;
+	bool propagate() override;
+	void clearPropState() override;
 
 	virtual bool propagateNewEdge(int edge);
 	virtual bool propagateRemEdge(int edge);
@@ -101,11 +102,11 @@ public:
 	DReachabilityPropagatorReif(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 															vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out,
 															vec<vec<int> >& _en, BoolView _b)
-			: DReachabilityPropagator(_r, _vs, _es, _in, _out, _en), b(_b) {
+			: DReachabilityPropagator(_r, _vs, _es, _in, _out, _en), b(std::move(_b)) {
 		b.attach(this, -1, EVENT_LU);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i == -1) {
 			pushInQueue();
 		} else {
@@ -113,8 +114,10 @@ public:
 		}
 	}
 
-	bool propagate() {
-		if (b.isFixed() && b.isTrue()) return this->DReachabilityPropagator::propagate();
+	bool propagate() override {
+		if (b.isFixed() && b.isTrue()) {
+			return this->DReachabilityPropagator::propagate();
+		}
 		return true;
 	}
 };

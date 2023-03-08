@@ -51,7 +51,9 @@ class Heap {
 		int x = heap[i];
 		while (left(i) < heap.size()) {
 			int child = right(i) < heap.size() && lt(heap[right(i)], heap[left(i)]) ? right(i) : left(i);
-			if (!lt(heap[child], x)) break;
+			if (!lt(heap[child], x)) {
+				break;
+			}
 			heap[i] = heap[child];
 			indices[heap[i]] = i;
 			i = child;
@@ -102,23 +104,29 @@ public:
 		indices[heap[0]] = 0;
 		indices[x] = -1;
 		heap.pop();
-		if (heap.size() > 1) percolateDown(0);
+		if (heap.size() > 1) {
+			percolateDown(0);
+		}
 		return x;
 	}
 
 	void clear(bool dealloc = false) {
-		for (int i = 0; i < heap.size(); i++) indices[heap[i]] = -1;
+		for (int i = 0; i < heap.size(); i++) {
+			indices[heap[i]] = -1;
+		}
 #ifdef NDEBUG
-		for (int i = 0; i < indices.size(); i++) assert(indices[i] == -1);
+		for (int i = 0; i < indices.size(); i++) {
+			assert(indices[i] == -1);
+		}
 #endif
 		heap.clear(dealloc);
 	}
 
 	// Fool proof variant of insert/decrease/increase
 	void update(int n) {
-		if (!inHeap(n))
+		if (!inHeap(n)) {
 			insert(n);
-		else {
+		} else {
 			percolateUp(indices[n]);
 			percolateDown(indices[n]);
 		}
@@ -128,16 +136,21 @@ public:
 	// *** this could probaly be replaced with a more general "buildHeap(vec<int>&)" method ***
 	template <class F>
 	void filter(const F& filt) {
-		int i, j;
-		for (i = j = 0; i < heap.size(); i++)
+		int i;
+		int j;
+		for (i = j = 0; i < heap.size(); i++) {
 			if (filt(heap[i])) {
 				heap[j] = heap[i];
 				indices[heap[i]] = j++;
-			} else
+			} else {
 				indices[heap[i]] = -1;
+			}
+		}
 
 		heap.shrink(i - j);
-		for (int i = heap.size() / 2 - 1; i >= 0; i--) percolateDown(i);
+		for (int i = heap.size() / 2 - 1; i >= 0; i--) {
+			percolateDown(i);
+		}
 
 		assert(heapProperty());
 	}

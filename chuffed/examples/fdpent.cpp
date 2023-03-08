@@ -4,11 +4,11 @@
 #include <chuffed/globals/mddglobals.h>
 
 #include <cassert>
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <errno.h>
 #include <iostream>
 #include <utility>
 // #include <chuffed/globals/circglobals.h>
@@ -40,7 +40,7 @@ public:
 		//        fprintf(stdout,"Created: %d\n", _data);
 	}
 
-	~hlnode(void) {
+	~hlnode() {
 		//      std::cout << "Dead: " << *data << std::endl;
 		//      delete data;
 		//      data = NULL;
@@ -49,13 +49,13 @@ public:
 			(next->extcount)--;
 			if (!(next->extcount)) {
 				delete next;
-				next = NULL;
+				next = nullptr;
 			}
 		}
 	}
 
 	hlnode(T _data, hlnode<T>* _next)
-			: extcount(0), length(_next ? _next->length + 1 : 1), data(_data), next(_next) {
+			: extcount(0), length(_next ? _next->length + 1 : 1), data(std::move(_data)), next(_next) {
 #if 1
 		if (_next) {
 			(_next->extcount)++;
@@ -70,15 +70,19 @@ class hlist {
 public:
 	hlnode<T>* root;
 
-	hlist(void) : root(NULL) {}
+	hlist() : root(nullptr) {}
 
 	hlist<T>& operator=(const hlist<T>& rhs) {
 		if (this != &rhs) {
-			if (rhs.root) (rhs.root->extcount)++;
+			if (rhs.root) {
+				(rhs.root->extcount)++;
+			}
 
 			if (root) {
 				(root->extcount)--;
-				if (!(root->extcount)) delete root;
+				if (!(root->extcount)) {
+					delete root;
+				}
 			}
 			root = rhs.root;
 		}
@@ -88,20 +92,26 @@ public:
 	hlist(const hlist<T>& other) : root(other.root) {
 		//      std::cout << "CP" << this << std::endl;
 
-		if (root) (root->extcount)++;
+		if (root) {
+			(root->extcount)++;
+		}
 	}
 
 	hlist(const T& data, const hlist<T>& other) : root(new hlnode<T>(data, other.root)) {
-		if (root) (root->extcount)++;
+		if (root) {
+			(root->extcount)++;
+		}
 	}
 
 	hlist(hlnode<T>* _root) : root(_root) {
 		//      std::cout << "ND" << this << std::endl;
 
-		if (_root) (_root->extcount)++;
+		if (_root) {
+			(_root->extcount)++;
+		}
 	}
 
-	int length(void) { return root ? root->length : 0; }
+	int length() { return root ? root->length : 0; }
 
 	T el(unsigned int n) {
 		assert(root && root->length > n);
@@ -116,7 +126,7 @@ public:
 		return curr->data;
 	}
 
-	bool is_empty(void) { return root == NULL; }
+	bool is_empty() { return root == nullptr; }
 
 	~hlist() {
 		//      std::cout << "DES" << this << std::endl;
@@ -126,7 +136,7 @@ public:
 #if 1
 			if (!(root->extcount)) {
 				delete root;
-				root = NULL;
+				root = nullptr;
 			}
 #endif
 		}
@@ -147,12 +157,12 @@ public:
 		return hlist<T>(el, root);
 	}
 
-	T head(void) {
+	T head() {
 		assert(root);
 		return root->data;
 	}
 
-	hlist<T> tail(void) {
+	hlist<T> tail() {
 		assert(root);
 
 		return hlist<T>(root->next);
@@ -165,8 +175,12 @@ public:
 		hlnode<T>* b = other.root;
 
 		while (a != b) {
-			if (!a || !b) return false;
-			if (a->data != b->data) return false;
+			if (!a || !b) {
+				return false;
+			}
+			if (a->data != b->data) {
+				return false;
+			}
 
 			a = a->next;
 			b = b->next;
@@ -177,7 +191,9 @@ public:
 
 template <class T>
 hlnode<T>* concat(hlnode<T>* a, hlnode<T>* b) {
-	if (!a) return b;
+	if (!a) {
+		return b;
+	}
 
 	return new hlnode<T>(a->data, concat(a->next, b));
 }
@@ -199,10 +215,10 @@ hlist<T> tail(hlist<T> old) {
 
 template <class T>
 static hlist<T> reversep(hlist<T> old, hlist<T> acc) {
-	if (old.is_empty())
+	if (old.is_empty()) {
 		return acc;
-	else
-		return reversep(tail(old), cons(head(old), acc));
+	}
+	return reversep(tail(old), cons(head(old), acc));
 }
 
 template <class T>
@@ -212,7 +228,9 @@ hlist<T> reverse(hlist<T> old) {
 
 template <class T>
 static T max(hlist<T> list, T acc) {
-	if (head(list) > acc) return max(tail(list), head(list));
+	if (head(list) > acc) {
+		return max(tail(list), head(list));
+	}
 
 	return max(tail(list), acc);
 }
@@ -247,10 +265,11 @@ std::ostream& operator<<(std::ostream& out, hlist<T> list) {
 	out << "[";
 	bool first = true;
 	while (!list.is_empty()) {
-		if (first)
+		if (first) {
 			first = false;
-		else
+		} else {
 			out << ",";
+		}
 		//        out << head(list) << ":" << list.count();
 		out << head(list);
 		list = tail(list);
@@ -264,15 +283,21 @@ std::ostream& operator<<(std::ostream& out, hlist<T> list) {
 template <class T>
 hlist<T> vec2hl(vec<T>& vs) {
 	hlist<T> in;
-	for (int i = vs.size() - 1; i >= 0; i--) in = cons(vs[i], in);
+	for (int i = vs.size() - 1; i >= 0; i--) {
+		in = cons(vs[i], in);
+	}
 	return in;
 }
 
 template <class T>
 void hl2vec(hlist<T> hl, vec<T>& out, bool first = true) {
-	if (first) out.clear();
+	if (first) {
+		out.clear();
+	}
 
-	if (hl.is_empty()) return;
+	if (hl.is_empty()) {
+		return;
+	}
 
 	out.push(head(hl));
 	hl2vec(tail(hl), out, false);
@@ -280,39 +305,48 @@ void hl2vec(hlist<T> hl, vec<T>& out, bool first = true) {
 
 template <class T1, class T2>
 hlist<T1> map(T1 (*fn)(T2), hlist<T2> in) {
-	if (in.is_empty()) return hlist<T1>();
+	if (in.is_empty()) {
+		return hlist<T1>();
+	}
 
 	return cons(fn(head(in)), map(fn, tail(in)));
 }
 
 template <class T>
 hlist<T> filter(bool (*fn)(hlist<T>), hlist<T> list) {
-	if (list.is_empty()) return list;
+	if (list.is_empty()) {
+		return list;
+	}
 
 	if (fn(head(list))) {
 		return cons(head(list), filter(fn, tail(list)));
-	} else {
-		return filter(fn, tail(list));
 	}
+	return filter(fn, tail(list));
 }
 
 template <class T1, class T2>
 T1 foldl(T1 (*fn)(T1, T2), hlist<T2> list, T1 acc) {
-	if (list.is_empty()) return acc;
+	if (list.is_empty()) {
+		return acc;
+	}
 
 	return (fn, tail(list), fn(acc, head(list)));
 }
 
 template <class T1, class T2>
 T1 foldr(T1 (*fn)(T1, T2), hlist<T2> list, T1 init) {
-	if (list.is_empty()) return init;
+	if (list.is_empty()) {
+		return init;
+	}
 
 	return fn(foldr(fn, tail(list), init), head(list));
 }
 
 template <class T>
 hlist<hlist<T> > transpose(hlist<hlist<T> > primal) {
-	if (primal.is_empty()) return hlist<hlist<T> >();
+	if (primal.is_empty()) {
+		return hlist<hlist<T> >();
+	}
 
 	return cons(map<T, hlist<T> >(head, primal), transpose(map<hlist<T>, hlist<T> >(tail, primal)));
 }
@@ -345,14 +379,18 @@ public:
 // Adds each element of a to the beginning of each list b.
 template <class T>
 hlist<hlist<T> > combine(hlist<T> a, hlist<hlist<T> > b) {
-	if (a.is_empty() || b.is_empty()) return hlist<hlist<T> >();
+	if (a.is_empty() || b.is_empty()) {
+		return hlist<hlist<T> >();
+	}
 	return cons(cons(head(a), head(b)), combine(tail(a), tail(b)));
 }
 
 // Code for rotating a matrix.
 template <class T>
 hlist<hlist<T> > rotatePr(hlist<hlist<T> > original, hlist<hlist<T> > acc) {
-	if (original.is_empty()) return acc;
+	if (original.is_empty()) {
+		return acc;
+	}
 
 	return rotatePr(tail(original), combine(head(original), acc));
 }
@@ -371,9 +409,13 @@ hlist<hlist<T> > rotate(hlist<hlist<T> > original) {
 // Given a shape, we generate the pattern for the regex to match.
 hlist<int> pent_seq(int width, hlist<hlist<int> > pattern) {
 	//   std::cout << pattern << std::endl;
-	if (pattern.is_empty()) return hlist<int>();
+	if (pattern.is_empty()) {
+		return hlist<int>();
+	}
 
-	if (pattern.length() == 1) return head(pattern);
+	if (pattern.length() == 1) {
+		return head(pattern);
+	}
 	return head(pattern) +
 				 (replicate(width - head(pattern).length(), 0) + pent_seq(width, tail(pattern)));
 }
@@ -382,7 +424,9 @@ static hlist<intpair> pentDFApr(hlist<int> pattern, int node) {
 	// Assumes leading 0s and garbage state has been handled.
 	assert(node > 1);
 
-	if (pattern.is_empty()) return cons(intpair(node, 1), hlist<intpair>());
+	if (pattern.is_empty()) {
+		return cons(intpair(node, 1), hlist<intpair>());
+	}
 
 	return cons(intpair(head(pattern) == 0 ? node + 1 : 1, head(pattern) == 1 ? node + 1 : 1),
 							pentDFApr(tail(pattern), node + 1));
@@ -392,15 +436,18 @@ static hlist<intpair> pentDFA(hlist<int> pattern, int node = 0) {
 	assert(!pattern.is_empty());
 
 	// Handle garbage state.
-	if (node == 1) return cons(intpair(1, 1), pentDFA(pattern, node + 1));
+	if (node == 1) {
+		return cons(intpair(1, 1), pentDFA(pattern, node + 1));
+	}
 
-	if (head(pattern) == 0)
-		return cons(intpair(node ? node + 1 : node + 2, 1), pentDFA(tail(pattern), node + 1));
+	if (head(pattern) == 0) {
+		return cons(intpair(node != 0 ? node + 1 : node + 2, 1), pentDFA(tail(pattern), node + 1));
+	}
 
-	if (node == 0)
+	if (node == 0) {
 		return cons(intpair(0, 2), cons(intpair(1, 1), pentDFApr(tail(pattern), 2)));
-	else
-		return cons(intpair(node, node + 1), pentDFApr(tail(pattern), node + 1));
+	}
+	return cons(intpair(node, node + 1), pentDFApr(tail(pattern), node + 1));
 }
 
 static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
@@ -443,6 +490,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 				assert(transition.size() == count);
 				transition.push();
 				for (int v = 0; v < domain; v++) {
+					// NOLINTBEGIN
 					assert(transition.last().size() == v);
 					if (v == val) {
 						/*
@@ -465,6 +513,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 						 */
 						transition.last().push(node.first + 1);
 					}
+					// NOLINTEND
 				}
 
 				dfa = tail(dfa);
@@ -480,7 +529,9 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 			pentmdd = (restr & orientation) | pentmdd;
 		}
 
-		if (!(opts.rotate)) break;
+		if (!(opts.rotate)) {
+			break;
+		}
 		pattern = rotate(pattern);  // Next layout
 	}
 
@@ -501,6 +552,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 					assert(transition.size() == count);
 					transition.push();
 					for (int v = 0; v < domain; v++) {
+						// NOLINTBEGIN
 						assert(transition.last().size() == v);
 						if (v == val) {
 							/*
@@ -524,6 +576,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 							 */
 							transition.last().push(node.first + 1);
 						}
+						// NOLINTEND
 					}
 
 					dfa = tail(dfa);
@@ -542,7 +595,9 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 				pentmdd = (restr & orientation) | pentmdd;
 			}
 
-			if (!(opts.rotate)) break;
+			if (!(opts.rotate)) {
+				break;
+			}
 
 			pattern = rotate(pattern);  // Next layout
 		}
@@ -568,7 +623,9 @@ public:
 		int nshapes = 0;
 		while (*in != EOF) {
 			Parse::skipWhitespace(in);
-			while (*in == '#') Parse::skipLine(in);
+			while (*in == '#') {
+				Parse::skipLine(in);
+			}
 			int r = Parse::parseInt(in);
 			int c = Parse::parseInt(in);
 			(void)c;
@@ -589,7 +646,9 @@ public:
 				}
 				shape = cons(reverse(row), shape);
 				Parse::skipLine(in);
-				while (*in == '\n') skipLine(in);
+				while (*in == '\n') {
+					skipLine(in);
+				}
 			}
 
 			shapes = cons(reverse(shape), shapes);
@@ -732,7 +791,7 @@ public:
 		output_vars(xs);
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		int xi = 0;
 		for (int ri = 0; ri < height; ri++) {
 			bool first = true;
@@ -758,7 +817,8 @@ public:
 int main(int argc, char** argv) {
 	Opts opts;
 
-	int i, j;
+	int i;
+	int j;
 	for (i = j = 0; i < argc; i++) {
 		if (strcmp(argv[i], "-noreflect") == 0) {
 			opts.reflect = false;
@@ -768,8 +828,9 @@ int main(int argc, char** argv) {
 			opts.restr = false;
 		} else if (strcmp(argv[i], "-sym") == 0) {
 			opts.symbreak = true;
-		} else
+		} else {
 			argv[j++] = argv[i];
+		}
 	}
 
 	argc = j;

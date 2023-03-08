@@ -86,7 +86,6 @@ public:
 #endif
 	void updateFixed();
 
-public:
 	static const int max_limit = 500000000;
 	static const int min_limit = -500000000;
 
@@ -118,29 +117,31 @@ public:
 	//--------------------------------------------------
 	// Branching stuff
 
-	bool finished() { return isFixed(); }
-	double getScore(VarBranch vb);
+	bool finished() override { return isFixed(); }
+	double getScore(VarBranch vb) override;
 #ifdef HAS_VAR_IMPACT
 	double updateImpact(double const newImpact) {
 		double const weight = (1 - IMPACT_DAMPING) * impact_count++;
 		return impact = (weight * impact + newImpact) / (weight + 1);
 	}
 #endif
-	void setPreferredVal(PreferredVal p) { preferred_val = p; }
-	DecInfo* branch();
+	void setPreferredVal(PreferredVal p) override { preferred_val = p; }
+	DecInfo* branch() override;
 
 	// Solution-based phase saving
 	bool sbps_value_selection;
 	int last_solution_value;
 	void saveCurrentValue() {
 		last_solution_value = getVal();
-		if (!sbps_value_selection) sbps_value_selection = true;
+		if (!sbps_value_selection) {
+			sbps_value_selection = true;
+		}
 	}
 
 	//--------------------------------------------------
 	// Type specialisation
 
-	VarType getType() { return INT_VAR; }
+	VarType getType() override { return INT_VAR; }
 
 	void specialiseToEL();
 	void specialiseToLL();
@@ -161,15 +162,19 @@ public:
 		return min;
 	}
 	int getShadowVal() const {
-		if (in_scip) return shadow_val;
+		if (in_scip) {
+			return shadow_val;
+		}
 		return min;
 	}
 
-	bool indomain(int64_t v) const { return v >= min && v <= max && (!vals || vals[v]); }
+	bool indomain(int64_t v) const {
+		return v >= min && v <= max && ((vals == nullptr) || (vals[v] != 0));
+	}
 	int64_t nextDomVal(int64_t v) const {
 		v++;
-		if (vals) {
-			while (!vals[v] && v <= max) {
+		if (vals != nullptr) {
+			while ((vals[v] == 0) && v <= max) {
 				v++;
 			}
 		}
@@ -177,8 +182,8 @@ public:
 	}
 	int64_t prevDomVal(int64_t v) const {
 		v--;
-		if (vals) {
-			while (!vals[v] && v >= min) {
+		if (vals != nullptr) {
+			while ((vals[v] == 0) && v >= min) {
 				v--;
 			}
 		}
@@ -198,211 +203,218 @@ public:
 		}
 		iterator& operator++() {
 			assert(val >= var->min && val <= var->max && var->vals && var->vals[val]);
-			if (val == var->max)
+			if (val == var->max) {
 				val = static_cast<int>(0x80000000);
-			else
+			} else {
 #if INT_DOMAIN_LIST
 				val = var->vals_list[2 * val + 1];
 #else
-				while (!var->vals[++val])
+				while (var->vals[++val] == 0) {
 					;
-#endif
-			return *this;
-		}
-		iterator operator++(int dummy) {
-			iterator temp = *this;
-			++*this;
-			return temp;
-		}
-		iterator& operator--() {
-			if (val == static_cast<int>(0x80000000))
-				val = var->max;
-			else {
-				assert(val > var->min && val <= var->max && var->vals && var->vals[val]);
-#if INT_DOMAIN_LIST
-				val = var->vals_list[2 * val];
-#else
-				while (!var->vals[--val])
-					;
-#endif
+				}
 			}
-			return *this;
-		}
-		iterator operator--(int dummy) {
-			iterator temp = *this;
-			--*this;
-			return temp;
-		}
-		bool operator==(const iterator& rhs) const {
-			assert(var == rhs.var);
-			return (val == rhs.val);
-		}
-		bool operator!=(const iterator& rhs) const {
-			assert(var == rhs.var);
-			return (val != rhs.val);
-		}
-	};
-	typedef iterator const_iterator;
-	iterator begin() const { return iterator(this, min); }
-	iterator end() const { return iterator(this, static_cast<int>(0x80000000)); }
+#endif
+				return *this;
+			}
+			iterator operator++(int dummy) {
+				iterator temp = *this;
+				++*this;
+				return temp;
+			}
+			iterator& operator--() {
+				if (val == static_cast<int>(0x80000000)) {
+					val = var->max;
+				} else {
+					assert(val > var->min && val <= var->max && var->vals && var->vals[val]);
+#if INT_DOMAIN_LIST
+					val = var->vals_list[2 * val];
+#else
+				while (var->vals[--val] == 0) {
+					;
+				}
+#endif
+				}
+				return *this;
+			}
+			iterator operator--(int dummy) {
+				iterator temp = *this;
+				--*this;
+				return temp;
+			}
+			bool operator==(const iterator& rhs) const {
+				assert(var == rhs.var);
+				return (val == rhs.val);
+			}
+			bool operator!=(const iterator& rhs) const {
+				assert(var == rhs.var);
+				return (val != rhs.val);
+			}
+		};
+		typedef iterator const_iterator;
+		iterator begin() const { return iterator(this, min); }
+		iterator end() const { return iterator(this, static_cast<int>(0x80000000)); }
 
-	class reverse_iterator {
-		iterator forward;
+		class reverse_iterator {
+			iterator forward;
 
-	public:
-		reverse_iterator() {}
-		reverse_iterator(iterator _forward) : forward(_forward) {}
-		int operator*() const {
-			iterator temp = forward;
-			return *--temp;
-		}
-		reverse_iterator& operator++() {
-			--forward;
-			return *this;
-		}
-		reverse_iterator operator++(int dummy) {
-			reverse_iterator temp = *this;
-			++*this;
-			return temp;
-		}
-		reverse_iterator& operator--() {
-			++forward;
-			return *this;
-		}
-		reverse_iterator operator--(int dummy) {
-			reverse_iterator temp = *this;
-			--*this;
-			return temp;
-		}
-		iterator base() const { return forward; }
-		bool operator==(const reverse_iterator& rhs) const { return (forward == rhs.forward); }
-		bool operator!=(const reverse_iterator& rhs) const { return (forward != rhs.forward); }
-	};
-	typedef reverse_iterator const_reverse_iterator;
-	reverse_iterator rbegin() const { return reverse_iterator(end()); }
-	reverse_iterator rend() const { return reverse_iterator(begin()); }
+		public:
+			reverse_iterator() {}
+			reverse_iterator(iterator _forward) : forward(_forward) {}
+			int operator*() const {
+				iterator temp = forward;
+				return *--temp;
+			}
+			reverse_iterator& operator++() {
+				--forward;
+				return *this;
+			}
+			reverse_iterator operator++(int dummy) {
+				reverse_iterator temp = *this;
+				++*this;
+				return temp;
+			}
+			reverse_iterator& operator--() {
+				++forward;
+				return *this;
+			}
+			reverse_iterator operator--(int dummy) {
+				reverse_iterator temp = *this;
+				--*this;
+				return temp;
+			}
+			iterator base() const { return forward; }
+			bool operator==(const reverse_iterator& rhs) const { return (forward == rhs.forward); }
+			bool operator!=(const reverse_iterator& rhs) const { return (forward != rhs.forward); }
+		};
+		typedef reverse_iterator const_reverse_iterator;
+		reverse_iterator rbegin() const { return reverse_iterator(end()); }
+		reverse_iterator rend() const { return reverse_iterator(begin()); }
 
-	int size() const {
+		int size() const {
 #ifdef HAS_VAR_IMPACT
-		if (!vals) return max + 1 - min;
+			if (!vals) return max + 1 - min;
 #else
 		assert(vals);
 #endif
 #if INT_DOMAIN_LIST
-		return vals_count;
+			return vals_count;
 #else
-		if (isFixed()) return 1;
+		if (isFixed()) {
+			return 1;
+		}
 		int count = 2;
-		for (int i = min + 1; i < max; ++i) count += vals[i];
+		for (int i = min + 1; i < max; ++i) {
+			count += vals[i];
+		}
 		return count;
 #endif
+		}
+
+		//--------------------------------------------------
+		// Explanations:
+
+		virtual Lit getMinLit() const { NEVER; }
+		virtual Lit getMaxLit() const { NEVER; }
+		virtual Lit getValLit() const { NEVER; }
+		virtual Lit getFMinLit(int64_t v) { NEVER; }
+		virtual Lit getFMaxLit(int64_t v) { NEVER; }
+
+		// NOTE: No support for INT_VAR_LL vars yet!
+		// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
+		virtual Lit getLit(int64_t v, int t) { NEVER; }
+
+		//--------------------------------------------------
+		// Domain operations
+
+		void set(int val, int type, bool channel = true);
+
+		bool setMinNotR(int64_t v) const { return v > min; }
+		bool setMaxNotR(int64_t v) const { return v < max; }
+		bool setValNotR(int64_t v) const { return v != min || v != max; }
+		bool remValNotR(int64_t v) const { return indomain(v); }
+
+		virtual bool setMin(int64_t v, Reason r = nullptr, bool channel = true);
+		virtual bool setMax(int64_t v, Reason r = nullptr, bool channel = true);
+		virtual bool setVal(int64_t v, Reason r = nullptr, bool channel = true);
+		virtual bool remVal(int64_t v, Reason r = nullptr, bool channel = true);
+		virtual bool allowSet(vec<int>& v, Reason r = nullptr, bool channel = true);
+
+		virtual void channel(int val, int val_type, int sign) { set(val, val_type * 3 ^ sign, false); }
+
+		Lit operator>=(int val) { return getLit(val, 2); }
+		Lit operator<=(int val) { return getLit(val, 3); }
+		Lit operator>(int val) { return getLit(val + 1, 2); }
+		Lit operator<(int val) { return getLit(val - 1, 3); }
+		Lit operator=(int val) { return getLit(val, 1); }
+		Lit operator!=(int val) { return getLit(val, 0); }
+
+		operator BoolView() {
+			assert(min >= 0 && max <= 1);
+			return getLit(1, 2);
+		}
+
+		//--------------------------------------------------
+		// Debug
+
+		void printLit(int val, int type) const;
+		void print() const;
+	};
+
+	IntVar* newIntVar(int min = IntVar::min_limit, int max = IntVar::max_limit);
+	IntVar* getConstant(int v);
+
+	inline void IntVar::pushInQueue() {
+		if (!in_queue) {
+			in_queue = true;
+			engine.v_queue.push(this);
+		}
 	}
 
-	//--------------------------------------------------
-	// Explanations:
-
-	virtual Lit getMinLit() const { NEVER; }
-	virtual Lit getMaxLit() const { NEVER; }
-	virtual Lit getValLit() const { NEVER; }
-	virtual Lit getFMinLit(int64_t v) { NEVER; }
-	virtual Lit getFMaxLit(int64_t v) { NEVER; }
-
-	// NOTE: No support for INT_VAR_LL vars yet!
-	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	virtual Lit getLit(int64_t v, int t) { NEVER; }
-
-	//--------------------------------------------------
-	// Domain operations
-
-	void set(int val, int type, bool channel = true);
-
-	bool setMinNotR(int64_t v) const { return v > min; }
-	bool setMaxNotR(int64_t v) const { return v < max; }
-	bool setValNotR(int64_t v) const { return v != min || v != max; }
-	bool remValNotR(int64_t v) const { return indomain(v); }
-
-	virtual bool setMin(int64_t v, Reason r = NULL, bool channel = true);
-	virtual bool setMax(int64_t v, Reason r = NULL, bool channel = true);
-	virtual bool setVal(int64_t v, Reason r = NULL, bool channel = true);
-	virtual bool remVal(int64_t v, Reason r = NULL, bool channel = true);
-	virtual bool allowSet(vec<int>& v, Reason r = NULL, bool channel = true);
-
-	virtual void channel(int val, int val_type, int sign) { set(val, val_type * 3 ^ sign, false); }
-
-	Lit operator>=(int val) { return getLit(val, 2); }
-	Lit operator<=(int val) { return getLit(val, 3); }
-	Lit operator>(int val) { return getLit(val + 1, 2); }
-	Lit operator<(int val) { return getLit(val - 1, 3); }
-	Lit operator=(int val) { return getLit(val, 1); }
-	Lit operator!=(int val) { return getLit(val, 0); }
-
-	operator BoolView() {
-		assert(min >= 0 && max <= 1);
-		return getLit(1, 2);
+	inline void IntVar::clearPropState() {
+		changes = 0;
+		in_queue = false;
 	}
 
-	//--------------------------------------------------
-	// Debug
-
-	void printLit(int val, int type);
-	void print();
-};
-
-IntVar* newIntVar(int min = IntVar::min_limit, int max = IntVar::max_limit);
-IntVar* getConstant(int v);
-
-inline void IntVar::pushInQueue() {
-	if (!in_queue) {
-		in_queue = true;
-		engine.v_queue.push(this);
+	inline void IntVar::set(int val, int type, bool channel) {
+		switch (type) {
+			case 0:
+				remVal(val, nullptr, channel);
+				break;
+			case 1:
+				setVal(val, nullptr, channel);
+				break;
+			case 2:
+				setMin(val + 1, nullptr, channel);
+				break;
+			case 3:
+				setMax(val, nullptr, channel);
+				break;
+			default:
+				NEVER;
+		}
 	}
-}
 
-inline void IntVar::clearPropState() {
-	changes = 0;
-	in_queue = false;
-}
-
-inline void IntVar::set(int val, int type, bool channel) {
-	switch (type) {
-		case 0:
-			remVal(val, NULL, channel);
-			break;
-		case 1:
-			setVal(val, NULL, channel);
-			break;
-		case 2:
-			setMin(val + 1, NULL, channel);
-			break;
-		case 3:
-			setMax(val, NULL, channel);
-			break;
-		default:
-			NEVER;
+	inline void IntVar::printLit(int val, int type) const {
+		printf("[v%d ", var_id);
+		switch (type) {
+			case 0:
+				printf("!= %d]", val);
+				break;
+			case 1:
+				printf("== %d]", val);
+				break;
+			case 2:
+				printf(">= %d]", val + 1);
+				break;
+			case 3:
+				printf("<= %d]", val);
+				break;
+		}
 	}
-}
 
-inline void IntVar::printLit(int val, int type) {
-	printf("[v%d ", var_id);
-	switch (type) {
-		case 0:
-			printf("!= %d]", val);
-			break;
-		case 1:
-			printf("== %d]", val);
-			break;
-		case 2:
-			printf(">= %d]", val + 1);
-			break;
-		case 3:
-			printf("<= %d]", val);
-			break;
+	inline void IntVar::print() const {
+		fprintf(stderr, "v%d: min = %d, max = %d\n", var_id, (int)min, (int)max);
 	}
-}
-
-inline void IntVar::print() {
-	fprintf(stderr, "v%d: min = %d, max = %d\n", var_id, (int)min, (int)max);
-}
 
 #undef IMPACT_DAMPING
 

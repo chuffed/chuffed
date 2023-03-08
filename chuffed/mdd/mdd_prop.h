@@ -1,5 +1,5 @@
-#ifndef __INC_PROP_H_
-#define __INC_PROP_H_
+#ifndef INC_PROP_H_
+#define INC_PROP_H_
 
 #include <chuffed/core/propagator.h>
 #include <chuffed/mdd/MDD.h>
@@ -65,7 +65,7 @@ typedef struct {
 
 class MDDTemplate {
 public:
-	MDDTemplate(MDDTable& tab, _MDD root, vec<int>& domain_sizes);
+	MDDTemplate(MDDTable& tab, MDDNodeInt root, vec<int>& domain_sizes);
 
 	vec<int>& getDoms() { return _doms; }
 
@@ -86,9 +86,9 @@ public:
 template <int U = 0>
 class MDDProp : public Propagator {
 public:
-	MDDProp(MDDTemplate*, vec<IntView<U> >& _vars, const MDDOpts& opts);
+	MDDProp(MDDTemplate* /*_templ*/, vec<IntView<U> >& _intvars, const MDDOpts& opts);
 
-	bool fullProp(void);
+	bool fullProp();
 	unsigned char fullPropRec(int node, int timestamp);
 
 	void genReason(vec<int>& out, Value value);
@@ -105,21 +105,23 @@ public:
 	//    void retrieveReason(vec<int>& out,int var, int val, int lim, int threshold = INT_MAX);
 	void retrieveReason(vec<int>& out, int var, int val, int lim, int threshold = 2);
 
-	void static_inference(vec<int>& out);
-	void static_inference(vec<Lit>& out);
+	void static_inference(vec<int>& inferences);
+	void static_inference(vec<Lit>& inferences);
 
-	inline int numNodes(void) { return nodes.size(); }
+	inline int numNodes() { return nodes.size(); }
 
 	void debugStateTikz(unsigned int lim, bool debug = true);
-	void verify(void);
+	void verify();
 
 	// Wake up only parts relevant to this event
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		assert(boolvars[i].isFixed());
-		if (boolvars[i].getVal()) {
+		if (boolvars[i].getVal() != 0) {
 			assert(0);
 		} else {
-			if (fixedvars.elem(i)) return;
+			if (fixedvars.elem(i)) {
+				return;
+			}
 			clear_queue.push(i);
 			val_entries[i].val_lim = fixedvars.size();
 			fixedvars.insert(i);
@@ -128,7 +130,7 @@ public:
 	}
 
 	// Propagate woken up parts
-	bool propagate();
+	bool propagate() override;
 
 	inline Lit get_val_lit(int v) {
 #ifndef WEAKNOGOOD
@@ -139,35 +141,38 @@ public:
 #endif
 	}
 
-	Clause* explain(Lit p, int inf) {
+	Clause* explain(Lit p, int inf) override {
 		vec<int> expl;
 		genReason(expl, inf);
 
 		if (opts.expl_strat == MDDOpts::E_KEEP) {
 			vec<Lit> ps(expl.size());
-			for (int k = 1; k < expl.size(); k++) ps[k] = get_val_lit(expl[k]);
+			for (int k = 1; k < expl.size(); k++) {
+				ps[k] = get_val_lit(expl[k]);
+			}
 			ps[0] = p;
 
 			Clause* c = Clause_new(ps, true);
 			c->learnt = true;
 			sat.addClause(*c);
 			return c;
-		} else {
-			Clause* r = Reason_new(expl.size());
-			for (int k = 1; k < expl.size(); k++) (*r)[k] = get_val_lit(expl[k]);
-			return r;
 		}
+		Clause* r = Reason_new(expl.size());
+		for (int k = 1; k < expl.size(); k++) {
+			(*r)[k] = get_val_lit(expl[k]);
+		}
+		return r;
 	}
 
 	// Clear intermediate states
-	void clearPropState() {
+	void clearPropState() override {
 		clear_queue.clear();
 		in_queue = false;
 	}
 
 private:
 	void clear_val(Value v);
-	void kill_dom(unsigned int, inc_edge* e, vec<int>& kfa, vec<int>& kfb);
+	void kill_dom(unsigned int /*lim*/, inc_edge* e, vec<int>& kfa, vec<int>& kfb);
 
 	// Parameters
 	MDDOpts opts;
@@ -188,7 +193,7 @@ private:
 	double act_inc;
 	vec<double> activity;
 	void bumpActivity(int val) { activity[val] += act_inc; }
-	void decayActivity(void) { act_inc *= act_decay; }
+	void decayActivity() { act_inc *= act_decay; }
 
 	bool simple;
 
@@ -198,7 +203,7 @@ private:
 };
 
 template <int U>
-MDDProp<U>* MDDProp_new(MDDTemplate*, vec<IntView<U> >& vars);
+MDDProp<U>* MDDProp_new(MDDTemplate* /*_templ*/, vec<IntView<U> >& vars);
 
-void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, _MDD root);
+void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root);
 #endif

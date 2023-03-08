@@ -35,7 +35,7 @@ private:
 	void COMPRESS(int v);
 
 protected:
-	virtual void DFS(int r);
+	virtual void DFS(int v);
 
 public:
 	virtual void init();

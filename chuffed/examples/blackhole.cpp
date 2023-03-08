@@ -32,12 +32,15 @@ public:
 		// Generate instance
 
 		bool dealt[cards];
-		for (int i = 0; i < cards; i++) dealt[i] = false;
+		for (bool& i : dealt) {
+			i = false;
+		}
 		for (int i = 0; i < piles; i++) {
 			for (int j = 0; j < layers; j++) {
 				int r;
-				while (dealt[r = myrand(so.rnd_seed) % (cards - 1) + 1])
+				while (dealt[r = myrand(so.rnd_seed) % (cards - 1) + 1]) {
 					;
+				}
 				dealt[r] = true;
 				layout[i][j] = r;
 				ctop[r] = i;
@@ -52,9 +55,9 @@ public:
 		inverse(x, y);
 
 		// Layer constraints on x
-		for (int i = 0; i < piles; i++) {
+		for (auto& i : layout) {
 			for (int j = 0; j < layers - 1; j++) {
-				int_rel(x[layout[i][j + 1]], IRT_LT, x[layout[i][j]]);
+				int_rel(x[i[j + 1]], IRT_LT, x[i[j]]);
 			}
 		}
 
@@ -81,8 +84,12 @@ public:
 			for (int i = 0; i < cards - 1; i++) {
 				for (int j = 0; j < 52; j++) {
 					for (int k = 0; k < 52; k++) {
-						if (j % 13 == (k + 1) % 13) continue;
-						if ((j + 1) % 13 == k % 13) continue;
+						if (j % 13 == (k + 1) % 13) {
+							continue;
+						}
+						if ((j + 1) % 13 == k % 13) {
+							continue;
+						}
 						bool_rel(BoolView(y[i]->getLit(j, 1)), BRT_R_IMPL, BoolView(y[i + 1]->getLit(k, 0)));
 					}
 				}
@@ -97,8 +104,12 @@ public:
 					for (int s2 = s1 + 1; s2 < suits; s2++) {
 						int o1 = s1 * ranks + i;
 						int o2 = s2 * ranks + i;
-						if (o1 == 0) continue;
-						if (ctop[o1] == ctop[o2]) continue;
+						if (o1 == 0) {
+							continue;
+						}
+						if (ctop[o1] == ctop[o2]) {
+							continue;
+						}
 						if (ctol[o1] < ctol[o2]) {
 							int t = o1;
 							o1 = o2;
@@ -140,7 +151,9 @@ public:
 		vec<IntVar*> pref_order;
 		for (int i = layers; i-- > 0;) {
 			for (int j = 1; j < cards; j++) {
-				if (ctol[j] == i) pref_order.push(x[j]);
+				if (ctol[j] == i) {
+					pref_order.push(x[j]);
+				}
 			}
 		}
 		assert(pref_order.size() == cards - 1);
@@ -148,11 +161,11 @@ public:
 		branch(pref_order, VAR_MIN_MIN, VAL_MIN);
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		char s[5] = "SCHD";
 		for (int i = 0; i < layers; i++) {
-			for (int j = 0; j < piles; j++) {
-				int v = layout[j][i];
+			for (auto& j : layout) {
+				int v = j[i];
 				os << " " << std::setw(2) << std::setfill('0') << (v % ranks + 1) << s[v / ranks];
 			}
 			os << "\n";
@@ -162,7 +175,9 @@ public:
 		for (int i = 0; i < cards; i++) {
 			int v = y[i]->getVal();
 			os << std::setw(2) << std::setfill('0') << (v % ranks + 1) << s[v / ranks] << " ";
-			if (i % ranks == ranks - 1) os << "\n";
+			if (i % ranks == ranks - 1) {
+				os << "\n";
+			}
 		}
 		os << "\n";
 	}

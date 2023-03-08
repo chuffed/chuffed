@@ -20,12 +20,14 @@ IntVarLL::IntVarLL(const IntVar& other) : IntVar(other), ld(2), li(0), hi(1) {
 	// fixed (see updateFixed).  It's not learnable, so any
 	// explanation will use the reason which includes the actual
 	// bounds literals.
-	valLit = Lit(sat.nVars(), 1);
+	valLit = Lit(sat.nVars(), true);
 	int v = sat.newVar(1, ChannelInfo(var_id, 1, 0, 0));
 	sat.flags[v].setDecidable(false);
 	sat.flags[v].setUIPable(false);
 	sat.flags[v].setLearnable(false);
-	if (isFixed()) sat.cEnqueue(valLit, NULL);
+	if (isFixed()) {
+		sat.cEnqueue(valLit, nullptr);
+	}
 
 	varLabel = intVarString[(IntVar*)(&other)];
 	std::stringstream ss;
@@ -43,9 +45,8 @@ DecInfo* IntVarLL::branch() {
 		if (indomain(last_solution_value)) {  // Lazy variables don't allow to use == decisions
 			if (setMinNotR(last_solution_value)) {
 				return new DecInfo(this, last_solution_value - 1, 2);
-			} else {
-				return new DecInfo(this, last_solution_value, 3);
 			}
+			return new DecInfo(this, last_solution_value, 3);
 		}
 	}
 
@@ -70,7 +71,7 @@ inline int IntVarLL::getLitNode() {
 	std::cerr << "IntVarLL::getLitNode\n";
 #endif
 	int i = -1;
-	if (freelist.size()) {
+	if (freelist.size() != 0) {
 		i = freelist.last();
 		freelist.pop();
 	} else {
@@ -94,8 +95,9 @@ void IntVarLL::freeLazyVar(int val) {
 			ni = ld[ni].next;
 			assert(0 <= ni && ni < ld.size());
 		}
-	} else
+	} else {
 		NEVER;
+	}
 	assert(ld[ni].val == val);
 	ld[ld[ni].prev].next = ld[ni].next;
 	ld[ld[ni].next].prev = ld[ni].prev;
@@ -103,18 +105,22 @@ void IntVarLL::freeLazyVar(int val) {
 }
 
 inline Lit IntVarLL::getGELit(int v) {
-	if (v > max) return getMaxLit();
+	if (v > max) {
+		return getMaxLit();
+	}
 	assert(v >= min);
 	int ni = li;
 	int prev = prevDomVal(v);
-	if (vals && !vals[v]) {
+	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = nextDomVal(v);
 	}
 	while (ld[ni].val < prev) {
 		ni = ld[ni].next;
 		assert(0 <= ni && ni < ld.size());
 	}
-	if (ld[ni].val == prev) return Lit(ld[ni].var, 1);
+	if (ld[ni].val == prev) {
+		return Lit(ld[ni].var, true);
+	}
 	// overshot, create new var and insert before ni
 	int mi = getLitNode();
 #if DEBUG_VERBOSE
@@ -135,11 +141,13 @@ inline Lit IntVarLL::getGELit(int v) {
 	ss << varLabel << "<=" << prev;
 	litString.insert(make_pair(ld[mi].var * 2, ss.str()));
 
-	return Lit(ld[mi].var, 1);
+	return Lit(ld[mi].var, true);
 }
 
 inline Lit IntVarLL::getLELit(int v) {
-	if (v < min) return getMinLit();
+	if (v < min) {
+		return getMinLit();
+	}
 	return ~getGELit(v + 1);
 }
 
@@ -149,8 +157,12 @@ Lit IntVarLL::getLit(int64_t v, int t) {
 	// decision levels.
 	// So far this assertion only seems to trigger with all_different (bounds)
 	// assert(engine.decisionLevel() == 0);
-	if (v < min) return toLit(1 ^ (t & 1));  // _, _, 1, 0
-	if (v > max) return toLit(t & 1);        // _, _, 0, 1
+	if (v < min) {
+		return toLit(1 ^ (t & 1));  // _, _, 1, 0
+	}
+	if (v > max) {
+		return toLit(t & 1);  // _, _, 0, 1
+	}
 	switch (t) {
 		case 2:
 			return getGELit(v);
@@ -167,7 +179,7 @@ inline void IntVarLL::channelMin(int v, Lit p) {
 	int ni;
 	int prev = prevDomVal(v);
 	for (ni = ld[li].next; ld[ni].val < prev; ni = ld[ni].next) {
-		sat.cEnqueue(Lit(ld[ni].var, 1), r);
+		sat.cEnqueue(Lit(ld[ni].var, true), r);
 	}
 	assert(ld[ni].val == prev);
 	li = ni;
@@ -179,7 +191,7 @@ inline void IntVarLL::channelMax(int v, Lit p) {
 	int ni;
 	assert(!vals || vals[v]);
 	for (ni = ld[hi].prev; ld[ni].val > v; ni = ld[ni].prev) {
-		sat.cEnqueue(Lit(ld[ni].var, 0), r);
+		sat.cEnqueue(Lit(ld[ni].var, false), r);
 	}
 	assert(ld[ni].val == v);
 	hi = ni;
@@ -195,11 +207,13 @@ inline void IntVarLL::updateFixed() {
 
 bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
-	if (vals && !vals[v]) {
+	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = nextDomVal(v);
 	}
 	Lit p = getGELit(v);
-	if (channel) sat.cEnqueue(p, r);
+	if (channel) {
+		sat.cEnqueue(p, r);
+	}
 	if (v > max) {
 		assert(sat.confl);
 		return false;
@@ -214,11 +228,13 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 
 bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
-	if (vals && !vals[v]) {
+	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = prevDomVal(v);
 	}
 	Lit p = getLELit(v);
-	if (channel) sat.cEnqueue(p, r);
+	if (channel) {
+		sat.cEnqueue(p, r);
+	}
 	if (v < min) {
 		assert(sat.confl);
 		return false;
@@ -234,16 +250,24 @@ bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 bool IntVarLL::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
 	assert(channel);
-	if (setMinNotR(v))
-		if (!setMin(v, r, channel)) return false;
-	if (setMaxNotR(v))
-		if (!setMax(v, r, channel)) return false;
+	if (setMinNotR(v)) {
+		if (!setMin(v, r, channel)) {
+			return false;
+		}
+	}
+	if (setMaxNotR(v)) {
+		if (!setMax(v, r, channel)) {
+			return false;
+		}
+	}
 	return true;
 }
 
 bool IntVarLL::remVal(int64_t v, Reason r, bool channel) {
 	assert(channel);
-	if (!engine.finished_init) NEVER;
+	if (!engine.finished_init) {
+		NEVER;
+	}
 	return true;
 }
 
@@ -255,7 +279,9 @@ Lit IntVarLL::createLit(int _v) {
 		ni = ld[ni].prev;
 		assert(0 <= ni && ni < ld.size());
 	}
-	if (ld[ni].val == v) return Lit(ld[ni].var, s);
+	if (ld[ni].val == v) {
+		return Lit(ld[ni].var, s != 0);
+	}
 	// overshot, create new var and insert before ni
 	int mi = getLitNode();
 	ld[mi].var = sat.getLazyVar(ChannelInfo(var_id, 1, 1, v));
@@ -265,31 +291,31 @@ Lit IntVarLL::createLit(int _v) {
 	ld[ni].next = mi;
 	ld[ld[mi].next].prev = mi;
 
-	Lit p = Lit(ld[ld[mi].next].var, 1);
-	Lit q = Lit(ld[ld[mi].prev].var, 0);
+	Lit p = Lit(ld[ld[mi].next].var, true);
+	Lit q = Lit(ld[ld[mi].prev].var, false);
 
 	//	printf("created var %d, ", ld[mi].var);
 
 	if (sat.value(p) == l_True) {
-		Clause* r = (Clause*)malloc(sizeof(Clause) + 2 * sizeof(Lit));
+		auto* r = (Clause*)malloc(sizeof(Clause) + 2 * sizeof(Lit));
 		r->clearFlags();
 		r->temp_expl = 1;
 		r->sz = 2;
 		(*r)[1] = ~p;
 		int l = sat.getLevel(var(p));
 		sat.rtrail[l].push(r);
-		sat.aEnqueue(Lit(ld[mi].var, 1), r, l);
+		sat.aEnqueue(Lit(ld[mi].var, true), r, l);
 	}
 	if (sat.value(q) == l_True) {
-		Clause* r = (Clause*)malloc(sizeof(Clause) + 2 * sizeof(Lit));
+		auto* r = (Clause*)malloc(sizeof(Clause) + 2 * sizeof(Lit));
 		r->clearFlags();
 		r->temp_expl = 1;
 		r->sz = 2;
 		(*r)[1] = ~q;
 		int l = sat.getLevel(var(q));
 		sat.rtrail[l].push(r);
-		sat.aEnqueue(Lit(ld[mi].var, 0), r, l);
+		sat.aEnqueue(Lit(ld[mi].var, false), r, l);
 	}
 
-	return Lit(ld[mi].var, s);
+	return Lit(ld[mi].var, s != 0);
 }

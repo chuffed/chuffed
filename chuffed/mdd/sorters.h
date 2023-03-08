@@ -1,5 +1,5 @@
-#ifndef __SORTERS_H__
-#define __SORTERS_H__
+#ifndef SORTERS_H_
+#define SORTERS_H_
 
 #include <chuffed/core/propagator.h>
 
@@ -54,7 +54,9 @@ struct HalfCmp {
 // output: bs (list of higher values), cs (list of lower values)
 template <class CMP>
 static void PWSplit(vec<Lit>& as, vec<Lit>& bs, vec<Lit>& cs) {
-	if (as.size() % 2 == 1) as.push(lit_False);
+	if (as.size() % 2 == 1) {
+		as.push(lit_False);
+	}
 	assert(as.size() % 2 == 0);
 
 	for (int ii = 0; ii < as.size(); ii += 2) {
@@ -71,7 +73,9 @@ static void PWSplit(vec<Lit>& as, vec<Lit>& bs, vec<Lit>& cs) {
 // Same as PWSplit, but pairs 0 with (n/2), etc.
 template <class CMP>
 static void PWSplit_mid(vec<Lit>& as, vec<Lit>& bs, vec<Lit>& cs) {
-	if (as.size() % 2 == 1) as.push(lit_False);
+	if (as.size() % 2 == 1) {
+		as.push(lit_False);
+	}
 	assert(as.size() % 2 == 0);
 
 	int mid = as.size() / 2;
@@ -126,10 +130,14 @@ static void PWMerge(int max, vec<Lit>& as, vec<Lit>& bs, vec<Lit>& os) {
 			CMP::cmp(es[ii], ds[ii + 1], oa, ob);
 
 			os.push(oa);
-			if (os.size() > max) return;
+			if (os.size() > max) {
+				return;
+			}
 
 			os.push(ob);
-			if (os.size() > max) return;
+			if (os.size() > max) {
+				return;
+			}
 		}
 		os.push(es.last());
 	}
@@ -137,7 +145,9 @@ static void PWMerge(int max, vec<Lit>& as, vec<Lit>& bs, vec<Lit>& os) {
 
 template <class CMP>
 static void PWSort(int max, vec<Lit>& as, vec<Lit>& os) {
-	if (as.size() == 0) return;
+	if (as.size() == 0) {
+		return;
+	}
 	if (as.size() == 1) {
 		os.push(as[0]);
 		return;
@@ -204,11 +214,15 @@ static void OEMerge(int max, vec<Lit>& as, vec<Lit>& bs, vec<Lit>& os) {
 			CMP::cmp(es[ii], ds[ii + 1], oa, ob);
 
 			os.push(oa);
-			if (os.size() > max) return;
+			if (os.size() > max) {
+				return;
+			}
 
 			os.push(ob);
 
-			if (os.size() > max) return;
+			if (os.size() > max) {
+				return;
+			}
 		}
 		os.push(es.last());
 	}
@@ -216,13 +230,17 @@ static void OEMerge(int max, vec<Lit>& as, vec<Lit>& bs, vec<Lit>& os) {
 
 template <class CMP>
 static void OESort(int max, vec<Lit>& as, vec<Lit>& os) {
-	if (as.size() == 0) return;
+	if (as.size() == 0) {
+		return;
+	}
 	if (as.size() == 1) {
 		os.push(as[0]);
 		return;
 	}
 
-	if (as.size() % 2) as.push(lit_False);
+	if (as.size() % 2) {
+		as.push(lit_False);
+	}
 
 	// as is of even length.
 	vec<Lit> bs;
@@ -283,7 +301,7 @@ static void CardNet(int max, vec<Lit>& as, vec<Lit>& os) {
 // input: max (ub), lits (input literals)
 // output: vals (fresh literals representing the sorter outputs)
 inline void sorter(int max, vec<Lit>& lits, vec<Lit>& vals, SorterKind kind, int flags) {
-	if (flags & SRT_HALF) {
+	if ((flags & SRT_HALF) != 0) {
 		switch (kind) {
 			case SRT_PAIRWISE:
 				PWSort<HalfCmp>(max, lits, vals);
@@ -324,7 +342,6 @@ inline void sorter(int max, vec<Lit>& lits, vec<Lit>& vals, SorterKind kind, int
 				break;
 		}
 	}
-	return;
 }
 
 #endif

@@ -1,20 +1,23 @@
-#ifndef __SPARSE_SET_H__
-#define __SPARSE_SET_H__
+#ifndef SPARSE_SET_H_
+#define SPARSE_SET_H_
 // U indicates whether to use FAST_FSET.
+
+#include <chuffed/core/engine.h>
+
 #include <cassert>
 #include <cstdlib>
 
 template <int U = 0>
 class SparseSet {
 public:
-	SparseSet(void) : dom(0), sparse(NULL), dense(NULL), members(0) {}
+	SparseSet() : dom(0), sparse(nullptr), dense(nullptr), members(0) {}
 
 	SparseSet(unsigned int size)
 			: dom(size),
 				sparse((unsigned int*)malloc(size * sizeof(unsigned int))),
 				dense((unsigned int*)malloc(size * sizeof(unsigned int))),
 				members(0) {
-		if (U & 1) {
+		if ((U & 1) != 0) {
 			assert(members == 0);
 			for (unsigned int i = 0; i < dom; i++) {
 				sparse[i] = i;
@@ -24,25 +27,30 @@ public:
 	}
 
 	~SparseSet() {
-		if (sparse) free(sparse);
-		if (dense) free(dense);
+		if (sparse != nullptr) {
+			free(sparse);
+		}
+		if (dense != nullptr) {
+			free(dense);
+		}
 	}
 
 	bool elem(unsigned int value) const {
-		if (U & 1) {
+		if ((U & 1) != 0) {
 			return (sparse[value] < members);
-		} else {
-			unsigned int a = sparse[value];
-
-			if (a < members && dense[a] == value) return true;
-			return false;
 		}
+		unsigned int a = sparse[value];
+
+		if (a < members && dense[a] == value) {
+			return true;
+		}
+		return false;
 	}
 
 	bool elemLim(unsigned int lim, unsigned int el) { return (sparse[el] < lim) && elem(el); }
 
 	virtual bool insert(unsigned int value) {
-		if (U & 1) {
+		if ((U & 1) != 0) {
 			unsigned int old_dense = sparse[value];
 			unsigned int lost_val = dense[members];
 
@@ -62,7 +70,7 @@ public:
 		return true;
 	}
 
-	void clear(void) { members = 0; }
+	void clear() { members = 0; }
 
 	unsigned int pos(unsigned int val) const {
 		assert(elem(val));
@@ -79,7 +87,7 @@ public:
 			sparse = (unsigned int*)realloc(sparse, sizeof(unsigned int) * sz);
 			dense = (unsigned int*)realloc(dense, sizeof(unsigned int) * sz);
 
-			if (U & 1) {
+			if ((U & 1) != 0) {
 				assert(members == 0);
 				for (; dom < sz; dom++) {
 					sparse[dom] = dom;
@@ -89,9 +97,9 @@ public:
 		}
 	}
 
-	unsigned int size(void) { return members; }
+	unsigned int size() { return members; }
 
-	unsigned int domain(void) { return dom; }
+	unsigned int domain() { return dom; }
 
 protected:
 	unsigned int dom;
@@ -124,10 +132,12 @@ public:
 	DeferredSet(int sz) : SparseSet<0>(sz) {}
 
 	// Ensure members is given the correct value.
-	inline void refresh(void) { members = stored; }
+	inline void refresh() { members = stored; }
 
-	inline void commit(void) {
-		if (stored != members) trailChange(stored, members);
+	inline void commit() {
+		if (stored != members) {
+			trailChange(stored, members);
+		}
 	}
 
 protected:

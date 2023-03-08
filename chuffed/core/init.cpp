@@ -16,10 +16,11 @@ void Engine::init() {
 	// Get the vars ready
 	for (int i = 0; i < vars.size(); i++) {
 		IntVar* v = vars[i];
-		if (v->pinfo.size() == 0)
+		if (v->pinfo.size() == 0) {
 			v->in_queue = true;
-		else
+		} else {
 			v->pushInQueue();
+		}
 	}
 
 	if (so.lazy) {
@@ -27,12 +28,16 @@ void Engine::init() {
 			if (vars[i]->getMax() - vars[i]->getMin() <= so.eager_limit) {
 				vars[i]->specialiseToEL();
 			} else {
-				if (so.verbosity >= 2) std::cerr << "using lazy literal\n";
+				if (so.verbosity >= 2) {
+					std::cerr << "using lazy literal\n";
+				}
 				vars[i]->specialiseToLL();
 			}
 		}
 	} else {
-		for (int i = 0; i < vars.size(); i++) vars[i]->initVals(true);
+		for (int i = 0; i < vars.size(); i++) {
+			vars[i]->initVals(true);
+		}
 	}
 
 	// Get the propagators ready
@@ -45,7 +50,9 @@ void Engine::init() {
 
 	// Get MIP propagator ready
 
-	if (so.mip) mip->init();
+	if (so.mip) {
+		mip->init();
+	}
 
 	// Get SAT propagator ready
 
@@ -56,11 +63,15 @@ void Engine::init() {
 
 	// Get LDSB ready
 
-	if (so.ldsb) ldsb.init();
+	if (so.ldsb) {
+		ldsb.init();
+	}
 
 	// Do MIP presolve
 
-	if (so.mip) mip->presolve();
+	if (so.mip) {
+		mip->presolve();
+	}
 
 	// Ready
 

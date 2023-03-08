@@ -2,7 +2,9 @@
 
 void createVar(IntVar*& x, int min, int max, bool el) {
 	x = newIntVar(min, max);
-	if (el) x->specialiseToEL();
+	if (el) {
+		x->specialiseToEL();
+	}
 }
 
 void createVars(vec<IntVar*>& x, int n, int min, int max, bool el) {
@@ -10,7 +12,9 @@ void createVars(vec<IntVar*>& x, int n, int min, int max, bool el) {
 	x.growTo(n);
 	for (int i = 0; i < n; i++) {
 		x[i] = newIntVar(min, max);
-		if (el) x[i]->specialiseToEL();
+		if (el) {
+			x[i]->specialiseToEL();
+		}
 	}
 }
 
@@ -21,7 +25,9 @@ void createVars(vec<vec<IntVar*> >& x, int n, int m, int min, int max, bool el) 
 		x[i].growTo(m);
 		for (int j = 0; j < m; j++) {
 			x[i][j] = newIntVar(min, max);
-			if (el) x[i][j]->specialiseToEL();
+			if (el) {
+				x[i][j]->specialiseToEL();
+			}
 		}
 	}
 }

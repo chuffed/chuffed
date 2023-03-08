@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 /**
@@ -43,12 +44,18 @@ class SetLit;
 /// Exception signaling type error
 class TypeError {
 private:
-	std::string _what;
+	const char* _what = nullptr;
 
 public:
-	TypeError() : _what("") {}
-	TypeError(std::string what) : _what(what) {}
-	std::string what(void) const { return _what; }
+	TypeError() {}
+	TypeError(const char* what) : _what(what) {}
+	std::string what() const {
+		if (_what != nullptr) {
+			std::string what = _what;
+			return what;
+		}
+		return "";
+	};
 };
 
 /**
@@ -57,7 +64,7 @@ public:
 class Node {
 public:
 	/// Destructor
-	virtual ~Node(void);
+	virtual ~Node();
 
 	/// Append \a n to an array node
 	void append(Node* n);
@@ -69,48 +76,48 @@ public:
 	/// Test if node is function call with \a id
 	bool isCall(const std::string& id);
 	/// Return function call
-	Call* getCall(void);
+	Call* getCall();
 	/// Test if node is function call or array containing function call \a id
 	bool hasCall(const std::string& id);
 	/// Return function call \a id
 	Call* getCall(const std::string& id);
 	/// Cast this node to an array node
-	Array* getArray(void);
+	Array* getArray();
 	/// Cast this node to an integer variable node
-	int getIntVar(void);
+	int getIntVar();
 	/// Cast this node to a Boolean variable node
-	int getBoolVar(void);
+	int getBoolVar();
 	/// Cast this node to a set variable node
-	int getSetVar(void);
+	int getSetVar();
 
 	/// Cast this node to an integer node
-	int getInt(void);
+	int getInt();
 	/// Cast this node to a Boolean node
-	bool getBool(void);
+	bool getBool();
 	/// Cast this node to a Float node
-	double getFloat(void);
+	double getFloat();
 	/// Cast this node to a set literal node
-	SetLit* getSet(void);
+	SetLit* getSet();
 
 	/// Cast this node to a string node
-	std::string getString(void);
+	std::string getString();
 
 	/// Test if node is an integer variable node
-	bool isIntVar(void);
+	bool isIntVar();
 	/// Test if node is a Boolean variable node
-	bool isBoolVar(void);
+	bool isBoolVar();
 	/// Test if node is a set variable node
-	bool isSetVar(void);
+	bool isSetVar();
 	/// Test if node is an integer node
-	bool isInt(void);
+	bool isInt();
 	/// Test if node is a Boolean node
-	bool isBool(void);
+	bool isBool();
 	/// Test if node is a string node
-	bool isString(void);
+	bool isString();
 	/// Test if node is an array node
-	bool isArray(void);
+	bool isArray();
 	/// Test if node is a set literal node
-	bool isSet(void);
+	bool isSet();
 
 	/// Output string representation
 	virtual void print(std::ostream&) = 0;
@@ -121,21 +128,21 @@ class BoolLit : public Node {
 public:
 	bool b;
 	BoolLit(bool b0) : b(b0) {}
-	virtual void print(std::ostream& os) { os << "b(" << (b ? "true" : "false") << ")"; }
+	void print(std::ostream& os) override { os << "b(" << (b ? "true" : "false") << ")"; }
 };
 /// Integer literal node
 class IntLit : public Node {
 public:
 	int i;
 	IntLit(int i0) : i(i0) {}
-	virtual void print(std::ostream& os) { os << "i(" << i << ")"; }
+	void print(std::ostream& os) override { os << "i(" << i << ")"; }
 };
 /// Float literal node
 class FloatLit : public Node {
 public:
 	double d;
 	FloatLit(double d0) : d(d0) {}
-	virtual void print(std::ostream& os) { os << "f(" << d << ")"; }
+	void print(std::ostream& os) override { os << "f(" << d << ")"; }
 };
 /// Set literal node
 class SetLit : public Node {
@@ -144,11 +151,11 @@ public:
 	int min;
 	int max;
 	std::vector<int> s;
-	SetLit(void) {}
+	SetLit() {}
 	SetLit(int min0, int max0) : interval(true), min(min0), max(max0) {}
-	SetLit(const std::vector<int>& s0) : interval(false), s(s0) {}
-	bool empty(void) const { return ((interval && min > max) || (!interval && s.size() == 0)); }
-	virtual void print(std::ostream& os) { os << "s()"; }
+	SetLit(std::vector<int> s0) : interval(false), s(std::move(s0)) {}
+	bool empty() const { return ((interval && min > max) || (!interval && s.empty())); }
+	void print(std::ostream& os) override { os << "s()"; }
 };
 
 /// Variable node base class
@@ -161,44 +168,48 @@ public:
 class BoolVar : public Var {
 public:
 	BoolVar(int i0) : Var(i0) {}
-	virtual void print(std::ostream& os) { os << "xb(" << i << ")"; }
+	void print(std::ostream& os) override { os << "xb(" << i << ")"; }
 };
 /// Integer variable node
 class IntVar : public Var {
 public:
 	IntVar(int i0) : Var(i0) {}
-	virtual void print(std::ostream& os) { os << "xi(" << i << ")"; }
+	void print(std::ostream& os) override { os << "xi(" << i << ")"; }
 };
 /// Float variable node
 class FloatVar : public Var {
 public:
 	FloatVar(int i0) : Var(i0) {}
-	virtual void print(std::ostream& os) { os << "xf(" << i << ")"; }
+	void print(std::ostream& os) override { os << "xf(" << i << ")"; }
 };
 /// Set variable node
 class SetVar : public Var {
 public:
 	SetVar(int i0) : Var(i0) {}
-	virtual void print(std::ostream& os) { os << "xs(" << i << ")"; }
+	void print(std::ostream& os) override { os << "xs(" << i << ")"; }
 };
 
 /// Array node
 class Array : public Node {
 public:
 	std::vector<Node*> a;
-	Array(const std::vector<Node*>& a0) : a(a0) {}
+	Array(std::vector<Node*> a0) : a(std::move(a0)) {}
 	Array(Node* n) : a(1) { a[0] = n; }
 	Array(int n = 0) : a(n) {}
-	virtual void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		os << "[";
 		for (unsigned int i = 0; i < a.size(); i++) {
 			a[i]->print(os);
-			if (i < a.size() - 1) os << ", ";
+			if (i < a.size() - 1) {
+				os << ", ";
+			}
 		}
 		os << "]";
 	}
-	~Array(void) {
-		for (int i = a.size(); i--;) delete a[i];
+	~Array() override {
+		for (int i = a.size(); (i--) != 0;) {
+			delete a[i];
+		}
 	}
 };
 
@@ -207,16 +218,18 @@ class Call : public Node {
 public:
 	std::string id;
 	Node* args;
-	Call(const std::string& id0, Node* args0) : id(id0), args(args0) {}
-	~Call(void) { delete args; }
-	virtual void print(std::ostream& os) {
+	Call(std::string id0, Node* args0) : id(std::move(id0)), args(args0) {}
+	~Call() override { delete args; }
+	void print(std::ostream& os) override {
 		os << id << "(";
 		args->print(os);
 		os << ")";
 	}
-	Array* getArgs(unsigned int n) {
+	Array* getArgs(unsigned int n) const {
 		Array* a = args->getArray();
-		if (a->a.size() != n) throw TypeError("arity mismatch");
+		if (a->a.size() != n) {
+			throw TypeError("arity mismatch");
+		}
 		return a;
 	}
 };
@@ -227,11 +240,11 @@ public:
 	Node* a;
 	Node* idx;
 	ArrayAccess(Node* a0, Node* idx0) : a(a0), idx(idx0) {}
-	~ArrayAccess(void) {
+	~ArrayAccess() override {
 		delete a;
 		delete idx;
 	}
-	virtual void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		a->print(os);
 		os << "[";
 		idx->print(os);
@@ -243,23 +256,23 @@ public:
 class Atom : public Node {
 public:
 	std::string id;
-	Atom(const std::string& id0) : id(id0) {}
-	virtual void print(std::ostream& os) { os << id; }
+	Atom(std::string id0) : id(std::move(id0)) {}
+	void print(std::ostream& os) override { os << id; }
 };
 
 /// String node
 class String : public Node {
 public:
 	std::string s;
-	String(const std::string& s0) : s(s0) {}
-	virtual void print(std::ostream& os) { os << "s(\"" << s << "\")"; }
+	String(std::string s0) : s(std::move(s0)) {}
+	void print(std::ostream& os) override { os << "s(\"" << s << "\")"; }
 };
 
-inline Node::~Node(void) {}
+inline Node::~Node() {}
 
 inline void Node::append(Node* newNode) {
-	Array* a = dynamic_cast<Array*>(this);
-	if (!a) {
+	auto* a = dynamic_cast<Array*>(this);
+	if (a == nullptr) {
 		std::cerr << "type error" << std::endl;
 		std::exit(-1);
 	}
@@ -267,10 +280,14 @@ inline void Node::append(Node* newNode) {
 }
 
 inline bool Node::hasAtom(const std::string& id) {
-	if (Array* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); i--;)
-			if (Atom* at = dynamic_cast<Atom*>(a->a[i]))
-				if (at->id == id) return true;
+	if (auto* a = dynamic_cast<Array*>(this)) {
+		for (int i = a->a.size(); (i--) != 0;) {
+			if (Atom* at = dynamic_cast<Atom*>(a->a[i])) {
+				if (at->id == id) {
+					return true;
+				}
+			}
+		}
 	} else if (Atom* a = dynamic_cast<Atom*>(this)) {
 		return a->id == id;
 	}
@@ -279,23 +296,29 @@ inline bool Node::hasAtom(const std::string& id) {
 
 inline bool Node::isCall(const std::string& id) {
 	if (Call* a = dynamic_cast<Call*>(this)) {
-		if (a->id == id) return true;
+		if (a->id == id) {
+			return true;
+		}
 	}
 	return false;
 }
 
-inline Call* Node::getCall(void) {
-	if (Call* a = dynamic_cast<Call*>(this)) return a;
+inline Call* Node::getCall() {
+	if (Call* a = dynamic_cast<Call*>(this)) {
+		return a;
+	}
 	throw TypeError("call expected");
 }
 
 inline bool Node::hasCall(const std::string& id) {
-	if (Array* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); i--;)
-			if (Call* at = dynamic_cast<Call*>(a->a[i]))
+	if (auto* a = dynamic_cast<Array*>(this)) {
+		for (int i = a->a.size(); (i--) != 0;) {
+			if (Call* at = dynamic_cast<Call*>(a->a[i])) {
 				if (at->id == id) {
 					return true;
 				}
+			}
+		}
 	} else if (Call* a = dynamic_cast<Call*>(this)) {
 		return a->id == id;
 	}
@@ -303,7 +326,7 @@ inline bool Node::hasCall(const std::string& id) {
 }
 
 inline bool Node::isInt(int& i) {
-	if (IntLit* il = dynamic_cast<IntLit*>(this)) {
+	if (auto* il = dynamic_cast<IntLit*>(this)) {
 		i = il->i;
 		return true;
 	}
@@ -311,67 +334,91 @@ inline bool Node::isInt(int& i) {
 }
 
 inline Call* Node::getCall(const std::string& id) {
-	if (Array* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); i--;)
-			if (Call* at = dynamic_cast<Call*>(a->a[i]))
-				if (at->id == id) return at;
+	if (auto* a = dynamic_cast<Array*>(this)) {
+		for (int i = a->a.size(); (i--) != 0;) {
+			if (Call* at = dynamic_cast<Call*>(a->a[i])) {
+				if (at->id == id) {
+					return at;
+				}
+			}
+		}
 	} else if (Call* a = dynamic_cast<Call*>(this)) {
-		if (a->id == id) return a;
+		if (a->id == id) {
+			return a;
+		}
 	}
 	throw TypeError("call expected");
 }
 
-inline Array* Node::getArray(void) {
-	if (Array* a = dynamic_cast<Array*>(this)) return a;
+inline Array* Node::getArray() {
+	if (auto* a = dynamic_cast<Array*>(this)) {
+		return a;
+	}
 	throw TypeError("array expected");
 }
 
-inline int Node::getIntVar(void) {
-	if (IntVar* a = dynamic_cast<IntVar*>(this)) return a->i;
+inline int Node::getIntVar() {
+	if (auto* a = dynamic_cast<IntVar*>(this)) {
+		return a->i;
+	}
 	throw TypeError("integer variable expected");
 }
-inline int Node::getBoolVar(void) {
-	if (BoolVar* a = dynamic_cast<BoolVar*>(this)) return a->i;
+inline int Node::getBoolVar() {
+	if (auto* a = dynamic_cast<BoolVar*>(this)) {
+		return a->i;
+	}
 	throw TypeError("bool variable expected");
 }
-inline int Node::getSetVar(void) {
-	if (SetVar* a = dynamic_cast<SetVar*>(this)) return a->i;
+inline int Node::getSetVar() {
+	if (auto* a = dynamic_cast<SetVar*>(this)) {
+		return a->i;
+	}
 	throw TypeError("set variable expected");
 }
-inline int Node::getInt(void) {
-	if (IntLit* a = dynamic_cast<IntLit*>(this)) return a->i;
+inline int Node::getInt() {
+	if (auto* a = dynamic_cast<IntLit*>(this)) {
+		return a->i;
+	}
 	throw TypeError("integer literal expected");
 }
-inline bool Node::getBool(void) {
-	if (BoolLit* a = dynamic_cast<BoolLit*>(this)) return a->b;
+inline bool Node::getBool() {
+	if (auto* a = dynamic_cast<BoolLit*>(this)) {
+		return a->b;
+	}
 	throw TypeError("bool literal expected");
 }
-inline double Node::getFloat(void) {
-	if (FloatLit* a = dynamic_cast<FloatLit*>(this)) return a->d;
+inline double Node::getFloat() {
+	if (auto* a = dynamic_cast<FloatLit*>(this)) {
+		return a->d;
+	}
 	throw TypeError("float literal expected");
 }
-inline SetLit* Node::getSet(void) {
-	if (SetLit* a = dynamic_cast<SetLit*>(this)) return a;
+inline SetLit* Node::getSet() {
+	if (auto* a = dynamic_cast<SetLit*>(this)) {
+		return a;
+	}
 	throw TypeError("set literal expected");
 }
-inline std::string Node::getString(void) {
-	if (String* a = dynamic_cast<String*>(this)) return a->s;
+inline std::string Node::getString() {
+	if (auto* a = dynamic_cast<String*>(this)) {
+		return a->s;
+	}
 	throw TypeError("string literal expected");
 }
-inline bool Node::isIntVar(void) { return (dynamic_cast<IntVar*>(this) != NULL); }
-inline bool Node::isBoolVar(void) { return (dynamic_cast<BoolVar*>(this) != NULL); }
-inline bool Node::isSetVar(void) { return (dynamic_cast<SetVar*>(this) != NULL); }
-inline bool Node::isInt(void) { return (dynamic_cast<IntLit*>(this) != NULL); }
-inline bool Node::isBool(void) { return (dynamic_cast<BoolLit*>(this) != NULL); }
-inline bool Node::isSet(void) { return (dynamic_cast<SetLit*>(this) != NULL); }
-inline bool Node::isString(void) { return (dynamic_cast<String*>(this) != NULL); }
-inline bool Node::isArray(void) { return (dynamic_cast<Array*>(this) != NULL); }
+inline bool Node::isIntVar() { return (dynamic_cast<IntVar*>(this) != nullptr); }
+inline bool Node::isBoolVar() { return (dynamic_cast<BoolVar*>(this) != nullptr); }
+inline bool Node::isSetVar() { return (dynamic_cast<SetVar*>(this) != nullptr); }
+inline bool Node::isInt() { return (dynamic_cast<IntLit*>(this) != nullptr); }
+inline bool Node::isBool() { return (dynamic_cast<BoolLit*>(this) != nullptr); }
+inline bool Node::isSet() { return (dynamic_cast<SetLit*>(this) != nullptr); }
+inline bool Node::isString() { return (dynamic_cast<String*>(this) != nullptr); }
+inline bool Node::isArray() { return (dynamic_cast<Array*>(this) != nullptr); }
 
 inline Node* extractSingleton(Node* n) {
-	if (Array* a = dynamic_cast<Array*>(n)) {
+	if (auto* a = dynamic_cast<Array*>(n)) {
 		if (a->a.size() == 1) {
 			Node* ret = a->a[0];
-			a->a[0] = NULL;
+			a->a[0] = nullptr;
 			delete a;
 			return ret;
 		}

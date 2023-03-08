@@ -1,4 +1,6 @@
 #include <chuffed/branching/impact.h>
+#include <chuffed/support/misc.h>
+#include <chuffed/support/vec.h>
 
 constexpr double WEIGHT_LOCAL = 420;
 constexpr double WEIGHT_GLOBAL = 42;
@@ -9,7 +11,9 @@ constexpr double CLEARED_REPARTITION = 1.00;
 
 double processImpact(vec<int> const& previousSizes, vec<int> const& newSizes) {
 	int const n = newSizes.size();
-	if (!n || previousSizes.size() != n) NEVER;
+	if ((n == 0) || previousSizes.size() != n) {
+		NEVER;
+	}
 
 	double local = 0;
 	double global = 0;
@@ -25,7 +29,7 @@ double processImpact(vec<int> const& previousSizes, vec<int> const& newSizes) {
 			repartition += CLEARED_REPARTITION;
 		} else {
 			int const fi = ti - newSizes[i];
-			if (fi) {
+			if (fi != 0) {
 				local += fi / ti;
 				global += fi;
 				++repartition;
@@ -39,7 +43,9 @@ double processImpact(vec<int> const& previousSizes, vec<int> const& newSizes) {
 
 double solvedImpact(vec<int> const& previousSizes) {
 	int const n = previousSizes.size();
-	if (!n) NEVER;
+	if (n == 0) {
+		NEVER;
+	}
 
 	double local = 0;
 	double global = 0;
@@ -55,7 +61,7 @@ double solvedImpact(vec<int> const& previousSizes) {
 			repartition += CLEARED_REPARTITION;
 		} else {
 			int const fi = ti - 1;
-			if (fi) {
+			if (fi != 0) {
 				local += fi / ti;
 				global += fi;
 				++repartition;

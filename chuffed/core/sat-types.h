@@ -48,7 +48,7 @@ inline Lit operator~(Lit p) {
 	q.x = p.x ^ 1;
 	return q;
 }
-inline bool sign(Lit p) { return p.x & 1; }
+inline bool sign(Lit p) { return (p.x & 1) != 0; }
 inline int var(Lit p) { return p.x >> 1; }
 inline Lit unsign(Lit p) {
 	Lit q;
@@ -76,7 +76,7 @@ class lbool {
 public:
 	lbool() : value(0) {}
 	lbool(bool x) : value((int)x * 2 - 1) {}
-	int toInt(void) const { return value; }
+	int toInt() const { return value; }
 
 	bool operator==(lbool b) const { return value == b.value; }
 	bool operator!=(lbool b) const { return value != b.value; }
@@ -113,7 +113,9 @@ public:
 		clearFlags();
 		sz = ps.size();
 		this->learnt = learnt;
-		for (int i = 0; i < ps.size(); i++) data[i] = ps[i];
+		for (int i = 0; i < ps.size(); i++) {
+			data[i] = ps[i];
+		}
 	}
 
 	// -- use this function instead:
@@ -125,7 +127,7 @@ public:
 		// with newSize until we've copied the activities, and make sure
 		// you copy data2 before data3 in case one would overwrite the
 		// other.
-		float* data2 = (float*)data;
+		auto* data2 = (float*)data;
 		int* data3 = (int*)data;
 		int* data4 = (int*)data;
 		if (learnt) {
@@ -137,14 +139,16 @@ public:
 	}
 
 	Lit& operator[](int i) {
-		if (i >= sz) abort();
+		if (i >= sz) {
+			abort();
+		}
 		return data[i];
 	}
 	Lit operator[](int i) const { return data[i]; }
-	operator const Lit*(void) const { return data; }
+	operator const Lit*() const { return data; }
 
 	float& activity() {
-		float* data2 = (float*)data;
+		auto* data2 = (float*)data;
 		return data2[sz];
 	}
 	int& rawActivity() {
@@ -161,7 +165,7 @@ template <class V>
 static Clause* Clause_new(const V& ps, bool learnt = false) {
 	int mem_size = sizeof(Clause) + ps.size() * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
 	void* mem = malloc(mem_size);
-	Clause* newClause = new (mem) Clause(ps, learnt);
+	auto* newClause = new (mem) Clause(ps, learnt);
 	return newClause;
 }
 
@@ -176,16 +180,18 @@ struct LitFlags {
 
 	LitFlags(char f) { *((char*)this) = f; }
 	void setDecidable(bool b) {
-		if (b)
+		if (b) {
 			decidable = uipable = 1;
-		else
+		} else {
 			decidable = 0;
+		}
 	}
 	void setUIPable(bool b) {
-		if (b)
+		if (b) {
 			uipable = 1;
-		else
+		} else {
 			uipable = decidable = 0;
+		}
 	}
 	void setLearnable(bool b) { learnable = b; }
 };
@@ -221,7 +227,9 @@ public:
 	};
 	WatchElem() : a(0) {}
 	WatchElem(Clause* c) : pt(c) {
-		if (sizeof(Clause*) == 4) d.d2 = 0;
+		if (sizeof(Clause*) == 4) {
+			d.d2 = 0;
+		}
 	}
 	WatchElem(Lit p) {
 		d.type = 1;
@@ -248,7 +256,9 @@ public:
 	};
 	Reason() : a(0) {}
 	Reason(Clause* c) : pt(c) {
-		if (sizeof(Clause*) == 4) d.d2 = 0;
+		if (sizeof(Clause*) == 4) {
+			d.d2 = 0;
+		}
 	}
 	Reason(int prop_id, int inf_id) {
 		d.type = 1;

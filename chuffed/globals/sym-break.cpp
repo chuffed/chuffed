@@ -20,14 +20,16 @@ public:
 		y.attach(this, 1, EVENT_U);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		if (y.getMax() < k) {
 			int64_t m = y.getMax() - 1;
 			setDom(x, setMax, m, y.getMaxLit());
 		}
 
 		int64_t m = x.getMin() + 1;
-		if (m > k) m = k;
+		if (m > k) {
+			m = k;
+		}
 		setDom(y, setMin, m, x.getMinLit());
 
 		return true;

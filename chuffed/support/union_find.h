@@ -22,12 +22,12 @@ class UF : public UnionFind {
 
 public:
 	T* id;
-	int getSize() const { return size; }
+	int getSize() const override { return size; }
 	UF(int n);
 	virtual ~UF();
-	void reset();
-	int find(int p);
-	bool unite(int x, int y);
+	void reset() override;
+	int find(int p) override;
+	bool unite(int x, int y) override;
 
 	void print() const {
 		std::cout << "Unionfind: ";
@@ -37,12 +37,17 @@ public:
 		std::cout << std::endl;
 		std::cout << "           ";
 		for (int i = 0; i < size; i++) {
-			if (id[i] == i)
+			if (id[i] == i) {
 				std::cout << "S ";
-			else
+			} else {
 				std::cout << "  ";
+			}
 			int x = id[i];
-			while (x /= 10) std::cout << " ";
+			x /= 10;
+			while (x != 0) {
+				std::cout << " ";
+				x /= 10;
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -53,9 +58,9 @@ private:
 	std::vector<int> id;
 
 public:
-	int getSize() const { return id.size(); }
+	int getSize() const override { return id.size(); }
 
-	void reset() { id = std::vector<int>(); }
+	void reset() override { id = std::vector<int>(); }
 
 	// Created a new node associated to parent
 	void push_back(int parent) {
@@ -63,14 +68,18 @@ public:
 		assert(parent < id.size());
 	}
 
-	int find(int p) {
-		if (p != id[p]) id[p] = find(id[p]);
+	int find(int p) override {
+		if (p != id[p]) {
+			id[p] = find(id[p]);
+		}
 		return id[p];
 	}
-	bool unite(int x, int y) {
+	bool unite(int x, int y) override {
 		int i = find(x);
 		int j = find(y);
-		if (i == j) return false;
+		if (i == j) {
+			return false;
+		}
 		id[j] = i;
 		return true;
 	}
@@ -82,8 +91,8 @@ class UFRootInfo : public UF<T> {
 
 public:
 	UFRootInfo(int n);
-	virtual ~UFRootInfo();
-	bool unite(int x, int y);
+	~UFRootInfo() override;
+	bool unite(int x, int y) override;
 	bool isRoot(int n);
 };
 
@@ -105,12 +114,12 @@ private:
 public:
 	RerootedUnionFind(int _size);
 	~RerootedUnionFind();
-	int getSize() const { return size; }
+	int getSize() const override { return size; }
 	// No path compression, otherwise we loose the magic of knowing where
 	// explanations come from
-	int find(int val);
-	bool unite(int u, int v);
-	void reset();
+	int find(int val) override;
+	bool unite(int u, int v) override;
+	void reset() override;
 	int ccCount() const;
 	bool isRoot(int i);
 	/*
@@ -141,14 +150,18 @@ void UF<T>::reset() {
 }
 template <typename T>
 int UF<T>::find(int p) {
-	if (p != id[p]) id[p] = find(id[p]);
+	if (p != id[p]) {
+		id[p] = find(id[p]);
+	}
 	return id[p];
 }
 template <typename T>
 bool UF<T>::unite(int x, int y) {
 	int i = find(x);
 	int j = find(y);
-	if (i == j) return false;
+	if (i == j) {
+		return false;
+	}
 	id[j] = i;
 
 	return true;
@@ -173,7 +186,9 @@ template <typename T>
 bool UFRootInfo<T>::unite(int x, int y) {
 	int i = this->find(x);
 	int j = this->find(y);
-	if (i == j) return false;
+	if (i == j) {
+		return false;
+	}
 	this->id[j] = i;
 	is_root[j] = 0;
 
@@ -243,7 +258,9 @@ int RerootedUnionFind<T>::find(int val) {
 
 template <typename T>
 bool RerootedUnionFind<T>::unite(int u, int v) {
-	if (connected(u, v)) return false;
+	if (connected(u, v)) {
+		return false;
+	}
 	// Walking the first tree to revert it
 	makeRoot(u);
 
@@ -283,7 +300,9 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
 	// fancyFindInfo vinfo = fancyFind(v);
 	// if(uinfo.repr != vinfo.repr)
 	//     return path;
-	if (u == v) return path;
+	if (u == v) {
+		return path;
+	}
 	int i = v;  //(uinfo.lengthUntilRoot > vinfo.lengthUntilRoot) ? u : v;
 	int limit = (i == u) ? v : u;
 
@@ -324,11 +343,11 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
 		// for (int k = path2.size()-1; k >=0; k--)
 		//     result.push_back(path2[k]);
 
-		assert(result.size() == 0 || (result[0] == u && result[result.size() - 1] == v) ||
+		assert(result.empty() || (result[0] == u && result[result.size() - 1] == v) ||
 					 (result[0] == v && result[result.size() - 1] == u));
 		return result;
 	}
-	assert(path.size() == 0 || (path[0] == u && path[path.size() - 1] == v) ||
+	assert(path.empty() || (path[0] == u && path[path.size() - 1] == v) ||
 				 (path[0] == v && path[path.size() - 1] == u));
 	return path;
 }

@@ -86,8 +86,12 @@ public:
 			// flip values symmetry
 
 			vec<int> sym3;
-			for (int i = 0; i <= nedges; i++) sym3.push(i);
-			for (int i = 0; i <= nedges; i++) sym3.push(nedges - i);
+			for (int i = 0; i <= nedges; i++) {
+				sym3.push(i);
+			}
+			for (int i = 0; i <= nedges; i++) {
+				sym3.push(nedges - i);
+			}
 
 			val_seq_sym_ldsb(2, nedges + 1, x, sym3);
 
@@ -101,9 +105,11 @@ public:
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
@@ -111,7 +117,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				os << " " << std::setw(4) << std::setfill('0') << x[i * m + j]->getVal() << ", ";
@@ -132,7 +138,8 @@ public:
 int main(int argc, char** argv) {
 	parseOptions(argc, argv);
 
-	int m, n;
+	int m;
+	int n;
 
 	assert(argc == 3);
 	m = atoi(argv[1]);

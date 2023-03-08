@@ -15,7 +15,8 @@ public:
 	Queens(int _n) : n(_n) {
 		createVars(x, n, 1, n);
 
-		vec<int> a, b;
+		vec<int> a;
+		vec<int> b;
 		for (int i = 0; i < n; i++) {
 			a.push(i);
 			b.push(-i);
@@ -46,8 +47,12 @@ public:
 			// vertical flip sym
 
 			vec<int> sym2;
-			for (int i = 0; i < n; i++) sym2.push(i + 1);
-			for (int i = 0; i < n; i++) sym2.push(n - i);
+			for (int i = 0; i < n; i++) {
+				sym2.push(i + 1);
+			}
+			for (int i = 0; i < n; i++) {
+				sym2.push(n - i);
+			}
 
 			val_seq_sym_ldsb(2, n, x, sym2);
 
@@ -59,7 +64,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				os << ((x[i]->getVal() - 1 == j) ? 1 : 0) << ", ";

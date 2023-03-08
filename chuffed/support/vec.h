@@ -12,43 +12,55 @@ class vec {
 
 public:
 	// Constructors:
-	vec() : sz(0), cap(0), data(NULL) {}
+	vec() : sz(0), cap(0), data(nullptr) {}
 	vec(int _sz) : sz(_sz), cap(sz) {
-		data = sz ? (T*)malloc(cap * sizeof(T)) : NULL;
-		for (int i = 0; i < sz; i++) new (&data[i]) T();
+		data = sz != 0 ? (T*)malloc(cap * sizeof(T)) : nullptr;
+		for (int i = 0; i < sz; i++) {
+			new (&data[i]) T();
+		}
 	}
 	vec(int _sz, const T& pad) : sz(_sz), cap(sz) {
-		data = sz ? (T*)malloc(cap * sizeof(T)) : NULL;
-		for (int i = 0; i < sz; i++) new (&data[i]) T(pad);
+		data = sz != 0 ? (T*)malloc(cap * sizeof(T)) : nullptr;
+		for (int i = 0; i < sz; i++) {
+			new (&data[i]) T(pad);
+		}
 	}
 	template <class U>
 	vec(vec<U>& other) : sz(other.size()), cap(sz) {
 		assert(sizeof(U) == sizeof(T));
 		data = (T*)malloc(cap * sizeof(T));
-		for (int i = 0; i < sz; i++) new (&data[i]) T(other[i]);
+		for (int i = 0; i < sz; i++) {
+			new (&data[i]) T(other[i]);
+		}
 		//		for (int i = 0; i < sz; i++) data[i] = other[i];
 	}
 
-	~vec(void) {
-		for (int i = 0; i < sz; i++) data[i].~T();
-		if (data) free(data);
-		data = NULL;
+	~vec() {
+		for (int i = 0; i < sz; i++) {
+			data[i].~T();
+		}
+		if (data) {
+			free(data);
+		}
+		data = nullptr;
 	}
 
 	// Size operations:
-	int size(void) const { return sz; }
+	int size() const { return sz; }
 	int& _size() { return sz; }
-	int capacity(void) const { return cap; }
+	int capacity() const { return cap; }
 	void resize(int nelems) {
 		assert(nelems <= sz);
-		for (int i = nelems; i < sz; i++) data[i].~T();
+		for (int i = nelems; i < sz; i++) {
+			data[i].~T();
+		}
 		sz = nelems;
 	}
 	void shrink(int nelems) {
 		assert(nelems <= sz);
 		resize(sz - nelems);
 	}
-	void pop(void) { data[--sz].~T(); }
+	void pop() { data[--sz].~T(); }
 
 	// Stack interface:
 	void push() {
@@ -66,35 +78,37 @@ public:
 		new (&data[sz++]) T(elem);
 	}
 
-	const T& last(void) const { return data[sz - 1]; }
-	T& last(void) { return data[sz - 1]; }
+	const T& last() const { return data[sz - 1]; }
+	T& last() { return data[sz - 1]; }
 
 	// Vector interface:
 	const T& operator[](int index) const { return data[index]; }
 	T& operator[](int index) { return data[index]; }
 
 	// Raw access to data
-	T* release(void) {
+	T* release() {
 		T* ret = data;
-		data = NULL;
+		data = nullptr;
 		sz = 0;
 		cap = 0;
 		return ret;
 	}
-	operator T*(void) { return data; }
+	operator T*() { return data; }
 
 	// Duplicatation (preferred instead):
 	void copyTo(vec<T>& copy) const {
 		copy.clear();
 		copy.growTo(sz);
-		for (int i = 0; i < sz; i++) new (&copy[i]) T(data[i]);
+		for (int i = 0; i < sz; i++) {
+			new (&copy[i]) T(data[i]);
+		}
 	}
 	void moveTo(vec<T>& dest) {
 		dest.clear(true);
 		dest.data = data;
 		dest.sz = sz;
 		dest.cap = cap;
-		data = NULL;
+		data = nullptr;
 		sz = 0;
 		cap = 0;
 	}
@@ -111,46 +125,61 @@ public:
 
 	void reserve(int size) {
 		if (size > cap) {
-			if (cap == 0)
+			if (cap == 0) {
 				cap = (size > 2) ? size : 2;
-			else
-				do cap = (cap * 3 + 1) >> 1;
-				while (cap < size);
+			} else {
+				do {
+					cap = (cap * 3 + 1) >> 1;
+				} while (cap < size);
+			}
 			data = (T*)realloc(data, cap * sizeof(T));
 		}
 	}
 
 	void growTo(int size) {
-		if (size <= sz) return;
+		if (size <= sz) {
+			return;
+		}
 		reserve(size);
-		for (int i = sz; i < size; i++) new (&data[i]) T();
+		for (int i = sz; i < size; i++) {
+			new (&data[i]) T();
+		}
 		sz = size;
 	}
 
 	void growTo(int size, const T& pad) {
-		if (size <= sz) return;
+		if (size <= sz) {
+			return;
+		}
 		reserve(size);
-		for (int i = sz; i < size; i++) new (&data[i]) T(pad);
+		for (int i = sz; i < size; i++) {
+			new (&data[i]) T(pad);
+		}
 		sz = size;
 	}
 
 	void growBy(int extra, const T& pad = T()) { growTo(sz + extra, pad); }
 
 	void clear(bool dealloc = false) {
-		if (!data) return;
-		for (int i = 0; i < sz; i++) data[i].~T();
+		if (!data) {
+			return;
+		}
+		for (int i = 0; i < sz; i++) {
+			data[i].~T();
+		}
 		sz = 0;
 		if (dealloc) {
 			cap = 0;
 			free(data);
-			data = NULL;
+			data = nullptr;
 		}
 	}
 
 	void remove(const T& t) {
 		int j;
-		for (j = 0; j < sz && data[j] != t; j++)
+		for (j = 0; j < sz && data[j] != t; j++) {
 			;
+		}
 		if (j < sz) {
 			data[j] = last();
 			pop();
@@ -182,12 +211,18 @@ public:
 	bool empty() { return tail == head; }
 	void push(const T& e) {
 		data[tail++] = e;
-		if (fifo && tail == cap) tail = 0;
+		if (fifo && tail == cap) {
+			tail = 0;
+		}
 	}
 	T pop() {
-		if (!fifo) return data[--tail];
+		if (!fifo) {
+			return data[--tail];
+		}
 		T& e = data[head++];
-		if (head == cap) head = 0;
+		if (head == cap) {
+			head = 0;
+		}
 		return e;
 	}
 };

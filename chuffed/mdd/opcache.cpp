@@ -15,7 +15,7 @@ OpCache::OpCache(unsigned int sz)
 	//    collisions = 0;
 }
 
-OpCache::~OpCache(void) {
+OpCache::~OpCache() {
 	free(indices);
 	free(entries);
 	//    std::cout << members << ", " << collisions << std::endl;
@@ -27,7 +27,7 @@ typedef struct {
 	unsigned int b;
 } cache_sig;
 
-inline unsigned int OpCache::hash(char op, unsigned int a, unsigned int b) {
+inline unsigned int OpCache::hash(char op, unsigned int a, unsigned int b) const {
 #ifndef USE_MURMURHASH
 	unsigned int hash = 5381;
 

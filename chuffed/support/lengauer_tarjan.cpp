@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <set>
+#include <utility>
 
 using namespace std;
 
@@ -17,17 +18,20 @@ void LengauerTarjan::LINK(int v, int w) { ancestor[w] = v; }
 int LengauerTarjan::EVAL(int v) {
 	if (ancestor[v] == -1) {
 		return v;
-	} else {
-		COMPRESS(v);
-		return label[v];
 	}
+	COMPRESS(v);
+	return label[v];
 }
 
 void LengauerTarjan::COMPRESS(int v) {
-	if (ancestor[v] == -1) return;
+	if (ancestor[v] == -1) {
+		return;
+	}
 	if (ancestor[ancestor[v]] != -1) {
 		COMPRESS(ancestor[v]);
-		if (semi[label[ancestor[v]]] < semi[label[v]]) label[v] = label[ancestor[v]];
+		if (semi[label[ancestor[v]]] < semi[label[v]]) {
+			label[v] = label[ancestor[v]];
+		}
 		ancestor[v] = ancestor[ancestor[v]];
 	}
 }
@@ -41,9 +45,13 @@ void LengauerTarjan::init() {
 		// cout <<"Succs of "<<i<<": ";
 		for (int j = 0; j < ou[i].size(); j++) {
 			int e = ou[i][j];
-			if (ignore_edge(e)) continue;
+			if (ignore_edge(e)) {
+				continue;
+			}
 			int o = en[e][1];
-			if (ignore_node(o)) continue;
+			if (ignore_node(o)) {
+				continue;
+			}
 			if (i != en[ou[i][j]][1]) {
 				succs[i].push_back(en[ou[i][j]][1]);
 				// cout <<en[ou[i][j]][1]<<", ";
@@ -124,7 +132,9 @@ void LengauerTarjan::find_doms() {
 		for (it = preds[w].begin(); it != preds[w].end(); it++) {
 			int v = *it;
 			int u = EVAL(v);
-			if (semi[u] < semi[w]) semi[w] = semi[u];
+			if (semi[u] < semi[w]) {
+				semi[w] = semi[u];
+			}
 		}
 		buckets[vertex[semi[w]]].push_back(w);
 		LINK(parent[w], w);
@@ -207,7 +217,7 @@ void LengauerTarjan::find_doms() {
 //*/
 
 LengauerTarjan::LengauerTarjan(int r, vvi_t _en, vvi_t _in, vvi_t _ou)
-		: root(r), en(_en), in(_in), ou(_ou) {
+		: root(r), en(std::move(_en)), in(std::move(_in)), ou(std::move(_ou)) {
 	// init();
 }
 
@@ -327,7 +337,9 @@ void ex1() {
 	lt.run(12);
 
 	vector<bool> vis(in.size(), false);
-	for (int i = 0; i < in.size(); i++) cout << "(" << i << "," << lt.dominator(i) << ") ";
+	for (int i = 0; i < in.size(); i++) {
+		cout << "(" << i << "," << lt.dominator(i) << ") ";
+	}
 	cout << endl;
 }
 

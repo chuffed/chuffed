@@ -1,5 +1,7 @@
 #include <chuffed/core/propagator.h>
 
+#include <utility>
+
 // AllDiff for mapping n vars to n values
 // x[i] != x[j] for all i, j
 
@@ -16,38 +18,48 @@ public:
 	AllDiffValue(vec<IntView<U> > _x, int _range) : sz(_x.size()), x(_x.release()), range(_range) {
 		priority = 2;
 		new_fixed.reserve(sz);
-		for (int i = 0; i < sz; i++) x[i].attach(this, i, EVENT_F);
-		if (range < sz) TL_FAIL();
+		for (int i = 0; i < sz; i++) {
+			x[i].attach(this, i, EVENT_F);
+		}
+		if (range < sz) {
+			TL_FAIL();
+		}
 		if (range == sz && so.alldiff_cheat) {
-			for (int i = 0; i < sz; i++) x[i].getVar()->specialiseToEL();
+			for (int i = 0; i < sz; i++) {
+				x[i].getVar()->specialiseToEL();
+			}
 			// Add clauses [a_1 = i] \/ [a_2 = i] \/ ... \/ [a_n = i]
 			for (int i = 0; i < range; i++) {
 				vec<Lit> ps(sz);
-				for (int j = 0; j < sz; j++) ps[j] = x[j].getLit(i, 1);
+				for (int j = 0; j < sz; j++) {
+					ps[j] = x[j].getLit(i, 1);
+				}
 				sat.addClause(ps);
 			}
 		}
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		assert(x[i].isFixed());
 		new_fixed.push(i);
 		pushInQueue();
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// fprintf(stderr, "AllDiffValue::propagate()\n");
 		for (int i = 0; i < new_fixed.size(); i++) {
 			int a = new_fixed[i];
 			int b = x[a].getVal();
 			// fprintf(stderr, "var %d == %d:\n", a, b);
-			Clause* r = NULL;
+			Clause* r = nullptr;
 			if (so.lazy) {
 				r = Reason_new(2);
 				(*r)[1] = x[a].getValLit();
 			}
 			for (int j = 0; j < sz; j++) {
-				if (j == a) continue;
+				if (j == a) {
+					continue;
+				}
 				if (x[j].remValNotR(b)) {
 					// fprintf(stderr, "  var %d != %d\n", j, b);
 					if (!x[j].remVal(b, r)) {
@@ -61,16 +73,20 @@ public:
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		new_fixed.clear();
 	}
 
-	bool check() {
-		if (sz == 0) return true;
+	bool check() override {
+		if (sz == 0) {
+			return true;
+		}
 		bool* taken = new bool[sz];
 		//		bool taken[sz];
-		for (int i = 0; i < sz; i++) taken[i] = false;
+		for (int i = 0; i < sz; i++) {
+			taken[i] = false;
+		}
 		for (int i = 0; i < sz; i++) {
 			if (taken[x[i].getShadowVal()]) {
 				delete[] taken;
@@ -90,19 +106,24 @@ struct interval {
 };
 
 void pathset(int* t, int start, int end, int to) {
-	int k, l;
-	for (l = start; (k = l) != end; t[k] = to) l = t[k];
+	int k;
+	int l;
+	for (l = start; (k = l) != end; t[k] = to) {
+		l = t[k];
+	}
 }
 
-int pathmin(int* t, int i) {
-	for (; t[i] < i; i = t[i])
+int pathmin(const int* t, int i) {
+	for (; t[i] < i; i = t[i]) {
 		;
+	}
 	return i;
 }
 
-int pathmax(int* t, int i) {
-	for (; t[i] > i; i = t[i])
+int pathmax(const int* t, int i) {
+	for (; t[i] > i; i = t[i]) {
 		;
+	}
 	return i;
 }
 
@@ -143,14 +164,20 @@ public:
 	}
 
 	void sortit() {
-		int i, j, min, max, last;
+		int i;
+		int j;
+		int min;
+		int max;
+		int last;
 
 		for (int i = sz - 1; i >= 0; --i) {
 			int t = minsorted[i];
 			iv[t].min = x[t].getMin();
 			int j;
 			for (j = i; j < sz - 1; ++j) {
-				if (iv[t].min < iv[minsorted[j + 1]].min) break;
+				if (iv[t].min < iv[minsorted[j + 1]].min) {
+					break;
+				}
 				minsorted[j] = minsorted[j + 1];
 			}
 			minsorted[j] = t;
@@ -160,7 +187,9 @@ public:
 			iv[t].max = x[t].getMax() + 1;
 			int j;
 			for (j = i; j < sz - 1; ++j) {
-				if (iv[t].max < iv[maxsorted[j + 1]].max) break;
+				if (iv[t].max < iv[maxsorted[j + 1]].max) {
+					break;
+				}
 				maxsorted[j] = maxsorted[j + 1];
 			}
 			maxsorted[j] = t;
@@ -172,13 +201,21 @@ public:
 
 		for (i = j = nb = 0;;) {       // merge minsorted[] and maxsorted[] into bounds[]
 			if (i < sz && min <= max) {  // make sure minsorted exhausted first
-				if (min != last) bounds[++nb] = last = min;
+				if (min != last) {
+					bounds[++nb] = last = min;
+				}
 				iv[minsorted[i]].minrank = nb;
-				if (++i < sz) min = iv[minsorted[i]].min;
+				if (++i < sz) {
+					min = iv[minsorted[i]].min;
+				}
 			} else {
-				if (max != last) bounds[++nb] = last = max;
+				if (max != last) {
+					bounds[++nb] = last = max;
+				}
 				iv[maxsorted[j]].maxrank = nb;
-				if (++j == sz) break;
+				if (++j == sz) {
+					break;
+				}
 				max = iv[maxsorted[j]].max;
 			}
 		}
@@ -186,7 +223,10 @@ public:
 	}
 
 	bool filterlower() {
-		int i, j, w, z;
+		int i;
+		int j;
+		int w;
+		int z;
 
 		// fprintf(stderr, "AllDiffBounds::filterlower()\n");
 		for (i = 1; i <= nb + 1; i++) {
@@ -200,28 +240,33 @@ public:
 			j = t[z = pathmax(t, minrank + 1)];
 			iv[maxsorted[i]].next = bucket[z];
 			bucket[z] = maxsorted[i];
-			if (--d[z] == 0) t[z = pathmax(t, t[z] = z + 1)] = j;
+			if (--d[z] == 0) {
+				t[z = pathmax(t, t[z] = z + 1)] = j;
+			}
 			pathset(t, minrank + 1, z, z);  // path compression
 			// if (d[z] < bounds[z]-bounds[maxrank]) return false; // no solution
 			if (h[minrank] > minrank) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				int hall_max = bounds[w = pathmax(h, h[minrank])];
 				if (so.lazy) {
 					int hall_min = bounds[minrank];
 					// here both k and hall_min are decreasing, stop when k catches up
-					for (int k = w; bounds[k] > hall_min; --k)
-						for (int l = bucket[k]; l >= 0; l = iv[l].next)
+					for (int k = w; bounds[k] > hall_min; --k) {
+						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							hall_min = std::min(hall_min, iv[l].min);
+						}
+					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(2 + (hall_max - hall_min) * 2);
 					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, 2);
 					int m = 2;
-					for (int k = w; bounds[k] > hall_min; --k)
+					for (int k = w; bounds[k] > hall_min; --k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
 							(*r)[m++] = ~x[l].getLit(hall_min, 2);
 							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
 						}
+					}
 					assert(m == 2 + (hall_max - hall_min) * 2);
 				}
 				if (!x[maxsorted[i]].setMin(hall_max, r)) {
@@ -246,7 +291,10 @@ public:
 	}
 
 	int filterupper() {
-		int i, j, w, z;
+		int i;
+		int j;
+		int w;
+		int z;
 
 		// fprintf(stderr, "AllDiffBounds::filterupper()\n");
 		for (i = 0; i <= nb; i++) {
@@ -261,33 +309,38 @@ public:
 			--d[z];
 			iv[minsorted[i]].next = bucket[z];
 			bucket[z] = minsorted[i];
-			if (d[z] == 0) t[z = pathmin(t, t[z] = z - 1)] = j;
+			if (d[z] == 0) {
+				t[z = pathmin(t, t[z] = z - 1)] = j;
+			}
 			pathset(t, maxrank - 1, z, z);
 			// if (d[z] < bounds[minrank]-bounds[z]) return false; // no solution
 			if (h[maxrank] < maxrank) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				int hall_min = bounds[w = pathmin(h, h[maxrank])];
 				if (so.lazy) {
 					int hall_max = bounds[maxrank];
 					// here both k and hall_max are increasing, stop when k catches up
-					for (int k = w; bounds[k] < hall_max; ++k)
-						for (int l = bucket[k]; l >= 0; l = iv[l].next)
+					for (int k = w; bounds[k] < hall_max; ++k) {
+						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							hall_max = std::max(hall_max, iv[l].max);
+						}
+					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(2 + (hall_max - hall_min) * 2);
 					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, 3);
 					int m = 2;
-					for (int k = w; bounds[k] < hall_max; ++k)
+					for (int k = w; bounds[k] < hall_max; ++k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
 							(*r)[m++] = ~x[l].getLit(hall_min, 2);
 							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
 						}
+					}
 					assert(m == 2 + (hall_max - hall_min) * 2);
 				}
 				if (!x[minsorted[i]].setMax(hall_min - 1, r)) {
 					// fprintf(stderr, "  failure\n");
-					return false;
+					return 0;
 				}
 				iv[minsorted[i]].max = hall_min;
 				if (x[minsorted[i]].getMax() < hall_min - 1) {
@@ -303,20 +356,24 @@ public:
 				h[minrank] = j + 1;
 			}
 		}
-		return true;
+		return 1;
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// fprintf(stderr, "AllDiffBounds::propagate()\n");
 		sortit();
 		return filterlower() && filterupper();
 	}
 
-	bool check() {
-		if (sz == 0) return true;
+	bool check() override {
+		if (sz == 0) {
+			return true;
+		}
 		bool* taken = new bool[sz];
 		//		bool taken[sz];
-		for (int i = 0; i < sz; i++) taken[i] = false;
+		for (int i = 0; i < sz; i++) {
+			taken[i] = false;
+		}
 		for (int i = 0; i < sz; i++) {
 			if (taken[x[i].getShadowVal()]) {
 				delete[] taken;
@@ -380,13 +437,15 @@ public:
 		}
 
 		priority = 5;
-		for (int i = 0; i < sz; i++) x[i].attach(this, i, EVENT_C);
+		for (int i = 0; i < sz; i++) {
+			x[i].attach(this, i, EVENT_C);
+		}
 
 		scoreboard = new bool[range];
 		memset(scoreboard, 0, range);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		int j = var_nodes[i].match;
 		if (j >= 0 && !x[i].indomain(j)) {
 			var_nodes[i].match = -1;
@@ -395,33 +454,38 @@ public:
 		pushInQueue();
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// fprintf(stderr, "AllDiffDomain::propagate()\n");
 		//  Edmonds-Karp, loop to find and augment a path
-		while (1) {
+		while (true) {
 			int var;
 			int val;
 
 			// visit source
 			queue_tail = &queue;
-			for (int i = 0; i < sz; ++i)
+			for (int i = 0; i < sz; ++i) {
 				if (var_nodes[i].match < 0) {
 					*queue_tail = i;
 					queue_tail = &var_nodes[i].next;
 				}
+			}
 			*queue_tail = -1;
-			for (int i = 0; i < range; ++i) val_nodes[i].mark = false;
+			for (int i = 0; i < range; ++i) {
+				val_nodes[i].mark = false;
+			}
 
 			// visit vars, also subsume visit of vals
 			while (queue >= 0) {
 				queue_tail = &queue;
-				for (var = queue; var >= 0; var = var_nodes[var].next)
+				for (var = queue; var >= 0; var = var_nodes[var].next) {
 					for (typename IntView<U>::iterator i = x[var].begin(); i != x[var].end(); ++i) {
 						val = *i;
 						if (!val_nodes[val].mark) {
 							assert(val != var_nodes[var].match);
 							int next_var = val_nodes[val].match;
-							if (next_var < 0) goto augment;
+							if (next_var < 0) {
+								goto augment;
+							}
 
 							val_nodes[val].mark = true;
 							val_nodes[val].next = var;
@@ -429,6 +493,7 @@ public:
 							queue_tail = &var_nodes[next_var].next;
 						}
 					}
+				}
 				*queue_tail = -1;
 			}
 
@@ -437,11 +502,13 @@ public:
 
 		augment:
 			// found an augmenting path
-			while (1) {
+			while (true) {
 				int parent_val = var_nodes[var].match;
 				val_nodes[val].match = var;
 				var_nodes[var].match = val;
-				if (parent_val < 0) break;
+				if (parent_val < 0) {
+					break;
+				}
 				val = parent_val;
 				var = val_nodes[val].next;
 			}
@@ -453,31 +520,37 @@ public:
 
 		index = 0;
 		stack = -1;
-		for (int i = 0; i < sz + range; ++i) var_nodes[i].mark = false;
-		for (int i = 0; i < sz; ++i)
-			if (!var_nodes[i].mark && !tarjan(i)) return false;
+		for (int i = 0; i < sz + range; ++i) {
+			var_nodes[i].mark = false;
+		}
+		for (int i = 0; i < sz; ++i) {
+			if (!var_nodes[i].mark && !tarjan(i)) {
+				return false;
+			}
+		}
 
 		return true;
 	}
 
 	bool prune(int node, int i) {
 		// fprintf(stderr, "prune var %d val %d\n", node, i);
-		Clause* r = NULL;
+		Clause* r = nullptr;
 		if (so.lazy) {
 			int vars = 0;
 			int vals = 0;
 			int min_val = INT_MAX;
 			int max_val = INT_MIN;
 			int scc = val_nodes[i].scc;
-			for (int j = scc; j >= 0; j = var_nodes[j].next)
-				if (j < sz)
+			for (int j = scc; j >= 0; j = var_nodes[j].next) {
+				if (j < sz) {
 					++vars;
-				else {
+				} else {
 					++vals;
 					min_val = std::min(min_val, j - sz);
 					max_val = std::max(max_val, j - sz);
 					scoreboard[j - sz] = true;
 				}
+			}
 			assert(vars == vals);
 			if (vals == 1) {
 				r = Reason_new(2);
@@ -485,13 +558,17 @@ public:
 			} else {
 				r = Reason_new(1 + vars * (2 + (max_val + 1 - min_val) - vals));
 				int k = 1;
-				for (int j = scc; j >= 0; j = var_nodes[j].next)
+				for (int j = scc; j >= 0; j = var_nodes[j].next) {
 					if (j < sz) {
 						(*r)[k++] = ~x[j].getLit(min_val, 2);
-						for (int v = min_val + 1; v < max_val; ++v)
-							if (!scoreboard[v]) (*r)[k++] = ~x[j].getLit(v, 0);
+						for (int v = min_val + 1; v < max_val; ++v) {
+							if (!scoreboard[v]) {
+								(*r)[k++] = ~x[j].getLit(v, 0);
+							}
+						}
 						(*r)[k++] = ~x[j].getLit(max_val, 3);
 					}
+				}
 				assert(k == 1 + vars * (2 + (max_val + 1 - min_val) - vals));
 			}
 			memset(scoreboard + min_val, 0, max_val + 1 - min_val);
@@ -510,32 +587,38 @@ public:
 		var_nodes[node].scc = -1;  // means stacked
 
 		var_nodes[node].leak = false;
-		if (node < sz)
+		if (node < sz) {
 			// visiting var node
 			for (typename IntView<U>::iterator i = x[node].begin(); i != x[node].end();) {
 				int val = *i++;
-				if (!val_nodes[val].mark && !tarjan(sz + val)) return false;
-				if (val_nodes[val].scc < 0)
-					var_nodes[node].index = std::min(var_nodes[node].index, val_nodes[val].index);
-				else if (!val_nodes[val].leak && !prune(node, val))
+				if (!val_nodes[val].mark && !tarjan(sz + val)) {
 					return false;
+				}
+				if (val_nodes[val].scc < 0) {
+					var_nodes[node].index = std::min(var_nodes[node].index, val_nodes[val].index);
+				} else if (!val_nodes[val].leak && !prune(node, val)) {
+					return false;
+				}
 				var_nodes[node].leak |= val_nodes[val].leak;
 			}
-		else {
+		} else {
 			// visiting val node
 			int var = var_nodes[node].match;
-			if (var < 0)
+			if (var < 0) {
 				var_nodes[node].leak = true;  // unassigned value
-			else {
-				if (!var_nodes[var].mark && !tarjan(var)) return false;
-				if (var_nodes[var].scc < 0)
+			} else {
+				if (!var_nodes[var].mark && !tarjan(var)) {
+					return false;
+				}
+				if (var_nodes[var].scc < 0) {
 					var_nodes[node].index = std::min(var_nodes[node].index, var_nodes[var].index);
+				}
 				var_nodes[node].leak |= var_nodes[var].leak;
 			}
 		}
 
 		if (var_nodes[node].index >= index_save) {  // node is SCC-root
-			int leak = var_nodes[node].leak;
+			int leak = static_cast<int>(var_nodes[node].leak);
 			int scc = stack;
 			stack = var_nodes[node].next;
 			var_nodes[node].next = -1;
@@ -543,22 +626,26 @@ public:
 			// fprintf(stderr, "leak %d\n", leak);
 			for (int i = scc; i >= 0; i = var_nodes[i].next) {
 				assert(var_nodes[i].mark);
-				var_nodes[i].leak = leak;  // propagate through SCC
-				var_nodes[i].scc = scc;    // propagate through SCC
-																	 // if (i < sz)
-																	 //  fprintf(stderr, "  var %d\n", i);
-																	 // else
-																	 //  fprintf(stderr, "  val %d\n", i - sz);
+				var_nodes[i].leak = (leak != 0);  // propagate through SCC
+				var_nodes[i].scc = scc;           // propagate through SCC
+																					// if (i < sz)
+																					//  fprintf(stderr, "  var %d\n", i);
+																					// else
+																					//  fprintf(stderr, "  val %d\n", i - sz);
 			}
 		}
 		return true;
 	}
 
-	bool check() {
-		if (sz == 0) return true;
+	bool check() override {
+		if (sz == 0) {
+			return true;
+		}
 		bool* taken = new bool[sz];
 		//		bool taken[sz];
-		for (int i = 0; i < sz; i++) taken[i] = false;
+		for (int i = 0; i < sz; i++) {
+			taken[i] = false;
+		}
 		for (int i = 0; i < sz; i++) {
 			if (taken[x[i].getShadowVal()]) {
 				delete[] taken;
@@ -591,7 +678,7 @@ public:
 	int* bucket;
 
 	AllDiffBoundsImp(BoolView _b, vec<IntView<U> > _x, int _range)
-			: b(_b), sz(_x.size()), x(_x.release()), range(_range) {
+			: b(std::move(_b)), sz(_x.size()), x(_x.release()), range(_range) {
 		priority = 4;
 		iv = new interval[sz];
 		minsorted = new int[sz];
@@ -611,14 +698,20 @@ public:
 	}
 
 	void sortit() {
-		int i, j, min, max, last;
+		int i;
+		int j;
+		int min;
+		int max;
+		int last;
 
 		for (int i = sz - 1; i >= 0; --i) {
 			int t = minsorted[i];
 			iv[t].min = x[t].getMin();
 			int j;
 			for (j = i; j < sz - 1; ++j) {
-				if (iv[t].min < iv[minsorted[j + 1]].min) break;
+				if (iv[t].min < iv[minsorted[j + 1]].min) {
+					break;
+				}
 				minsorted[j] = minsorted[j + 1];
 			}
 			minsorted[j] = t;
@@ -628,7 +721,9 @@ public:
 			iv[t].max = x[t].getMax() + 1;
 			int j;
 			for (j = i; j < sz - 1; ++j) {
-				if (iv[t].max < iv[maxsorted[j + 1]].max) break;
+				if (iv[t].max < iv[maxsorted[j + 1]].max) {
+					break;
+				}
 				maxsorted[j] = maxsorted[j + 1];
 			}
 			maxsorted[j] = t;
@@ -640,13 +735,21 @@ public:
 
 		for (i = j = nb = 0;;) {       // merge minsorted[] and maxsorted[] into bounds[]
 			if (i < sz && min <= max) {  // make sure minsorted exhausted first
-				if (min != last) bounds[++nb] = last = min;
+				if (min != last) {
+					bounds[++nb] = last = min;
+				}
 				iv[minsorted[i]].minrank = nb;
-				if (++i < sz) min = iv[minsorted[i]].min;
+				if (++i < sz) {
+					min = iv[minsorted[i]].min;
+				}
 			} else {
-				if (max != last) bounds[++nb] = last = max;
+				if (max != last) {
+					bounds[++nb] = last = max;
+				}
 				iv[maxsorted[j]].maxrank = nb;
-				if (++j == sz) break;
+				if (++j == sz) {
+					break;
+				}
 				max = iv[maxsorted[j]].max;
 			}
 		}
@@ -654,7 +757,10 @@ public:
 	}
 
 	bool filterlower() {
-		int i, j, w, z;
+		int i;
+		int j;
+		int w;
+		int z;
 
 		// fprintf(stderr, "AllDiffBounds::filterlower()\n");
 		for (i = 1; i <= nb + 1; i++) {
@@ -668,28 +774,33 @@ public:
 			j = t[z = pathmax(t, minrank + 1)];
 			iv[maxsorted[i]].next = bucket[z];
 			bucket[z] = maxsorted[i];
-			if (--d[z] == 0) t[z = pathmax(t, t[z] = z + 1)] = j;
+			if (--d[z] == 0) {
+				t[z = pathmax(t, t[z] = z + 1)] = j;
+			}
 			pathset(t, minrank + 1, z, z);  // path compression
 			// if (d[z] < bounds[z]-bounds[maxrank]) return false; // no solution
 			if (h[minrank] > minrank) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				int hall_max = bounds[w = pathmax(h, h[minrank])];
 				if (so.lazy) {
 					int hall_min = bounds[minrank];
 					// here both k and hall_min are decreasing, stop when k catches up
-					for (int k = w; bounds[k] > hall_min; --k)
-						for (int l = bucket[k]; l >= 0; l = iv[l].next)
+					for (int k = w; bounds[k] > hall_min; --k) {
+						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							hall_min = std::min(hall_min, iv[l].min);
+						}
+					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(3 + (hall_max - hall_min) * 2);
 					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, 2);
 					int m = 3;
-					for (int k = w; bounds[k] > hall_min; --k)
+					for (int k = w; bounds[k] > hall_min; --k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
 							(*r)[m++] = ~x[l].getLit(hall_min, 2);
 							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
 						}
+					}
 					assert(m == 3 + (hall_max - hall_min) * 2);
 				}
 				if (b.isFixed()) {
@@ -723,7 +834,10 @@ public:
 	}
 
 	int filterupper() {
-		int i, j, w, z;
+		int i;
+		int j;
+		int w;
+		int z;
 
 		// fprintf(stderr, "AllDiffBounds::filterupper()\n");
 		for (i = 0; i <= nb; i++) {
@@ -738,28 +852,33 @@ public:
 			--d[z];
 			iv[minsorted[i]].next = bucket[z];
 			bucket[z] = minsorted[i];
-			if (d[z] == 0) t[z = pathmin(t, t[z] = z - 1)] = j;
+			if (d[z] == 0) {
+				t[z = pathmin(t, t[z] = z - 1)] = j;
+			}
 			pathset(t, maxrank - 1, z, z);
 			// if (d[z] < bounds[minrank]-bounds[z]) return false; // no solution
 			if (h[maxrank] < maxrank) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				int hall_min = bounds[w = pathmin(h, h[maxrank])];
 				if (so.lazy) {
 					int hall_max = bounds[maxrank];
 					// here both k and hall_max are increasing, stop when k catches up
-					for (int k = w; bounds[k] < hall_max; ++k)
-						for (int l = bucket[k]; l >= 0; l = iv[l].next)
+					for (int k = w; bounds[k] < hall_max; ++k) {
+						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							hall_max = std::max(hall_max, iv[l].max);
+						}
+					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(3 + (hall_max - hall_min) * 2);
 					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, 3);
 					int m = 3;
-					for (int k = w; bounds[k] < hall_max; ++k)
+					for (int k = w; bounds[k] < hall_max; ++k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
 							(*r)[m++] = ~x[l].getLit(hall_min, 2);
 							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
 						}
+					}
 					assert(m == 3 + (hall_max - hall_min) * 2);
 				}
 				if (b.isFixed()) {
@@ -767,7 +886,7 @@ public:
 					(*r)[2] = b.getValLit();
 					if (!x[minsorted[i]].setMax(hall_min - 1, r)) {
 						// fprintf(stderr, "  failure\n");
-						return false;
+						return 0;
 					}
 					iv[minsorted[i]].max = hall_min;
 					if (x[minsorted[i]].getMax() < hall_min - 1) {
@@ -779,7 +898,7 @@ public:
 				} else {
 					if (x[maxsorted[i]].getMin() > hall_min + 1) {
 						(*r)[2] = x[maxsorted[i]].getLit(hall_min + 1, 3);
-						return b.setVal(false, r);
+						return static_cast<int>(b.setVal(false, r));
 					}
 				}
 			}
@@ -789,10 +908,10 @@ public:
 				h[minrank] = j + 1;
 			}
 		}
-		return true;
+		return 1;
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		if (b.isFixed() && b.isFalse()) {
 			return true;
 		}
@@ -808,7 +927,8 @@ public:
 };
 
 void all_different_imp(BoolView b, vec<IntVar*>& x, ConLevel cl) {
-	int min = INT_MAX, max = INT_MIN;
+	int min = INT_MAX;
+	int max = INT_MIN;
 	for (int i = 0; i < x.size(); i++) {
 		if (x[i]->getMin() < min) {
 			min = x[i]->getMin();
@@ -825,27 +945,38 @@ void all_different_imp(BoolView b, vec<IntVar*>& x, ConLevel cl) {
 	for (int i = 0; i < x.size(); i++) {
 		u.push(IntView<>(x[i], 1, -min));
 	}
-	if (min == 0)
+	if (min == 0) {
 		new AllDiffBoundsImp<0>(b, u, range);
-	else
+	} else {
 		new AllDiffBoundsImp<4>(b, u, range);
+	}
 }
 
 void all_different(vec<IntVar*>& x, ConLevel cl) {
-	int min = INT_MAX, max = INT_MIN;
+	int min = INT_MAX;
+	int max = INT_MIN;
 	for (int i = 0; i < x.size(); i++) {
-		if (x[i]->getMin() < min) min = x[i]->getMin();
-		if (x[i]->getMax() > max) max = x[i]->getMax();
+		if (x[i]->getMin() < min) {
+			min = x[i]->getMin();
+		}
+		if (x[i]->getMax() > max) {
+			max = x[i]->getMax();
+		}
 	}
 	int range = max + 1 - min;
 	if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, -min));
-		if (min == 0)
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, -min));
+		}
+		if (min == 0) {
 			new AllDiffDomain<0>(u, range);
-		else
+		} else {
 			new AllDiffDomain<4>(u, range);
-		if (!so.alldiff_stage) return;
+		}
+		if (!so.alldiff_stage) {
+			return;
+		}
 	} else {
 		// NOTE that the bounds propagator will be posted temporarily, unless the
 		// consistency level is specified as "domain". There is an issue with the
@@ -853,41 +984,64 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		// (see Issue #10). In the future, it needs to be decided how to
 		// permamently fix this issue.
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, -min));
-		if (min == 0)
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, -min));
+		}
+		if (min == 0) {
 			new AllDiffBounds<0>(u, range);
-		else
+		} else {
 			new AllDiffBounds<4>(u, range);
-		if (!so.alldiff_stage && cl == CL_BND) return;
+		}
+		if (!so.alldiff_stage && cl == CL_BND) {
+			return;
+		}
 	}
 	vec<IntView<> > u;
-	for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, -min));
-	if (min == 0)
+	for (int i = 0; i < x.size(); i++) {
+		u.push(IntView<>(x[i], 1, -min));
+	}
+	if (min == 0) {
 		new AllDiffValue<0>(u, range);
-	else
+	} else {
 		new AllDiffValue<4>(u, range);
+	}
 }
 
 void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
-	int min = INT_MAX, max = INT_MIN;
+	int min = INT_MAX;
+	int max = INT_MIN;
 	for (int i = 0; i < x.size(); i++) {
-		if (a[i] + x[i]->getMin() < min) min = a[i] + x[i]->getMin();
-		if (a[i] + x[i]->getMax() > max) max = a[i] + x[i]->getMax();
+		if (a[i] + x[i]->getMin() < min) {
+			min = a[i] + x[i]->getMin();
+		}
+		if (a[i] + x[i]->getMax() > max) {
+			max = a[i] + x[i]->getMax();
+		}
 	}
 	int range = max + 1 - min;
 	if (cl == CL_BND) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, a[i] - min));
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, a[i] - min));
+		}
 		new AllDiffBounds<4>(u, range);
-		if (!so.alldiff_stage) return;
+		if (!so.alldiff_stage) {
+			return;
+		}
 	} else if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, a[i] - min));
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, a[i] - min));
+		}
 		new AllDiffDomain<4>(u, range);
-		if (!so.alldiff_stage) return;
+		if (!so.alldiff_stage) {
+			return;
+		}
 	}
 	vec<IntView<> > u;
-	for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, a[i] - min));
+	for (int i = 0; i < x.size(); i++) {
+		u.push(IntView<>(x[i], 1, a[i] - min));
+	}
 	new AllDiffValue<4>(u, range);
 }
 
@@ -905,21 +1059,31 @@ void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 	}
 	if (cl == CL_BND) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, -o1));
-		if (o1 == 0)
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, -o1));
+		}
+		if (o1 == 0) {
 			new AllDiffBounds<0>(u, x.size());
-		else
+		} else {
 			new AllDiffBounds<4>(u, x.size());
+		}
 	} else if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) u.push(IntView<>(x[i], 1, -o1));
-		if (o1 == 0)
+		for (int i = 0; i < x.size(); i++) {
+			u.push(IntView<>(x[i], 1, -o1));
+		}
+		if (o1 == 0) {
 			new AllDiffDomain<0>(u, x.size());
-		else
+		} else {
 			new AllDiffDomain<4>(u, x.size());
+		}
 	}
-	for (int i = 0; i < x.size(); i++) x[i]->specialiseToEL();
-	for (int i = 0; i < y.size(); i++) y[i]->specialiseToEL();
+	for (int i = 0; i < x.size(); i++) {
+		x[i]->specialiseToEL();
+	}
+	for (int i = 0; i < y.size(); i++) {
+		y[i]->specialiseToEL();
+	}
 	for (int i = 0; i < x.size(); i++) {
 		for (int j = 0; j < y.size(); j++) {
 			sat.addClause(x[i]->getLit(o1 + j, 0), y[j]->getLit(o2 + i, 1));

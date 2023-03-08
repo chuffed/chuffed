@@ -67,7 +67,9 @@ public:
 		}
 
 		// Mathamatical global constraint
-		if (USE_GLOBAL) addGlobalProp();
+		if (USE_GLOBAL) {
+			addGlobalProp();
+		}
 
 		// Test
 		if (TEST) {
@@ -91,13 +93,14 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				if (x[i][j]->isFixed())
+				if (x[i][j]->isFixed()) {
 					os << x[i][j]->getVal() << ", ";
-				else
+				} else {
 					os << "?, ";
+				}
 			}
 			os << "\n";
 		}
@@ -155,15 +158,21 @@ public:
 		set_sizes = (int*)malloc(n_sets * sizeof(int));
 		for (int i = 0; i < n_sets; i++) {
 			set_sizes[i] = 0;
-			for (int j = i; j; set_sizes[i]++) j &= j - 1;
+			for (int j = i; j != 0; set_sizes[i]++) {
+				j &= j - 1;
+			}
 		}
 		fixed = (Tint**)malloc(p.n * sizeof(Tint*));
 		for (int i = 0; i < p.n; i++) {
 			fixed[i] = (Tint*)malloc(p.m * sizeof(Tint));
-			for (int j = 0; j < p.m; j++) fixed[i][j] = 0;
+			for (int j = 0; j < p.m; j++) {
+				fixed[i][j] = 0;
+			}
 		}
 		counts = (Tint*)malloc(n_sets * sizeof(Tint));
-		for (int i = 0; i < n_sets; i++) counts[i] = 0;
+		for (int i = 0; i < n_sets; i++) {
+			counts[i] = 0;
+		}
 		calcLimits();
 	}
 
@@ -183,23 +192,26 @@ public:
 			printf("limits[%d]: ", j);
 			for (int i = 0; i <= p.m; i++) {
 				int hard_limit = i * (i - 1) / 2 * p.c - (p.n - j) * min_matches[i];
-				int soft_limit = (int)ceil((double)i * (p.m / p.c) / 2 + (double)j * i * (i - 1) / 2 / p.c);
+				int soft_limit = (int)ceil((double)i * static_cast<int>(p.m / p.c) / 2 +
+																	 (double)j * i * (i - 1) / 2 / p.c);
 				//				int soft_limit = (int) ceil((double)i*(p.m/p.c)/2 +
 				//((double)i*(i-1)/2*p.c-(double)i*(p.m/p.c)/2)*j/p.n);
 				limits[j][i] = hard_limit;
-				if (SOFT_LIMIT && soft_limit < limits[j][i]) limits[j][i] = soft_limit;
+				if (SOFT_LIMIT && soft_limit < limits[j][i]) {
+					limits[j][i] = soft_limit;
+				}
 				printf("%d, ", limits[j][i]);
 			}
 			printf("\n");
 		}
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		new_fixed.push(i);
 		pushInQueue();
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		for (int i = 0; i < new_fixed.size(); i++) {
 			int r = new_fixed[i] / p.m;
 			int c = new_fixed[i] % p.m;
@@ -211,10 +223,11 @@ public:
 				printf("r = %d, c = %d\n", r, c);
 				for (int i = 0; i < p.n; i++) {
 					for (int j = 0; j < p.m; j++) {
-						if (p.x[i][j]->isFixed())
+						if (p.x[i][j]->isFixed()) {
 							printf("%d, ", p.x[i][j]->getVal());
-						else
+						} else {
 							printf("?, ");
+						}
 					}
 					printf("\n");
 				}
@@ -224,9 +237,14 @@ public:
 			assert(r == row);
 			IntVar* v = p.x[r][c];
 			for (int j = 0; j < p.m; j++) {
-				if (!fixed[row][j]) continue;
-				if (p.x[row][j]->getVal() != v->getVal()) continue;
-				int s, b;
+				if (fixed[row][j] == 0) {
+					continue;
+				}
+				if (p.x[row][j]->getVal() != v->getVal()) {
+					continue;
+				}
+				int s;
+				int b;
 				if (j < c) {
 					s = j;
 					b = c;
@@ -234,7 +252,9 @@ public:
 					s = c;
 					b = j;
 				}
-				int size1 = (1 << s), size2 = (1 << (b - s - 1)), size3 = (1 << (p.m - b - 1));
+				int size1 = (1 << s);
+				int size2 = (1 << (b - s - 1));
+				int size3 = (1 << (p.m - b - 1));
 				for (int v3 = 0; v3 < size3; v3++) {
 					for (int v2 = 0; v2 < size2; v2++) {
 						for (int v1 = 0; v1 < size1; v1++) {
@@ -259,11 +279,13 @@ public:
 				break;
 			}
 		}
-		if (finished_row) row = row + 1;
+		if (finished_row) {
+			row = row + 1;
+		}
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		new_fixed.clear();
 	}

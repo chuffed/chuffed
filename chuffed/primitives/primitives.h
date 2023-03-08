@@ -1,6 +1,8 @@
 #ifndef primitives_h
 #define primitives_h
 
+#include <chuffed/support/misc.h>
+
 enum IntRelType {
 	IRT_EQ,  // =	Equal to
 	IRT_NE,  // <> 	Not equal to
@@ -96,11 +98,11 @@ void int_rel(IntVar* x, IntRelType t, int c);
 // x rel y + c <-> r
 void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c = 0);
 // x rel y + c <- r
-void int_rel_half_reif(IntVar* a, IntRelType t, IntVar* b, BoolView r, int c = 0);
+void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c = 0);
 // x rel c <-> r
-void int_rel_reif(IntVar* a, IntRelType t, int c, BoolView r);
+void int_rel_reif(IntVar* x, IntRelType t, int c, BoolView r);
 // x rel c <- r
-void int_rel_half_reif(IntVar* a, IntRelType t, int c, BoolView r);
+void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r);
 
 // linear.c
 
@@ -157,6 +159,6 @@ void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, Int
 // domain.c
 
 // y = |ub(x) - lb(y) + 1|
-void range_size(IntVar* x, IntVar* s);
+void range_size(IntVar* x, IntVar* y);
 
 #endif

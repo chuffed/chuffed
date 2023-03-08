@@ -4,7 +4,13 @@
 #include <chuffed/support/floyd_warshall.h>
 
 #include <algorithm>
-#define MIN(a, b) ((a < b) ? a : b)
+#include <cassert>
+#include <ctime>
+#include <map>
+#include <set>
+#include <vector>
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 template <typename T>
 class ClusteringAlgorithm {
@@ -41,10 +47,10 @@ private:
 	public:
 		ImplementedFloydWarshall(int n, int e, DynamicKMeans* km) : FloydWarshall<T>(n, e), _km(km) {}
 
-		virtual int from(int edge_id) { return _km->from(edge_id); }
-		virtual int to(int edge_id) { return _km->to(edge_id); }
-		virtual int exists(int edge_id) { return _km->available_edge(edge_id); }
-		virtual int weight(int edge_id) { return _km->weight(edge_id); }
+		int from(int edge_id) override { return _km->from(edge_id); }
+		int to(int edge_id) override { return _km->to(edge_id); }
+		int exists(int edge_id) override { return _km->available_edge(edge_id); }
+		int weight(int edge_id) override { return _km->weight(edge_id); }
 	};
 
 	int n, e;
@@ -54,20 +60,20 @@ private:
 	ImplementedFloydWarshall* fw;
 
 public:
-	DynamicKMeans(int k, int _n, int _e) : ClusteringAlgorithm<T>(k), n(_n), e(_e), fw(NULL) {
+	DynamicKMeans(int k, int _n, int _e) : ClusteringAlgorithm<T>(k), n(_n), e(_e), fw(nullptr) {
 		fw = new ImplementedFloydWarshall(n, e, this);
 	}
 
 	virtual ~DynamicKMeans() { delete fw; }
 
-	inline std::set<int>& get_cluster(int id) { return clusters[id]; }
-	inline int get_centroid(int id) { return centroids[id]; }
-	inline std::vector<int> get_centroids() { return centroids; }
-	inline int cluster_of(int n) { return cluster_id.count(n) > 0 ? -1 : cluster_id[n]; }
+	inline std::set<int>& get_cluster(int id) override { return clusters[id]; }
+	inline int get_centroid(int id) override { return centroids[id]; }
+	inline std::vector<int> get_centroids() override { return centroids; }
+	inline int cluster_of(int n) override { return cluster_id.count(n) > 0 ? -1 : cluster_id[n]; }
 
-	void update_dists() { fw->compute(); }
-	std::vector<int> cluster(std::vector<int> to_cluster) {
-		srand(time(NULL));
+	void update_dists() override { fw->compute(); }
+	std::vector<int> cluster(std::vector<int> to_cluster) override {
+		srand(time(nullptr));
 		clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 		centroids = std::vector<int>(this->clusters_count, -1);
 		// Special case
@@ -91,25 +97,26 @@ public:
 
 		clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 
-		for (unsigned int i = 0; i < to_cluster.size(); i++) {
-			int n = to_cluster[i];
+		for (int n : to_cluster) {
 			int min = -1;
 			int arg_min = -1;
 			for (unsigned int j = 0; j < this->clusters_count; j++) {
 				int cent = centroids[j];
-				int inf = 0, inf2 = 0;
+				int inf = 0;
+				int inf2 = 0;
 				int d = 0;
 				int d1 = fw->getDist(n, cent, &inf);
 				int d2 = fw->getDist(cent, n, &inf2);
-				if (inf && !inf2)
+				if ((inf != 0) && (inf2 == 0)) {
 					d = d2;
-				else if (!inf && inf2)
+				} else if ((inf == 0) && (inf2 != 0)) {
 					d = d1;
-				else if (!inf && !inf2)
+				} else if ((inf == 0) && (inf2 == 0)) {
 					d = MIN(d1, d2);
-				else if (inf && inf2)
+				} else if ((inf != 0) && (inf2 != 0)) {
 					continue;  // Go to another cluster
-				if (!inf || !inf2) {
+				}
+				if ((inf == 0) || (inf2 == 0)) {
 					if (min == -1 || min > d) {
 						min = d;
 						arg_min = j;
@@ -138,19 +145,21 @@ public:
 					// std::cout<<"it1 "<<*it<<std::endl;
 					std::set<int>::iterator it2;
 					for (it2 = clusters[cl].begin(); it2 != clusters[cl].end(); ++it2) {
-						int inf = 0, inf2 = 0;
+						int inf = 0;
+						int inf2 = 0;
 						int d1 = fw->getDist(*it, *it2, &inf);
 						int d2 = fw->getDist(*it2, *it, &inf2);
 						int d = 0;
 						assert(!(inf && inf2));
-						if (inf && !inf2)
+						if ((inf != 0) && (inf2 == 0)) {
 							d = d2;
-						else if (!inf && inf2)
+						} else if ((inf == 0) && (inf2 != 0)) {
 							d = d1;
-						else if (!inf && !inf2)
+						} else if ((inf == 0) && (inf2 == 0)) {
 							d = MIN(d1, d2);
-						else
+						} else {
 							sum += d;
+						}
 					}
 					if (sum != -1) {
 						if (min == -1 || min > sum) {
@@ -169,25 +178,26 @@ public:
 
 			clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 
-			for (unsigned int i = 0; i < to_cluster.size(); i++) {
-				int n = to_cluster[i];
+			for (int n : to_cluster) {
 				int min = -1;
 				int arg_min = -1;
 				for (unsigned int j = 0; j < this->clusters_count; j++) {
 					int cent = centroids[j];
-					int inf = 0, inf2 = 0;
+					int inf = 0;
+					int inf2 = 0;
 					int d = 0;
 					int d1 = fw->getDist(n, cent, &inf);
 					int d2 = fw->getDist(cent, n, &inf2);
-					if (inf && !inf2)
+					if ((inf != 0) && (inf2 == 0)) {
 						d = d2;
-					else if (!inf && inf2)
+					} else if ((inf == 0) && (inf2 != 0)) {
 						d = d1;
-					else if (!inf && !inf2)
+					} else if ((inf == 0) && (inf2 == 0)) {
 						d = MIN(d1, d2);
-					else if (inf && inf2)
+					} else if ((inf != 0) && (inf2 != 0)) {
 						continue;  // Go to another cluster
-					if (!inf || !inf2) {
+					}
+					if ((inf == 0) || (inf2 == 0)) {
 						if (min == -1 || min > d) {
 							min = d;
 							arg_min = j;

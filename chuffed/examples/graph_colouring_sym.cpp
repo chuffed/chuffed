@@ -22,7 +22,8 @@ public:
 
 	GraphColouringSym(char* filename) {
 		FILE* fp = fopen(filename, "r");
-		int temp, temp2;
+		int temp;
+		int temp2;
 
 		rassert(fscanf(fp, "%d\n", &v) == 1);
 		rassert(fscanf(fp, "%d\n", &p) == 1);
@@ -59,7 +60,8 @@ public:
 		rassert(fscanf(fp, "%d\n", &b) == 1);
 
 		for (int i = 0; i < b; i++) {
-			int p1, p2;
+			int p1;
+			int p2;
 			rassert(fscanf(fp, "%d %d\n", &p1, &p2) == 2);
 			for (int j = 0; j < partitions[p1].size(); j++) {
 				for (int k = 0; k < partitions[p2].size(); k++) {
@@ -94,9 +96,11 @@ public:
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
@@ -106,7 +110,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < p; i++) {
 			os << "|P" << i << ": ";
 			for (int j = 0; j < partitions[i].size(); j++) {

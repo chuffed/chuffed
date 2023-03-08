@@ -1,6 +1,7 @@
 #include <chuffed/core/propagator.h>
 
 #include <map>
+#include <utility>
 
 // y = a[x-offset]
 
@@ -16,10 +17,11 @@ void array_bool_element(IntVar* _x, vec<bool>& a, BoolView y, int offset) {
 	ps1.push(y);
 	ps2.push(~y);
 	for (int i = 0; i < a.size(); i++) {
-		if (a[i])
+		if (a[i]) {
 			ps2.push(x = i);
-		else
+		} else {
 			ps1.push(x = i);
+		}
 	}
 	sat.addClause(ps1);
 	sat.addClause(ps2);
@@ -35,8 +37,12 @@ void array_int_element(IntVar* _x, vec<int>& a, IntVar* _y, int offset) {
 
 	vec<int> z;
 	for (int i = _x->getMin() - offset; i <= _x->getMax() - offset; i++) {
-		if (!_x->indomain(i + offset)) continue;
-		if (!_y->indomain(a[i])) continue;
+		if (!_x->indomain(i + offset)) {
+			continue;
+		}
+		if (!_y->indomain(a[i])) {
+			continue;
+		}
 		z.push(a[i]);
 	}
 
@@ -55,9 +61,11 @@ void array_int_element(IntVar* _x, vec<int>& a, IntVar* _y, int offset) {
 	// Add clause [y != a[i]] \/ [x = i_1] \/ ... \/ [x = i_m]
 	vec<vec<Lit> > pss;
 	for (int i = 0; i < a.size(); i++) {
-		if (!y.indomain(a[i])) continue;
+		if (!y.indomain(a[i])) {
+			continue;
+		}
 		int index = -1;
-		std::map<int, int>::iterator it = val_to_pss.find(a[i]);
+		auto it = val_to_pss.find(a[i]);
 		if (it != val_to_pss.end()) {
 			index = it->second;
 		} else {
@@ -66,7 +74,9 @@ void array_int_element(IntVar* _x, vec<int>& a, IntVar* _y, int offset) {
 			pss[index].push(y != a[i]);
 			val_to_pss.insert(std::pair<int, int>(a[i], index));
 		}
-		if (x.indomain(i)) pss[index].push(x = i);
+		if (x.indomain(i)) {
+			pss[index].push(x = i);
+		}
 	}
 	for (int i = 0; i < pss.size(); i++) {
 		sat.addClause(pss[i]);
@@ -87,13 +97,14 @@ void array_var_bool_element(IntVar* _x, vec<BoolView>& a, BoolView y, int offset
 	ps1[0] = ~y;
 	ps2[0] = y;
 	for (int i = 0; i < a.size(); i++) {
-		BoolView c_i(Lit(sat.newVar(), 1));
-		BoolView d_i(Lit(sat.newVar(), 1));
+		BoolView c_i(Lit(sat.newVar(), true));
+		BoolView d_i(Lit(sat.newVar(), true));
 		sat.addClause(~c_i, x = i);
 		sat.addClause(~c_i, a[i]);
 		sat.addClause(~d_i, x = i);
 		sat.addClause(~d_i, ~a[i]);
-		vec<Lit> ps3(3), ps4(3);
+		vec<Lit> ps3(3);
+		vec<Lit> ps4(3);
 		ps3[0] = y;
 		ps3[1] = ~a[i];
 		ps3[2] = (x != i);
@@ -134,39 +145,47 @@ class IntElemBoundsImp : public Propagator {
 
 public:
 	IntElemBoundsImp(BoolView _b, IntView<U> _y, IntView<V> _x, vec<IntView<W> >& _a)
-			: b(_b),
+			: b(std::move(_b)),
 				y(_y),
 				x(_x),
 				a(_a),
-				is_fixed(false),
+				is_fixed(0),
 				min_support(-1),
 				max_support(-1),
 				fixed_index(-1),
 				no_min_support(false),
 				no_max_support(false) {
-		for (int i = 0; i < a.size(); i++) a[i].attach(this, i, EVENT_LU);
+		for (int i = 0; i < a.size(); i++) {
+			a[i].attach(this, i, EVENT_LU);
+		}
 		y.attach(this, a.size(), EVENT_LU);
 		x.attach(this, a.size() + 1, EVENT_C);
 		b.attach(this, a.size() + 2, EVENT_F);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i == a.size() + 2 && (c & EVENT_F)) {
-			if (!b.getVal()) {
+			if (b.getVal() == 0) {
 				return;
 			}
 		}
 		if (i == a.size() + 1 && (c & EVENT_F)) {
-			is_fixed = true;
+			is_fixed = 1;
 			fixed_index = x.getVal();
 			no_min_support = no_max_support = false;
 			pushInQueue();
-		} else if (is_fixed) {
-			if (i == a.size() || i == fixed_index) pushInQueue();
+		} else if (is_fixed != 0) {
+			if (i == a.size() || i == fixed_index) {
+				pushInQueue();
+			}
 		} else {
 			if (i < a.size()) {
-				if (i == min_support && a[i].getMin() > y.getMin()) no_min_support = true;
-				if (i == max_support && a[i].getMax() < y.getMax()) no_max_support = true;
+				if (i == min_support && a[i].getMin() > y.getMin()) {
+					no_min_support = true;
+				}
+				if (i == max_support && a[i].getMax() < y.getMax()) {
+					no_max_support = true;
+				}
 				pushInQueue();
 			} else if (i == a.size() + 1) {
 				if (!x.indomain(min_support)) {
@@ -177,12 +196,13 @@ public:
 					no_max_support = true;
 					pushInQueue();
 				}
-			} else
+			} else {
 				pushInQueue();
+			}
 		}
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		if (b.isFixed() && b.isFalse()) {
 			satisfied = true;
 			return true;
@@ -194,7 +214,7 @@ public:
 		}
 
 		// y = a[fixed_index]
-		if (is_fixed) {
+		if (is_fixed != 0) {
 			assert(x.getVal() == fixed_index);
 			IntView<W>& f = a[fixed_index];
 			if (b.isFixed()) {
@@ -202,7 +222,9 @@ public:
 				setDom(f, setMin, y.getMin(), Reason_new({b.getValLit(), y.getMinLit(), x.getValLit()}));
 				setDom(y, setMax, f.getMax(), Reason_new({b.getValLit(), f.getMaxLit(), x.getValLit()}));
 				setDom(f, setMax, y.getMax(), Reason_new({b.getValLit(), y.getMaxLit(), x.getValLit()}));
-				if (y.isFixed() && f.isFixed()) satisfied = true;
+				if (y.isFixed() && f.isFixed()) {
+					satisfied = true;
+				}
 			} else if (f.getMin() > y.getMax()) {
 				Clause* r = Reason_new({x.getValLit(), f.getMinLit(), y.getMaxLit()});
 				return b.setVal(false, r);
@@ -215,7 +237,9 @@ public:
 
 		if (b.isFixed()) {
 			for (int i = 0; i < a.size(); i++) {
-				if (!x.indomain(i)) continue;
+				if (!x.indomain(i)) {
+					continue;
+				}
 				if (y.getMax() < a[i].getMin()) {
 					Clause* r = Reason_new({b.getValLit(), a[i].getMinLit(), y.getMaxLit()});
 					setDom(x, remVal, i, r);
@@ -261,18 +285,22 @@ public:
 			int64_t new_m = INT64_MAX;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
-				if (!x.indomain(i)) continue;
+				if (!x.indomain(i)) {
+					continue;
+				}
 				int64_t cur_m = a[i].getMin();
 				if (cur_m < new_m) {
 					best = i;
 					new_m = cur_m;
-					if (cur_m <= old_m) break;
+					if (cur_m <= old_m) {
+						break;
+					}
 				}
 			}
 			min_support = best;
 			if (y.setMinNotR(new_m)) {
 				auto reason = [&] {
-					Clause* r = NULL;
+					Clause* r = nullptr;
 					if (so.lazy) {
 						r = Reason_new(a.size() + 2);
 						// Finesse lower bounds
@@ -302,18 +330,22 @@ public:
 			int64_t new_m = INT_MIN;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
-				if (!x.indomain(i)) continue;
+				if (!x.indomain(i)) {
+					continue;
+				}
 				int64_t cur_m = a[i].getMax();
 				if (cur_m > new_m) {
 					best = i;
 					new_m = cur_m;
-					if (cur_m >= old_m) break;
+					if (cur_m >= old_m) {
+						break;
+					}
 				}
 			}
 			max_support = best;
 			if (y.setMaxNotR(new_m)) {
 				auto reason = [&] {
-					Clause* r = NULL;
+					Clause* r = nullptr;
 					if (so.lazy) {
 						r = Reason_new(a.size() + 2);
 						// Finesse upper bounds
@@ -341,18 +373,18 @@ public:
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		no_min_support = false;
 		no_max_support = false;
 	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
-		if (b.isFixed() && !b.getVal()) {
-			satisfied = true;
-		} else if (b.isFixed() && x.isFixed() && y.isFixed() &&
-							 a[static_cast<int>(x.getVal())].isFixed()) {
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
+		if ((b.isFixed() && (b.getVal() == 0)) ||
+				(b.isFixed() && x.isFixed() && y.isFixed() && a[static_cast<int>(x.getVal())].isFixed())) {
 			satisfied = true;
 		}
 		return 3;
@@ -386,23 +418,31 @@ public:
 				fixed_index(-1),
 				no_min_support(false),
 				no_max_support(false) {
-		for (int i = 0; i < a.size(); i++) a[i].attach(this, i, EVENT_LU);
+		for (int i = 0; i < a.size(); i++) {
+			a[i].attach(this, i, EVENT_LU);
+		}
 		y.attach(this, a.size(), EVENT_LU);
 		x.attach(this, a.size() + 1, EVENT_C);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i == a.size() + 1 && (c & EVENT_F)) {
 			fixed_index = x.getVal();
 			no_min_support = no_max_support = false;
 			pushInQueue();
 		}
 		if (fixed_index >= 0) {
-			if (i == a.size() || i == fixed_index) pushInQueue();
+			if (i == a.size() || i == fixed_index) {
+				pushInQueue();
+			}
 		} else {
 			if (i < a.size()) {
-				if (i == min_support && a[i].getMin() > y.getMin()) no_min_support = true;
-				if (i == max_support && a[i].getMax() < y.getMax()) no_max_support = true;
+				if (i == min_support && a[i].getMin() > y.getMin()) {
+					no_min_support = true;
+				}
+				if (i == max_support && a[i].getMax() < y.getMax()) {
+					no_max_support = true;
+				}
 				pushInQueue();
 			} else if (i == a.size() + 1) {
 				if (!x.indomain(min_support)) {
@@ -413,12 +453,13 @@ public:
 					no_max_support = true;
 					pushInQueue();
 				}
-			} else
+			} else {
 				pushInQueue();
+			}
 		}
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// y = a[fixed_index]
 		if (fixed_index >= 0) {
 			assert(x.getVal() == fixed_index);
@@ -427,14 +468,22 @@ public:
 			setDom(f, setMin, y.getMin(), y.getMinLit(), x.getValLit());
 			setDom(y, setMax, f.getMax(), f.getMaxLit(), x.getValLit());
 			setDom(f, setMax, y.getMax(), y.getMaxLit(), x.getValLit());
-			if (y.isFixed() && f.isFixed()) satisfied = true;
+			if (y.isFixed() && f.isFixed()) {
+				satisfied = true;
+			}
 			return true;
 		}
 
 		for (int i = 0; i < a.size(); i++) {
-			if (!x.indomain(i)) continue;
-			if (y.getMax() < a[i].getMin()) setDom(x, remVal, i, y.getMaxLit(), a[i].getMinLit());
-			if (y.getMin() > a[i].getMax()) setDom(x, remVal, i, y.getMinLit(), a[i].getMaxLit());
+			if (!x.indomain(i)) {
+				continue;
+			}
+			if (y.getMax() < a[i].getMin()) {
+				setDom(x, remVal, i, y.getMaxLit(), a[i].getMinLit());
+			}
+			if (y.getMin() > a[i].getMax()) {
+				setDom(x, remVal, i, y.getMinLit(), a[i].getMaxLit());
+			}
 		}
 
 		if (no_min_support) {
@@ -442,17 +491,21 @@ public:
 			int64_t new_m = INT64_MAX;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
-				if (!x.indomain(i)) continue;
+				if (!x.indomain(i)) {
+					continue;
+				}
 				int64_t cur_m = a[i].getMin();
 				if (cur_m < new_m) {
 					best = i;
 					new_m = cur_m;
-					if (cur_m <= old_m) break;
+					if (cur_m <= old_m) {
+						break;
+					}
 				}
 			}
 			min_support = best;
 			if (y.setMinNotR(new_m)) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					r = Reason_new(a.size() + 1);
 					// Finesse lower bounds
@@ -460,7 +513,9 @@ public:
 						(*r)[i + 1] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, 1);
 					}
 				}
-				if (!y.setMin(new_m, r)) return false;
+				if (!y.setMin(new_m, r)) {
+					return false;
+				}
 			}
 			no_min_support = false;
 		}
@@ -470,17 +525,21 @@ public:
 			int64_t new_m = INT_MIN;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
-				if (!x.indomain(i)) continue;
+				if (!x.indomain(i)) {
+					continue;
+				}
 				int64_t cur_m = a[i].getMax();
 				if (cur_m > new_m) {
 					best = i;
 					new_m = cur_m;
-					if (cur_m >= old_m) break;
+					if (cur_m >= old_m) {
+						break;
+					}
 				}
 			}
 			max_support = best;
 			if (y.setMaxNotR(new_m)) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					r = Reason_new(a.size() + 1);
 					// Finesse upper bounds
@@ -488,7 +547,9 @@ public:
 						(*r)[i + 1] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
 					}
 				}
-				if (!y.setMax(new_m, r)) return false;
+				if (!y.setMax(new_m, r)) {
+					return false;
+				}
 			}
 			no_max_support = false;
 		}
@@ -496,14 +557,16 @@ public:
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		no_min_support = false;
 		no_max_support = false;
 	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
 		if (x.isFixed() && y.isFixed() && a[static_cast<int>(x.getVal())].isFixed()) {
 			satisfied = true;
 		}
@@ -528,8 +591,10 @@ class IntElemDomain : public Propagator {
 
 public:
 	IntElemDomain(IntView<U> _y, IntView<V> _x, vec<IntView<W> >& _a) : y(_y), x(_x), a(_a) {
-		num_support = new Tint[y.getMax() - y.getMin() + 1] - y.getMin();
-		support = new int*[y.getMax() - y.getMin() + 1] - y.getMin();
+		num_support = new Tint[y.getMax() - y.getMin() + 1];
+		num_support -= y.getMin();
+		support = new int*[y.getMax() - y.getMin() + 1];
+		support -= y.getMin();
 		temp_sup = new int[x.getMax() - x.getMin() + 1];
 
 		vec<int> temp;
@@ -537,7 +602,9 @@ public:
 			temp.clear();
 			if (y.indomain(v)) {
 				for (int i = x.getMin(); i <= x.getMax(); i++) {
-					if (x.indomain(i) && a[i].indomain(v)) temp.push(i);
+					if (x.indomain(i) && a[i].indomain(v)) {
+						temp.push(i);
+					}
 				}
 			}
 			num_support[v] = temp.size();
@@ -547,25 +614,32 @@ public:
 			}
 		}
 
-		for (int i = 0; i < a.size(); i++) a[i].attach(this, i, EVENT_C);
+		for (int i = 0; i < a.size(); i++) {
+			a[i].attach(this, i, EVENT_C);
+		}
 		y.attach(this, a.size(), EVENT_C);
 		x.attach(this, a.size() + 1, EVENT_C);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// propagate holes in y
 		for (int v = y.getMin(); v <= y.getMax(); v++) {
-			if (!y.indomain(v)) continue;
+			if (!y.indomain(v)) {
+				continue;
+			}
 			int* s = support[v];
 			int f = 0;
 			if (num_support[v] > 0) {
-				if (x.indomain(s[0]) && a[s[0]].indomain(v)) continue;
-				while (!(x.indomain(s[f]) && a[s[f]].indomain(v)) && ++f < num_support[v])
+				if (x.indomain(s[0]) && a[s[0]].indomain(v)) {
+					continue;
+				}
+				while (!(x.indomain(s[f]) && a[s[f]].indomain(v)) && ++f < num_support[v]) {
 					;
+				}
 			}
 			if (f == num_support[v]) {
 				// v has no support, remove from y
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					r = Reason_new(x.getMax() + 4 - x.getMin());
 					(*r)[1] = x.getMinLit();
@@ -582,15 +656,21 @@ public:
 						}
 					}
 				}
-				if (!y.remVal(v, r)) return false;
+				if (!y.remVal(v, r)) {
+					return false;
+				}
 			} else {
 				// shift bad supports to back
-				for (int i = 0; i < f; i++) temp_sup[i] = s[i];
+				for (int i = 0; i < f; i++) {
+					temp_sup[i] = s[i];
+				}
 				for (int i = f; i < num_support[v]; i++) {
 					s[i - f] = s[i];
 				}
 				s += num_support[v] - f;
-				for (int i = 0; i < f; i++) s[i] = temp_sup[i];
+				for (int i = 0; i < f; i++) {
+					s[i] = temp_sup[i];
+				}
 				num_support[v] -= f;
 			}
 		}
@@ -609,8 +689,9 @@ public:
 			for (typename IntView<W>::iterator i = a[v].begin(); i != a[v].end();) {
 				int w = *i++;
 				if (!y.indomain(w) &&
-						!a[v].remVal(w, so.lazy ? Reason(~y.getLit(w, 0), ~x.getLit(v, 1)) : Reason()))
+						!a[v].remVal(w, so.lazy ? Reason(~y.getLit(w, 0), ~x.getLit(v, 1)) : Reason())) {
 					return false;
+				}
 			}
 		}
 
@@ -624,22 +705,28 @@ public:
 void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset) {
 	x->specialiseToEL();
 	vec<IntView<> > w;
-	for (int i = 0; i < a.size(); i++) w.push(IntView<>(a[i]));
-	if (offset)
+	for (int i = 0; i < a.size(); i++) {
+		w.push(IntView<>(a[i]));
+	}
+	if (offset != 0) {
 		new IntElemBounds<0, 4, 0>(IntView<>(y), IntView<4>(x, 1, -offset), w);
-	else
+	} else {
 		new IntElemBounds<0, 0, 0>(IntView<>(y), IntView<>(x), w);
+	}
 }
 
 void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y,
 																		 int offset) {
 	x->specialiseToEL();
 	vec<IntView<> > w;
-	for (int i = 0; i < a.size(); i++) w.push(IntView<>(a[i]));
-	if (offset)
+	for (int i = 0; i < a.size(); i++) {
+		w.push(IntView<>(a[i]));
+	}
+	if (offset != 0) {
 		new IntElemBoundsImp<0, 4, 0>(b, IntView<>(y), IntView<4>(x, 1, -offset), w);
-	else
+	} else {
 		new IntElemBoundsImp<0, 0, 0>(b, IntView<>(y), IntView<>(x), w);
+	}
 }
 
 // domain consistent version
@@ -652,8 +739,9 @@ void array_var_int_element_dom(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset
 		a[i]->initVals();
 		w.push(IntView<>(a[i]));
 	}
-	if (offset)
+	if (offset != 0) {
 		new IntElemDomain<0, 4, 0>(IntView<>(y), IntView<4>(x, 1, -offset), w);
-	else
+	} else {
 		new IntElemDomain<0, 0, 0>(IntView<>(y), IntView<>(x), w);
+	}
 }

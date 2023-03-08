@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <utility>
 
 using namespace std;
 
@@ -10,16 +11,22 @@ using namespace std;
 //  i.e. the label on each node says when will you be done with it.
 
 Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<int>& _ws)
-		: source(_s), nb_nodes(_in.size()), en(_en), in(_in), out(_ou), ws(_ws), verbose(false) {}
+		: source(_s),
+			nb_nodes(_in.size()),
+			en(std::move(_en)),
+			in(_in),
+			out(std::move(_ou)),
+			ws(_ws),
+			verbose(false) {}
 Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<vector<int> >& _wst,
 									 std::vector<int> d)
 		: source(_s),
 			nb_nodes(_in.size()),
-			en(_en),
+			en(std::move(_en)),
 			in(_in),
-			out(_ou),
+			out(std::move(_ou)),
 			wst(_wst),
-			job(d),
+			job(std::move(d)),
 			verbose(false) {}
 
 void Dijkstra::run() {
@@ -37,29 +44,35 @@ void Dijkstra::run() {
 	tuple initial(source, cost[source]);
 	q.push(initial);
 
-	if (verbose) cout << "START" << endl;
+	if (verbose) {
+		cout << "START" << endl;
+	}
 
 	while (!q.empty() && count < nb_nodes) {
 		tuple top = q.top();
 		q.pop();
 		int curr = top.node;
 
-		if (vis[curr]) continue;
+		if (vis[curr]) {
+			continue;
+		}
 
 		on_visiting_node(curr);
 		vis[curr] = true;
 		count++;
 
-		if (verbose)
+		if (verbose) {
 			cout << "Visiting " << curr << " from " << pred[curr] << "(cost: " << cost[curr] << ")"
 					 << endl;
+		}
 
 		for (unsigned int i = 0; i < out[curr].size(); i++) {
 			int e = out[curr][i];
 			assert(en[e][0] == curr);
 			if (ignore_edge(e) || weight(e) < 0) {
-				if (verbose)
+				if (verbose) {
 					cout << "Ignoring edge " << e << " from " << en[e][0] << " to " << en[e][1] << endl;
+				}
 				on_ignore_edge(e);
 				continue;
 			}
@@ -77,8 +90,9 @@ void Dijkstra::run() {
 				assert(cost[other] != -1);
 				pred[other] = curr;
 				has_kids[curr] = true;
-				if (verbose)
+				if (verbose) {
 					cout << "Marked " << other << " from " << curr << " of cost " << cost[other] << endl;
+				}
 				tuple new_node(other, cost[other]);
 				enqueue(new_node);
 			}
@@ -210,12 +224,12 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t
 		: source(_s),
 			dest(_d),
 			nb_nodes(_in.size()),
-			en(_en),
+			en(std::move(_en)),
 			in(_in),
-			out(_ou),
-			ws(_ws),
+			out(std::move(_ou)),
+			ws(std::move(_ws)),
 			sccs(new FilteredKosarajuSCC(this, nb_nodes, out, in, en)),
-			clustering(NULL) {
+			clustering(nullptr) {
 #ifdef DIJKSTRAMANDATORY_ALLOW_CYCLE
 	// Extra edge from dest to source of cost 0
 	out[dest].push_back(en.size());
@@ -232,13 +246,13 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t
 		: source(_s),
 			dest(_d),
 			nb_nodes(_in.size()),
-			en(_en),
+			en(std::move(_en)),
 			in(_in),
-			out(_ou),
-			wst(_wst),
-			job(_ds),
+			out(std::move(_ou)),
+			wst(std::move(_wst)),
+			job(std::move(_ds)),
 			sccs(new FilteredKosarajuSCC(this, nb_nodes, out, in, en)),
-			clustering(NULL) {}
+			clustering(nullptr) {}
 
 void DijkstraMandatory::init() {
 #ifdef SCC_REASONING
@@ -332,14 +346,14 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 #endif
 		{
 			// Normal case, less mandatories than clusters
-			for (unsigned int i = 0; i < mands.size(); i++) {
-				target[mands[i]] = 1;
+			for (int mand : mands) {
+				target[mand] = true;
 			}
 		}
 	}
 
-	target[source] = 1;
-	target[dest] = 1;
+	target[source] = true;
+	target[dest] = true;
 #ifdef SCC_REASONING
 	vector<std::vector<bool> > target_sccs =
 			vector<std::vector<bool> >(nb_nodes + 1, std::vector<bool>(nb_nodes, false));
@@ -351,9 +365,9 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 
 	// Initialize Queue:
 	std::vector<bool> pathS(nb_nodes, false);
-	pathS[source] = 1;
+	pathS[source] = true;
 	std::vector<bool> mandS(nb_nodes, false);
-	mandS[source] = 1;
+	mandS[source] = true;
 	tuple initial(source, duration(source), pathS, mandS);
 	table[source][hash_fn(mandS)] = initial;
 	// tries[source].add(mandS,duration(source));
@@ -418,7 +432,9 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 
 			bool _enqueue = true;
 			bool was_mand_other = top.mand[other];
-			if (target[other]) top.mand[other] = 1;
+			if (target[other]) {
+				top.mand[other] = true;
+			}
 			it = table[other].find(hash_fn(top.mand));
 			if (it != table[other].end() && (it->second).cost >= 0) {
 				if ((it->second).cost <= top.cost + weight(e, top.cost) + duration(other)) {
@@ -448,10 +464,10 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 			if (_enqueue) {
 				tuple copy = top;
 				if (target[other]) {  // Other is mandatory
-					copy.mand[other] = 1;
+					copy.mand[other] = true;
 				}
 				copy.cost += weight(e, top.cost) + duration(other);
-				copy.path[other] = 1;
+				copy.path[other] = true;
 				copy.node = other;
 				/*//TODO !Find all subsets in sfs[other]. If more expensive, mark them -1 on the table
 				// to not explore them. Remove them from sfs[other].
@@ -481,22 +497,29 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	// cout<<endl;
 
 	if (minToDest >= 0) {
-		if (ok != NULL) *ok = true;
+		if (ok != nullptr) {
+			*ok = true;
+		}
 		// cout<<target<<" Min: "<<minToDest<<" ("<<engine.decisionLevel()<<")"<<endl;
 		return minToDest;
-	} else {
-		if (ok != NULL) *ok = false;
-		int max = -1;
-
-		for (table_iterator it = table[dest].begin(); it != table[dest].end(); ++it) {
-			if ((it->second).cost > max) max = (it->second).cost;
-		}
-		// cout<<target<<" Max: "<<max<<endl;
-		return max;
 	}
+	if (ok != nullptr) {
+		*ok = false;
+	}
+	int max = -1;
+
+	for (const auto& it : table[dest]) {
+		if (it.second.cost > max) {
+			max = it.second.cost;
+		}
+	}
+	// cout<<target<<" Max: "<<max<<endl;
+	return max;
 }
 
 void Dijkstra::print_pred() const {
-	for (unsigned int i = 0; i < pred.size(); i++) std::cout << pred[i] << " ";
+	for (int i : pred) {
+		std::cout << i << " ";
+	}
 	std::cout << std::endl;
 }

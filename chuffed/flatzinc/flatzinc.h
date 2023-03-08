@@ -34,6 +34,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 extern std::map<IntVar*, std::string> intVarString;
@@ -61,9 +62,9 @@ private:
 	Val _v;
 
 public:
-	bool operator()(void) const { return _some; }
-	const Val& some(void) const { return _v; }
-	static Option<Val> none(void) {
+	bool operator()() const { return _some; }
+	const Val& some() const { return _v; }
+	static Option<Val> none() {
 		Option<Val> o;
 		o._some = false;
 		new (&o._v) Val();
@@ -87,7 +88,7 @@ public:
 	/// Whether the variable *looks* introduced by the mzn2fzn translation
 	bool looks_introduced;
 	/// Destructor
-	virtual ~VarSpec(void) {}
+	virtual ~VarSpec() {}
 	/// Variable index
 	int i;
 	/// Whether the variable aliases another variable
@@ -121,8 +122,10 @@ public:
 		alias = true;
 		i = eq.v;
 	}
-	~IntVarSpec(void) {
-		if (!alias && !assigned && domain()) delete domain.some();
+	~IntVarSpec() override {
+		if (!alias && !assigned && domain()) {
+			delete domain.some();
+		}
 	}
 };
 
@@ -149,7 +152,7 @@ public:
 			: VarSpec(output, introduced, looks) {
 		alias = false;
 		assigned = true;
-		i = b;
+		i = static_cast<int>(b);
 #if EXPOSE_INT_LITS
 		alias_var = -1;
 #endif
@@ -162,8 +165,10 @@ public:
 		alias_var = -1;
 #endif
 	}
-	~BoolVarSpec(void) {
-		if (!alias && !assigned && domain()) delete domain.some();
+	~BoolVarSpec() override {
+		if (!alias && !assigned && domain()) {
+			delete domain.some();
+		}
 	}
 };
 
@@ -194,8 +199,10 @@ public:
 		alias = true;
 		i = eq.v;
 	}
-	~SetVarSpec(void) {
-		if (!alias && upperBound()) delete upperBound.some();
+	~SetVarSpec() override {
+		if (!alias && upperBound()) {
+			delete upperBound.some();
+		}
 	}
 };
 
@@ -213,15 +220,17 @@ public:
 			: VarSpec(output, introduced, looks) {
 		alias = false;
 		assigned = true;
-		i = b;
+		i = static_cast<int>(b);
 	}
 	FloatVarSpec(const Alias& eq, bool output, bool introduced, bool looks = false)
 			: VarSpec(output, introduced, looks) {
 		alias = true;
 		i = eq.v;
 	}
-	~FloatVarSpec(void) {
-		if (!alias && !assigned && domain()) delete domain.some();
+	~FloatVarSpec() override {
+		if (!alias && !assigned && domain()) {
+			delete domain.some();
+		}
 	}
 };
 
@@ -233,11 +242,11 @@ public:
 	/// Constraint arguments
 	AST::Array* args;
 	/// Constructor
-	ConExpr(const std::string& id0, AST::Array* args0) : id(id0), args(args0) {}
+	ConExpr(std::string id0, AST::Array* args0) : id(std::move(id0)), args(args0) {}
 	/// Return argument \a i
 	AST::Node* operator[](int i) const { return args->a[i]; }
 	/// Destructor
-	~ConExpr(void) { delete args; }
+	~ConExpr() { delete args; }
 };
 
 /// Map from constraint identifier to constraint posting functions
@@ -256,7 +265,7 @@ private:
 };
 
 /// Return global registry object
-Registry& registry(void);
+Registry& registry();
 
 /// Symbol table mapping identifiers (strings) to values
 template <class Val>
@@ -270,7 +279,9 @@ public:
 	/// Return whether \a key exists, and set \a val if it does exist
 	bool get(const std::string& key, Val& val) const {
 		typename std::map<std::string, Val>::const_iterator i = m.find(key);
-		if (i == m.end()) return false;
+		if (i == m.end()) {
+			return false;
+		}
 		val = i->second;
 		return true;
 	}
@@ -312,10 +323,10 @@ public:
 	/// Create new Boolean variable from specification
 	void newBoolVar(BoolVarSpec* vs);
 	/// Create new set variable from specification
-	void newSetVar(SetVarSpec* vs);
+	static void newSetVar(SetVarSpec* vs);
 
 	/// Post a constraint specified by \a ce
-	void postConstraint(const ConExpr& ce, AST::Node* annotation);
+	static void postConstraint(const ConExpr& ce, AST::Node* annotation);
 
 	/// Post the solve item
 	void solve(AST::Array* annotation);
@@ -326,38 +337,43 @@ public:
 
 	/// Define output variables
 	void setOutputElem(AST::Node* ai) const;
-	void setOutput();
+	void setOutput() const;
 
 	void printElem(AST::Node* ai, std::ostream& out = std::cout) const;
 	// Needed by the profiler
-	void print(std::ostream& out) {
-		if (output == NULL) return;
-		for (unsigned int i = 0; i < output->a.size(); i++) {
-			AST::Node* ai = output->a[i];
+	void print(std::ostream& out) override {
+		if (output == nullptr) {
+			return;
+		}
+		for (auto* ai : output->a) {
 			if (ai->isArray()) {
 				AST::Array* aia = ai->getArray();
 				int size = aia->a.size();
 				out << "[";
 				for (int j = 0; j < size; j++) {
 					printElem(aia->a[j], out);
-					if (j < size - 1) out << ", ";
+					if (j < size - 1) {
+						out << ", ";
+					}
 				}
 				out << "]";
 			} else if (ai->isCall("ifthenelse")) {
 				AST::Array* aia = ai->getCall("ifthenelse")->getArgs(3);
 				if (aia->a[0]->isBool()) {
-					if (aia->a[0]->getBool())
+					if (aia->a[0]->getBool()) {
 						printElem(aia->a[1], out);
-					else
+					} else {
 						printElem(aia->a[2], out);
+					}
 				} else if (aia->a[0]->isBoolVar()) {
 					BoolView b = bv[aia->a[0]->getBoolVar()];
-					if (b.isTrue())
+					if (b.isTrue()) {
 						printElem(aia->a[1], out);
-					else if (b.isFalse())
+					} else if (b.isFalse()) {
 						printElem(aia->a[2], out);
-					else
+					} else {
 						std::cerr << "% Error: Condition not fixed." << std::endl;
+					}
 				} else {
 					std::cerr << "% Error: Condition not Boolean." << std::endl;
 				}
@@ -374,23 +390,31 @@ public:
 		bool outerFirst = true;
 
 		for (int i = 0; i < iv.size(); i++) {
-			if (iv_introduced[i]) continue;
+			if (iv_introduced[i]) {
+				continue;
+			}
 
 			IntVar* var = iv[i];
 			std::string varName = intVarString[var];
 
-			if (varName.empty() || varName.find(so.filter_domains) == std::string::npos) continue;
+			if (varName.empty() || varName.find(so.filter_domains) == std::string::npos) {
+				continue;
+			}
 
-			if (!outerFirst) out << ",";
+			if (!outerFirst) {
+				out << ",";
+			}
 			outerFirst = false;
 
 			out << '"' << varName << '"' << ":";
 			out << "[";
-			if (var->vals != NULL) {
+			if (var->vals != nullptr) {
 				bool first = true;
 				for (int val = var->getMin(); val <= var->getMax(); val++) {
-					if (var->vals[val]) {
-						if (!first) out << ",";
+					if (var->vals[val] != 0) {
+						if (!first) {
+							out << ",";
+						}
 						first = false;
 						out << val;
 					}
@@ -402,7 +426,9 @@ public:
 		}
 
 		for (int i = 0; i < bv.size(); i++) {
-			if (bv_introduced[i]) continue;
+			if (bv_introduced[i]) {
+				continue;
+			}
 
 			BoolView bview = bv[i];
 			std::string bvstring = boolVarString[bview];
@@ -419,28 +445,33 @@ public:
 				bvstring = boolVarString[otherval];
 			}
 
-			if (bvstring.compare("ASSIGNED_AT_ROOT") == 0) continue;
+			if (bvstring == "ASSIGNED_AT_ROOT") {
+				continue;
+			}
 
-			if (!outerFirst) out << ",";
+			if (!outerFirst) {
+				out << ",";
+			}
 			outerFirst = false;
 
 			out << boolVarString[bview] << ":";
 			/* out << litString[toInt(bview.getLit(true))] << ":"; */
 			/* out << litString[toInt(bview.getLit(false))] << ":"; */
 			bool first = true;
-			if (!bview.isFixed())
+			if (!bview.isFixed()) {
 				out << "'undef'";
-			else if (bview.isTrue())
+			} else if (bview.isTrue()) {
 				out << "'true'";
-			else if (bview.isFalse())
+			} else if (bview.isFalse()) {
 				out << "'false'";
-			else
+			} else {
 				abort();
+			}
 		}
 		out << "}";
 	};
 	// Needed by the profiler
-	std::string getDomainsString(void) {
+	std::string getDomainsString() {
 		std::stringstream ss;
 		printDomains(ss);
 		return ss.str();
@@ -471,10 +502,10 @@ typedef std::pair<std::string, VarSpec*> varspec;
 class ParserState {
 public:
 	ParserState(const std::string& b, std::ostream& err0)
-			: buf(b.c_str()), pos(0), length(b.size()), fg(NULL), hadError(false), err(err0) {}
+			: buf(b.c_str()), pos(0), length(b.size()), fg(nullptr), hadError(false), err(err0) {}
 
-	ParserState(char* buf0, int length0, std::ostream& err0)
-			: buf(buf0), pos(0), length(length0), fg(NULL), hadError(false), err(err0) {}
+	ParserState(const char* buf0, int length0, std::ostream& err0)
+			: buf(buf0), pos(0), length(length0), fg(nullptr), hadError(false), err(err0) {}
 
 	void* yyscanner;
 	const char* buf;
@@ -512,31 +543,31 @@ public:
 	std::ostream& err;
 
 	int fillBuffer(char* lexBuf, unsigned int lexBufSize) {
-		if (pos >= length) return 0;
+		if (pos >= length) {
+			return 0;
+		}
 		int num = std::min(length - pos, lexBufSize);
 		memcpy(lexBuf, buf + pos, num);
 		pos += num;
 		return num;
 	}
 
-	void output(std::string x, AST::Node* n) {
-		_output.push_back(std::pair<std::string, AST::Node*>(x, n));
-	}
+	void output(std::string x, AST::Node* n) { _output.emplace_back(x, n); }
 
-	AST::Array* getOutput(void) {
+	AST::Array* getOutput() {
 		std::sort(_output.begin(), _output.end());
-		AST::Array* a = new AST::Array();
-		for (unsigned int i = 0; i < _output.size(); i++) {
-			a->a.push_back(new AST::String(_output[i].first + " = "));
-			if (_output[i].second->isArray()) {
-				AST::Array* oa = _output[i].second->getArray();
-				for (unsigned int j = 0; j < oa->a.size(); j++) {
-					a->a.push_back(oa->a[j]);
-					oa->a[j] = NULL;
+		auto* a = new AST::Array();
+		for (auto& i : _output) {
+			a->a.push_back(new AST::String(i.first + " = "));
+			if (i.second->isArray()) {
+				AST::Array* oa = i.second->getArray();
+				for (auto& j : oa->a) {
+					a->a.push_back(j);
+					j = nullptr;
 				}
-				delete _output[i].second;
+				delete i.second;
 			} else {
-				a->a.push_back(_output[i].second);
+				a->a.push_back(i.second);
 			}
 			a->a.push_back(new AST::String(";\n"));
 		}
@@ -551,7 +582,7 @@ private:
 
 public:
 	Error(const std::string& where, const std::string& what) : msg(where + ": " + what) {}
-	const std::string& toString(void) const { return msg; }
+	const std::string& toString() const { return msg; }
 };
 
 void solve(const std::string& filename, std::ostream& err = std::cerr);

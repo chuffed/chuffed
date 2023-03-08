@@ -30,7 +30,9 @@ public:
 		for (int i = 0; i < v; i++) {
 			m[i].growTo(v);
 			for (int j = 0; j < v; j++) {
-				if (j <= i) continue;
+				if (j <= i) {
+					continue;
+				}
 				for (int k = 0; k < b; k++) {
 					m[i][j].push(newIntVar(0, 1));
 				}
@@ -81,9 +83,11 @@ public:
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < v; i++) {
 			for (int j = 0; j < b; j++) {
 				assert(x[i][j]->getType() == INT_VAR_EL);
@@ -93,7 +97,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < v; i++) {
 			for (int j = 0; j < b; j++) {
 				os << x[i][j]->getVal();
@@ -107,7 +111,11 @@ public:
 int main(int argc, char** argv) {
 	parseOptions(argc, argv);
 
-	int v, b, r, k, l;
+	int v;
+	int b;
+	int r;
+	int k;
+	int l;
 
 	assert(argc == 6);
 	v = atoi(argv[1]);

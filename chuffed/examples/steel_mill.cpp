@@ -51,9 +51,15 @@ public:
 	vec<vec<IntVar*> > b2i_slab_colour;  // whether slab i is assigned colour j
 
 	SteelMill(int n) : n_colours(88), n_orders(n), n_slabs(n) {
-		for (int i = 0; i < 20; i++) capacities.push(csplib_capacities[i]);
-		for (int i = 0; i < n_orders; i++) weight.push(csplib_orders[i][0]);
-		for (int i = 0; i < n_orders; i++) colour.push(csplib_orders[i][1]);
+		for (int& csplib_capacitie : csplib_capacities) {
+			capacities.push(csplib_capacitie);
+		}
+		for (int i = 0; i < n_orders; i++) {
+			weight.push(csplib_orders[i][0]);
+		}
+		for (int i = 0; i < n_orders; i++) {
+			colour.push(csplib_orders[i][1]);
+		}
 
 		max_cap = capacities.last();
 
@@ -61,16 +67,22 @@ public:
 		max_loss = 0;
 		for (int j = 1; j < capacities[0]; j++) {
 			loss_table[j] = capacities[0] - j;
-			if (loss_table[j] > max_loss) max_loss = loss_table[j];
+			if (loss_table[j] > max_loss) {
+				max_loss = loss_table[j];
+			}
 		}
 		for (int i = 0; i < capacities.size() - 1; i++) {
 			for (int j = capacities[i] + 1; j < capacities[i + 1]; j++) {
 				loss_table[j] = capacities[i + 1] - j;
-				if (loss_table[j] > max_loss) max_loss = loss_table[j];
+				if (loss_table[j] > max_loss) {
+					max_loss = loss_table[j];
+				}
 			}
 		}
 
-		for (int i = 0; i < max_cap; i++) printf("%d ", loss_table[i]);
+		for (int i = 0; i < max_cap; i++) {
+			printf("%d ", loss_table[i]);
+		}
 		printf("\n");
 
 		// Create vars
@@ -102,7 +114,9 @@ public:
 				BoolView t = newBoolVar();
 				bool2int(t, b2i_slab_colour[i][j]);
 				for (int k = 0; k < n_orders; k++) {
-					if (colour[k] != j + 1) continue;
+					if (colour[k] != j + 1) {
+						continue;
+					}
 					bool_rel(~b_order_slab[k][i], BRT_OR, t);
 				}
 			}
@@ -111,13 +125,17 @@ public:
 		// Packing constraints
 		for (int i = 0; i < n_slabs; i++) {
 			vec<IntVar*> t;
-			for (int j = 0; j < n_orders; j++) t.push(b2i_order_slab[j][i]);
+			for (int j = 0; j < n_orders; j++) {
+				t.push(b2i_order_slab[j][i]);
+			}
 			int_linear(weight, t, IRT_EQ, load[i]);
 		}
 
 		// Redundant packing constraint
 		int total_weight = 0;
-		for (int i = 0; i < n_orders; i++) total_weight += weight[i];
+		for (int i = 0; i < n_orders; i++) {
+			total_weight += weight[i];
+		}
 		vec<int> a_slabs(n_slabs, 1);
 		int_linear(a_slabs, load, IRT_EQ, total_weight);
 
@@ -144,9 +162,11 @@ public:
 		val_sym_break(x, 0, n_slabs - 1);
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
@@ -156,7 +176,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n_orders; i++) {
 			os << x[i]->getVal() << ", ";
 		}

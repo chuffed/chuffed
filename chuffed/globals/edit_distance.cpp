@@ -94,11 +94,15 @@ public:
 		// attach variable views
 		int offset = 0;
 
-		for (int i = 0; i < seqSize; i++) seq1[i].attach(this, offset + i, EVENT_C);
+		for (int i = 0; i < seqSize; i++) {
+			seq1[i].attach(this, offset + i, EVENT_C);
+		}
 
 		offset += seqSize;
 
-		for (int i = 0; i < seqSize; i++) seq2[i].attach(this, offset + i, EVENT_C);
+		for (int i = 0; i < seqSize; i++) {
+			seq2[i].attach(this, offset + i, EVENT_C);
+		}
 
 		// in the future we could also wake the propagator on changes on the edit distance
 		offset += seqSize;
@@ -112,7 +116,7 @@ public:
 
 	void wakeup(int i, int c) override {
 		if (i < seqSize * 2) {
-			if ((unsigned)c & EVENT_C) {
+			if (((unsigned)c & EVENT_C) != 0U) {
 				if (cellHasChanged[i] == 0) {
 					cellHasChanged[i] = 1;
 					cellChanges++;
@@ -188,7 +192,9 @@ public:
 							break;
 					}
 
-					if (!ed.setMin(editDistanceLB, r)) return false;
+					if (!ed.setMin(editDistanceLB, r)) {
+						return false;
+					}
 				}
 			}
 		}

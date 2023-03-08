@@ -74,19 +74,19 @@ public:
 
 	void setObjective(int val) {}
 	long double getRC(IntVar* v);
-	void printStats();
+	void printStats() override;
 
 	// Main propagator methods
 
-	void wakeup(int i, int c);
-	bool propagate();
-	void clearPropState();
+	void wakeup(int i, int c) override;
+	bool propagate() override;
+	void clearPropState() override;
 
 	// LP methods
 
-	int getLimit();
+	int getLimit() const;
 	void updateBounds();
-	int doSimplex();
+	int doSimplex() const;
 	void unboundedFailure();
 	bool propagateAllBounds();
 	template <int T>
@@ -95,7 +95,7 @@ public:
 
 	// Inline functions
 
-	inline int decisionLevel() { return bctrail_lim.size(); }
+	inline int decisionLevel() const { return bctrail_lim.size(); }
 };
 
 extern MIP* mip;

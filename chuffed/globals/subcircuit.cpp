@@ -70,15 +70,21 @@ public:
 		index = (int*)malloc(size * sizeof(int));
 		lowlink = (int*)malloc(size * sizeof(int));
 
-		if (scc)
-			for (int i = 0; i < size; i++) x[i].attach(this, i, EVENT_C);
-		else
-			for (int i = 0; i < size; i++) x[i].attach(this, i, EVENT_F);
+		if (scc) {
+			for (int i = 0; i < size; i++) {
+				x[i].attach(this, i, EVENT_C);
+			}
+		} else {
+			for (int i = 0; i < size; i++) {
+				x[i].attach(this, i, EVENT_F);
+			}
+		}
 	}
 
-	void wakeup(int i, int c) {
-		if (c & EVENT_F && x[i].getVal() != i)
+	void wakeup(int i, int c) override {
+		if (c & EVENT_F && x[i].getVal() != i) {
 			new_fixed.push(i);  // only put in new_fixed if it's in the circuit
+		}
 		pushInQueue();
 	}
 
@@ -99,17 +105,24 @@ public:
 		//  We have a set of chains, each one with a start index that no variable is fixed to.
 		//  First find the start indices for the chains
 
-		for (int i = 0; i < size; i++) isStartChain[i] = true;
+		for (int i = 0; i < size; i++) {
+			isStartChain[i] = true;
+		}
 
-		for (int i = 0; i < size; i++)
-			if (x[i].isFixed())
+		for (int i = 0; i < size; i++) {
+			if (x[i].isFixed()) {
 				isStartChain[x[i].getVal()] = false;
-			else
+			} else {
 				isStartChain[i] = false;
+			}
+		}
 
 		chain_start.clear();
-		for (int i = 0; i < size; i++)
-			if (isStartChain[i]) chain_start.push(i);
+		for (int i = 0; i < size; i++) {
+			if (isStartChain[i]) {
+				chain_start.push(i);
+			}
+		}
 
 		// For each chain, assuming we can find a var outside it which is not a self-loop,
 		// follow the chain and set the end variable not equal to the index of the start
@@ -117,7 +130,9 @@ public:
 		// 5-start other chain, 1-first valid, 2-last, 3-high level, 4-low level
 		// The start of another chain is valid as the justification because that will be a
 		// var outside this chain that is fixed to value not its own index
-		if (so.preventevidence == 5 && chain_start.size() < 2) return true;
+		if (so.preventevidence == 5 && chain_start.size() < 2) {
+			return true;
+		}
 
 		for (int chainNumber = 0; chainNumber < chain_start.size(); chainNumber++) {
 			// get possible vars to use as evidence that we can't close this cycle
@@ -127,14 +142,16 @@ public:
 			if (so.preventevidence == 5) {
 				// if this is the first chain, use the
 				// start of the second, otherwise use the start of the first
-				if (chainNumber == 0)
+				if (chainNumber == 0) {
 					evidenceOptions.push(chain_start[1]);
-				else
+				} else {
 					evidenceOptions.push(chain_start[0]);
+				}
 			} else {
 				for (int i = 0; i < size; i++) {
-					if (!x[i].remValNotR(i))  // if it can't equal its own index
+					if (!x[i].remValNotR(i)) {  // if it can't equal its own index
 						evidenceOptions.push(i);
+					}
 				}
 			}
 
@@ -142,19 +159,25 @@ public:
 			int startVar = chain_start[chainNumber];
 			int chainLength = 1;
 			int endVar = startVar;
-			if (so.preventevidence != 5) evidenceOptions.remove(startVar);
+			if (so.preventevidence != 5) {
+				evidenceOptions.remove(startVar);
+			}
 			while (x[endVar].isFixed()) {
 				chainLength++;
 				endVar = x[endVar].getVal();
-				if (so.preventevidence != 5) evidenceOptions.remove(endVar);
+				if (so.preventevidence != 5) {
+					evidenceOptions.remove(endVar);
+				}
 			}
 
 			if (x[endVar].remValNotR(startVar) && evidenceOptions.size() > 0) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					int evidenceVar = chooseEvidenceVar(evidenceOptions, so.preventevidence);
 
-					if (so.preventevidence != 5) evidenceOptions.remove(startVar);
+					if (so.preventevidence != 5) {
+						evidenceOptions.remove(startVar);
+					}
 					if (so.prevexpl == 1) {
 						r = Reason_new(chainLength + 1);
 						int v = startVar;
@@ -168,8 +191,11 @@ public:
 						// find the vars in the start of the chain and those not in the chain
 						vec<int> inStartChain;
 						vec<int> outside;
-						for (int i = 0; i < size; i++)
-							if (i != endVar) outside.push(i);
+						for (int i = 0; i < size; i++) {
+							if (i != endVar) {
+								outside.push(i);
+							}
+						}
 						int v = startVar;
 						for (int index = 1; index < chainLength; index++) {
 							inStartChain.push(v);
@@ -186,7 +212,9 @@ public:
 					}
 				}
 
-				if (!x[endVar].remVal(startVar, r)) return false;
+				if (!x[endVar].remVal(startVar, r)) {
+					return false;
+				}
 			}
 		}
 
@@ -199,21 +227,26 @@ public:
 		varsIn.clear();
 		for (int i = 0; i < potentialVarIndices.size(); i++) {
 			int varindex = potentialVarIndices[i];
-			if (!x[varindex].indomain(varindex)) varsIn.push(varindex);
+			if (!x[varindex].indomain(varindex)) {
+				varsIn.push(varindex);
+			}
 		}
 		// now choose one using our selection method
 		if (varsIn.size() > 0) {
 			int chosen = chooseEvidenceVar(varsIn, so.sccevidence);
 			assert(!x[chosen].indomain(chosen));
 			bool found = false;
-			for (int i = 0; i < potentialVarIndices.size(); i++)
-				if (potentialVarIndices[i] == chosen) found = true;
+			for (int i = 0; i < potentialVarIndices.size(); i++) {
+				if (potentialVarIndices[i] == chosen) {
+					found = true;
+				}
+			}
 			assert(found);
 			Lit result = ~x[chosen].getLit(chosen, 0);
 			assert(result != lit_True);
 			return result;
-		} else
-			return lit_True;
+		}
+		return lit_True;
 	}
 
 	// Add literals to reason to explain that no node in set A
@@ -249,10 +282,13 @@ public:
 			// If we haven't visited the child yet, do so now
 			if (index[child] == -1) {
 				// fprintf(stderr,"new child %d\n", child);
-				if (!exploreSubtree(child, startPrevSubtree, endPrevSubtree, backfrom, backto, numback))
+				if (!exploreSubtree(child, startPrevSubtree, endPrevSubtree, backfrom, backto, numback)) {
 					return false;  // fail if there was an scc contained within this child
+				}
 
-				if (lowlink[child] < lowlink[thisNode]) lowlink[thisNode] = lowlink[child];
+				if (lowlink[child] < lowlink[thisNode]) {
+					lowlink[thisNode] = lowlink[child];
+				}
 
 				// If this is the first child and its lowlink is equal to the
 				// parent's index, we can prune the edge from this node to the
@@ -271,17 +307,19 @@ public:
 					// First divide the nodes into those inside and outside the child's subtree
 					vec<int> inside;
 					vec<int> outside;
-					for (int i = 0; i < size; i++)
-						if (index[i] >= index[child])
+					for (int i = 0; i < size; i++) {
+						if (index[i] >= index[child]) {
 							inside.push(i);
-						else if (index[i] != index[thisNode])
+						} else if (index[i] != index[thisNode]) {
 							outside.push(i);
+						}
+					}
 
 					// Now check one node is definitely in
 					Lit evidenceIn = getEvidenceLit(inside);
 					Lit evidenceOut = getEvidenceLit(outside);
 					if (evidenceOut != lit_True) {
-						Clause* r = NULL;
+						Clause* r = nullptr;
 						if (so.lazy) {
 							r = Reason_new(inside.size() * outside.size() + 2);
 							(*r)[1] = evidenceOut;
@@ -290,14 +328,16 @@ public:
 						addPropagation(false, thisNode, child, r);
 					}
 					if (evidenceIn != lit_True) {
-						Clause* r = NULL;
+						Clause* r = nullptr;
 						if (so.lazy) {
 							r = Reason_new(inside.size() * outside.size() + 2);
 							(*r)[1] = evidenceIn;
 							explainAcantreachB(r, 2, inside, outside);
 						}
 						for (int i = 0; i < outside.size(); i++) {
-							if (x[outside[i]].indomain(thisNode)) addPropagation(false, outside[i], thisNode, r);
+							if (x[outside[i]].indomain(thisNode)) {
+								addPropagation(false, outside[i], thisNode, r);
+							}
 						}
 					}
 				}
@@ -320,7 +360,7 @@ public:
 						// XXX [AS] Commented following line, because propagator related statistics
 						// should be collected within the propagator class.
 						// engine.prunedSkip++;
-						Clause* r = NULL;
+						Clause* r = nullptr;
 						if (so.lazy) {
 							// The reason is that no node in an earlier
 							// subtree can reach the prev or later subtrees,
@@ -328,8 +368,12 @@ public:
 							// later subtrees.
 							vec<int> prevAndLater;
 							prevAndLater.reserve(prev.size() + later.size());
-							for (int i = 0; i < prev.size(); i++) prevAndLater.push(prev[i]);
-							for (int i = 0; i < later.size(); i++) prevAndLater.push(later[i]);
+							for (int i = 0; i < prev.size(); i++) {
+								prevAndLater.push(prev[i]);
+							}
+							for (int i = 0; i < later.size(); i++) {
+								prevAndLater.push(later[i]);
+							}
 							r = Reason_new(earlier.size() * prevAndLater.size() + prev.size() * later.size() + 2);
 							(*r)[1] = evidence;
 							explainAcantreachB(r, 2, prev, later);
@@ -339,7 +383,9 @@ public:
 					}
 				}
 
-				if (index[child] < lowlink[thisNode]) lowlink[thisNode] = index[child];
+				if (index[child] < lowlink[thisNode]) {
+					lowlink[thisNode] = index[child];
+				}
 			}
 			// fprintf(stderr,"lowpoint is %d\n", lowlink[thisNode]);
 		}
@@ -355,10 +401,11 @@ public:
 			vec<int> outside;
 
 			for (int i = 0; i < size; i++) {
-				if (index[i] > index[thisNode])
+				if (index[i] > index[thisNode]) {
 					inside.push(i);
-				else if (i != thisNode)
+				} else if (i != thisNode) {
 					outside.push(i);
+				}
 			}
 
 			Lit evidenceInside = getEvidenceLit(inside);  // at this point inside excludes this node
@@ -367,7 +414,7 @@ public:
 
 			// Set all vars outside the component to be self-cycles
 			if (evidenceInside != lit_True) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					r = Reason_new(inside.size() * outside.size() + 2);
 					(*r)[1] = evidenceInside;
@@ -399,24 +446,34 @@ public:
 		// make sure we don't choose a self-cycle
 		// if all vars are self-cycles just return -1
 		vec<int> options;
-		for (int i = 0; i < size; i++)
-			if (!x[i].isFixed() || x[i].getVal() != i) options.push(i);
-		if (options.size() == 0) return -1;
+		for (int i = 0; i < size; i++) {
+			if (!x[i].isFixed() || x[i].getVal() != i) {
+				options.push(i);
+			}
+		}
+		if (options.size() == 0) {
+			return -1;
+		}
 		int root = options[0];
 		int dom = 0;
 		switch (so.rootSelection) {
 			case 1:  // first non-fixed
-				for (int i = 0; i < size; i++)
+				for (int i = 0; i < size; i++) {
 					if (!x[i].isFixed()) {
 						root = i;
 						break;
 					}
+				}
 				break;
 			case 2:  // random non-fixed
-				for (int i = 0; i < size; i++)
-					if (x[i].isFixed()) options.remove(i);
-				if (options.size() > 0)
+				for (int i = 0; i < size; i++) {
+					if (x[i].isFixed()) {
+						options.remove(i);
+					}
+				}
+				if (options.size() > 0) {
 					root = options[(int)(((double)options.size()) * rand() / (RAND_MAX + 1.0))];
+				}
 				break;
 			case 7:  // first (even if fixed) - this is the default
 				break;
@@ -425,11 +482,12 @@ public:
 				break;
 			case 9:  // largest domain
 				dom = x[root].size();
-				for (int i = 1; i < options.size(); i++)
+				for (int i = 1; i < options.size(); i++) {
 					if (x[options[i]].size() > dom) {
 						dom = x[options[i]].size();
 						root = options[i];
 					}
+				}
 				break;
 		}
 		return root;
@@ -448,7 +506,9 @@ public:
 		later.clear();
 
 		assert(!x[root].isFixed() || x[root].getVal() != root);
-		for (int i = 0; i < size; i++) index[i] = -1;  // unvisited
+		for (int i = 0; i < size; i++) {
+			index[i] = -1;  // unvisited
+		}
 
 		index[root] = 0;  // first node visited
 		lowlink[root] = 0;
@@ -476,17 +536,20 @@ public:
 				thisSubtree.clear();
 				later.clear();
 				for (int i = 0; i < size; i++) {
-					if (index[i] < 0)
+					if (index[i] < 0) {
 						later.push(i);
-					else if (index[i] > endSubtree)
+					} else if (index[i] > endSubtree) {
 						thisSubtree.push(i);
+					}
 				}
 
 				Lit evidenceThis = getEvidenceLit(thisSubtree);
 				Lit evidenceOther = getEvidenceLit(prev);
 				vec<int> alloutside;
 				if (prev.size() == 0) {
-					for (int i = 0; i < later.size(); i++) alloutside.push(later[i]);
+					for (int i = 0; i < later.size(); i++) {
+						alloutside.push(later[i]);
+					}
 					alloutside.push(root);
 					evidenceOther = getEvidenceLit(alloutside);
 				}
@@ -525,14 +588,26 @@ public:
 							// 3. and nodes in this subtree can't reach the
 							// previous one or unexplored ones.
 							vec<int> prev_later;
-							for (int i = 0; i < prev.size(); i++) prev_later.push(prev[i]);
-							for (int i = 0; i < later.size(); i++) prev_later.push(later[i]);
+							for (int i = 0; i < prev.size(); i++) {
+								prev_later.push(prev[i]);
+							}
+							for (int i = 0; i < later.size(); i++) {
+								prev_later.push(later[i]);
+							}
 							vec<int> prev_this_later;
-							for (int i = 0; i < prev_later.size(); i++) prev_this_later.push(prev_later[i]);
-							for (int i = 0; i < thisSubtree.size(); i++) prev_this_later.push(thisSubtree[i]);
+							for (int i = 0; i < prev_later.size(); i++) {
+								prev_this_later.push(prev_later[i]);
+							}
+							for (int i = 0; i < thisSubtree.size(); i++) {
+								prev_this_later.push(thisSubtree[i]);
+							}
 							vec<int> this_later;
-							for (int i = 0; i < thisSubtree.size(); i++) this_later.push(thisSubtree[i]);
-							for (int i = 0; i < later.size(); i++) this_later.push(later[i]);
+							for (int i = 0; i < thisSubtree.size(); i++) {
+								this_later.push(thisSubtree[i]);
+							}
+							for (int i = 0; i < later.size(); i++) {
+								this_later.push(later[i]);
+							}
 
 							int size1 = earlier.size() * prev_this_later.size();
 							int size2 = prev.size() * this_later.size();
@@ -560,7 +635,7 @@ public:
 						// XXX [AS] Commented following line, because propagator related statistics
 						// should be collected within the propagator class.
 						// engine.fixedBackedge++;
-						Clause* r = NULL;
+						Clause* r = nullptr;
 						if (so.lazy) {
 							// If this is the first subtree, the reason we're setting this link is that
 							// there is no other link between nodes of this subtree to nodes outside the subtree
@@ -576,14 +651,26 @@ public:
 								// The reason is the same as when failing above,
 								// but we leave out the one we're setting
 								vec<int> prev_later;
-								for (int i = 0; i < prev.size(); i++) prev_later.push(prev[i]);
-								for (int i = 0; i < later.size(); i++) prev_later.push(later[i]);
+								for (int i = 0; i < prev.size(); i++) {
+									prev_later.push(prev[i]);
+								}
+								for (int i = 0; i < later.size(); i++) {
+									prev_later.push(later[i]);
+								}
 								vec<int> prev_this_later;
-								for (int i = 0; i < prev_later.size(); i++) prev_this_later.push(prev_later[i]);
-								for (int i = 0; i < thisSubtree.size(); i++) prev_this_later.push(thisSubtree[i]);
+								for (int i = 0; i < prev_later.size(); i++) {
+									prev_this_later.push(prev_later[i]);
+								}
+								for (int i = 0; i < thisSubtree.size(); i++) {
+									prev_this_later.push(thisSubtree[i]);
+								}
 								vec<int> this_later;
-								for (int i = 0; i < thisSubtree.size(); i++) this_later.push(thisSubtree[i]);
-								for (int i = 0; i < later.size(); i++) this_later.push(later[i]);
+								for (int i = 0; i < thisSubtree.size(); i++) {
+									this_later.push(thisSubtree[i]);
+								}
+								for (int i = 0; i < later.size(); i++) {
+									this_later.push(later[i]);
+								}
 
 								int size1 = earlier.size() * prev_this_later.size();
 								int size2 = prev.size() * this_later.size();
@@ -609,9 +696,13 @@ public:
 
 				// When a new subtree has been explored, update the prev and earlier vectors (only necessary
 				// if explaining)
-				for (int i = 0; i < prev.size(); i++) earlier.push(prev[i]);
+				for (int i = 0; i < prev.size(); i++) {
+					earlier.push(prev[i]);
+				}
 				prev.clear();
-				for (int i = 0; i < thisSubtree.size(); i++) prev.push(thisSubtree[i]);
+				for (int i = 0; i < thisSubtree.size(); i++) {
+					prev.push(thisSubtree[i]);
+				}
 
 				// Set the new subtree boundaries
 				startSubtree = endSubtree + 1;
@@ -626,10 +717,11 @@ public:
 			vec<int> notseen;
 
 			for (int var = 0; var < size; var++) {
-				if (index[var] >= 0)
+				if (index[var] >= 0) {
 					seen.push(var);
-				else
+				} else {
 					notseen.push(var);
+				}
 			}
 			int numNotSeen = size - nodesSeen;
 			assert(seen.size() == nodesSeen);
@@ -640,7 +732,7 @@ public:
 				// XXX [AS] Commented following line, because propagator related statistics
 				// should be collected within the propagator class.
 				// engine.disconnected++;
-				Clause* r = NULL;
+				Clause* r = nullptr;
 
 				if (so.lazy) {
 					// need to say that each seen node doesn't reach any non-seen node
@@ -650,8 +742,11 @@ public:
 				}
 				for (int i = 0; i < notseen.size(); i++) {
 					int outsideVar = notseen[i];
-					if (x[outsideVar].setValNotR(outsideVar))
-						if (!x[outsideVar].setVal(outsideVar, r)) return false;
+					if (x[outsideVar].setValNotR(outsideVar)) {
+						if (!x[outsideVar].setVal(outsideVar, r)) {
+							return false;
+						}
+					}
 				}
 			}
 		}
@@ -666,21 +761,20 @@ public:
 			vec<int> lastSubtreeAndOutside;
 			vec<int> earlierSubtree;
 			for (int i = 0; i < size; i++) {
-				if (index[i] >= startSubtree) {
+				if (index[i] >= startSubtree || index[i] < 0) {
 					lastSubtreeAndOutside.push(i);
-				} else if (index[i] > 0)  // The root is considered in no subtree
+				} else if (index[i] > 0) {  // The root is considered in no subtree
 					earlierSubtree.push(i);
-				else if (index[i] < 0)
-					lastSubtreeAndOutside.push(i);
-				else
+				} else {
 					assert(i == root);
+				}
 			}
 			assert(earlierSubtree.size() > 0);
 			assert(earlierSubtree.size() + lastSubtreeAndOutside.size() + 1 == size);
 			Lit evidenceLast = getEvidenceLit(lastSubtreeAndOutside);
 			if (evidenceLast != lit_True) {
 				// Build the reason if neccessary (it will be the same for all of the pruned edges)
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					// Reason should state that no var in an earlier sub tree reaches a var
 					// in the last subtree or outside
@@ -691,7 +785,9 @@ public:
 
 				// Prune all edges from the root to nodes in earlier subtrees
 				for (int i = 0; i < size; i++) {
-					if (i != root && index[i] < startSubtree) addPropagation(false, root, i, r);
+					if (i != root && index[i] < startSubtree) {
+						addPropagation(false, root, i, r);
+					}
 				}
 
 				/* for (typename IntView<U>::iterator i = x[root].begin(); i != x[root].end(); ++i)
@@ -712,11 +808,17 @@ public:
 			PROP p = propQueue[i];
 			// fprintf(stderr, "propagating\n");
 			if (p.fix) {
-				if (x[p.var].setValNotR(p.val))
-					if (!x[p.var].setVal(p.val, p.reason)) return false;
+				if (x[p.var].setValNotR(p.val)) {
+					if (!x[p.var].setVal(p.val, p.reason)) {
+						return false;
+					}
+				}
 			} else {
-				if (x[p.var].remValNotR(p.val))
-					if (!x[p.var].remVal(p.val, p.reason)) return false;
+				if (x[p.var].remValNotR(p.val)) {
+					if (!x[p.var].remVal(p.val, p.reason)) {
+						return false;
+					}
+				}
 			}
 		}
 		return true;
@@ -734,7 +836,9 @@ public:
 			int chainLength = 0;
 
 			// Clear the inCircuit array
-			for (int i = 0; i < size; i++) inCircuit[i] = false;
+			for (int i = 0; i < size; i++) {
+				inCircuit[i] = false;
+			}
 
 			bool foundCycle = false;
 			while (x[nextVar].isFixed()) {
@@ -744,13 +848,13 @@ public:
 				if (x[nextVar].getVal() == startVar) {
 					foundCycle = true;
 					break;
-				} else
-					nextVar = x[nextVar].getVal();
+				}
+				nextVar = x[nextVar].getVal();
 			}
 			if (foundCycle && chainLength < size) {
 				// fprintf(stderr,"found cycle length %d\n", chainLength);
 				//  all variables not in the cycle must have their own indices as values
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				vec<int> notInCycle;
 				bool doOutsideIn = false;
 				if (so.lazy) {
@@ -772,7 +876,9 @@ public:
 					} else {
 						// find the vars in and not in the cycle
 						notInCycle.growTo(size);
-						for (int i = 0; i < size; i++) notInCycle[i] = i;
+						for (int i = 0; i < size; i++) {
+							notInCycle[i] = i;
+						}
 						vec<int> inCycle;
 						inCycle.growTo(chainLength);
 						int v = startVar;
@@ -787,21 +893,23 @@ public:
 						int chosenVar = chooseEvidenceVar(inCycle, so.checkevidence);
 						(*r)[1] = x[chosenVar].getLit(chosenVar, 1);  // xi == i (is false)
 
-						if (so.checkexpl == 2)  // inside can't reach out
+						if (so.checkexpl == 2) {  // inside can't reach out
 							doOutsideIn = false;
-						else if (so.checkexpl == 3)  // outside can't reach in
+						} else if (so.checkexpl == 3) {  // outside can't reach in
 							doOutsideIn = true;
-						else if (so.checkexpl == 4)  // smaller group can't reach bigger group
+						} else if (so.checkexpl == 4) {  // smaller group can't reach bigger group
 							doOutsideIn = notInCycle.size() < inCycle.size();
-						else if (so.checkexpl == 5)  // bigger group can't reach smaller group
+						} else if (so.checkexpl == 5) {  // bigger group can't reach smaller group
 							doOutsideIn = inCycle.size() < notInCycle.size();
-						else
+						} else {
 							fprintf(stderr, "Unknown check explanation type\n");
+						}
 
-						if (doOutsideIn)
+						if (doOutsideIn) {
 							explainAcantreachB(r, 2, notInCycle, inCycle);
-						else
+						} else {
 							explainAcantreachB(r, 2, inCycle, notInCycle);
+						}
 					}
 				}
 
@@ -811,14 +919,16 @@ public:
 				// options are: 1-first, 2-last, 3-high level, 4-low level
 				vec<int> failIndices;
 				for (int i = 0; i < size; i++) {
-					if (!inCircuit[i])
+					if (!inCircuit[i]) {
 						if (x[i].setValNotR(i)) {
-							if (!x[i].remValNotR(i)) failIndices.push(i);
-							// fprintf(stderr,"prune\n");
-							else if (!x[i].setVal(i, r)) {
+							if (!x[i].remValNotR(i)) {
+								failIndices.push(i);
+								// fprintf(stderr,"prune\n");
+							} else if (!x[i].setVal(i, r)) {
 								fprintf(stderr, "unexpected fail\n");
 							}
 						}
+					}
 				}
 				// now do the failing one(s) if there are any
 				if (failIndices.size() > 0) {
@@ -832,7 +942,9 @@ public:
 
 			// If we found a cycle stop here as all other fixed vars will be in the
 			// same cycle (or we would have returned false already).
-			if (foundCycle) break;
+			if (foundCycle) {
+				break;
+			}
 		}
 
 		return true;
@@ -843,7 +955,8 @@ public:
 			// fprintf(stderr, "option 2 chose %d\n", options[0]);
 			//  1 is the first
 			return options[0];
-		} else if (selectionMethod == 2) {
+		}
+		if (selectionMethod == 2) {
 			// fprintf(stderr, "option 1 chose %d\n", options[1]);
 			//  the last
 			return options.last();
@@ -884,7 +997,7 @@ public:
 					 }
 					 return bestVar;
 			 }*/
-		else if (selectionMethod == 3) {
+		if (selectionMethod == 3) {
 			// highest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 			// Maybe it shoud be replaced by sat.getLevel(.)?
@@ -895,10 +1008,11 @@ public:
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?
 				if (sat.trailpos[var(x[options[0]].getLit(options[0], 1))] !=
-						sat.trailpos[var(x[options[0]].getLit(options[0], 0))])
+						sat.trailpos[var(x[options[0]].getLit(options[0], 0))]) {
 					// if(sat.getLevel(var(x[options[0]].getLit(options[0],1))) !=
 					// sat.getLevel(var(x[options[0]].getLit(options[0],0))))
 					fprintf(stderr, "not same\n");
+				}
 				int v = options[i];
 				Lit p = x[v].getLit(v, 1);
 				int satvar = var(p);
@@ -915,7 +1029,8 @@ public:
 				}
 			}
 			return bestVar;
-		} else if (selectionMethod == 4) {
+		}
+		if (selectionMethod == 4) {
 			// lowest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 			// Maybe it shoud be replaced by sat.getLevel(.)?
@@ -935,25 +1050,31 @@ public:
 					// Maybe it shoud be replaced by sat.getLevel(.)?
 					lowestLevel = sat.trailpos[satvar];
 					// lowestLevel = sat.getLevel(satvar);
-					if (lowestLevel == 0 && (sat.value(p) != l_False)) fprintf(stderr, "level 0 not fixed\n");
+					if (lowestLevel == 0 && (sat.value(p) != l_False)) {
+						fprintf(stderr, "level 0 not fixed\n");
+					}
 					bestVar = v;
 				}
 			}
 			return bestVar;
-		} else if (selectionMethod == 6) {
+		}
+		if (selectionMethod == 6) {
 			// fprintf(stderr, "random\n");
 			int bestIndex = (int)(((double)options.size()) * rand() / (RAND_MAX + 1.0));
 			return options[bestIndex];
-		} else {
-			return options[0];
-			fprintf(stderr, "unexpected evidence type\n");
 		}
+		return options[0];
+		fprintf(stderr, "unexpected evidence type\n");
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		assert(check || scc);
-		if (check && !propagateCheck()) return false;
-		if (prevent && !propagatePrevent()) return false;
+		if (check && !propagateCheck()) {
+			return false;
+		}
+		if (prevent && !propagatePrevent()) {
+			return false;
+		}
 		if (scc) {
 			if (so.rootSelection == 10) {
 				// try all roots not fixed in self-cycles
@@ -961,45 +1082,52 @@ public:
 				for (int root = 0; root < size; root++) {
 					if (!x[root].isFixed() || x[root].getVal() != root) {
 						numTried++;
-						if (!propagateSCC(root))
+						if (!propagateSCC(root)) {
 							return false;
-						else {
-							// check if alldiff now broken
-							bool alldiffbroken = false;
-							vec<bool> valueTaken;
-							for (int i = 0; i < size; i++) valueTaken.push(false);
-							for (int i = 0; i < size; i++)
-								if (x[i].isFixed()) {
-									int v = x[i].getVal();
-									if (valueTaken[v]) alldiffbroken = true;
-									valueTaken[v] = true;
+						}  // check if alldiff now broken
+						bool alldiffbroken = false;
+						vec<bool> valueTaken;
+						for (int i = 0; i < size; i++) {
+							valueTaken.push(false);
+						}
+						for (int i = 0; i < size; i++) {
+							if (x[i].isFixed()) {
+								int v = x[i].getVal();
+								if (valueTaken[v]) {
+									alldiffbroken = true;
 								}
-							if (alldiffbroken) break;
+								valueTaken[v] = true;
+							}
+						}
+						if (alldiffbroken) {
+							break;
 						}
 					}
 				}
 				if (numTried == 0) {
-					if (check)
+					if (check) {
 						return true;
-					else
-						return propagateCheck();
+					}
+					return propagateCheck();
 				}
 			} else {
 				int root = chooseRoot();
 				if (root < 0)  // means all vars are fixed self-cycles
 				{
-					if (check)
+					if (check) {
 						return true;
-					else
-						return propagateCheck();
+					}
+					return propagateCheck();
 				}
-				if (!propagateSCC(root)) return false;
+				if (!propagateSCC(root)) {
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		new_fixed.clear();
 	}
@@ -1008,16 +1136,24 @@ public:
 void subcircuit(vec<IntVar*>& _x, int offset) {
 	all_different(_x, CL_DOM);
 	vec<IntView<> > x;
-	for (int i = 0; i < _x.size(); i++) _x[i]->specialiseToEL();
-	if (offset == 0)
-		for (int i = 0; i < _x.size(); i++) x.push(IntView<>(_x[i]));
-	else
-		for (int i = 0; i < _x.size(); i++) x.push(IntView<4>(_x[i], 1, -offset));
+	for (int i = 0; i < _x.size(); i++) {
+		_x[i]->specialiseToEL();
+	}
+	if (offset == 0) {
+		for (int i = 0; i < _x.size(); i++) {
+			x.push(IntView<>(_x[i]));
+		}
+	} else {
+		for (int i = 0; i < _x.size(); i++) {
+			x.push(IntView<4>(_x[i], 1, -offset));
+		}
+	}
 
-	if (offset == 0)
+	if (offset == 0) {
 		new SubCircuit<0>(x);
-	else
+	} else {
 		new SubCircuit<4>(x);
+	}
 }
 
 // mandatoryIndices does not need to include the start and end index

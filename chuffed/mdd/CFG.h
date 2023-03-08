@@ -1,7 +1,9 @@
-#ifndef __CFG_H__
-#define __CFG_H__
+#ifndef CFG_H_
+#define CFG_H_
+
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 namespace CFG {
 
@@ -15,7 +17,7 @@ class Span : public ProdR {
 public:
 	Span(int _low, int _high) : low(_low), high(_high) {}
 
-	bool check(int start, int end) {
+	bool check(int start, int end) override {
 		int span(end - start);
 		return low <= span && span <= high;
 	}
@@ -29,7 +31,7 @@ class Start : public ProdR {
 public:
 	Start(int _low, int _high) : low(_low), high(_high) {}
 
-	bool check(int start, int end) { return low <= start && start <= high; }
+	bool check(int start, int end) override { return low <= start && start <= high; }
 
 protected:
 	int low;
@@ -40,7 +42,7 @@ class SpanLB : public ProdR {
 public:
 	SpanLB(int _low) : low(_low) {}
 
-	bool check(int start, int end) {
+	bool check(int start, int end) override {
 		int span(end - start);
 		return low <= span;
 	}
@@ -52,7 +54,7 @@ protected:
 class LB : public ProdR {
 public:
 	LB(int _lb) : lb(_lb) {}
-	bool check(int start, int end) { return lb <= start; }
+	bool check(int start, int end) override { return lb <= start; }
 
 protected:
 	int lb;
@@ -88,13 +90,13 @@ inline Sym mkVar(int id) {
 	return p;
 }
 inline int symID(Sym p) { return p.x >> 1; }
-inline bool isVar(Sym p) { return p.x & 1; }
+inline bool isVar(Sym p) { return (p.x & 1) != 0; }
 
 class RSym {
 public:
-	RSym() : sym(mkTerm(0)), cond(NULL) {}
-	RSym(int i) : sym(mkTerm(i)), cond(NULL) {}
-	RSym(const Sym& _s) : sym(_s), cond(NULL) {}
+	RSym() : sym(mkTerm(0)), cond(nullptr) {}
+	RSym(int i) : sym(mkTerm(i)), cond(nullptr) {}
+	RSym(const Sym& _s) : sym(_s), cond(nullptr) {}
 	RSym(int i, ProdR* _p) : sym(mkTerm(i)), cond(_p) {}
 	RSym(const Sym& _s, ProdR* _p) : sym(_s), cond(_p) {}
 
@@ -126,7 +128,7 @@ class CFG;
 
 class Rule {
 public:
-	Rule(void) {}
+	Rule() {}
 
 	Rule& operator<<(RSym s) {
 		syms.push_back(s);
@@ -134,14 +136,14 @@ public:
 	}
 
 	Rule& operator<<(int n) {
-		syms.push_back(mkTerm(n));
+		syms.emplace_back(mkTerm(n));
 		return *this;
 	}
 
 	std::vector<RSym> syms;
 };
 
-Rule E(void) { return Rule(); }
+Rule E() { return Rule(); }
 
 class CFG {
 public:
@@ -153,17 +155,21 @@ public:
 	}
 
 	~CFG() {
-		for (unsigned int ii = 0; ii < conds.size(); ii++) delete conds[ii];
+		for (auto& cond : conds) {
+			delete cond;
+		}
 	}
 
-	Sym term(int i) { return mkTerm(i); }
+	static Sym term(int i) { return mkTerm(i); }
 	Sym var(int i) {
-		while (((int)prods.size()) <= i) prods.push_back(std::vector<ProdInfo>());
+		while (((int)prods.size()) <= i) {
+			prods.emplace_back();
+		}
 		return mkVar(i);
 	}
-	Sym newVar(void) {
+	Sym newVar() {
 		int id = prods.size();
-		prods.push_back(std::vector<ProdInfo>());
+		prods.emplace_back();
 		return mkVar(id);
 	}
 
@@ -172,7 +178,7 @@ public:
 		start = symID(s);
 	}
 
-	Sym startSym(void) const { return mkVar(start); }
+	Sym startSym() const { return mkVar(start); }
 
 	void prod(RSym p, const Rule& r) {
 		int r_id = rules.size();
@@ -182,7 +188,7 @@ public:
 
 	void rulePush(int id, Sym r) { rules[id].push_back(r); }
 
-	void normalize(void) {
+	void normalize() {
 		for (unsigned int ii = 0; ii < rules.size(); ii++) {
 			std::vector<RSym> nr(2);
 			while (rules[ii].size() > 2) {
@@ -194,17 +200,19 @@ public:
 
 				rules[ii].push_back(next);
 				rules.push_back(nr);
-				prods[symID(next)].push_back(ProdInfo(NULL, rules.size() - 1));
+				prods[symID(next)].push_back(ProdInfo(nullptr, rules.size() - 1));
 			}
 		}
 	}
 
-	void print(void) {
+	void print() {
 		for (unsigned int vv = 0; vv < prods.size(); vv++) {
 			std::cout << (char)('A' + vv) << " -> ";
 
 			for (unsigned int ri = 0; ri < prods[vv].size(); ri++) {
-				if (ri != 0) std::cout << "|";
+				if (ri != 0) {
+					std::cout << "|";
+				}
 				printRule(prods[vv][ri].rule);
 			}
 			std::cout << std::endl;
@@ -212,13 +220,13 @@ public:
 	}
 
 	void printRule(int r) {
-		if (rules[r].size() == 0) {
+		if (rules[r].empty()) {
 			std::cout << "e";
 			return;
 		}
 
-		for (unsigned int ii = 0; ii < rules[r].size(); ii++) {
-			std::cout << rules[r][ii].sym;
+		for (auto& ii : rules[r]) {
+			std::cout << ii.sym;
 		}
 	}
 

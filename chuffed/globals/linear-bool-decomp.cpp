@@ -3,12 +3,12 @@
 #include <chuffed/support/sparse_set.h>
 
 static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k);
-static Lit _bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
-														int k, int vv, int cc);
+static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
+													 int k, int vv, int cc);
 
 static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k);
-static Lit _bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
-																int k, int vv, int cc);
+static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
+															 int k, int vv, int cc);
 
 void bool_linear_decomp(vec<BoolView>& x, IntRelType t, int k) {
 	bool polarity;
@@ -32,11 +32,15 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, int k) {
 	}
 
 	vec<Lit> vs;
-	for (int ii = 0; ii < x.size(); ii++) vs.push(x[ii].getLit(polarity));
+	for (int ii = 0; ii < x.size(); ii++) {
+		vs.push(x[ii].getLit(polarity));
+	}
 
 #if 1
 	vec<Lit> terminals;
-	for (int ii = 0; ii <= k; ii++) terminals.push(lit_True);
+	for (int ii = 0; ii <= k; ii++) {
+		terminals.push(lit_True);
+	}
 
 	bool_linear_leq(terminals, vs, k);
 #else
@@ -74,17 +78,25 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 		return;
 	}
 
-	if (kv->setMinNotR(0)) kv->setMin(0);
-	if (kv->setMaxNotR(x.size())) kv->setMax(x.size());
+	if (kv->setMinNotR(0)) {
+		kv->setMin(0);
+	}
+	if (kv->setMaxNotR(x.size())) {
+		kv->setMax(x.size());
+	}
 	kv->specialiseToEL();
 
 	int k = kv->getMax();
 
 	vec<Lit> terminals;
-	for (int ii = 0; ii <= k; ii++) terminals.push(kv->getLit(ii, 2));  // kv >= ii
+	for (int ii = 0; ii <= k; ii++) {
+		terminals.push(kv->getLit(ii, 2));  // kv >= ii
+	}
 
 	vec<Lit> xv;
-	for (int ii = 0; ii < x.size(); ii++) xv.push(x[ii].getLit(1));
+	for (int ii = 0; ii < x.size(); ii++) {
+		xv.push(x[ii].getLit(true));
+	}
 
 #if 1
 	bool_linear_leq_std(terminals, xv, k);
@@ -104,15 +116,21 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	// Special cases
 	if (k == 0) {
-		for (int ii = 0; ii < xs.size(); ii++) sat.enqueue(~xs[ii]);
+		for (int ii = 0; ii < xs.size(); ii++) {
+			sat.enqueue(~xs[ii]);
+		}
 		return;
 	}
-	if (k >= xs.size()) return;
+	if (k >= xs.size()) {
+		return;
+	}
 
 	if (k == xs.size() - 1) {
 		// sum_i ~xs[i] >= 1
 		vec<Lit> cl;
-		for (int ii = 0; ii < xs.size(); ii++) cl.push(~xs[ii]);
+		for (int ii = 0; ii < xs.size(); ii++) {
+			cl.push(~xs[ii]);
+		}
 		sat.addClause(cl);
 		return;
 	}
@@ -121,7 +139,7 @@ static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	vec<Lit> vs;
 
 	// Should add stuff for nodes that are locked T.
-	Lit r = _bool_linear_leq(elts, vs, terminals, xs, k, 0, 0);
+	Lit r = bool_linear_leq(elts, vs, terminals, xs, k, 0, 0);
 	assert(r != lit_True);
 	sat.enqueue(r);
 }
@@ -130,21 +148,25 @@ static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 // xs the literals, s.t. \sum_{i} xs[i] <= k.
 
 // We're currently constructing the function for sum_{i \in 0..vv} xs[i] = cc.
-static Lit _bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
-														int k, int vv, int cc) {
-	if (cc > k) return lit_False;
+static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
+													 int k, int vv, int cc) {
+	if (cc > k) {
+		return lit_False;
+	}
 
 	if (vv == xs.size()) {
 		assert(cc < terminals.size());
 		return terminals[cc];
 	}
 
-	if (elts.elem(vv * (k + 1) + cc)) return vs[elts.pos(vv * (k + 1) + cc)];
+	if (elts.elem(vv * (k + 1) + cc)) {
+		return vs[elts.pos(vv * (k + 1) + cc)];
+	}
 
 	Lit ret;
 
-	Lit low = _bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc);
-	Lit high = _bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc + 1);
+	Lit low = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc);
+	Lit high = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc + 1);
 
 	if (low == lit_False) {
 		assert(high == lit_False);
@@ -156,7 +178,7 @@ static Lit _bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals
 		assert(low != high);
 
 		// Actually going to need to introduce a node variable.
-		ret = Lit(sat.newVar(), 1);
+		ret = Lit(sat.newVar(), true);
 
 		// Introduce the clauses.
 		if (low != lit_True) {
@@ -180,7 +202,9 @@ static Lit _bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals
 static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	// Special cases
 	if (k == 0) {
-		for (int ii = 0; ii < xs.size(); ii++) sat.enqueue(~xs[ii]);
+		for (int ii = 0; ii < xs.size(); ii++) {
+			sat.enqueue(~xs[ii]);
+		}
 		return;
 	}
 #if 0
@@ -202,15 +226,17 @@ static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	vec<Lit> vs;
 
 	// Should add stuff for nodes that are locked T.
-	Lit r = _bool_linear_leq_std(elts, vs, terminals, xs, k, 0, 0);
+	Lit r = bool_linear_leq_std(elts, vs, terminals, xs, k, 0, 0);
 	assert(r != lit_True);
 	sat.enqueue(r);
 }
 
 // We're currently constructing the function for sum_{i \in 0..vv} xs[i] = cc.
-static Lit _bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
-																int k, int vv, int cc) {
-	if (cc > k) return lit_False;
+static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,
+															 int k, int vv, int cc) {
+	if (cc > k) {
+		return lit_False;
+	}
 
 	if (vv == xs.size()) {
 		assert(cc < terminals.size());
@@ -224,8 +250,8 @@ static Lit _bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termi
 
 	Lit ret;
 
-	Lit low = _bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc);
-	Lit high = _bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc + 1);
+	Lit low = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc);
+	Lit high = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc + 1);
 
 	if (low == lit_False) {
 		assert(high == lit_False);
@@ -237,7 +263,7 @@ static Lit _bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termi
 		assert(low != high);
 
 		// Actually going to need to introduce a node variable.
-		ret = Lit(sat.newVar(), 1);
+		ret = Lit(sat.newVar(), true);
 
 		// Introduce the clauses.
 #if 0

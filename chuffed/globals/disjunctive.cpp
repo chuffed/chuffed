@@ -49,15 +49,20 @@ public:
 		return Reason(prop_id, p_info.size() - 1);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		trailed_pinfo_sz = false;
 
-		for (int i = 0; i < x.size(); i++) old_est[i] = est(i);
 		for (int i = 0; i < x.size(); i++) {
-			int b = INT_MIN, e = INT_MIN;
+			old_est[i] = est(i);
+		}
+		for (int i = 0; i < x.size(); i++) {
+			int b = INT_MIN;
+			int e = INT_MIN;
 			for (int ests_i = 0; ests_i < x.size(); ests_i++) {
 				int j = ests[ests_i];
-				if (!pred[j][i].isTrue()) continue;
+				if (!pred[j][i].isTrue()) {
+					continue;
+				}
 				if (old_est[j] >= b) {
 					e = b = old_est[j];
 				}
@@ -68,13 +73,15 @@ public:
 					fprintf(stderr, "%% prop_id = %d, var_id = %d, i = %d, b = %d\n", prop_id, x[i]->var_id,
 									i, b);
 				}
-				if (!x[i]->setMin(b, createReason(i, e))) return false;
+				if (!x[i]->setMin(b, createReason(i, e))) {
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) {
+	Clause* explain(Lit p, int inf_id) override {
 		Pinfo& pi = p_info[inf_id];
 		/*
 				fprintf(stderr, "var = %d, est = %d\n", pi.var, pi.est);
@@ -128,7 +135,9 @@ public:
 		expl->temp_expl = 1;
 		sat.rtrail.last().push(expl);
 
-		if (DISJ_DEBUG) fprintf(stderr, "BP explain: length %d\n", expl->size());
+		if (DISJ_DEBUG) {
+			fprintf(stderr, "BP explain: length %d\n", expl->size());
+		}
 
 		return expl;
 	}
@@ -142,7 +151,7 @@ class DisjunctiveEF : public Propagator {
 		int var;       // task which has to be after set of other tasks
 		int let;       // let of set used to make inference
 		Clause* expl;  // explanation for inference
-		Pinfo(int _ps_i, int _var, int _let) : ps_i(_ps_i), var(_var), let(_let), expl(NULL) {}
+		Pinfo(int _ps_i, int _var, int _let) : ps_i(_ps_i), var(_var), let(_let), expl(nullptr) {}
 	};
 
 	bool trailed_pinfo_sz;
@@ -174,25 +183,25 @@ public:
 
 	struct SortEstAsc {
 		DisjunctiveEF* p;
-		bool operator()(int i, int j) { return p->est(i) < p->est(j); }
+		bool operator()(int i, int j) const { return p->est(i) < p->est(j); }
 		SortEstAsc(DisjunctiveEF* _p) : p(_p) {}
 	} sort_est_asc;
 
 	struct SortEstDsc {
 		DisjunctiveEF* p;
-		bool operator()(int i, int j) { return p->est(i) > p->est(j); }
+		bool operator()(int i, int j) const { return p->est(i) > p->est(j); }
 		SortEstDsc(DisjunctiveEF* _p) : p(_p) {}
 	} sort_est_dsc;
 
 	struct SortLetAsc {
 		DisjunctiveEF* p;
-		bool operator()(int i, int j) { return p->let(i) < p->let(j); }
+		bool operator()(int i, int j) const { return p->let(i) < p->let(j); }
 		SortLetAsc(DisjunctiveEF* _p) : p(_p) {}
 	} sort_let_asc;
 
 	struct SortLetDsc {
 		DisjunctiveEF* p;
-		bool operator()(int i, int j) { return p->let(i) > p->let(j); }
+		bool operator()(int i, int j) const { return p->let(i) > p->let(j); }
 		SortLetDsc(DisjunctiveEF* _p) : p(_p) {}
 	} sort_let_dsc;
 
@@ -208,7 +217,9 @@ public:
 
 		// create all intermediate precedence literals
 		pred = (BoolView**)malloc(x.size() * sizeof(BoolView*));
-		for (int i = 0; i < x.size(); i++) pred[i] = (BoolView*)malloc(x.size() * sizeof(BoolView));
+		for (int i = 0; i < x.size(); i++) {
+			pred[i] = (BoolView*)malloc(x.size() * sizeof(BoolView));
+		}
 		for (int i = 0; i < x.size(); i++) {
 			for (int j = i + 1; j < x.size(); j++) {
 				BoolView r = newBoolVar();
@@ -221,17 +232,21 @@ public:
 		}
 
 		// initialise data structures
-		ps_times = (Tint*)malloc(4 * x.size() * sizeof(Tint));
-		ps_tasks = (Tint*)malloc(4 * x.size() * sizeof(Tint));
+		ps_times = (Tint*)malloc(static_cast<size_t>(4 * x.size()) * sizeof(Tint));
+		ps_tasks = (Tint*)malloc(static_cast<size_t>(4 * x.size()) * sizeof(Tint));
 		residual = (Tint*)malloc(x.size() * sizeof(Tint));
 
 		ests = (int*)malloc(x.size() * sizeof(int));
 		lets = (int*)malloc(x.size() * sizeof(int));
 
-		for (int i = 0; i < x.size(); i++) ests[i] = lets[i] = i;
+		for (int i = 0; i < x.size(); i++) {
+			ests[i] = lets[i] = i;
+		}
 
 		// attach to var events
-		for (int i = 0; i < x.size(); i++) x[i]->attach(this, i, EVENT_LU);
+		for (int i = 0; i < x.size(); i++) {
+			x[i]->attach(this, i, EVENT_LU);
+		}
 
 		bp = new DisjunctiveBP(x, dur, pred, ests, lets);
 	}
@@ -278,7 +293,9 @@ public:
 	}
 
 	bool doEdgeFinding() {
-		for (int i = 0; i < x.size(); i++) residual[i] = dur[i];
+		for (int i = 0; i < x.size(); i++) {
+			residual[i] = dur[i];
+		}
 
 		// create pre-emptive schedule
 
@@ -303,7 +320,9 @@ public:
 			// process newly available tasks
 			for (; ests_i < x.size(); ests_i++) {
 				int task = ests[ests_i];
-				if (x[task]->getMin() > cur_time) break;
+				if (x[task]->getMin() > cur_time) {
+					break;
+				}
 				assert(x[task]->getMin() == cur_time);
 
 				// add task to priority queue
@@ -315,19 +334,27 @@ public:
 				int eet = cur_time + dur[task];
 				for (lets_i = lets_comp; let(lets[--lets_i]) < let(task);) {
 					eet += residual[lets[lets_i]];
-					if (eet > let(lets[lets_i])) break;
+					if (eet > let(lets[lets_i])) {
+						break;
+					}
 				}
 
 				// no precedences can be inferred
-				if (let(lets[lets_i]) == let(task)) continue;
+				if (let(lets[lets_i]) == let(task)) {
+					continue;
+				}
 
 				// precedences can be inferred
 				Reason r = createReason(ps_i, task, let(lets[lets_i]));
 				for (int i = lets_i; i < lets_comp; i++) {
-					if (residual[lets[i]] == 0) continue;
+					if (residual[lets[i]] == 0) {
+						continue;
+					}
 					BoolView& v = pred[lets[i]][task];
-					if (v.setValNotR(1)) {
-						if (!v.setVal(1, r)) return false;
+					if (v.setValNotR(true)) {
+						if (!v.setVal(true, r)) {
+							return false;
+						}
 					}
 				}
 			}
@@ -352,9 +379,13 @@ public:
 					cur_time += res;
 					res = 0;
 					pqueue.removeMin();
-					while (lets_comp && residual[lets[lets_comp - 1]] == 0) lets_comp--;
+					while ((lets_comp != 0) && residual[lets[lets_comp - 1]] == 0) {
+						lets_comp--;
+					}
 					//					fprintf(stderr, "lets_comp = %d\n", lets_comp);
-					if (lets_comp == 0) break;
+					if (lets_comp == 0) {
+						break;
+					}
 				} else {
 					// do some of highest priority task
 					//					fprintf("f%d, ", next_lb - cur_time);
@@ -393,13 +424,17 @@ public:
 
 				fprintf(stderr, "task = %d, cur_time = %d, in: \n", task, ps_times[ps_i]);
 		*/
-		for (int i = 0; i < x.size(); i++) in[i] = false;
+		for (int i = 0; i < x.size(); i++) {
+			in[i] = false;
+		}
 		in[task] = true;
 
 		while (ps_times[ps_i--] > set_est) {
 			if (!in[ps_tasks[ps_i]]) {
 				in[ps_tasks[ps_i]] = true;
-				if (est(ps_tasks[ps_i]) < set_est) set_est = est(ps_tasks[ps_i]);
+				if (est(ps_tasks[ps_i]) < set_est) {
+					set_est = est(ps_tasks[ps_i]);
+				}
 			}
 		}
 		/*
@@ -413,7 +448,9 @@ public:
 
 		// can lift!
 		for (int i = 0; i < x.size(); i++) {
-			if (!in[i]) continue;
+			if (!in[i]) {
+				continue;
+			}
 			ps.push(x[i]->getMinLit());
 			ps.push(x[i]->getMaxLit());
 		}
@@ -432,11 +469,13 @@ public:
 		sat.rtrail.last().push(expl);
 		sat.confl = expl;
 
-		if (DISJ_DEBUG) fprintf(stderr, "EF fail: length %d\n", expl->size());
+		if (DISJ_DEBUG) {
+			fprintf(stderr, "EF fail: length %d\n", expl->size());
+		}
 		delete[] in;
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		trailed_pinfo_sz = false;
 
 		// sort vars based on est and let
@@ -444,16 +483,22 @@ public:
 		sort(lets, lets + x.size(), sort_let_dsc);
 
 		//		if (!findBasicPrecedences()) return false;
-		if (so.disj_edge_find && !doEdgeFinding()) return false;
-		if (so.disj_set_bp && !bp->propagate()) return false;
+		if (so.disj_edge_find && !doEdgeFinding()) {
+			return false;
+		}
+		if (so.disj_set_bp && !bp->propagate()) {
+			return false;
+		}
 
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) {
+	Clause* explain(Lit p, int inf_id) override {
 		Pinfo& pi = p_info[inf_id];
 
-		if (pi.expl != NULL) return pi.expl;
+		if (pi.expl != nullptr) {
+			return pi.expl;
+		}
 
 		// find set which forced the precedence
 		//		bool in[x.size()];
@@ -464,7 +509,9 @@ public:
 		for (int i = 0; i < x.size(); i++) {
 			if (let(i) <= pi.let && residual[i] > 0) {
 				in[i] = true;
-				if (est(i) < set_est) set_est = est(i);
+				if (est(i) < set_est) {
+					set_est = est(i);
+				}
 			} else {
 				in[i] = false;
 			}
@@ -476,7 +523,9 @@ public:
 		while (ps_times[ps_i--] > set_est) {
 			if (!in[ps_tasks[ps_i]]) {
 				in[ps_tasks[ps_i]] = true;
-				if (est(ps_tasks[ps_i]) < set_est) set_est = est(ps_tasks[ps_i]);
+				if (est(ps_tasks[ps_i]) < set_est) {
+					set_est = est(ps_tasks[ps_i]);
+				}
 			}
 		}
 
@@ -516,7 +565,9 @@ public:
 		// can lift!
 		ps.push(x[pi.var]->getMinLit());
 		for (int i = 0; i < x.size(); i++) {
-			if (!in[i]) continue;
+			if (!in[i]) {
+				continue;
+			}
 			ps.push(x[i]->getMinLit());
 			ps.push(x[i]->getMaxLit());
 		}
@@ -536,7 +587,9 @@ public:
 
 		pi.expl = expl;
 
-		if (DISJ_DEBUG) fprintf(stderr, "EF explain: length %d\n", expl->size());
+		if (DISJ_DEBUG) {
+			fprintf(stderr, "EF explain: length %d\n", expl->size());
+		}
 
 		delete[] in;
 

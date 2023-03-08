@@ -67,13 +67,17 @@ static inline bool isEof(const char* in) { return *in == '\0'; }
 
 template <class B>
 static void skipWhitespace(B& in) {
-	while ((*in >= 9 && *in <= 13) || *in == 32) ++in;
+	while ((*in >= 9 && *in <= 13) || *in == 32) {
+		++in;
+	}
 }
 
 template <class B>
 static void skipLine(B& in) {
 	for (;;) {
-		if (isEof(in)) return;
+		if (isEof(in)) {
+			return;
+		}
 		if (*in == '\n') {
 			++in;
 			return;
@@ -87,12 +91,17 @@ static int parseInt(B& in) {
 	int val = 0;
 	bool neg = false;
 	skipWhitespace(in);
-	if (*in == '-')
+	if (*in == '-') {
 		neg = true, ++in;
-	else if (*in == '+')
+	} else if (*in == '+') {
 		++in;
-	if (*in < '0' || *in > '9') fprintf(stderr, "PARSE ERROR! Unexpected char: %c\n", *in), exit(3);
-	while (*in >= '0' && *in <= '9') val = val * 10 + (*in - '0'), ++in;
+	}
+	if (*in < '0' || *in > '9') {
+		fprintf(stderr, "PARSE ERROR! Unexpected char: %c\n", *in), exit(3);
+	}
+	while (*in >= '0' && *in <= '9') {
+		val = val * 10 + (*in - '0'), ++in;
+	}
 	return neg ? -val : val;
 }
 
@@ -101,8 +110,11 @@ static int parseInt(B& in) {
 template <class B>
 static bool match(B& in, const char* str) {
 	int i;
-	for (i = 0; str[i] != '\0'; i++)
-		if (in[i] != str[i]) return false;
+	for (i = 0; str[i] != '\0'; i++) {
+		if (in[i] != str[i]) {
+			return false;
+		}
+	}
 
 	in += i;
 
@@ -112,8 +124,11 @@ static bool match(B& in, const char* str) {
 // String matching: consumes characters eagerly, but does not require random access iterator.
 template <class B>
 static bool eagerMatch(B& in, const char* str) {
-	for (; *str != '\0'; ++str, ++in)
-		if (*str != *in) return false;
+	for (; *str != '\0'; ++str, ++in) {
+		if (*str != *in) {
+			return false;
+		}
+	}
 	return true;
 }
 

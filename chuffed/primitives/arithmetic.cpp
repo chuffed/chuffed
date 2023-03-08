@@ -16,7 +16,7 @@ public:
 		y.attach(this, 1, EVENT_U);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		int64_t l = x.getMin();
 		int64_t u = x.getMax();
 
@@ -54,7 +54,7 @@ public:
 		return true;
 	}
 
-	bool check() {
+	bool check() override {
 		return ((x.getShadowVal() == y.getShadowVal()) || (x.getShadowVal() == -y.getShadowVal()));
 	}
 };
@@ -72,10 +72,16 @@ void int_abs(IntVar* x, IntVar* y) {
 
 int64_t my_pow(const int64_t base, const int64_t exponent) {
 	assert(exponent >= 0);
-	if (exponent == 0) return 1;
-	if (base == 0) return 0;
+	if (exponent == 0) {
+		return 1;
+	}
+	if (base == 0) {
+		return 0;
+	}
 	int64_t z = base;
-	for (int i = 1; i < exponent; i++) z *= base;
+	for (int i = 1; i < exponent; i++) {
+		z *= base;
+	}
 	return z;
 }
 
@@ -95,17 +101,27 @@ public:
 		z.attach(this, 2, EVENT_LU);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// Check for case 0
-		if (!propagate_case_zero()) return false;
+		if (!propagate_case_zero()) {
+			return false;
+		}
 		// Check for case 1
-		if (!propagate_case_one()) return false;
+		if (!propagate_case_one()) {
+			return false;
+		}
 		// Propagation on z
-		if (!propagate_z()) return false;
+		if (!propagate_z()) {
+			return false;
+		}
 		// Propagation on x
-		if (!propagate_x()) return false;
+		if (!propagate_x()) {
+			return false;
+		}
 		// Propagation on y
-		if (!propagate_y()) return false;
+		if (!propagate_y()) {
+			return false;
+		}
 
 		return true;
 	}
@@ -161,7 +177,9 @@ public:
 		int64_t x_min_new = ceil(pow_res);
 		if (x_min_new > x.getMin()) {
 			// Check for numerical errors and correct them
-			if (z.getMin() <= my_pow(x_min_new - 1, y.getMax())) x_min_new--;
+			if (z.getMin() <= my_pow(x_min_new - 1, y.getMax())) {
+				x_min_new--;
+			}
 			setDom(x, setMin, x_min_new, z.getMinLit(), y.getMaxLit());
 		}
 		// Propagation on the upper bound
@@ -169,7 +187,9 @@ public:
 		int64_t x_max_new = floor(pow_res);
 		if (x_max_new < x.getMax()) {
 			// Check for numerical errors and correct them
-			if (z.getMax() >= my_pow(x_max_new + 1, y.getMin())) x_max_new++;
+			if (z.getMax() >= my_pow(x_max_new + 1, y.getMin())) {
+				x_max_new++;
+			}
 			setDom(x, setMax, x_max_new, z.getMaxLit(), y.getMinLit());
 		}
 		return true;
@@ -184,7 +204,9 @@ public:
 			int64_t y_min_new = ceil(log_res);
 			if (y_min_new > y.getMin()) {
 				// Check for numerical errors and correct them
-				if (z.getMin() <= my_pow(x.getMax(), y_min_new - 1)) y_min_new--;
+				if (z.getMin() <= my_pow(x.getMax(), y_min_new - 1)) {
+					y_min_new--;
+				}
 				setDom(y, setMin, y_min_new, z.getMinLit(), x.getMaxLit());
 			}
 		}
@@ -194,7 +216,9 @@ public:
 			int64_t y_max_new = floor(log_res);
 			if (y_max_new < y.getMax()) {
 				// Check for numerical errors and correct them
-				if (z.getMax() <= my_pow(x.getMin(), y_max_new + 1)) y_max_new++;
+				if (z.getMax() <= my_pow(x.getMin(), y_max_new + 1)) {
+					y_max_new++;
+				}
 				setDom(x, setMax, y_max_new, z.getMaxLit(), x.getMinLit());
 			}
 		}
@@ -208,9 +232,10 @@ void int_pow(IntVar* x, IntVar* y, IntVar* z) {
 	if (0 <= x->getMin() && 0 < y->getMin()) {
 		int_rel(z, IRT_GE, 0);
 		new PowerPos<0, 0, 0>(IntView<>(x), IntView<>(y), IntView<>(z));
-	} else
+	} else {
 		CHUFFED_ERROR(
 				"The constraint int_pow is not yet supported for non-negative base and exponent integer!");
+	}
 }
 
 //-----
@@ -232,23 +257,29 @@ public:
 		z.attach(this, 2, EVENT_LU);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		const int64_t x_min = x.getMin();
 		const int64_t x_max = x.getMax();
 		const int64_t y_min = y.getMin();
 		const int64_t y_max = y.getMax();
 
 		// Propagating the bounds on z
-		if (!propagate_z(x_min, x_max, y_min, y_max)) return false;
+		if (!propagate_z(x_min, x_max, y_min, y_max)) {
+			return false;
+		}
 
 		const int64_t z_min = z.getMin();
 		const int64_t z_max = z.getMax();
 
 		// Propagating the bounds on x
-		if (!propagate_xy(x, y, y_min, y_max, z_min, z_max)) return false;
+		if (!propagate_xy(x, y, y_min, y_max, z_min, z_max)) {
+			return false;
+		}
 
 		// Propagating the bounds on y
-		if (!propagate_xy(y, x, x_min, x_max, z_min, z_max)) return false;
+		if (!propagate_xy(y, x, x_min, x_max, z_min, z_max)) {
+			return false;
+		}
 
 		return true;
 	}
@@ -339,8 +370,12 @@ public:
 				}
 				setDom(v, setMax, -1, reason);
 			} else {
-				if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max)) return false;
-				if (!propagate_xy_max(u, v, v_min, v_max, z_min, z_max)) return false;
+				if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max)) {
+					return false;
+				}
+				if (!propagate_xy_max(u, v, v_min, v_max, z_min, z_max)) {
+					return false;
+				}
 			}
 		} else if (z_max < 0) {
 			if (v_min == 0) {
@@ -362,8 +397,12 @@ public:
 				}
 				setDom(v, setMax, -1, reason);
 			} else {
-				if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max)) return false;
-				if (!propagate_xy_max(u, v, v_min, v_max, z_min, z_max)) return false;
+				if (!propagate_xy_min(u, v, v_min, v_max, z_min, z_max)) {
+					return false;
+				}
+				if (!propagate_xy_max(u, v, v_min, v_max, z_min, z_max)) {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -471,16 +510,20 @@ public:
 		z.attach(this, 2, EVENT_LU);
 	}
 
-	bool propagate() {
-		int64_t x_min = x.getMin(), x_max = x.getMax();
-		int64_t y_min = y.getMin(), y_max = y.getMax();
-		int64_t z_min = z.getMin(), z_max = z.getMax();
+	bool propagate() override {
+		int64_t x_min = x.getMin();
+		int64_t x_max = x.getMax();
+		int64_t y_min = y.getMin();
+		int64_t y_max = y.getMax();
+		int64_t z_min = z.getMin();
+		int64_t z_max = z.getMax();
 
 		// z >= x.min * y.min
 		setDom(z, setMin, x_min * y_min, x.getMinLit(), y.getMinLit());
 		// z <= x.max * y.max
-		if (x_max * y_max < IntVar::max_limit)
+		if (x_max * y_max < IntVar::max_limit) {
 			setDom(z, setMax, x_max * y_max, x.getMaxLit(), y.getMaxLit());
+		}
 
 		// x >= ceil(z.min / y.max)
 		if (y_max >= 1) {
@@ -505,19 +548,23 @@ public:
 		return true;
 	}
 
-	bool check() { return (x.getShadowVal() * y.getShadowVal() == z.getShadowVal()); }
+	bool check() override { return (x.getShadowVal() * y.getShadowVal() == z.getShadowVal()); }
 };
 
 int get_sign(IntVar* x) {
-	if (x->getMin() >= 0) return 1;
-	if (x->getMax() <= 0) return -1;
+	if (x->getMin() >= 0) {
+		return 1;
+	}
+	if (x->getMax() <= 0) {
+		return -1;
+	}
 	return 0;
 }
 
 // z = x * y
 
 void int_times(IntVar* x, IntVar* y, IntVar* z) {
-	if (!get_sign(x) || !get_sign(y) || !get_sign(z)) {
+	if ((get_sign(x) == 0) || (get_sign(y) == 0) || (get_sign(z) == 0)) {
 		new TimesAll<0, 0, 0>(IntView<>(x), IntView<>(y), IntView<>(z));
 	} else {
 		bool x_flip = (get_sign(x) == -1);
@@ -563,10 +610,13 @@ public:
 		z.attach(this, 2, EVENT_LU);
 	}
 
-	bool propagate() {
-		int64_t x_min = x.getMin(), x_max = x.getMax();
-		int64_t y_min = y.getMin(), y_max = y.getMax();
-		int64_t z_min = z.getMin(), z_max = z.getMax();
+	bool propagate() override {
+		int64_t x_min = x.getMin();
+		int64_t x_max = x.getMax();
+		int64_t y_min = y.getMin();
+		int64_t y_max = y.getMax();
+		int64_t z_min = z.getMin();
+		int64_t z_max = z.getMax();
 
 		// z >= ceil(x.min / y.max)
 		setDom(z, setMin, (x_min + y_max - 1) / y_max, x.getMinLit(), y.getMaxLit());
@@ -591,13 +641,16 @@ public:
 		return true;
 	}
 
-	bool check() { return ((int)ceil(x.getShadowVal() / y.getShadowVal()) == z.getShadowVal()); }
+	bool check() override {
+		auto ceil_div = [](int64_t x, int64_t y) { return (x + (y - 1)) / y; };
+		return ceil_div(x.getShadowVal(), y.getShadowVal()) == z.getShadowVal();
+	}
 };
 
 // z = floor(x / y)
 
 void int_div(IntVar* x, IntVar* y, IntVar* z) {
-	if (!get_sign(x) || !get_sign(y) || !get_sign(z)) {
+	if ((get_sign(x) == 0) || (get_sign(y) == 0) || (get_sign(z) == 0)) {
 		CHUFFED_ERROR("Cannot handle non-sign-fixed vars\n");
 	}
 	bool x_flip = (get_sign(x) == -1);
@@ -637,7 +690,7 @@ public:
 		z.attach(this, 2, EVENT_L);
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// make a less than or equal to min(max(b_i))
 
 		setDom(z, setMax, x.getMax(), x.getMaxLit());
@@ -649,16 +702,24 @@ public:
 		setDom(x, setMin, z.getMin(), z.getMinLit());
 		setDom(y, setMin, z.getMin(), z.getMinLit());
 
-		if (z.getMin() == x.getMax() || z.getMin() == y.getMax()) satisfied = true;
+		if (z.getMin() == x.getMax() || z.getMin() == y.getMax()) {
+			satisfied = true;
+		}
 
 		return true;
 	}
 
-	bool check() { return ((int)std::min(x.getShadowVal(), y.getShadowVal()) == z.getShadowVal()); }
+	bool check() override {
+		return ((int)std::min(x.getShadowVal(), y.getShadowVal()) == z.getShadowVal());
+	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
-		if (z.getMin() == x.getMax() || z.getMin() == y.getMax()) satisfied = true;
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
+		if (z.getMin() == x.getMax() || z.getMin() == y.getMax()) {
+			satisfied = true;
+		}
 		return 3;
 	}
 };

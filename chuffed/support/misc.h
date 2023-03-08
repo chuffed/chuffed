@@ -12,11 +12,11 @@
 #include <winsock2.h>
 #endif
 #include <windows.h>
-#define __SEP__ '\\'
+#define SEP_ '\\'
 #else
 #include <sys/time.h>
 #include <unistd.h>
-#define __SEP__ '/'
+#define SEP_ '/'
 #endif
 
 #include <chuffed/support/vec.h>
@@ -25,22 +25,22 @@
 
 extern uint64_t bit[65];
 
-#define low(s) ((int)(s))
-#define high(s) ((int)((s) >> 32))
+// #define low(s) ((int)(s))
+// #define high(s) ((int)((s) >> 32))
 #define inSet(i, s) (bit[(i)] & (s))
 #define getbit(i, s) (((s) >> (i)) & 1)
 
 //------
 #ifdef NDEBUG
-#define __FILENAME__ (strrchr(__FILE__, __SEP__) ? strrchr(__FILE__, __SEP__) + 1 : __FILE__)
+#define FILENAME_ (strrchr(__FILE__, SEP_) ? strrchr(__FILE__, SEP_) + 1 : __FILE__)
 #else
-#define __FILENAME__ __FILE__
+#define FILENAME_ __FILE__
 #endif
-#define CHUFFED_ERROR(...)                              \
-	do {                                                  \
-		fprintf(stderr, "%s:%d: ", __FILENAME__, __LINE__); \
-		fprintf(stderr, __VA_ARGS__);                       \
-		abort();                                            \
+#define CHUFFED_ERROR(...)                           \
+	do {                                               \
+		fprintf(stderr, "%s:%d: ", FILENAME_, __LINE__); \
+		fprintf(stderr, __VA_ARGS__);                    \
+		abort();                                         \
 	} while (0)
 
 #define NOT_SUPPORTED CHUFFED_ERROR("Not yet supported\n")
@@ -83,7 +83,7 @@ static inline unsigned int myrand(int& rseed) {
 	return (rseed = (long long)1103515245 * rseed + 12345);
 }
 
-#define irand(n) ((int)floor(myrand(so.rnd_seed) / MYRAND_MAX * n))
+#define irand(n) ((int)floor(myrand(so.rnd_seed) / MYRAND_MAX * (n)))
 
 //------
 
@@ -122,7 +122,7 @@ static inline double wallClockTime() {
 	return (double)sec + (double)msec / 1000;
 #else
 	struct timeval tp;
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, nullptr);
 	return (double)tp.tv_sec + (double)tp.tv_usec / 1000000;
 #endif
 }

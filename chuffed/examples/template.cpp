@@ -43,13 +43,12 @@ public:
 	}
 
 	// Function to print out solution
-
-	void print() {
+	void print(std::ostream& out) override {
 		for (int i = 0; i < n; i++) {
-			printf("%d, ", x[i]->getVal());
+			out << x[i]->getVal() << ", ";
 		}
-		printf("\n");
-	}
+		out << "\n";
+	};
 };
 
 int main(int argc, char** argv) {

@@ -11,8 +11,10 @@ public:
 		x->attach(this, 0, EVENT_LU);
 	}
 
-	bool propagate() {
-		if (y->getMin() < 1) setDom((*y), setMin, 1, y->getMinLit());
+	bool propagate() override {
+		if (y->getMin() < 1) {
+			setDom((*y), setMin, 1, y->getMinLit());
+		}
 		setDom((*y), setMax, x->getMax() - x->getMin() + 1, x->getMinLit(), x->getMaxLit());
 		return true;
 	}

@@ -1,5 +1,5 @@
-#ifndef __CYK_H__
-#define __CYK_H__
+#ifndef CYK_H_
+#define CYK_H_
 #include <chuffed/mdd/CFG.h>
 
 #include <map>
@@ -18,9 +18,13 @@ cyk_sig mk_sig(CFG::Sym s, int start, int end) {
 
 struct cyk_clt {
 	bool operator()(const cyk_sig a, const cyk_sig b) const {
-		if (a.s != b.s) return a.s < b.s;
+		if (a.s != b.s) {
+			return a.s < b.s;
+		}
 
-		if (a.start != b.start) return a.start < b.start;
+		if (a.start != b.start) {
+			return a.start < b.start;
+		}
 
 		return a.end < b.end;
 	}
@@ -36,7 +40,7 @@ public:
 	CYKParser(F _fff, CFG::CFG& _g, std::vector<std::vector<F> >& _vars)
 			: g(_g), fff(_fff), vars(_vars) {}
 
-	F parse(void) {
+	F parse() {
 		g.normalize();
 		return part(g.startSym(), 0, vars.size());
 	}
@@ -44,22 +48,25 @@ public:
 	F part(CFG::Sym s, int start, int end) {
 		cyk_sig sig = mk_sig(s, start, end);
 
-		typename CacheT::iterator cval = cache.find(sig);
+		auto cval = cache.find(sig);
 
-		if (cval != cache.end()) return fs[(*cval).second];
+		if (cval != cache.end()) {
+			return fs[(*cval).second];
+		}
 
 		if (!isVar(s)) {
-			if (end == start + 1 && ((unsigned int)symID(s)) < vars[start].size())
+			if (end == start + 1 && ((unsigned int)symID(s)) < vars[start].size()) {
 				return vars[start][symID(s)];
-			else
-				return fff;
+			}
+			return fff;
 		}
 
 		F ret(fff);
 		int vid(symID(s));
-		for (unsigned int pi = 0; pi < g.prods[vid].size(); pi++) {
-			CFG::ProdInfo pinf(g.prods[vid][pi]);
-			if (!pinf.cond || pinf.cond->check(start, end)) ret = ret | prod(pinf.rule, start, end);
+		for (auto pinf : g.prods[vid]) {
+			if ((pinf.cond == nullptr) || pinf.cond->check(start, end)) {
+				ret = ret | prod(pinf.rule, start, end);
+			}
 		}
 
 		int rindex = fs.size();
@@ -72,10 +79,10 @@ public:
 		std::vector<F> partial;
 
 		if (g.rules[r_id].size() == 1) {
-			if (!g.rules[r_id][0].cond || g.rules[r_id][0].cond->check(start, end))
+			if ((g.rules[r_id][0].cond == nullptr) || g.rules[r_id][0].cond->check(start, end)) {
 				return part(g.rules[r_id][0].sym, start, end);
-			else
-				return fff;
+			}
+			return fff;
 		}
 
 		// Assumes binary.
@@ -86,8 +93,10 @@ public:
 		for (int si = start + 1; si < end; si++) {
 			CFG::RSym& r0(g.rules[r_id][0]);
 			CFG::RSym& r1(g.rules[r_id][1]);
-			if ((!r0.cond || r0.cond->check(start, si)) && (!r1.cond || r1.cond->check(si, end)))
+			if (((r0.cond == nullptr) || r0.cond->check(start, si)) &&
+					((r1.cond == nullptr) || r1.cond->check(si, end))) {
 				ret = ret | (part(r0.sym, start, si) & part(r1.sym, si, end));
+			}
 		}
 
 		return ret;

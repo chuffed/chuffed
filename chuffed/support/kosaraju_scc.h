@@ -47,12 +47,12 @@ public:
 	inline int nb_sccs() { return sccs.size(); }
 
 	// Levels
-	void __set_levels(int start, int sink);
+	void _set_levels(int start, int sink);
 	void topological_sort(int u, std::vector<std::vector<int> >& out,
 												std::vector<std::vector<int> >& ends, std::queue<int>& sort,
 												std::vector<bool>& seen);
 	void _set_levels(int u, bool vis[], std::unordered_map<int, bool>& mscc, int parent = -1,
-									 std::string dges = "");
+									 std::string des = "");
 	void set_levels(int start, int sink);
 	inline int level_of_scc(int scc) { return levels[scc]; }
 	inline bool scc_mand(int scc) { return is_mand[scc]; }

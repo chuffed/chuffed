@@ -1,5 +1,7 @@
-#ifndef __BITVEC_H__
-#define __BITVEC_H__
+#ifndef BITVEC_H_
+#define BITVEC_H_
+
+#include <chuffed/core/engine.h>
 
 #include <cassert>
 #include <cstdlib>
@@ -32,7 +34,7 @@ public:
 		}
 	}
 
-	~ValVec(void) { free(data); }
+	~ValVec() { free(data); }
 
 	unsigned int operator[](unsigned int el) {
 		unsigned int shift = B * (el % eltsT);
@@ -50,20 +52,22 @@ public:
 		if (elts + 1 >= sz * eltsT) {
 			unsigned int newsz = 2 * sz;
 			data = (T*)realloc(data, sizeof(T) * sz);
-			for (; sz < newsz; sz++) data[sz] = 0;
+			for (; sz < newsz; sz++) {
+				data[sz] = 0;
+			}
 		}
 
 		set(elts, val);
 		elts++;
 	}
 
-	unsigned int pop(void) {
+	unsigned int pop() {
 		assert(elts > 0);
 		elts--;
 		return (*this)[elts];
 	}
 
-	unsigned int size(void) { return elts; }
+	unsigned int size() { return elts; }
 
 protected:
 	unsigned int elts;
@@ -82,7 +86,7 @@ public:
 		}
 	}
 
-	~BitVec(void) { free(data); }
+	~BitVec() { free(data); }
 
 	bool operator[](unsigned int el) { return elem(el); }
 
@@ -116,14 +120,14 @@ public:
 		}
 	}
 
-	bool pop(void) {
+	bool pop() {
 		assert(elts > 0);
 
 		elts--;
 		return elem(elts);
 	}
 
-	unsigned int size(void) { return elts; }
+	unsigned int size() { return elts; }
 
 protected:
 	unsigned int elts;

@@ -11,19 +11,29 @@ void regular_check(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec
 		}
 	}
 	assert(q0 >= 1 && q0 <= q);
-	for (int i = 0; i < f.size(); i++) assert(f[i] >= 1 && f[i] <= q);
+	for (int i = 0; i < f.size(); i++) {
+		assert(f[i] >= 1 && f[i] <= q);
+	}
 }
 
 void regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f) {
 	regular_check(x, q, s, d, q0, f);
 	//	bool accept[q+1];
 	bool* accept = new bool[q + 1];
-	for (int i = 0; i <= q; i++) accept[i] = false;
-	for (int i = 0; i < f.size(); i++) accept[f[i]] = true;
-	vec<vec<int> > start, middle, end;
+	for (int i = 0; i <= q; i++) {
+		accept[i] = false;
+	}
+	for (int i = 0; i < f.size(); i++) {
+		accept[f[i]] = true;
+	}
+	vec<vec<int> > start;
+	vec<vec<int> > middle;
+	vec<vec<int> > end;
 	for (int i = 0; i < q; i++) {
 		for (int j = 0; j < s; j++) {
-			if (!d[i][j]) continue;
+			if (d[i][j] == 0) {
+				continue;
+			}
 			if (i + 1 == q0) {
 				start.push();
 				start.last().push(j + 1);
@@ -41,7 +51,9 @@ void regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>&
 		}
 	}
 	vec<IntVar*> y;
-	for (int i = 1; i < x.size(); i++) y.push(newIntVar(1, q));
+	for (int i = 1; i < x.size(); i++) {
+		y.push(newIntVar(1, q));
+	}
 	vec<IntVar*> sx;
 	sx.push(x[0]);
 	sx.push(y[0]);

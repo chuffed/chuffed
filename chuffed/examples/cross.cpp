@@ -10,7 +10,9 @@
 static void skipComments(std::istream& i) {
 	assert(i.peek() == '#');
 
-	while (i.peek() != '\n' && i.peek() != EOF) i.ignore();
+	while (i.peek() != '\n' && i.peek() != EOF) {
+		i.ignore();
+	}
 }
 
 class Cross : public Problem {
@@ -25,7 +27,9 @@ public:
 	Cross() {
 		// Generate instance
 
-		while (std::cin.peek() == '#') skipComments(std::cin);
+		while (std::cin.peek() == '#') {
+			skipComments(std::cin);
+		}
 
 		std::cin >> nvars;
 		std::cin >> dom;
@@ -52,7 +56,9 @@ public:
 					tuples.last().push();
 					std::cin >> tuples.last().last();
 				}
-				if (std::cin.peek() == '|') std::cin.ignore();
+				if (std::cin.peek() == '|') {
+					std::cin.ignore();
+				}
 			}
 			std::cin.ignore();
 		}
@@ -87,7 +93,7 @@ public:
 		//        branch(pref_order, VAR_MIN_MIN, VAL_SPLIT_MIN);
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < nvars; i++) {
 			int v = x[i]->getVal();
 			os << i << ": " << v << "\n";

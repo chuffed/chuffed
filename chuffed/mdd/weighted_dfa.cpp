@@ -19,33 +19,40 @@ const int EVLayerGraph::EVTrue = (0);
 
 struct edge_leq {
 	bool operator()(const EVLayerGraph::EInfo& e1, const EVLayerGraph::EInfo& e2) {
-		if (e1.val != e2.val) return e1.val < e2.val;
+		if (e1.val != e2.val) {
+			return e1.val < e2.val;
+		}
 
-		if (e1.dest == e2.dest) return e1.dest < e2.dest;
+		if (e1.dest == e2.dest) {
+			return e1.dest < e2.dest;
+		}
 
 		return e1.weight < e2.weight;
 	}
 } edge_leq;
 
-EVLayerGraph::EVLayerGraph(void)
-		: opcache(OpCache(OPCACHE_SZ)), cache(), intermed_maxsz(2), nodes() {
+EVLayerGraph::EVLayerGraph() : opcache(OpCache(OPCACHE_SZ)), intermed_maxsz(2) {
 	// Initialize \ttt
-	nodes.push_back(NULL);  // true node
+	nodes.push_back(nullptr);  // true node
 	TravInfo tinfo = {0, -1, 1};
 	status.push_back(tinfo);
 
 	intermed = allocNode(intermed_maxsz);
 }
 
-EVLayerGraph::~EVLayerGraph(void) {
+EVLayerGraph::~EVLayerGraph() {
 	deallocNode(intermed);
-	for (unsigned int i = 2; i < nodes.size(); i++) deallocNode(nodes[i]);
+	for (unsigned int i = 2; i < nodes.size(); i++) {
+		deallocNode(nodes[i]);
+	}
 }
 
 EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 	// Ensure there's adequate space in the intermed node.
 	if (intermed_maxsz < edges.size()) {
-		while (intermed_maxsz < edges.size()) intermed_maxsz *= 2;
+		while (intermed_maxsz < edges.size()) {
+			intermed_maxsz *= 2;
+		}
 
 		deallocNode(intermed);
 		intermed = allocNode(intermed_maxsz);
@@ -65,23 +72,30 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 	}
 	// Copy the remaining non-dominated edges.
 	for (; ii < edges.size(); ii++) {
-		if (edges[ii].dest == EVFalse) continue;
+		if (edges[ii].dest == EVFalse) {
+			continue;
+		}
 		if (intermed->edges[jj - 1].val != edges[ii].val ||
-				intermed->edges[jj - 1].dest != edges[ii].dest)
+				intermed->edges[jj - 1].dest != edges[ii].dest) {
 			intermed->edges[jj++] = edges[ii];
+		}
 	}
 
 	// If there are no edges, it's F.
-	if (jj == 0) return EVFalse;
+	if (jj == 0) {
+		return EVFalse;
+	}
 
 	intermed->var = level;
 	intermed->sz = jj;
 
 	// Check if the normalized node is already in the table.
-	NodeCache::iterator res = cache.find(intermed);
+	auto res = cache.find(intermed);
 
 	// If so, return it.
-	if (res != cache.end()) return (*res).second;
+	if (res != cache.end()) {
+		return (*res).second;
+	}
 
 	// Otherwise, add it.
 	NodeRef node = allocNode(intermed->sz);
@@ -118,7 +132,7 @@ int EVLayerGraph::traverse(NodeID idx) {
 		NodeRef node(nodes[nodeIdx]);
 		for (unsigned int ei = 0; ei < node->sz; ei++) {
 			int dest = node->edges[ei].dest;
-			if (!status[dest].flag) {
+			if (status[dest].flag == 0) {
 				status[dest].flag = 1;
 				queue.push(dest);
 				status[dest].id = queue.size();
@@ -130,7 +144,9 @@ int EVLayerGraph::traverse(NodeID idx) {
 	}
 	status[prev].next = -1;
 
-	for (qhead = 0; qhead < queue.size(); qhead++) status[queue[qhead]].flag = 0;
+	for (qhead = 0; qhead < queue.size(); qhead++) {
+		status[queue[qhead]].flag = 0;
+	}
 
 	// Return the number of nodes.
 	return queue.size() + 1;
@@ -199,16 +215,16 @@ EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom,
 	return root;
 }
 
-EVEdge EVNode::operator[](int eidx) {
+EVEdge EVNode::operator[](int eidx) const {
 	EVLayerGraph::EInfo edge(g->nodes[idx]->edges[eidx]);
 	return EVEdge(edge.val, edge.weight, EVNode(g, edge.dest));
 }
 
-int EVNode::id(void) { return g->status[idx].id; }
+int EVNode::id() const { return g->status[idx].id; }
 
-int EVNode::var(void) { return g->nodes[idx]->var; }
+int EVNode::var() const { return g->nodes[idx]->var; }
 
-int EVNode::size(void) { return g->nodes[idx]->sz; }
+int EVNode::size() const { return g->nodes[idx]->sz; }
 
 EVNode& operator++(EVNode& x) {
 	x.idx = x.g->status[x.idx].next;

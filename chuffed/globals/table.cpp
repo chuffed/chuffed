@@ -6,12 +6,14 @@ class TableChecker : public Checker {
 
 	TableChecker(vec<IntVar*>& _x, vec<vec<int> >& _t) { NOT_SUPPORTED; }
 
-	bool check() { NOT_SUPPORTED; }
+	bool check() override { NOT_SUPPORTED; }
 };
 
 void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 	assert(x.size() >= 2);
-	for (int i = 0; i < x.size(); i++) x[i]->specialiseToEL();
+	for (int i = 0; i < x.size(); i++) {
+		x[i]->specialiseToEL();
+	}
 	int base_lit = 2 * sat.nVars();
 	if (x.size() != 2) {
 		for (int i = 0; i < t.size(); i++) {
@@ -24,21 +26,26 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 	for (int w = 0; w < x.size(); w++) {
 		int sup_off = x[w]->getMin();
 		vec<vec<Lit> > sup;
-		for (int i = sup_off; i <= x[w]->getMax(); i++) sup.push();
+		for (int i = sup_off; i <= x[w]->getMax(); i++) {
+			sup.push();
+		}
 		for (int i = 0; i < t.size(); i++) {
 			int k = t[i][w] - sup_off;
 			if (k < 0 || k >= sup.size()) {
 				if (DEBUG) {
 					printf("Warning: useless tuple (");
-					for (int j = 0; j < x.size(); j++) printf("%d, ", t[i][j]);
+					for (int j = 0; j < x.size(); j++) {
+						printf("%d, ", t[i][j]);
+					}
 					printf(")\n");
 				}
 				continue;
 			}
-			if (x.size() == 2)
+			if (x.size() == 2) {
 				sup[k].push(x[1 - w]->getLit(t[i][1 - w], 1));
-			else
+			} else {
 				sup[k].push(toLit(base_lit + 2 * i + 1));
+			}
 		}
 		for (int i = 0; i < sup.size(); i++) {
 			if (sup[i].size() == 0) {

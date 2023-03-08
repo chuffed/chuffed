@@ -55,9 +55,11 @@ public:
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				assert(x[i][j]->getType() == INT_VAR_EL);
@@ -67,7 +69,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				os << x[i][j]->getVal() << ", ";

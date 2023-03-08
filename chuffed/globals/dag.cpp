@@ -7,7 +7,9 @@ using namespace std;
 DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 														 vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en)
 		: DReachabilityPropagator(_r, _vs, _es, _in, _out, _en) {
-	if (!getNodeVar(get_root_idx()).isFixed()) getNodeVar(get_root_idx()).setVal(true);
+	if (!getNodeVar(get_root_idx()).isFixed()) {
+		getNodeVar(get_root_idx()).setVal(true);
+	}
 
 	// build the Tint array
 
@@ -19,7 +21,9 @@ DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 
 	for (int i = 0; i < nbNodes(); i++) {
 		reachability[i] = new Tint[tints];
-		for (int j = 0; j < tints; j++) reachability[i][j] = 0;
+		for (int j = 0; j < tints; j++) {
+			reachability[i][j] = 0;
+		}
 		// reachability[i][i/sizeof(int)] |= (1 << sizeof(int)-(i % sizeof(int)));
 		reachability[i][i] = 1;
 	}
@@ -27,8 +31,8 @@ DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 	succs = vector<TrailedSuccList>();
 	preds = vector<TrailedPredList>();
 	for (int i = 0; i < nbNodes(); i++) {
-		succs.push_back(TrailedSuccList(nbNodes()));
-		preds.push_back(TrailedPredList(nbNodes()));
+		succs.emplace_back(nbNodes());
+		preds.emplace_back(nbNodes());
 	}
 }
 
@@ -49,7 +53,9 @@ void DAGPropagator::connectTo(int source, int dest) {
 			reachability[source][i] |= reachability[dest][i];
 	}*/
 
-	if (succs[source].get(dest)) return;
+	if (succs[source].get(dest)) {
+		return;
+	}
 	std::pair<node_id, node_id> dd(dest, dest);
 	succs[source].add(dd);
 	preds[dest].add(source);
@@ -82,9 +88,13 @@ void DAGPropagator::connectTo(int source, int dest) {
 }
 
 bool DAGPropagator::propagateNewEdge(int e) {
-	if (!DReachabilityPropagator::propagateNewEdge(e)) return false;
+	if (!DReachabilityPropagator::propagateNewEdge(e)) {
+		return false;
+	}
 
-	if (!check_cycle(e)) return false;
+	if (!check_cycle(e)) {
+		return false;
+	}
 
 	TrailedSuccList::const_iterator succ_taile = succs[getTail(e)].end();
 	connectTo(getTail(e), getHead(e));
@@ -93,8 +103,8 @@ bool DAGPropagator::propagateNewEdge(int e) {
 	// Only checking the new ones
 	for (; succ_taile != succs[getTail(e)].end(); succ_taile++) {
 		int n = (*succ_taile).first;
-		for (int i = 0; i < ou[n].size(); i++) {
-			prevent_cycle(ou[n][i]);
+		for (int i : ou[n]) {
+			prevent_cycle(i);
 		}
 	}
 	/*
@@ -120,13 +130,15 @@ bool DAGPropagator::propagateNewEdge(int e) {
 }
 
 bool DAGPropagator::propagateNewNode(int n) {
-	if (!DReachabilityPropagator::propagateNewNode(n)) return false;
-
-	for (int i = 0; i < in[n].size(); i++) {
-		prevent_cycle(in[n][i]);
+	if (!DReachabilityPropagator::propagateNewNode(n)) {
+		return false;
 	}
-	for (int i = 0; i < ou[n].size(); i++) {
-		prevent_cycle(ou[n][i]);
+
+	for (int i : in[n]) {
+		prevent_cycle(i);
+	}
+	for (int i : ou[n]) {
+		prevent_cycle(i);
 	}
 
 	processed_n[n] = true;
@@ -143,7 +155,9 @@ void DAGPropagator::findPathFromTo(int u, int v, vec<Lit>& path) {
 	}
 
 	vec<Lit> path2;
-	if (path.size() == 1) path2.push();
+	if (path.size() == 1) {
+		path2.push();
+	}
 
 	int current = u;
 	while (current != v) {
@@ -157,7 +171,6 @@ void DAGPropagator::findPathFromTo(int u, int v, vec<Lit>& path) {
 		path.push(getEdgeVar(e).getValLit());
 		current = pair.second;
 	}
-	return;
 	// Longer paths:
 	/*
 	bool found_v = false;
@@ -232,7 +245,7 @@ bool DAGPropagator::check_cycle(int e) {
 bool DAGPropagator::prevent_cycle(int e) {
 	if (!getEdgeVar(e).isFixed()) {
 		if (reachable(getHead(e), getTail(e))) {
-			Clause* r = NULL;
+			Clause* r = nullptr;
 			if (so.lazy) {
 				vec<Lit> ps;
 				ps.push();
@@ -276,7 +289,9 @@ bool DAGPropagator::propagate() {
 }
 
 bool DAGPropagator::checkFinalSatisfied() {
-	if (!DReachabilityPropagator::checkFinalSatisfied()) return false;
+	if (!DReachabilityPropagator::checkFinalSatisfied()) {
+		return false;
+	}
 	vector<int> v = vector<int>(nbNodes(), 0);
 	assert(check_correctness(get_root_idx(), v));
 	return check_correctness(get_root_idx(), v);
@@ -285,13 +300,14 @@ bool DAGPropagator::checkFinalSatisfied() {
 bool DAGPropagator::check_correctness(int r, vector<int>& v) {
 	v[r] = -1;
 	// cout <<"Visiting "<<r<<endl;
-	for (int i = 0; i < ou[r].size(); i++) {
-		int e = ou[r][i];
+	for (int e : ou[r]) {
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 			int hd = getHead(e);
 			assert(hd != r);
 			if (v[hd] == 0) {
-				if (!check_correctness(hd, v)) return false;
+				if (!check_correctness(hd, v)) {
+					return false;
+				}
 			} else if (v[hd] == -1) {
 				// cout <<"I saw "<<getHead(ou[r][i])<<" "<<v[ou[r][i]]<<endl;
 				return false;
@@ -304,7 +320,7 @@ bool DAGPropagator::check_correctness(int r, vector<int>& v) {
 
 void dag(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 				 vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
-	DAGPropagator* dag = new DAGPropagator(r, _vs, _es, _in, _out, _en);
+	auto* dag = new DAGPropagator(r, _vs, _es, _in, _out, _en);
 	// if (so.check_prop)
 	//     engine.propagators.push(dag);
 }

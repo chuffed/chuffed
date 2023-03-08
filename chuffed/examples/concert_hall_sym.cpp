@@ -39,7 +39,9 @@ public:
 
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
-				if (start[i] > end[j] || start[j] > end[i]) continue;
+				if (start[i] > end[j] || start[j] > end[i]) {
+					continue;
+				}
 				/*
 								vec<BoolView> y;
 								BoolView q = newBoolVar();
@@ -87,18 +89,21 @@ public:
 				i++;
 			}
 			printf("\n");
-			if (so.ldsb)
+			if (so.ldsb) {
 				var_sym_ldsb(sym);
-			else if (so.sym_static)
+			} else if (so.sym_static) {
 				var_sym_break(sym);
+			}
 			sym.clear();
 			base = i;
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
@@ -109,12 +114,12 @@ public:
 			((IntVarEL*)bi[i])->setBLearnable();
 		}
 		for (int i = 0; i < t.size(); i++) {
-			sat.flags[var(t[i].getLit(0))].setLearnable(true);
-			sat.flags[var(t[i].getLit(0))].setUIPable(true);
+			sat.flags[var(t[i].getLit(false))].setLearnable(true);
+			sat.flags[var(t[i].getLit(false))].setUIPable(true);
 		}
 		for (int i = 0; i < qs.size(); i++) {
-			sat.flags[var(qs[i].getLit(0))].setLearnable(true);
-			sat.flags[var(qs[i].getLit(0))].setUIPable(true);
+			sat.flags[var(qs[i].getLit(false))].setLearnable(true);
+			sat.flags[var(qs[i].getLit(false))].setUIPable(true);
 		}
 	}
 
@@ -132,7 +137,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			os << x[i]->getVal() << ", ";
 		}

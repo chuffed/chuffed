@@ -5,7 +5,7 @@
 // Convert a MDD into a edge-valued layer graph according to an array of costs.
 EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& costs) {
 	MDDTable& t(*r.table);
-	_MDD root = r.val;
+	MDDNodeInt root = r.val;
 	root = t.expand(0, root);
 
 	const std::vector<MDDNode>& nodes(t.getNodes());
@@ -49,7 +49,9 @@ EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& co
 
 		vec<EVLayerGraph::EInfo> edges;
 		for (unsigned int j = 0; j < nodeptr->sz; j++) {
-			if (nodeptr->edges[j].val > costs.size()) break;
+			if (nodeptr->edges[j].val > costs.size()) {
+				break;
+			}
 
 			if (nodeptr->edges[j].dest != MDDFALSE) {
 				EVLayerGraph::NodeID dest = status[nodeptr->edges[j].dest];
@@ -71,7 +73,9 @@ EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& co
 	// Clear the status flags.
 	status[0] = 0;
 	status[1] = 0;
-	for (qhead = 0; qhead < node_queue.size(); qhead++) status[node_queue[qhead]] = 0;
+	for (qhead = 0; qhead < node_queue.size(); qhead++) {
+		status[node_queue[qhead]] = 0;
+	}
 
 	return ret;
 }

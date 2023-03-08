@@ -19,13 +19,18 @@ std::ofstream implication_stream;
 // inline methods
 
 inline void SAT::learntLenBumpActivity(int l) {
-	if (l >= MAX_SHARE_LEN) return;
+	if (l >= MAX_SHARE_LEN) {
+		return;
+	}
 	if (engine.conflicts % 16 == 0) {
 		time_point new_ll_time = chuffed_clock::now();
 		auto diff = std::chrono::duration_cast<duration>(new_ll_time - ll_time);
 		double factor = exp(to_sec(diff) / learnt_len_el);
-		if ((ll_inc *= factor) > 1e100) {
-			for (int i = 0; i < MAX_SHARE_LEN; i++) learnt_len_occ[i] *= 1e-100;
+		ll_inc *= factor;
+		if (ll_inc > 1e100) {
+			for (int i = 0; i < MAX_SHARE_LEN; i++) {
+				learnt_len_occ[i] *= 1e-100;
+			}
 			ll_inc *= 1e-100;
 		}
 		ll_time = new_ll_time;
@@ -36,9 +41,14 @@ inline void SAT::learntLenBumpActivity(int l) {
 }
 
 inline void SAT::varDecayActivity() {
-	if ((var_inc *= 1.05) > 1e100) {
-		for (int i = 0; i < nVars(); i++) activity[i] *= 1e-100;
-		for (int i = 0; i < engine.vars.size(); i++) engine.vars[i]->activity *= 1e-100;
+	var_inc *= 1.05;
+	if (var_inc > 1e100) {
+		for (int i = 0; i < nVars(); i++) {
+			activity[i] *= 1e-100;
+		}
+		for (int i = 0; i < engine.vars.size(); i++) {
+			engine.vars[i]->activity *= 1e-100;
+		}
 		var_inc *= 1e-100;
 	}
 }
@@ -47,9 +57,15 @@ inline void SAT::varBumpActivity(Lit p) {
 	int v = var(p);
 	if (so.vsids) {
 		activity[v] += var_inc;
-		if (order_heap.inHeap(v)) order_heap.decrease(v);
-		if (so.sat_polarity == 1) polarity[v] = sign(p) ^ 1;
-		if (so.sat_polarity == 2) polarity[v] = sign(p);
+		if (order_heap.inHeap(v)) {
+			order_heap.decrease(v);
+		}
+		if (so.sat_polarity == 1) {
+			polarity[v] = ((static_cast<int>(sign(p)) ^ 1) != 0);
+		}
+		if (so.sat_polarity == 2) {
+			polarity[v] = sign(p);
+		}
 	}
 	if (c_info[v].cons_type == 1) {
 		int var_id = c_info[v].cons_id;
@@ -69,7 +85,9 @@ inline void SAT::claDecayActivity() {
 	// counts by scaling everything down by a factor of 1e20.
 	if (cla_inc > 1e20) {
 		cla_inc *= 1e-20;
-		for (int i = 0; i < learnts.size(); i++) learnts[i]->activity() *= 1e-20;
+		for (int i = 0; i < learnts.size(); i++) {
+			learnts[i]->activity() *= 1e-20;
+		}
 	}
 }
 
@@ -82,7 +100,7 @@ Clause* SAT::_getExpl(Lit p) {
 	return engine.propagators[r.d.d2]->explain(p, r.d.d1);
 }
 
-Clause* SAT::getConfl(Reason& r, Lit p) {
+Clause* SAT::getConfl(Reason& r, Lit p) const {
 	switch (r.d.type) {
 		case 0:
 			return r.pt;
@@ -92,7 +110,9 @@ Clause* SAT::getConfl(Reason& r, Lit p) {
 			Clause& c = *short_expl;
 			c.sz = r.d.type;
 			c[1] = toLit(r.d.d1);
-			if (c.sz == 3) c[2] = toLit(r.d.d2);
+			if (c.sz == 3) {
+				c[2] = toLit(r.d.d2);
+			}
 			return short_expl;
 	}
 }
@@ -117,14 +137,16 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 	claDecayActivity();
 	getLearntClause(nodeid, contributingNogoods);
 	explainUnlearnable(contributingNogoods);
-	if (so.exhaustive_activity) explainToExhaustion(contributingNogoods);
+	if (so.exhaustive_activity) {
+		explainToExhaustion(contributingNogoods);
+	}
 	clearSeen();
 
 	int btlevel = findBackTrackLevel();
 	back_jumps += decisionLevel() - 1 - btlevel;
 	//	fprintf(stderr, "btlevel = %d\n", btlevel);
 	btToLevel(btlevel);
-	confl = NULL;
+	confl = nullptr;
 
 	if (so.sort_learnt_level && out_learnt.size() >= 4) {
 		std::sort((Lit*)out_learnt + 2, (Lit*)out_learnt + out_learnt.size(), lit_sort);
@@ -156,23 +178,33 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 		addClause(*c, so.one_watch);
 	}
 
-	if (!so.learn || (so.bin_clause_opt && c->size() <= 2)) rtrail.last().push(c);
+	if (!so.learn || (so.bin_clause_opt && c->size() <= 2)) {
+		rtrail.last().push(c);
+	}
 
 	enqueue(out_learnt[0], (so.bin_clause_opt && c->size() == 2) ? Reason(out_learnt[1]) : c);
 
-	if (PRINT_ANALYSIS) printClause(*c);
+	if (PRINT_ANALYSIS) {
+		printClause(*c);
+	}
 
 	if (so.ldsbad) {
 		vec<Lit> out_learnt2;
 		out_learnt2.push(out_learnt[0]);
-		for (int i = 0; i < decisionLevel(); i++) out_learnt2.push(~decLit(decisionLevel() - i));
+		for (int i = 0; i < decisionLevel(); i++) {
+			out_learnt2.push(~decLit(decisionLevel() - i));
+		}
 		c = Clause_new(out_learnt2, true);
 		rtrail.last().push(c);
 	}
 
-	if (so.ldsb && !ldsb.processImpl(c)) engine.async_fail = true;
+	if (so.ldsb && !ldsb.processImpl(c)) {
+		engine.async_fail = true;
+	}
 
-	if (learnts.size() >= so.nof_learnts || learnts_literals >= so.learnts_mlimit / 4) reduceDB();
+	if (learnts.size() >= so.nof_learnts || learnts_literals >= so.learnts_mlimit / 4) {
+		reduceDB();
+	}
 }
 
 void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
@@ -181,7 +213,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 	int clevel = findConflictLevel();
 	vec<Lit>& ctrail = trail[clevel];
 	Clause* expl = confl;
-	Reason last_reason = NULL;
+	Reason last_reason = nullptr;
 
 	if (so.debug) {
 		std::cerr << "trail of conflict level:";
@@ -199,11 +231,13 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 	out_learnt_level.push();
 
 	while (true) {
-		assert(expl != NULL);  // (otherwise should be UIP)
+		assert(expl != nullptr);  // (otherwise should be UIP)
 		Clause& c = *expl;
 
 		if (PRINT_ANALYSIS) {
-			if (p != lit_Undef) c[0] = p;
+			if (p != lit_Undef) {
+				c[0] = p;
+			}
 			printClause(c);
 		}
 
@@ -239,8 +273,9 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 				implication_stream << getLitString(toInt(p));
 			}
 			implication_stream << ",";
-			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++)
+			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
 				implication_stream << " " << getLitString(toInt(~c[i]));
+			}
 			implication_stream << "\n";
 		}
 
@@ -256,8 +291,9 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 				std::cerr << getLitString(toInt(p));
 			}
 			std::cerr << "  <-";
-			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++)
+			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
 				std::cerr << "  \t" << getLitString(toInt(~c[i]));
+			}
 			std::cerr << "\n";
 		}
 
@@ -268,7 +304,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 			/*   std::cerr << "adding " << getLitString(toInt(~q)) << " (lit number " << toInt(~q) << ",
 			 * var " << x << ") from level " << getLevel(x); */
 			/* } */
-			if (!seen[x]) {
+			if (seen[x] == 0) {
 				varBumpActivity(q);
 				seen[x] = 1;
 				if (isCurLevel(x)) {
@@ -300,8 +336,9 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 		assert(pathC > 0);
 
 		// Select next clause to look at:
-		while (!seen[var(ctrail[--index])])
+		while (seen[var(ctrail[--index])] == 0) {
 			;
+		}
 		assert(index >= 0);
 		p = ctrail[index];
 		seen[var(p)] = 0;
@@ -320,7 +357,9 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 
 		// This appears to be just an optimisation.
 		if (last_reason == reason[var(p)]) {
-			if (so.debug) std::cerr << "same reason as previously explained literal; skipping\n";
+			if (so.debug) {
+				std::cerr << "same reason as previously explained literal; skipping\n";
+			}
 			goto FindNextExpl;
 		}
 		last_reason = reason[var(p)];
@@ -335,7 +374,9 @@ int SAT::findConflictLevel() {
 	int tp = -1;
 	for (int i = 0; i < confl->size(); i++) {
 		int l = trailpos[var((*confl)[i])];
-		if (l > tp) tp = l;
+		if (l > tp) {
+			tp = l;
+		}
 	}
 	int clevel = engine.tpToLevel(tp);
 
@@ -358,7 +399,9 @@ int SAT::findConflictLevel() {
 
 	//	fprintf(stderr, "clevel = %d\n", clevel);
 
-	if (PRINT_ANALYSIS) printf("Conflict: level = %d\n", clevel);
+	if (PRINT_ANALYSIS) {
+		printf("Conflict: level = %d\n", clevel);
+	}
 
 	return clevel;
 }
@@ -369,7 +412,9 @@ void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
 	vec<Lit> removed;
 	for (int i = 1; i < out_learnt.size(); i++) {
 		Lit p = out_learnt[i];
-		if (flags[var(p)].learnable) continue;
+		if (flags[var(p)].learnable) {
+			continue;
+		}
 		assert(!reason[var(p)].isLazy());
 		Clause& c = *getExpl(~p);
 		removed.push(p);
@@ -379,7 +424,7 @@ void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
 		i--;
 		for (int j = 1; j < c.size(); j++) {
 			Lit q = c[j];
-			if (!seen[var(q)]) {
+			if (seen[var(q)] == 0) {
 				seen[var(q)] = 1;
 				out_learnt.push(q);
 				out_learnt_level.push(getLevel(var(q)));
@@ -387,7 +432,9 @@ void SAT::explainUnlearnable(std::set<int>& contributingNogoods) {
 		}
 	}
 
-	for (int i = 0; i < removed.size(); i++) seen[var(removed[i])] = 0;
+	for (int i = 0; i < removed.size(); i++) {
+		seen[var(removed[i])] = 0;
+	}
 
 	pushback_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
 }
@@ -412,39 +459,44 @@ void push_back(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
 			out_nogood.push(p);
 		}
 		return;
-	} else {
-		// Otherwise, fill in the reason for ~p...
-		for (int i = 1; i < cp->size(); i++) {
-			Lit q((*cp)[i]);
-			out_nogood.push(q);
-			// Only look at the first bit of seen, because
-			// we're using the second bit for assumption-ness.
-			sat.seen[var(q)] |= 1;
+	}  // Otherwise, fill in the reason for ~p...
+	for (int i = 1; i < cp->size(); i++) {
+		Lit q((*cp)[i]);
+		out_nogood.push(q);
+		// Only look at the first bit of seen, because
+		// we're using the second bit for assumption-ness.
+		sat.seen[var(q)] |= 1;
+	}
+	// then push it back to assumptions.
+	for (int i = 1; i < out_nogood.size(); i++) {
+		Lit q(out_nogood[i]);
+		if (is_extractable(q)) {
+			continue;
 		}
-		// then push it back to assumptions.
-		for (int i = 1; i < out_nogood.size(); i++) {
-			Lit q(out_nogood[i]);
-			if (is_extractable(q)) continue;
-			assert(!sat.reason[var(p)].isLazy());
-			Clause* c = sat.getExpl(~q);
-			assert(c != nullptr);
-			removed.push(q);
-			out_nogood[i] = out_nogood.last();
-			out_nogood.pop();
-			--i;
+		assert(!sat.reason[var(p)].isLazy());
+		Clause* c = sat.getExpl(~q);
+		assert(c != nullptr);
+		removed.push(q);
+		out_nogood[i] = out_nogood.last();
+		out_nogood.pop();
+		--i;
 
-			for (int j = 1; j < c->size(); j++) {
-				Lit r((*c)[j]);
-				if (!(sat.seen[var(r)] & 1)) {
-					sat.seen[var(r)] = true;
-					out_nogood.push(r);
-				}
+		for (int j = 1; j < c->size(); j++) {
+			Lit r((*c)[j]);
+			if (!(sat.seen[var(r)] & 1)) {
+				sat.seen[var(r)] = true;
+				out_nogood.push(r);
 			}
 		}
 	}
+
 	// Clear the 'seen' bit.
-	for (int i = 0; i < removed.size(); i++) sat.seen[var(removed[i])] &= (~1);
-	for (int i = 1; i < out_nogood.size(); i++) sat.seen[var(out_nogood[i])] &= (~1);
+	for (int i = 0; i < removed.size(); i++) {
+		sat.seen[var(removed[i])] &= (~1);
+	}
+	for (int i = 1; i < out_nogood.size(); i++) {
+		sat.seen[var(out_nogood[i])] &= (~1);
+	}
 }
 
 void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
@@ -459,7 +511,7 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 		if (so.debug) {
 			std::cerr << "checking literal " << getLitString(toInt(~p)) << "\n";
 		}
-		if (cp == NULL) {
+		if (cp == nullptr) {
 			if (so.debug) {
 				std::cerr << "it has no reason\n";
 			}
@@ -479,7 +531,7 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 			if (so.debug) {
 				std::cerr << "adding literal " << getLitString(toInt(q));
 			}
-			if (!seen[var(q)]) {
+			if (seen[var(q)] == 0) {
 				seen[var(q)] = 1;
 				out_learnt.push(q);
 				out_learnt_level.push(getLevel(var(q)));
@@ -500,11 +552,14 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 }
 
 void SAT::clearSeen() {
-	for (int i = 0; i < ivseen_toclear.size(); i++) ivseen[ivseen_toclear[i]] = false;
+	for (int i = 0; i < ivseen_toclear.size(); i++) {
+		ivseen[ivseen_toclear[i]] = false;
+	}
 	ivseen_toclear.clear();
 
-	for (int i = 0; i < out_learnt.size(); i++)
+	for (int i = 0; i < out_learnt.size(); i++) {
 		seen[var(out_learnt[i])] = 0;  // ('seen[]' is now cleared)
+	}
 }
 
 int SAT::findBackTrackLevel() {
@@ -515,7 +570,9 @@ int SAT::findBackTrackLevel() {
 
 	int max_i = 1;
 	for (int i = 2; i < out_learnt.size(); i++) {
-		if (trailpos[var(out_learnt[i])] > trailpos[var(out_learnt[max_i])]) max_i = i;
+		if (trailpos[var(out_learnt[i])] > trailpos[var(out_learnt[max_i])]) {
+			max_i = i;
+		}
 	}
 	Lit p = out_learnt[max_i];
 	int plevel = out_learnt_level[max_i];
@@ -533,15 +590,17 @@ int SAT::findBackTrackLevel() {
 // Lit:meaning:value:level
 
 void SAT::printLit(Lit p) {
-	if (isRootLevel(var(p))) return;
+	if (isRootLevel(var(p))) {
+		return;
+	}
 	printf("%d:", toInt(p));
 	ChannelInfo& ci = c_info[var(p)];
 	if (ci.cons_type == 1) {
-		engine.vars[ci.cons_id]->printLit(ci.val, ci.val_type * 3 ^ sign(p));
+		engine.vars[ci.cons_id]->printLit(ci.val, ci.val_type * 3 ^ static_cast<int>(sign(p)));
 	} else if (ci.cons_type == 2) {
 		engine.propagators[ci.cons_id]->printLit(ci.val, sign(p));
 	} else {
-		printf(":%d:%d, ", sign(p), trailpos[var(p)]);
+		printf(":%d:%d, ", static_cast<int>(sign(p)), trailpos[var(p)]);
 	}
 }
 
@@ -550,14 +609,18 @@ void SAT::printClause(T& c) {
 	printf("Size:%d - ", c.size());
 	printLit(c[0]);
 	printf(" <- ");
-	for (int i = 1; i < c.size(); i++) printLit(~c[i]);
+	for (int i = 1; i < c.size(); i++) {
+		printLit(~c[i]);
+	}
 	printf("\n");
 }
 
-void SAT::checkConflict() {
-	assert(confl != NULL);
+void SAT::checkConflict() const {
+	assert(confl != nullptr);
 	for (int i = 0; i < confl->size(); i++) {
-		if (value((*confl)[i]) != l_False) printf("Analyze: %dth lit is not false\n", i);
+		if (value((*confl)[i]) != l_False) {
+			printf("Analyze: %dth lit is not false\n", i);
+		}
 		assert(value((*confl)[i]) == l_False);
 	}
 
@@ -578,7 +641,9 @@ void SAT::checkExplanation(Clause& c, int clevel, int index) {
 		for (int j = 0; j < ctrail.size(); j++) {
 			if (var(ctrail[j]) == var(c[i])) {
 				pos = j;
-				if (trailpos[var(c[i])] == clevel) assert(j <= index);
+				if (trailpos[var(c[i])] == clevel) {
+					assert(j <= index);
+				}
 				break;
 			}
 		}

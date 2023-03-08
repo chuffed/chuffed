@@ -1,5 +1,6 @@
-#ifndef __WEIGHTED_DFA_H__
-#define __WEIGHTED_DFA_H__
+#ifndef WEIGHTED_DFA_H_
+#define WEIGHTED_DFA_H_
+
 #include <chuffed/mdd/opcache.h>
 #include <chuffed/support/vec.h>
 
@@ -27,11 +28,11 @@ class EVEdge;
 class EVNode {
 public:
 	EVNode(EVLayerGraph* _g, int _idx) : g(_g), idx(_idx) {}
-	EVEdge operator[](int idx);
+	EVEdge operator[](int idx) const;
 
-	int var(void);
-	int id(void);
-	int size(void);
+	int var() const;
+	int id() const;
+	int size() const;
 
 	EVLayerGraph* g;
 	int idx;
@@ -93,43 +94,48 @@ public:
 protected:
 	struct eqnode {
 		bool operator()(const NodeRef a1, const NodeRef a2) const {
-			if (a1->var != a2->var) return false;
-			if (a1->sz != a2->sz) return false;
+			if (a1->var != a2->var) {
+				return false;
+			}
+			if (a1->sz != a2->sz) {
+				return false;
+			}
 
 			for (unsigned int ii = 0; ii < a1->sz; ii++) {
 				if (a1->edges[ii].val != a2->edges[ii].val || a1->edges[ii].dest != a2->edges[ii].dest ||
-						a1->edges[ii].weight != a2->edges[ii].weight)
+						a1->edges[ii].weight != a2->edges[ii].weight) {
 					return false;
+				}
 			}
 			return true;
 		}
 	};
 
 	struct hashnode {
-		unsigned int operator()(const NodeRef a1) const;
+		unsigned int operator()(NodeRef a1) const;
 	};
 
 	typedef std::unordered_map<const NodeRef, NodeID, hashnode, eqnode> NodeCache;
 
 	// Public Methods
 public:
-	EVLayerGraph(void);  // Do we need the number of variables as a parameter?
-	~EVLayerGraph(void);
+	EVLayerGraph();  // Do we need the number of variables as a parameter?
+	~EVLayerGraph();
 
 	NodeID insert(int level, vec<EInfo>& edges);
 
 	// Initialize the traversal info stuff.
 	// Returns the size of the computed subgraph.
 	int traverse(NodeID idx);
-	EVNode travBegin(void) { return EVNode(this, status[0].next); }
-	EVNode travEnd(void) { return EVNode(this, -1); }
+	EVNode travBegin() { return EVNode(this, status[0].next); }
+	EVNode travEnd() { return EVNode(this, -1); }
 
 	const static int EVFalse;
 	const static int EVTrue;
 
 protected:
-	inline NodeRef allocNode(int sz);
-	inline void deallocNode(NodeRef node);
+	static inline NodeRef allocNode(int sz);
+	static inline void deallocNode(NodeRef node);
 
 	int nvars;
 

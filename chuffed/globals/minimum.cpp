@@ -27,15 +27,19 @@ public:
 				min_fixed(INT_MAX),
 				lower_change(false) {
 		priority = 1;
-		for (int i = 0; i < sz; i++) x[i].attach(this, i, EVENT_LU);
+		for (int i = 0; i < sz; i++) {
+			x[i].attach(this, i, EVENT_LU);
+		}
 		y.attach(this, sz, EVENT_L);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i < sz) {
-			if (c & EVENT_F) {
+			if ((c & EVENT_F) != 0) {
 				int64_t m = x[i].getVal();
-				if (m < min_fixed) min_fixed = m;
+				if (m < min_fixed) {
+					min_fixed = m;
+				}
 			}
 
 			int64_t m = x[i].getMax();
@@ -52,7 +56,7 @@ public:
 		}
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		// make a less than or equal to min(max(x_i))
 		setDom(y, setMax, min_max, x[min_max_var].getMaxLit());
 
@@ -61,67 +65,89 @@ public:
 			int64_t m = INT64_MAX;
 			for (int i = 0; i < sz; i++) {
 				int64_t t = x[i].getMin();
-				if (t < m) m = t;
+				if (t < m) {
+					m = t;
+				}
 			}
 			if (y.setMinNotR(m)) {
-				Clause* r = NULL;
+				Clause* r = nullptr;
 				if (so.lazy) {
 					r = Reason_new(sz + 1);
 					// Finesse lower bounds
 					// Add reason ![y <= m-1] \/ [x_1 <= m-1] \/ ... \/ [x_n <= m-1]
-					for (int i = 0; i < sz; i++) (*r)[i + 1] = x[i].getFMinLit(m);
+					for (int i = 0; i < sz; i++) {
+						(*r)[i + 1] = x[i].getFMinLit(m);
+					}
 					//					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getLit(m-1, 3);
 				}
-				if (!y.setMin(m, r)) return false;
+				if (!y.setMin(m, r)) {
+					return false;
+				}
 			}
 
 			// make b_i greater than or equal to min(a)
 			m = y.getMin();
-			Clause* r = NULL;
+			Clause* r = nullptr;
 			if (so.lazy) {
 				r = Reason_new(2);
 				(*r)[1] = y.getMinLit();
 			}
 			for (int i = 0; i < sz; i++) {
-				if (x[i].setMinNotR(m))
-					if (!x[i].setMin(m, r)) return false;
+				if (x[i].setMinNotR(m)) {
+					if (!x[i].setMin(m, r)) {
+						return false;
+					}
+				}
 			}
 		}
 
 		// Necessary and sufficient conditions for redundancy
 
-		if (y.getMin() == min_max) satisfied = true;
+		if (y.getMin() == min_max) {
+			satisfied = true;
+		}
 
 		return true;
 	}
 
-	void clearPropState() {
+	void clearPropState() override {
 		in_queue = false;
 		lower_change = false;
 	}
 
-	bool check() {
+	bool check() override {
 		int min = INT_MAX;
-		for (int i = 0; i < sz; i++)
-			if (x[i].getShadowVal() < min) min = x[i].getShadowVal();
+		for (int i = 0; i < sz; i++) {
+			if (x[i].getShadowVal() < min) {
+				min = x[i].getShadowVal();
+			}
+		}
 		return (y.getShadowVal() == min);
 	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
-		if (y.getMin() == min_max) satisfied = true;
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
+		if (y.getMin() == min_max) {
+			satisfied = true;
+		}
 		return 2;
 	}
 };
 
 void minimum(vec<IntVar*>& x, IntVar* y) {
 	vec<IntView<> > w;
-	for (int i = 0; i < x.size(); i++) w.push(IntView<>(x[i]));
+	for (int i = 0; i < x.size(); i++) {
+		w.push(IntView<>(x[i]));
+	}
 	new Minimum<0>(w, IntView<>(y));
 }
 
 void maximum(vec<IntVar*>& x, IntVar* y) {
 	vec<IntView<> > w;
-	for (int i = 0; i < x.size(); i++) w.push(IntView<>(x[i]));
+	for (int i = 0; i < x.size(); i++) {
+		w.push(IntView<>(x[i]));
+	}
 	new Minimum<1>(w, IntView<>(y));
 }

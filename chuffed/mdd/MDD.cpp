@@ -37,25 +37,22 @@ MDDTable::MDDTable(int _nvars)
 			opcache(OpCache(OPCACHE_SZ)),
 #ifdef SPLIT_CACHE
 			cache(new NodeCache[nvars]),
-#else
-			//      cache(CACHE_SZ),
-			cache(),
 #endif
-			stack(),
-			intermed_maxsz(2),
-			nodes() {
+			intermed_maxsz(2) {
 	// Initialize \ttt and \fff.
-	nodes.push_back(NULL);  // false node
-	nodes.push_back(NULL);  // true node
+	nodes.push_back(nullptr);  // false node
+	nodes.push_back(nullptr);  // true node
 	status.push_back(0);
 	status.push_back(0);
 
 	intermed = allocNode(intermed_maxsz);
 }
 
-MDDTable::~MDDTable(void) {
+MDDTable::~MDDTable() {
 	deallocNode(intermed);
-	for (unsigned int i = 2; i < nodes.size(); i++) deallocNode(nodes[i]);
+	for (unsigned int i = 2; i < nodes.size(); i++) {
+		deallocNode(nodes[i]);
+	}
 
 #ifdef SPLIT_CACHE
 	delete[] cache;
@@ -64,7 +61,7 @@ MDDTable::~MDDTable(void) {
 
 // Insert a node with edges
 // stack[start,...].
-_MDD MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bool expand) {
+MDDNodeInt MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bool expand) {
 #ifdef SPLIT_CACHE
 	//   NodeCache& varcache( cache[node[0]] );
 	NodeCache& varcache(cache[(*node)[0]]);
@@ -74,7 +71,9 @@ _MDD MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bo
 
 	// Ensure there's adequate space in the intermed node.
 	if (intermed_maxsz < (stack.size() - start)) {
-		while (intermed_maxsz < (stack.size() - start)) intermed_maxsz *= 2;
+		while (intermed_maxsz < (stack.size() - start)) {
+			intermed_maxsz *= 2;
+		}
 
 		deallocNode(intermed);
 		intermed = allocNode(intermed_maxsz);
@@ -87,7 +86,9 @@ _MDD MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bo
 	while (ii < stack.size() && stack[ii].dest == low) {
 		ii++;
 	}
-	if (ii < stack.size()) intermed->edges[jj++] = stack[ii];
+	if (ii < stack.size()) {
+		intermed->edges[jj++] = stack[ii];
+	}
 	for (; ii < stack.size(); ii++) {
 		if (stack[ii].dest != intermed->edges[jj - 1].dest) {
 			intermed->edges[jj] = stack[ii];
@@ -106,7 +107,7 @@ _MDD MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bo
 	intermed->low = low;
 	intermed->sz = jj;
 
-	NodeCache::iterator res = varcache.find(intermed);
+	auto res = varcache.find(intermed);
 
 	if (res != varcache.end()) {
 		stack.resize(start);
@@ -126,8 +127,8 @@ _MDD MDDTable::insert(unsigned int var, unsigned int low, unsigned int start, bo
 }
 
 template <class T>
-_MDD MDDTable::tuple(vec<T>& tpl) {
-	_MDD res = MDDTRUE;
+MDDNodeInt MDDTable::tuple(vec<T>& tpl) {
+	MDDNodeInt res = MDDTRUE;
 
 	unsigned int start = stack.size();
 	for (int i = tpl.size() - 1; i >= 0; i--) {
@@ -139,9 +140,9 @@ _MDD MDDTable::tuple(vec<T>& tpl) {
 	return res;
 }
 
-template _MDD MDDTable::tuple(vec<int>& tpl);
+template MDDNodeInt MDDTable::tuple(vec<int>& tpl);
 
-_MDD MDDTable::mdd_vareq(int var, int val) {
+MDDNodeInt MDDTable::mdd_vareq(int var, int val) {
 	assert(var < nvars);
 
 	unsigned int start = stack.size();
@@ -149,46 +150,48 @@ _MDD MDDTable::mdd_vareq(int var, int val) {
 	stack.push_back(mkedge(val, MDDTRUE));
 	stack.push_back(mkedge(val + 1, MDDFALSE));
 
-	_MDD res = insert(var, MDDFALSE, start);
+	MDDNodeInt res = insert(var, MDDFALSE, start);
 	assert(stack.size() == start);
 
 	return res;
 }
 
-_MDD MDDTable::mdd_varlt(int var, int val) {
+MDDNodeInt MDDTable::mdd_varlt(int var, int val) {
 	unsigned int start = stack.size();
 
 	stack.push_back(mkedge(val, MDDFALSE));
-	_MDD res = insert(var, MDDTRUE, start);
+	MDDNodeInt res = insert(var, MDDTRUE, start);
 
 	assert(stack.size() == start);
 
 	return res;
 }
 
-_MDD MDDTable::mdd_vargt(int var, int val) {
+MDDNodeInt MDDTable::mdd_vargt(int var, int val) {
 	unsigned int start = stack.size();
 	stack.push_back(mkedge(val + 1, MDDTRUE));
 
-	_MDD res = insert(var, MDDFALSE, start);
+	MDDNodeInt res = insert(var, MDDFALSE, start);
 	assert(stack.size() == start);
 
 	return res;
 }
 
-_MDD MDDTable::mdd_case(int var, std::vector<edgepair>& cases) {
-	if (cases.size() == 0) return MDDFALSE;
+MDDNodeInt MDDTable::mdd_case(int var, std::vector<edgepair>& cases) {
+	if (cases.empty()) {
+		return MDDFALSE;
+	}
 
-	_MDD res = MDDFALSE;
+	MDDNodeInt res = MDDFALSE;
 
-	for (unsigned int ii = 0; ii < cases.size(); ii++) {
-		res = mdd_or(res, mdd_and(mdd_vareq(var, cases[ii].first), cases[ii].second));
+	for (auto& ii : cases) {
+		res = mdd_or(res, mdd_and(mdd_vareq(var, ii.first), ii.second));
 	}
 	return res;
 }
 
 // FIXME: Completely bogus.
-_MDD MDDTable::bound(_MDD root, vec<intpair>& range) {
+MDDNodeInt MDDTable::bound(MDDNodeInt root, vec<intpair>& range) {
 	return root;
 	/*
 	 if( root == MDDFALSE || root == MDDTRUE )
@@ -230,16 +233,20 @@ _MDD MDDTable::bound(_MDD root, vec<intpair>& range) {
 	 }
 	 stack.push_back( mkedge(ub+1,MDDFALSE) );
 
-	 _MDD res = insert(var, MDDFALSE, start);
+	 MDDNodeInt res = insert(var, MDDFALSE, start);
 	 return res;
 	 */
 }
 
-_MDD MDDTable::expand(int var, _MDD r) {
-	if (r == MDDFALSE) return MDDFALSE;
+MDDNodeInt MDDTable::expand(int var, MDDNodeInt r) {
+	if (r == MDDFALSE) {
+		return MDDFALSE;
+	}
 
-	_MDD res = opcache.check(OP_EXPAND, var, r);
-	if (res != UINT_MAX) return res;
+	MDDNodeInt res = opcache.check(OP_EXPAND, var, r);
+	if (res != UINT_MAX) {
+		return res;
+	}
 
 	int cvar = (r == MDDTRUE) ? nvars : nodes[r]->var;
 	assert(cvar >= var && var <= nvars);
@@ -248,7 +255,9 @@ _MDD MDDTable::expand(int var, _MDD r) {
 	int low;
 
 	if (cvar == var) {
-		if (r == MDDTRUE) return r;
+		if (r == MDDTRUE) {
+			return r;
+		}
 
 		low = expand(var + 1, nodes[r]->low);
 		for (unsigned int ii = 0; ii < nodes[r]->sz; ii++) {
@@ -267,13 +276,21 @@ _MDD MDDTable::expand(int var, _MDD r) {
 	return res;
 }
 
-_MDD MDDTable::mdd_and(_MDD a, _MDD b) {
-	if (a == MDDFALSE || b == MDDFALSE) return MDDFALSE;
-	if (a == MDDTRUE) return b;
-	if (b == MDDTRUE) return a;
+MDDNodeInt MDDTable::mdd_and(MDDNodeInt a, MDDNodeInt b) {
+	if (a == MDDFALSE || b == MDDFALSE) {
+		return MDDFALSE;
+	}
+	if (a == MDDTRUE) {
+		return b;
+	}
+	if (b == MDDTRUE) {
+		return a;
+	}
 
-	_MDD res = a < b ? opcache.check(OP_AND, a, b) : opcache.check(OP_AND, b, a);
-	if (res != UINT_MAX) return res;
+	MDDNodeInt res = a < b ? opcache.check(OP_AND, a, b) : opcache.check(OP_AND, b, a);
+	if (res != UINT_MAX) {
+		return res;
+	}
 
 	unsigned int start = stack.size();
 	unsigned int var;
@@ -295,8 +312,8 @@ _MDD MDDTable::mdd_and(_MDD a, _MDD b) {
 		var = nodes[a]->var;
 		low = mdd_and(nodes[a]->low, nodes[b]->low);
 
-		_MDD aprev = nodes[a]->low;
-		_MDD bprev = nodes[b]->low;
+		MDDNodeInt aprev = nodes[a]->low;
+		MDDNodeInt bprev = nodes[b]->low;
 
 		// Say we have:
 		// A: (0: a1), (2: a2), (3: a3)
@@ -337,22 +354,31 @@ _MDD MDDTable::mdd_and(_MDD a, _MDD b) {
 	}
 
 	res = insert(var, low, start);
-	if (a < b)
+	if (a < b) {
 		opcache.insert(OP_AND, a, b, res);
-	else
+	} else {
 		opcache.insert(OP_AND, b, a, res);
+	}
 
 	return res;
 }
 
 // Should abstract out to mdd_apply(op, a, b).
-_MDD MDDTable::mdd_or(_MDD a, _MDD b) {
-	if (a == MDDTRUE || b == MDDTRUE) return MDDTRUE;
-	if (a == MDDFALSE) return b;
-	if (b == MDDFALSE) return a;
+MDDNodeInt MDDTable::mdd_or(MDDNodeInt a, MDDNodeInt b) {
+	if (a == MDDTRUE || b == MDDTRUE) {
+		return MDDTRUE;
+	}
+	if (a == MDDFALSE) {
+		return b;
+	}
+	if (b == MDDFALSE) {
+		return a;
+	}
 
-	_MDD res = a < b ? opcache.check(OP_OR, a, b) : opcache.check(OP_OR, b, a);
-	if (res != UINT_MAX) return res;
+	MDDNodeInt res = a < b ? opcache.check(OP_OR, a, b) : opcache.check(OP_OR, b, a);
+	if (res != UINT_MAX) {
+		return res;
+	}
 
 	unsigned int start = stack.size();
 	unsigned int var;
@@ -374,8 +400,8 @@ _MDD MDDTable::mdd_or(_MDD a, _MDD b) {
 		var = nodes[a]->var;
 		low = mdd_or(nodes[a]->low, nodes[b]->low);
 
-		_MDD aprev = nodes[a]->low;
-		_MDD bprev = nodes[b]->low;
+		MDDNodeInt aprev = nodes[a]->low;
+		MDDNodeInt bprev = nodes[b]->low;
 
 		// Say we have:
 		// A: (0: a1), (2: a2), (3: a3)
@@ -416,25 +442,32 @@ _MDD MDDTable::mdd_or(_MDD a, _MDD b) {
 	}
 
 	res = insert(var, low, start);
-	if (a < b)
+	if (a < b) {
 		opcache.insert(OP_OR, a, b, res);
-	else
+	} else {
 		opcache.insert(OP_OR, b, a, res);
+	}
 
 	return res;
 }
 
-_MDD MDDTable::mdd_exist(_MDD root, unsigned int var) {
-	if (root == MDDTRUE || root == MDDFALSE) return root;
+MDDNodeInt MDDTable::mdd_exist(MDDNodeInt root, unsigned int var) {
+	if (root == MDDTRUE || root == MDDFALSE) {
+		return root;
+	}
 
 	unsigned int r_var = nodes[root]->var;
-	if (r_var > var) return root;
+	if (r_var > var) {
+		return root;
+	}
 
-	_MDD res;
-	if ((res = opcache.check(OP_EXIST, root, var)) != UINT_MAX) return res;
+	MDDNodeInt res = opcache.check(OP_EXIST, root, var);
+	if (res != UINT_MAX) {
+		return res;
+	}
 
 	if (r_var == var) {
-		_MDD res = MDDFALSE;
+		MDDNodeInt res = MDDFALSE;
 		for (unsigned ii = 0; ii < nodes[root]->sz; ii++) {
 			res = mdd_or(res, nodes[root]->edges[ii].dest);
 		}
@@ -454,9 +487,13 @@ _MDD MDDTable::mdd_exist(_MDD root, unsigned int var) {
 	return res;
 }
 
-_MDD MDDTable::mdd_not(_MDD root) {
-	if (root == MDDTRUE) return MDDFALSE;
-	if (root == MDDFALSE) return MDDTRUE;  // Will need to handle long edges.
+MDDNodeInt MDDTable::mdd_not(MDDNodeInt root) {
+	if (root == MDDTRUE) {
+		return MDDFALSE;
+	}
+	if (root == MDDFALSE) {
+		return MDDTRUE;  // Will need to handle long edges.
+	}
 
 	unsigned int var = nodes[root]->var;
 	unsigned int start = stack.size();
@@ -466,31 +503,41 @@ _MDD MDDTable::mdd_not(_MDD root) {
 	for (unsigned int ii = 0; ii < nodes[root]->sz; ii++) {
 		stack.push_back(mkedge(nodes[root]->edges[ii].val, mdd_not(nodes[root]->edges[ii].dest)));
 	}
-	_MDD res = insert(var, low, start);
+	MDDNodeInt res = insert(var, low, start);
 	return res;
 }
 
-bool MDDTable::mdd_leq(_MDD a, _MDD b) {
-	if (a == MDDFALSE) return true;
-	if (b == MDDTRUE) return true;
+bool MDDTable::mdd_leq(MDDNodeInt a, MDDNodeInt b) {
+	if (a == MDDFALSE) {
+		return true;
+	}
+	if (b == MDDTRUE) {
+		return true;
+	}
 
-	if (a == MDDTRUE) return false;   // b != MDDTRUE
-	if (b == MDDFALSE) return false;  // a != MDDFALSE
+	if (a == MDDTRUE) {
+		return false;  // b != MDDTRUE
+	}
+	if (b == MDDFALSE) {
+		return false;  // a != MDDFALSE
+	}
 
 	unsigned int res = opcache.check(OP_LEQ, a, b);
-	if (res != UINT_MAX) return res;
+	if (res != UINT_MAX) {
+		return res != 0U;
+	}
 
 	assert(nodes[a]->var == nodes[b]->var);
 
-	res = true;
+	res = 1U;
 
 	unsigned int ii = 0;
 	unsigned int jj = 0;
-	_MDD aprev = nodes[a]->low;
-	_MDD bprev = nodes[b]->low;
+	MDDNodeInt aprev = nodes[a]->low;
+	MDDNodeInt bprev = nodes[b]->low;
 	while (ii < nodes[a]->sz && jj < nodes[b]->sz) {
 		if (!mdd_leq(aprev, bprev)) {
-			res = false;
+			res = 0U;
 			goto _mdd_leq_done;
 		}
 		int aval = nodes[a]->edges[ii].val;
@@ -507,7 +554,7 @@ bool MDDTable::mdd_leq(_MDD a, _MDD b) {
 	}
 	while (ii < nodes[a]->sz) {
 		if (!mdd_leq(aprev, bprev)) {
-			res = false;
+			res = 0U;
 			goto _mdd_leq_done;
 		}
 		aprev = nodes[a]->edges[ii].dest;
@@ -515,31 +562,37 @@ bool MDDTable::mdd_leq(_MDD a, _MDD b) {
 	}
 	while (jj < nodes[b]->sz) {
 		if (!mdd_leq(aprev, bprev)) {
-			res = false;
+			res = 0U;
 			goto _mdd_leq_done;
 		}
 		bprev = nodes[b]->edges[jj].dest;
 		jj++;
 	}
 	// Last pair
-	res = mdd_leq(aprev, bprev);
+	res = static_cast<unsigned int>(mdd_leq(aprev, bprev));
 
 _mdd_leq_done:
 	opcache.insert(OP_LEQ, a, b, res);
-	return res;
+	return res != 0U;
 }
 
-void MDDTable::clear_status(_MDD r) {
-	if (!status[r]) return;
+void MDDTable::clear_status(MDDNodeInt r) {
+	if (status[r] == 0) {
+		return;
+	}
 	status[r] = 0;
 
-	if (r == MDDFALSE || r == MDDTRUE) return;
+	if (r == MDDFALSE || r == MDDTRUE) {
+		return;
+	}
 
 	clear_status(nodes[r]->low);
-	for (unsigned int ii = 0; ii < nodes[r]->sz; ii++) clear_status(nodes[r]->edges[ii].dest);
+	for (unsigned int ii = 0; ii < nodes[r]->sz; ii++) {
+		clear_status(nodes[r]->edges[ii].dest);
+	}
 }
 
-void MDDTable::print_nodes(void) {
+void MDDTable::print_nodes() {
 #if 1
 	for (unsigned int i = 2; i < nodes.size(); i++) {
 		print_node(i);
@@ -549,16 +602,17 @@ void MDDTable::print_nodes(void) {
 #endif
 }
 
-void MDDTable::print_node(_MDD r) {
+void MDDTable::print_node(MDDNodeInt r) {
 	std::cout << r << "(" << nodes[r]->var << "): ";
 	std::cout << "(..," << nodes[r]->low << ")";
-	for (unsigned int jj = 0; jj < nodes[r]->sz; jj++)
+	for (unsigned int jj = 0; jj < nodes[r]->sz; jj++) {
 		std::cout << " (" << nodes[r]->edges[jj].val << "," << nodes[r]->edges[jj].dest << ")";
+	}
 	std::cout << std::endl;
 }
 
-void MDDTable::print_mdd(_MDD r) {
-	std::vector<_MDD> queued;
+void MDDTable::print_mdd(MDDNodeInt r) {
+	std::vector<MDDNodeInt> queued;
 	queued.push_back(r);
 	status[0] = 1;
 	status[1] = 1;
@@ -566,7 +620,7 @@ void MDDTable::print_mdd(_MDD r) {
 	unsigned int head = 0;
 
 	while (head < queued.size()) {
-		_MDD n = queued[head];
+		MDDNodeInt n = queued[head];
 
 		print_node(n);
 		for (unsigned int jj = 0; jj < nodes[n]->sz; jj++) {
@@ -577,16 +631,15 @@ void MDDTable::print_mdd(_MDD r) {
 		}
 		head++;
 	}
-	for (unsigned int i = 0; i < queued.size(); i++) {
-		status[queued[i]] = 0;
+	for (unsigned int i : queued) {
+		status[i] = 0;
 	}
 	status[0] = 0;
 	status[1] = 0;
 }
 
-void MDDTable::print_mdd_tikz(_MDD r) {
+void MDDTable::print_mdd_tikz(MDDNodeInt r) {
 	assert(0);
-	return;
 #if 0
    std::cout << "\\documentclass{article}\n";
 
@@ -601,7 +654,7 @@ void MDDTable::print_mdd_tikz(_MDD r) {
    std::cout << "\\tikzstyle{kaedge} = [draw,thick,=>,color=blue]\n";
    std::cout << "\\tikzstyle{kbedge} = [draw,thick,=>,color=pinegreen!25]\n";
    
-   std::vector<_MDD> queued;
+   std::vector<MDDNodeInt> queued;
    queued.push_back(r);
    status[0] = 1;
    status[1] = 1;
@@ -615,7 +668,7 @@ void MDDTable::print_mdd_tikz(_MDD r) {
    unsigned int var = 0; 
    while( head < queued.size() )
    {
-      _MDD n = queued[head];
+      MDDNodeInt n = queued[head];
       
       if(first)
       {
@@ -650,7 +703,7 @@ void MDDTable::print_mdd_tikz(_MDD r) {
    first = true;
    for( unsigned int i = 0; i < queued.size(); i++ )
    {
-      _MDD n = queued[i];
+      MDDNodeInt n = queued[i];
 
 
       for( unsigned int j = 2; j < nodes[n][0]; j += 2 )
@@ -672,8 +725,7 @@ void MDDTable::print_mdd_tikz(_MDD r) {
 #endif
 }
 
-void MDDTable::print_dot(_MDD r) {
-	return;
+void MDDTable::print_dot(MDDNodeInt r) {
 #if 0
   if(r < 2)
     return;

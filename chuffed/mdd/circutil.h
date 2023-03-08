@@ -1,8 +1,8 @@
-#ifndef __CIRCUTIL_H__
-#define __CIRCUTIL_H__
+#ifndef CIRCUTIL_H
+#define CIRCUTIL_H
 #include <ext/hash_map>
 // #include <tr1/unordered_map>
-#include <chuffed/circuit/MurmurHash3.h>
+// #include <chuffed/circuit/MurmurHash3.h>
 
 #define SEED 0xdeadbeef
 
@@ -14,20 +14,23 @@ struct AutoS {
 	struct eq {
 		bool operator()(const S& a, const S& b) const {
 			if (sizeof(S) % sizeof(uint32_t) == 0) {
-				uint32_t* ap((uint32_t*)&a);
-				uint32_t* bp((uint32_t*)&b);
+				auto* ap((uint32_t*)&a);
+				auto* bp((uint32_t*)&b);
 				for (unsigned int ii = 0; ii < sizeof(S) / sizeof(uint32_t); ii++) {
-					if (ap[ii] != bp[ii]) return false;
-				}
-				return true;
-			} else {
-				char* ap((char*)&a);
-				char* bp((char*)&b);
-				for (unsigned int ii = 0; ii < sizeof(S); ii++) {
-					if (ap[ii] != bp[ii]) return false;
+					if (ap[ii] != bp[ii]) {
+						return false;
+					}
 				}
 				return true;
 			}
+			char* ap((char*)&a);
+			char* bp((char*)&b);
+			for (unsigned int ii = 0; ii < sizeof(S); ii++) {
+				if (ap[ii] != bp[ii]) {
+					return false;
+				}
+			}
+			return true;
 		}
 	};
 

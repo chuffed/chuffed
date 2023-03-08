@@ -91,8 +91,8 @@ private:
 	void topLevelCleanUp();
 	void simplifyDB();
 	void blockCurrentSol();
-	unsigned int getRestartLimit(unsigned int i);  // Return the restart limit for restart i
-	void toggleVSIDS();
+	static unsigned int getRestartLimit(unsigned int i);  // Return the restart limit for restart i
+	void toggleVSIDS() const;
 #if HAS_VAR_IMPACT
 	vec<int>& getVarSizes(vec<int>& outVarSizes) const;
 #endif
@@ -113,7 +113,7 @@ public:
 	void solve(Problem* p, const std::string& problemLabel = "chuffed");
 
 	void set_assumptions(vec<BoolView>& xs);
-	void retrieve_assumption_nogood(vec<BoolView>& xs);
+	static void retrieve_assumption_nogood(vec<BoolView>& xs);
 
 	// Stats
 	void printStats();
@@ -122,8 +122,11 @@ public:
 	int decisionLevel() const { return trail_lim.size(); }
 	int trailPos() const { return trail.size(); }
 	int tpToLevel(int tp) const {
-		for (int i = trail_lim.size(); i--;)
-			if (tp >= trail_lim[i]) return i + 1;
+		for (int i = trail_lim.size(); (i--) != 0;) {
+			if (tp >= trail_lim[i]) {
+				return i + 1;
+			}
+		}
 		return 0;
 	}
 
@@ -149,7 +152,7 @@ public:
 					: _sz == 2 ? *((short*)pt)
 										 : *pt),
 				sz(_sz) {}
-	void undo() {
+	void undo() const {
 		switch (sz) {
 			case 1:
 				*((char*)pt) = x;
@@ -187,6 +190,7 @@ static inline void trailSave(T& v) {
 //------
 
 // Auto-trailed int
+// NOLINTBEGIN
 
 #define AUTOTRAIL(t)                              \
 	class T##t {                                    \
@@ -248,6 +252,7 @@ inline int64_t Tint64_t::operator=(int64_t o) {
 	return v = o;
 }
 
+// NOLINTEND
 //-----
 
 class Problem {

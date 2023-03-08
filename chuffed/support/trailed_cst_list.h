@@ -26,11 +26,17 @@ public:
 
 	virtual int key(T k) = 0;
 
-	bool get(int k, T* val = NULL) {
-		if (k < 0 || k >= max_size) return false;
+	bool get(int k, T* val = nullptr) {
+		if (k < 0 || k >= max_size) {
+			return false;
+		}
 		if (sparse[k] > -1 && sparse[k] < size) {
-			if (key(dense[sparse[k]]) != k) return false;
-			if (val != NULL) *val = dense[sparse[k]];
+			if (key(dense[sparse[k]]) != k) {
+				return false;
+			}
+			if (val != nullptr) {
+				*val = dense[sparse[k]];
+			}
 			return true;
 		}
 		return false;
@@ -54,7 +60,7 @@ public:
 		int i;
 
 	public:
-		Iterator(int _i = 0) : l(NULL), i(_i) {}
+		Iterator(int _i = 0) : l(nullptr), i(_i) {}
 		Iterator(TrailedConstantAccessList* _l, int _i = 0) : l(_l), i(_i) {}
 		Iterator& operator++() {
 			i++;

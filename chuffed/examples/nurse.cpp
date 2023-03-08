@@ -1,7 +1,7 @@
+#include <cerrno>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <errno.h>
 #include <iostream>
 #include <utility>
 
@@ -44,7 +44,9 @@ void mdd_gcc(vec<IntVar*>& vs, CardOp op, const vec<int>& cards) {
 	vec<vec<MDD> > vars;
 	for (int ii = 0; ii < vs.size(); ii++) {
 		vars.push();
-		for (int jj = 0; jj < cards.size(); jj++) vars.last().push(tab.vareq(ii, jj));
+		for (int jj = 0; jj < cards.size(); jj++) {
+			vars.last().push(tab.vareq(ii, jj));
+		}
 	}
 	MDD ret(circ_gcc(tab.fff(), vars, op, cards));
 
@@ -57,7 +59,9 @@ MDD multi_sequence(MDDTable& tab, int nDays, vec<int>& bmin, vec<int>& bmax, vec
 
 	for (int ii = 0; ii < bsz.size(); ii++) {
 		vec<MDD> terms;
-		for (int jj = 0; jj < nDays; jj++) terms.push(tab.vareq(jj, ii));
+		for (int jj = 0; jj < nDays; jj++) {
+			terms.push(tab.vareq(jj, ii));
+		}
 		seq = seq & (sequence(tab.fff(), terms, bmin[ii], bmax[ii], bsz[ii]));
 	}
 	return seq;
@@ -69,7 +73,7 @@ class NurseSeq : public Problem {
 public:
 	class Opts {
 	public:
-		Opts() : model(1), gcard(false) {}
+		Opts() : model(1), gcard(0) {}
 
 		int model;
 		int gcard;
@@ -82,7 +86,9 @@ public:
 		Parse::StreamBuffer in(file);
 
 		Parse::skipWhitespace(in);
-		while (*in == '#') Parse::skipLine(in);
+		while (*in == '#') {
+			Parse::skipLine(in);
+		}
 
 		nNurses = Parse::parseInt(in);
 		nDays = Parse::parseInt(in);
@@ -100,7 +106,9 @@ public:
 				coverage.last().push(parseInt(in));
 				cov += coverage.last().last();
 			}
-			if (cov > maxcov) maxcov = cov;
+			if (cov > maxcov) {
+				maxcov = cov;
+			}
 		}
 		nNurses = 1.5 * maxcov;
 
@@ -119,15 +127,18 @@ public:
 		// Coverage
 		vec<int> cov_props;  // Coverage propagator ids.
 		for (int j = 0; j < nDays; j++) {
-			if (!opts.gcard) {
+			if (opts.gcard == 0) {
 				for (int i = 0; i < nShifts; i++) {
 					// Required coverage for the day.
 					int req = coverage[j][i];
-					if (req == 0) continue;
+					if (req == 0) {
+						continue;
+					}
 
 					vec<BoolView> rostered;
-					for (int k = 0; k < nNurses; k++)
+					for (int k = 0; k < nNurses; k++) {
 						rostered.push(xs[(nNurses * j) + k]->getLit(i, 1));  // [[ nurse_shift = i ]]
+					}
 					bool_linear_decomp(rostered, IRT_GE, req);
 #if 0
               fprintf(out, "bool_linear_ge(["); 
@@ -160,7 +171,9 @@ public:
 		vec<int> bmax;
 		vec<int> bsz;
 		vec<int> domvec;
-		for (int i = 0; i < nDays; i++) domvec.push(nShifts);
+		for (int i = 0; i < nDays; i++) {
+			domvec.push(nShifts);
+		}
 
 		// Spacing
 		/*
@@ -215,7 +228,7 @@ public:
 
 		MDDTable tab(nDays);
 
-		_MDD _spacing = fd_regular(tab, nDays, nStates, trans, q0, accepts, false);
+		MDDNodeInt _spacing = fd_regular(tab, nDays, nStates, trans, q0, accepts, false);
 		MDD spacing(&tab, _spacing);
 		/* /
 		MDD spacing = tab.ttt();
@@ -276,14 +289,16 @@ public:
 		for (int i = 0; i < nNurses; i++) {
 			// Multi-sequence constraint
 			inst.clear();
-			for (int j = 0; j < nDays; j++) inst.push(xs[j * nNurses + i]);
+			for (int j = 0; j < nDays; j++) {
+				inst.push(xs[j * nNurses + i]);
+			}
 
 			addMDD(inst, seqprop, mopts);
 		}
 		fprintf(out, "satisfy\n");
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int ii = 0; ii < nDays; ii++) {
 			bool first = true;
 			os << "[";
@@ -307,25 +322,28 @@ protected:
 
 static char* hasPrefix(char* str, const char* prefix) {
 	int len = strlen(prefix);
-	if (strncmp(str, prefix, len) == 0)
+	if (strncmp(str, prefix, len) == 0) {
 		return str + len;
-	else
-		return NULL;
+	}
+	return nullptr;
 }
 
 int main(int argc, char** argv) {
 	NurseSeq::Opts opts;
 
 	// Problem-specific options
-	int i, j;
+	int i;
+	int j;
 	const char* value;
 	for (i = j = 0; i < argc; i++) {
-		if ((value = hasPrefix(argv[i], "-model="))) {
+		value = hasPrefix(argv[i], "-model=");
+		if (value != nullptr) {
 			opts.model = atoi(value);
 		} else if (strcmp(argv[i], "-gcc") == 0) {
-			opts.gcard = true;
-		} else
+			opts.gcard = 1;
+		} else {
 			argv[j++] = argv[i];
+		}
 	}
 	argc = j;
 

@@ -53,7 +53,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < v; i++) {
 			os << x[i]->getVal() << ", ";
 		}

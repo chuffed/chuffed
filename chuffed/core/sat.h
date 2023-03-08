@@ -22,18 +22,25 @@ class SClause;
 extern std::map<int, std::string> litString;
 
 inline std::string getLitString(int n) {
-	if (n == toInt(lit_True)) return "true";
-	if (n == toInt(lit_False)) return "false";
-	if (n == toInt(~lit_True)) return "false";
-	if (n == toInt(~lit_False)) return "true";
-	std::map<int, std::string>::const_iterator it = litString.find(n);
-	if (it != litString.end())
-		return it->second;
-	else {
-		std::stringstream ss;
-		ss << "UNKNOWN_LITERAL (" << n << ")";
-		return ss.str();
+	if (n == toInt(lit_True)) {
+		return "true";
 	}
+	if (n == toInt(lit_False)) {
+		return "false";
+	}
+	if (n == toInt(~lit_True)) {
+		return "false";
+	}
+	if (n == toInt(~lit_False)) {
+		return "true";
+	}
+	std::map<int, std::string>::const_iterator it = litString.find(n);
+	if (it != litString.end()) {
+		return it->second;
+	}
+	std::stringstream ss;
+	ss << "UNKNOWN_LITERAL (" << n << ")";
+	return ss.str();
 }
 
 class SAT : public Branching {
@@ -136,8 +143,8 @@ public:
 	void removeClause(Clause& c);
 	void topLevelCleanUp();
 	void simplifyDB();
-	bool simplify(Clause& c);
-	void enqueue(Lit p, Reason r = NULL);
+	bool simplify(Clause& c) const;
+	void enqueue(Lit p, Reason r = nullptr);
 	void cEnqueue(Lit p, Reason r);
 	void aEnqueue(Lit p, Reason r, int l);
 	void untrailToPos(vec<Lit>& t, int p);
@@ -146,17 +153,17 @@ public:
 	bool propagate();
 	Clause* getExpl(Lit p);
 	Clause* _getExpl(Lit p);
-	Clause* getConfl(Reason& r, Lit p);
+	Clause* getConfl(Reason& r, Lit p) const;
 
 	void reduceDB();
-	void printStats();
+	void printStats() const;
 	void printLearntStats();
 
 	// Branching methods
 
-	bool finished();
-	double getScore(VarBranch vb) { NEVER; }
-	DecInfo* branch();
+	bool finished() override;
+	double getScore(VarBranch vb) override { NEVER; }
+	DecInfo* branch() override;
 
 	// Solution-based phase saving
 	void saveCurrentPolarities() {
@@ -196,8 +203,10 @@ public:
 	}
 	bool isCurLevel(int v) const { return trailpos[v] >= engine.trail_lim.last(); }
 	int getLevel(int v) const {
-		for (int i = engine.trail_lim.size(); i--;) {
-			if (trailpos[v] >= engine.trail_lim[i]) return i;
+		for (int i = engine.trail_lim.size(); (i--) != 0;) {
+			if (trailpos[v] >= engine.trail_lim[i]) {
+				return i;
+			}
 		}
 		return 0;
 	}
@@ -207,7 +216,7 @@ public:
 	void printLit(Lit p);
 	template <class T>
 	void printClause(T& c);
-	void checkConflict();
+	void checkConflict() const;
 	void checkExplanation(Clause& c, int clevel, int index);
 };
 
@@ -219,12 +228,16 @@ inline void SAT::newDecisionLevel() {
 
 inline void SAT::incVarUse(int v) {
 	v -= orig_cutoff;
-	if (v >= 0) num_used[v]++;
+	if (v >= 0) {
+		num_used[v]++;
+	}
 }
 
 inline void SAT::decVarUse(int v) {
 	v -= orig_cutoff;
-	if (v >= 0) num_used[v]--;
+	if (v >= 0) {
+		num_used[v]--;
+	}
 }
 
 inline Clause* SAT::getExpl(Lit p) {
@@ -239,7 +252,9 @@ inline Clause* SAT::getExpl(Lit p) {
 			Clause& c = *short_expl;
 			c.sz = r.d.type;
 			c[1] = toLit(r.d.d1);
-			if (c.sz == 3) c[2] = toLit(r.d.d2);
+			if (c.sz == 3) {
+				c[2] = toLit(r.d.d2);
+			}
 			return short_expl;
 	}
 }

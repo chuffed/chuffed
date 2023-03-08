@@ -8,8 +8,8 @@
 
 using namespace std;
 
-#define MIN(a, b) ((a < b) ? a : b)
-#define MAX(a, b) ((a > b) ? a : b)
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 #define MSTPROP_DEBUG 0
 
@@ -26,13 +26,16 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 																	 std::vector<vector<int> >& ends) {
 	std::vector<iipair> sorted;
 
-	for (unsigned int i = 0; i < weights.size(); i++) sorted.push_back(make_pair(i, weights[i]));
+	for (unsigned int i = 0; i < weights.size(); i++) {
+		sorted.emplace_back(i, weights[i]);
+	}
 	std::sort(sorted.begin(), sorted.end(), sorter);
 
 	// Minimum ST
 
 	unsigned int i = 0;
-	int in = 0, cost = 0;
+	int in = 0;
+	int cost = 0;
 	UF<int> uf(n);
 	while (i < sorted.size() && in < n - 1) {
 		int e = sorted[i].first;
@@ -47,7 +50,8 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 
 	// Maximum ST
 	unsigned int i2 = sorted.size() - 1;
-	int in2 = 0, cost2 = 0;
+	int in2 = 0;
+	int cost2 = 0;
 	UF<int> uf2(n);
 	while (i2 >= 0 && in2 < n - 1) {
 		int e = sorted[i2].first;
@@ -76,19 +80,24 @@ public:
 		MSTPropagator* p;
 		bool dec;
 		sortByW(MSTPropagator* _p) : p(_p), dec(false) {}
-		bool operator()(int e1, int e2) {
-			if (dec) return p->ws[e1] > p->ws[e2];
+		bool operator()(int e1, int e2) const {
+			if (dec) {
+				return p->ws[e1] > p->ws[e2];
+			}
 			return p->ws[e1] < p->ws[e2];
 		}
 	} sort_by_w;
 
-public:
 	MSTPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj,
 								vec<vec<int> >& _en, IntVar* _w, vec<int>& _ws)
 			: TreePropagator(_vs, _es, _adj, _en), w(_w), sort_by_w(this) {
-		for (int i = 0; i < _ws.size(); i++) ws.push_back(_ws[i]);
+		for (int i = 0; i < _ws.size(); i++) {
+			ws.push_back(_ws[i]);
+		}
 
-		for (unsigned int i = 0; i < ws.size(); i++) sorted.push_back(make_pair(i, ws[i]));
+		for (unsigned int i = 0; i < ws.size(); i++) {
+			sorted.emplace_back(i, ws[i]);
+		}
 		std::sort(sorted.begin(), sorted.end(), sorter);
 
 		// for (int i = 0; i < _en.size(); i++)
@@ -105,7 +114,7 @@ public:
 		w->attach(this, nbEdges() + nbNodes(), EVENT_LU);
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i == nbEdges() + nbNodes()) {
 			pushInQueue();
 		} else {
@@ -113,7 +122,7 @@ public:
 		}
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		if (!TreePropagator::propagate()) {
 			return false;
 		}
@@ -147,7 +156,8 @@ public:
 				}
 				// cout <<"Looking at "<<e<<endl;
 				int w = sorted[i].second;
-				int u = endnodes[e][0], v = endnodes[e][1];
+				int u = endnodes[e][0];
+				int v = endnodes[e][1];
 				bool connected = uf.connected(u, v);
 
 				// I wanted to connected them, but I can't bc I'm out
@@ -176,7 +186,9 @@ public:
 								(subs[e_path] == -1) ? e : ((ws[subs[e_path]] > ws[e]) ? e : subs[e_path]);
 					}
 					if (heavier) {
-						if (getEdgeVar(e).isFalse()) expl_fail.push(getEdgeVar(e).getValLit());
+						if (getEdgeVar(e).isFalse()) {
+							expl_fail.push(getEdgeVar(e).getValLit());
+						}
 					}
 					support[e] = arg_maxw;
 				}
@@ -204,27 +216,30 @@ public:
 				sat.confl = expl;
 			}
 			return false;
-		} else {
-			bool computed_expl = false;
-			vec<Lit> ps;
-			for (int e = 0; e < nbEdges(); e++) {
-				if (support[e] < 0 || getEdgeVar(e).isFixed()) continue;
+		}
+		bool computed_expl = false;
+		vec<Lit> ps;
+		for (int e = 0; e < nbEdges(); e++) {
+			if (support[e] < 0 || getEdgeVar(e).isFixed()) {
+				continue;
+			}
 
-				if (c - ws[support[e]] + ws[e] > w->getMax()) {
-					Clause* r = NULL;
-					if (so.lazy) {
-						if (!computed_expl) {
-							ps.push();
-							for (int i = 0; i < expl_fail.size(); i++) ps.push(expl_fail[i]);
-							explain_mandatory(ps, c, subs);
-							ps.push(w->getMaxLit());
-							computed_expl = true;
+			if (c - ws[support[e]] + ws[e] > w->getMax()) {
+				Clause* r = nullptr;
+				if (so.lazy) {
+					if (!computed_expl) {
+						ps.push();
+						for (int i = 0; i < expl_fail.size(); i++) {
+							ps.push(expl_fail[i]);
 						}
-						// vec<Lit> ps2; ps2.push(); fullExpl(ps2);
-						r = Reason_new(ps);
+						explain_mandatory(ps, c, subs);
+						ps.push(w->getMaxLit());
+						computed_expl = true;
 					}
-					getEdgeVar(e).setVal(false, r);
+					// vec<Lit> ps2; ps2.push(); fullExpl(ps2);
+					r = Reason_new(ps);
 				}
+				getEdgeVar(e).setVal(false, r);
 			}
 		}
 		return true;
@@ -237,7 +252,7 @@ public:
 			if (es[j].isFixed() && es[j].isTrue())
 			in_edges.push_back(j);
 		*/
-		if (in_edges.size() == 0) {
+		if (in_edges.empty()) {
 			return;
 		}
 		std::vector<int> in_edges_cpy = in_edges;
@@ -248,9 +263,7 @@ public:
 		// bool prevention_case = c <= w->getMax();
 
 		int cost = c;
-		for (unsigned int i = 0;
-				 i < in_edges_cpy.size() /*&& ( prevention_case || cost > w->getMax())*/; i++) {
-			int e = in_edges_cpy[i];
+		for (int e : in_edges_cpy) {
 			if (substitute[e] == -1 || ws[e] <= ws[substitute[e]]) {
 				continue;
 			}
@@ -261,7 +274,6 @@ public:
 				add++;
 			}
 		}
-		return;
 	}
 };
 
@@ -270,7 +282,6 @@ MSTPropagator* mst_p;
 void mst(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj, vec<vec<int> >& _en,
 				 IntVar* _w, vec<int>& _ws) {
 	mst_p = new MSTPropagator(_vs, _es, _adj, _en, _w, _ws);
-	return;
 }
 
 bool sortPairKey2(std::pair<int, int> u, pair<int, int> v) { return u.second < v.second; }
@@ -291,26 +302,36 @@ class DCMSTSearch : public BranchGroup {
 		root = (IntVar*)(x[0]);
 
 		int max_w = ws[0];
-		for (int i = 0; i < mst_p->nbEdges(); i++)
-			if (ws[i] > max_w) max_w = ws[i];
-
-		for (int i = 0; i < mst_p->nbNodes(); i++)
-			for (int j = 0; j < mst_p->nbNodes(); j++) {
-				if (i == j)
-					dist[i].push_back(0);
-				else
-					dist[i].push_back(max_w + 1);
+		for (int i = 0; i < mst_p->nbEdges(); i++) {
+			if (ws[i] > max_w) {
+				max_w = ws[i];
 			}
+		}
+
+		for (int i = 0; i < mst_p->nbNodes(); i++) {
+			for (int j = 0; j < mst_p->nbNodes(); j++) {
+				if (i == j) {
+					dist[i].push_back(0);
+				} else {
+					dist[i].push_back(max_w + 1);
+				}
+			}
+		}
 
 		for (int i = 0; i < mst_p->nbEdges(); i++) {
 			dist[mst_p->getEndnode(i, 0)][mst_p->getEndnode(i, 1)] = ws[i];
 			dist[mst_p->getEndnode(i, 1)][mst_p->getEndnode(i, 0)] = ws[i];
 		}
 
-		for (int i = 0; i < mst_p->nbNodes(); i++)
-			for (int j = 0; j < mst_p->nbNodes(); j++)
-				for (int k = 0; k < mst_p->nbNodes(); k++)
-					if (dist[i][j] > dist[i][k] + dist[k][j]) dist[i][j] = dist[i][k] + dist[k][j];
+		for (int i = 0; i < mst_p->nbNodes(); i++) {
+			for (int j = 0; j < mst_p->nbNodes(); j++) {
+				for (int k = 0; k < mst_p->nbNodes(); k++) {
+					if (dist[i][j] > dist[i][k] + dist[k][j]) {
+						dist[i][j] = dist[i][k] + dist[k][j];
+					}
+				}
+			}
+		}
 
 		if (((IntVar*)x[0])->getMax() == mst_p->nbNodes()) {
 			//            cout << "Even" <<endl;
@@ -319,7 +340,7 @@ class DCMSTSearch : public BranchGroup {
 				for (int j = 0; j < mst_p->nbNodes(); j++) {
 					s += dist[i][j];
 				}
-				sums.push_back(make_pair(i, s));
+				sums.emplace_back(i, s);
 			}
 
 			sort(sums.begin(), sums.end(), sortPairKey2);
@@ -330,7 +351,9 @@ class DCMSTSearch : public BranchGroup {
 
 			for (int i = 0; i < mst_p->nbNodes(); i++) {
 				vector<std::pair<int, int> > cost;
-				for (int j = 0; j < mst_p->nbNodes(); j++) cost.push_back(make_pair(j, dist[i][j]));
+				for (int j = 0; j < mst_p->nbNodes(); j++) {
+					cost.emplace_back(j, dist[i][j]);
+				}
 				sort(cost.begin(), cost.end(), sortPairKey2);
 				reverse(cost.begin(), cost.end());
 				costs.push_back(cost);
@@ -343,7 +366,7 @@ class DCMSTSearch : public BranchGroup {
 				for (int j = 0; j < mst_p->nbNodes(); j++) {
 					s += dist[i][j];
 				}
-				tmp.push_back(make_pair(i, s));
+				tmp.emplace_back(i, s);
 			}
 			for (int e = 0; e < mst_p->nbEdges(); e++) {
 				int i = mst_p->getEndnode(e, 0);
@@ -351,10 +374,11 @@ class DCMSTSearch : public BranchGroup {
 				// Is v the MIN or the SUM?? Its not clear from the paper that
 				// describes the searchs trategy....
 				int v = MIN(tmp[i].second, tmp[j].second);
-				sums.push_back(make_pair(e, v));
+				sums.emplace_back(e, v);
 				vector<std::pair<int, int> > cost;
-				for (int k = 0; k < mst_p->nbNodes(); k++)
-					cost.push_back(make_pair(k, MIN(dist[i][k], dist[j][k])));
+				for (int k = 0; k < mst_p->nbNodes(); k++) {
+					cost.emplace_back(k, MIN(dist[i][k], dist[j][k]));
+				}
 				sort(cost.begin(), cost.end(), sortPairKey2);
 				reverse(cost.begin(), cost.end());
 				costs.push_back(cost);
@@ -370,7 +394,7 @@ class DCMSTSearch : public BranchGroup {
 public:
 	static DCMSTSearch* search;
 	static DCMSTSearch* getDCMSTSearch(vec<Branching*>& _x, VarBranch vb, bool t) {
-		if (search == NULL) {
+		if (search == nullptr) {
 			search = new DCMSTSearch(_x, vb, t);
 		}
 		return search;
@@ -382,8 +406,10 @@ public:
 		int act;
 	};
 
-	bool finished() {
-		if (fin) return true;
+	bool finished() override {
+		if (fin != 0) {
+			return true;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			if (!x[i]->finished()) {
 				// cout <<"Not finished with "<<i<<endl;
@@ -415,14 +441,14 @@ public:
 		return false;
 	}
 
-	struct Action nextAction(struct Action prev) {
+	struct Action nextAction(struct Action prev) const {
 		struct Action next = {-1, -1, -1};
 		int h = prev.h;
 		if (prev.idx + 1 == (int)to_look.size()) {
 			h++;
 		}
 		if (h > max_h) {  // Should have finished
-			assert(finished());
+			// assert(finished());
 			return next;
 		}
 
@@ -436,7 +462,7 @@ public:
 		if (t.act == -1) {
 			// Finish!
 			assert(finished());
-			*di = NULL;
+			*di = nullptr;
 			return true;
 		}
 		int v = to_look[t.idx].first;
@@ -452,7 +478,8 @@ public:
 				return true;
 			}
 			return false;
-		} else if (t.act == 1) {
+		}
+		if (t.act == 1) {
 			if (!((IntVar*)x[v + 1])->isFixed() && ((IntVar*)x[v + 1])->indomain(t.h)) {
 				*di = new DecInfo(x[v + 1], t.h, 1);
 				// cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Node  "<< v+1 << " will take value
@@ -460,39 +487,40 @@ public:
 				return true;
 			}
 			return false;
-		} else {
-			assert(false);
-			return false;  // Never
 		}
+		assert(false);
+		return false;  // Never
 	}
 	//* Naive version below. This uses a list of actions to
 	// Restore the sate and know here I am in the loop at all times.
-	DecInfo* branch() {
+	DecInfo* branch() override {
 		// cout <<"Enter branch"<<endl;
-		DecInfo* di = NULL;
+		DecInfo* di = nullptr;
 		if (!((IntVar*)x[0])->finished()) {
-			for (unsigned int i = 0; i < sums.size(); i++) {
-				if (((IntVar*)x[0])->indomain(sums[i].first + 1)) {
-					di = new DecInfo(x[0], sums[i].first + 1, 1);
+			for (auto& sum : sums) {
+				if (((IntVar*)x[0])->indomain(sum.first + 1)) {
+					di = new DecInfo(x[0], sum.first + 1, 1);
 					// cout <<"New root "<<i<<" "<<sums[i].first<<" "<<(x[0]) <<endl;
 					// for (int j = 0; j < costs[sums[i].first].size(); j++) {
 					//     cout <<  (costs[sums[i].first][j].first) <<",";
 					// }
 					// cout<<endl;
-					to_look = costs[sums[i].first];
+					to_look = costs[sum.first];
 					decisions.clear();
 					last_dec_level = engine.decisionLevel() - 1;
 					// cout <<"foudn new root"<<endl;
 					return di;
 				}
 			}
-			return NULL;
+			return nullptr;
 		}
-		if (finished()) return NULL;
+		if (finished()) {
+			return nullptr;
+		}
 		struct Action nttd = {0, 0, -1};
 		if (backtrack()) {
 			// cout <<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>BT"<<endl;
-			assert(decisions.size() > 0 || engine.decisionLevel() == 0);
+			assert(!decisions.empty() || engine.decisionLevel() == 0);
 			if (engine.decisionLevel() == 0) {
 				assert(last_dec_level == 0);
 				decisions.clear();
@@ -524,12 +552,12 @@ public:
 			// cout << "nxt nttd "<<nttd.idx<<" "<<nttd.h<<" "<<nttd.act<<endl;
 		}
 		// cout << "di "<<di<<endl;
-		if (di != NULL) {
+		if (di != nullptr) {
 			decisions.push_back(nttd);
 			assert(nttd.h < max_h + 1);
 		}
 
-		assert(di != NULL || finished());
+		assert(di != nullptr || finished());
 		return di;
 	}  //*/
 
@@ -562,4 +590,4 @@ public:
 			return di;
 			}*/
 };
-DCMSTSearch* DCMSTSearch::search = NULL;
+DCMSTSearch* DCMSTSearch::search = nullptr;

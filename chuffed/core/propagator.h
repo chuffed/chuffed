@@ -45,8 +45,7 @@ public:
 	// Intermediate state
 	bool in_queue;
 
-	Propagator()
-			: prop_id(engine.propagators.size()), priority(0), satisfied(false), in_queue(false) {
+	Propagator() : prop_id(engine.propagators.size()), priority(0), satisfied(0), in_queue(false) {
 		engine.propagators.push(this);
 	}
 
@@ -110,7 +109,7 @@ public:
 };
 
 static inline Clause* Reason_new(int sz) {
-	Clause* c = (Clause*)malloc(sizeof(Clause) + sz * sizeof(Lit));
+	auto* c = (Clause*)malloc(sizeof(Clause) + sz * sizeof(Lit));
 	c->clearFlags();
 	c->temp_expl = 1;
 	c->sz = sz;
@@ -133,9 +132,9 @@ static inline Clause* Reason_new(std::vector<Lit> ps) {
 	return c;
 }
 
-#define TL_SET(var, op, val)                            \
-	do {                                                  \
-		if (var->op##NotR(val) && !var->op(val)) TL_FAIL(); \
+#define TL_SET(var, op, val)                                \
+	do {                                                      \
+		if ((var)->op##NotR(val) && !(var)->op(val)) TL_FAIL(); \
 	} while (0)
 
 #define setDom(var, op, val, ...)                  \
@@ -148,10 +147,10 @@ static inline Clause* Reason_new(std::vector<Lit> ps) {
 		}                                              \
 	} while (0)
 
-#define setDom2(var, op, val, index)                                         \
-	do {                                                                       \
-		int64_t v = (val);                                                       \
-		if (var.op##NotR(v) && !var.op(v, Reason(prop_id, index))) return false; \
+#define setDom2(var, op, val, index)                                             \
+	do {                                                                           \
+		int64_t v = (val);                                                           \
+		if ((var).op##NotR(v) && !(var).op(v, Reason(prop_id, index))) return false; \
 	} while (0)
 
 #include <chuffed/globals/globals.h>

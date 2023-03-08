@@ -15,7 +15,7 @@ public:
 	int* rtoc;
 	int* ctor;
 	int* shift;
-	SimplexState() : rtoc(NULL), ctor(NULL), shift(NULL) {}
+	SimplexState() : rtoc(nullptr), ctor(nullptr), shift(nullptr) {}
 };
 
 class IndexVal {
@@ -59,12 +59,12 @@ public:
 	int m;       // number of constraints
 	int A_size;  // number of coefficients
 
-	IndexVal** AH;  // original constraints horizontally
-	IndexVal** AV;  // original constraints vertically
-	IndexVal* _AH;  // memory for AH
-	IndexVal* _AV;  // memory for AV
-	int* AH_nz;     // number of non-zeros in AH
-	int* AV_nz;     // number of non-zeros in AV
+	IndexVal** AH;     // original constraints horizontally
+	IndexVal** AV;     // original constraints vertically
+	IndexVal* AH_mem;  // memory for AH
+	IndexVal* AV_mem;  // memory for AV
+	int* AH_nz;        // number of non-zeros in AH
+	int* AV_nz;        // number of non-zeros in AV
 
 	long double* Z;    // pivot row of B^-1
 	long double* Y;    // pivot column
@@ -117,13 +117,13 @@ public:
 
 	struct SortColRatio {
 		long double*& ratio;
-		bool operator()(int i, int j) { return (ratio[i] < ratio[j]); }
+		bool operator()(int i, int j) const { return (ratio[i] < ratio[j]); }
 		SortColRatio(long double*& r) : ratio(r) {}
 	} sort_col_ratio;
 
 	struct SortColNz {
 		int*& nz;
-		bool operator()(int i, int j) { return (nz[i] < nz[j]); }
+		bool operator()(int i, int j) const { return (nz[i] < nz[j]); }
 		SortColNz(int*& _nz) : nz(_nz) {}
 	} sort_col_nz;
 
@@ -133,8 +133,8 @@ public:
 
 	void init();
 	void pivotObjVar();
-	void boundChange(int v, int d);
-	void boundSwap(int v);
+	void boundChange(int v, int d) const;
+	void boundSwap(int v) const;
 	int simplex();
 	bool findPivotRow();
 	void regeneratePivotRow();
@@ -154,44 +154,46 @@ public:
 	void calcObjBound();
 	void calcBInvRow(long double* a, int r);
 	void updateBasis();
-	void updateNorms();
+	void updateNorms() const;
 	void refactorB();
 
-	void saveState(SimplexState& s);
-	void loadState(SimplexState& s);
+	void saveState(SimplexState& s) const;
+	void loadState(SimplexState& s) const;
 
 	// Debug methods
 
-	void printObjective();
+	void printObjective() const;
 	void printTableau(bool full = false);
 	void printL();
 	void printU();
-	void printLUF();
+	void printLUF() const;
 	void printB();
-	void printRHS();
+	void printRHS() const;
 
-	void checkObjective();
+	void checkObjective() const;
 	void checkBasis();
-	void unboundedDebug();
+	void unboundedDebug() const;
 
 	// inline methods
 
-	void checkZero13(long double& a);
-	bool almostZero6(long double a);
-	long double optimum();
-	int gap(int i);
+	static void checkZero13(long double& a);
+	static bool almostZero6(long double a);
+	long double optimum() const;
+	int gap(int i) const;
 };
 
 extern Simplex simplex;
 
 inline void Simplex::checkZero13(long double& a) {
 	//	if ((((int*) &a)[2] & 0x7fff) <= 16339)           // 16382 + log_2(precision)
-	if (-1e-13 < a && a < 1e-13) a = 0;
+	if (-1e-13 < a && a < 1e-13) {
+		a = 0;
+	}
 }
 
 inline bool Simplex::almostZero6(long double a) { return (-0.000001 < a && a < 0.000001); }
 
-inline long double Simplex::optimum() { return -obj_bound - bound_weaken; }
-inline int Simplex::gap(int i) { return ub[i] - lb[i]; }
+inline long double Simplex::optimum() const { return -obj_bound - bound_weaken; }
+inline int Simplex::gap(int i) const { return ub[i] - lb[i]; }
 
 #endif

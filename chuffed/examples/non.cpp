@@ -3,10 +3,10 @@
 #include <chuffed/core/propagator.h>
 #include <chuffed/globals/mddglobals.h>
 
+#include <cerrno>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <errno.h>
 #include <iostream>
 #include <utility>
 
@@ -18,7 +18,9 @@ static void nonogramDFA(vec<int>& blocks, vec<vec<int> >& output);
 static void skipComments(std::istream& i) {
 	assert(i.peek() == '#' || i.peek() == '\n');
 
-	while (i.peek() != '\n' && i.peek() != EOF) i.ignore();
+	while (i.peek() != '\n' && i.peek() != EOF) {
+		i.ignore();
+	}
 
 	i.ignore();
 }
@@ -33,7 +35,9 @@ public:
 	Nonogram() {
 		// Generate instance
 
-		while (std::cin.peek() == '#' || std::cin.peek() == '\n') skipComments(std::cin);
+		while (std::cin.peek() == '#' || std::cin.peek() == '\n') {
+			skipComments(std::cin);
+		}
 
 		std::cin >> r;
 		std::cin >> c;
@@ -89,7 +93,7 @@ public:
 		branch(pref_order, VAR_INORDER, VAL_MIN);
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < x.size(); i++) {
 			int v = x[i]->getVal();
 			os << i << ": " << v << "\n";

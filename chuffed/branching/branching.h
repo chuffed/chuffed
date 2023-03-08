@@ -78,9 +78,9 @@ public:
 	BranchGroup(VarBranch vb = VAR_INORDER, bool t = false);
 	BranchGroup(vec<Branching*>& _x, VarBranch vb, bool t = false);
 
-	bool finished();
-	double getScore(VarBranch vb);
-	DecInfo* branch();
+	bool finished() override;
+	double getScore(VarBranch vb) override;
+	DecInfo* branch() override;
 
 	virtual void add(Branching* n) { x.push(n); }
 };
@@ -96,11 +96,11 @@ public:
 
 	PriorityBranchGroup(vec<Branching*>& _x, VarBranch vb);
 
-	bool finished();
-	double getScore(VarBranch vb);
-	DecInfo* branch();
+	bool finished() override;
+	double getScore(VarBranch vb) override;
+	DecInfo* branch() override;
 
-	void add(Branching* n) { annotations.push(n); }
+	void add(Branching* n) override { annotations.push(n); }
 };
 
 #endif

@@ -31,14 +31,13 @@ public:
 	bool coherence_innodes(int edge, std::vector<node_id>& added_n);
 	bool coherence_outedges(int node, std::vector<edge_id>& remvd_e);
 
-public:
 	GraphPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _en);
-	virtual void clearPropState();
-	virtual ~GraphPropagator();
+	void clearPropState() override;
+	~GraphPropagator() override;
 
 	virtual void attachToAll();
-	virtual void wakeup(int i, int c);
-	virtual bool propagate();
+	void wakeup(int i, int c) override;
+	bool propagate() override;
 
 	inline BoolView& getNodeVar(int u) {
 		assert(u >= 0);
@@ -52,9 +51,9 @@ public:
 		return es[e];
 	}
 
-	inline int nbNodes() { return vs.size(); }
+	inline int nbNodes() const { return vs.size(); }
 
-	inline int nbEdges() { return es.size(); }
+	inline int nbEdges() const { return es.size(); }
 
 	inline int getHead(int e) {
 		assert(e >= 0);

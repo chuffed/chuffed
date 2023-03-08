@@ -33,7 +33,7 @@ void Engine::printStats() {
 	printf("%%%%%%mzn-stat: solveTime=%.3f\n", to_sec(search_time));
 
 	// Chuffed specific statistics
-	if (opt_var) {
+	if (opt_var != nullptr) {
 		printf("%%%%%%mzn-stat: objective=%d\n", best_sol);
 		printf("%%%%%%mzn-stat: optTime=%.3f\n", to_sec(opt_time));
 	}
@@ -42,7 +42,10 @@ void Engine::printStats() {
 	printf("%%%%%%mzn-stat: randomSeed=%d\n", so.rnd_seed);
 
 	if (so.verbosity >= 2) {
-		int nl = 0, el = 0, ll = 0, sl = 0;
+		int nl = 0;
+		int el = 0;
+		int ll = 0;
+		int sl = 0;
 		for (int i = 0; i < vars.size(); i++) {
 			switch (vars[i]->getType()) {
 				case INT_VAR:

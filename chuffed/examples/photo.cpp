@@ -27,8 +27,10 @@ public:
 		//		n_prefs = 24 + (int) floor((double) rand()/RAND_MAX*12);
 		n_names = 10 + (int)floor((double)rand() / RAND_MAX * 3);
 		n_prefs = 20 + (int)floor((double)rand() / RAND_MAX * 10);
-		prefs = (int*)malloc(2 * n_prefs * sizeof(int));
-		for (int i = 0; i < 2 * n_prefs; i++) prefs[i] = rand() % n_names;
+		prefs = (int*)malloc(static_cast<size_t>(2 * n_prefs) * sizeof(int));
+		for (int i = 0; i < 2 * n_prefs; i++) {
+			prefs[i] = rand() % n_names;
+		}
 
 		printf("%d preferences\n", n_prefs);
 
@@ -66,7 +68,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n_names; i++) {
 			os << x[i]->getVal() << ", ";
 		}

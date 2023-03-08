@@ -24,10 +24,10 @@
 // Code for additional option handling.
 static char* hasPrefix(char* str, const char* prefix) {
 	int len = strlen(prefix);
-	if (strncmp(str, prefix, len) == 0)
+	if (strncmp(str, prefix, len) == 0) {
 		return str + len;
-	else
-		return NULL;
+	}
+	return nullptr;
 }
 
 #ifdef DISTINCT_REST
@@ -62,7 +62,9 @@ public:
 		int first = 0;
 		while (first < shifts) {
 			for (int ii = 0; ii < acts; ii++) {
-				if (demand[first][ii]) goto found_first;
+				if (demand[first][ii] != 0) {
+					goto found_first;
+				}
 			}
 			first++;
 		}
@@ -71,7 +73,7 @@ public:
 		int last = first;
 		for (int ss = first; ss < shifts; ss++) {
 			for (int ii = 0; ii < acts; ii++) {
-				if (demand[ss][ii]) {
+				if (demand[ss][ii] != 0) {
 					last = ss;
 					break;
 				}
@@ -83,7 +85,7 @@ public:
 		MDDTable mdd_tab(shifts);
 		std::vector<std::vector<MDD> > seq;
 		for (int ii = 0; ii < shifts; ii++) {
-			seq.push_back(std::vector<MDD>());
+			seq.emplace_back();
 			for (int kk = 0; kk < dom; kk++) {
 				seq[ii].push_back(mdd_tab.vareq(ii, kk));
 			}
@@ -92,8 +94,12 @@ public:
 
 		// Convert the MDD into an edge-valued graph.
 		vec<int> slot_cost;
-		for (int si = 0; si < acts; si++) slot_cost.push(1);
-		for (int si = acts; si < dom; si++) slot_cost.push(0);
+		for (int si = 0; si < acts; si++) {
+			slot_cost.push(1);
+		}
+		for (int si = acts; si < dom; si++) {
+			slot_cost.push(0);
+		}
 
 		EVLayerGraph graph;
 		EVLayerGraph::NodeID gcirc_evgraph(mdd_to_layergraph(graph, gcirc, slot_cost));
@@ -107,7 +113,9 @@ public:
 			evgraph_to_wmdd(xv[ww], staff_cost[ww], graph, gcirc_evgraph, mopts);
 		}
 
-		for (int ww = 1; ww < staff; ww++) lex(xv[ww - 1], xv[ww], false);
+		for (int ww = 1; ww < staff; ww++) {
+			lex(xv[ww - 1], xv[ww], false);
+		}
 
 		// Enforce coverage constraints.
 		for (int ss = 0; ss < shifts; ss++) {
@@ -164,7 +172,7 @@ public:
 		output_vars(vs);
 	}
 
-	CFG::CFG buildSchedG(int n_acts, int first, int last) {
+	static CFG::CFG buildSchedG(int n_acts, int first, int last) {
 		unsigned int rest(n_acts + G_R);
 		unsigned int brk(n_acts + G_B);
 		unsigned int lunch(n_acts + G_L);
@@ -210,7 +218,7 @@ public:
 		return g;
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 #if 1
 		for (int act = 0; act < acts; act++) {
 			os << "[";
@@ -277,21 +285,29 @@ int main(int argc, char** argv) {
 	int jj = 1;
 	char* value;
 	for (int ii = 1; ii < argc; ii++) {
-		if ((value = hasPrefix(argv[ii], "-decomp="))) {
+		value = hasPrefix(argv[ii], "-decomp=");
+		if (value != nullptr) {
 			if (strcmp(value, "true") == 0) {
 				mode |= DECOMP;
 			}
-		} else if ((value = hasPrefix(argv[ii], "-mdd="))) {
+			continue;
+		}
+		value = hasPrefix(argv[ii], "-mdd=");
+		if (value != nullptr) {
 			if (strcmp(value, "true") == 0) {
 				mode |= USEMDD;
 			}
-		} else if ((value = hasPrefix(argv[ii], "-gcc="))) {
+			continue;
+		}
+		value = hasPrefix(argv[ii], "-gcc=");
+		if (value != nullptr) {
 			if (strcmp(value, "true") == 0) {
 				mode |= USEGCC;
 			}
-		} else {
-			argv[jj++] = argv[ii];
+			continue;
 		}
+
+		argv[jj++] = argv[ii];
 	}
 	argc = jj;
 

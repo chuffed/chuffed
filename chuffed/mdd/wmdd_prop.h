@@ -1,5 +1,5 @@
-#ifndef __EVMDD_PROP_H_
-#define __EVMDD_PROP_H_
+#ifndef EVMDD_PROP_H_
+#define EVMDD_PROP_H_
 // Propagator for weighted (edge-valued) MDDs.
 #include <chuffed/core/propagator.h>
 #include <chuffed/mdd/opts.h>
@@ -98,19 +98,19 @@ public:
 	WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Edge>& _edges,
 					 const MDDOpts& opts);
 
-	bool fullProp(void);
-	bool incProp(void);
+	bool fullProp();
+	bool incProp();
 
 	void incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ);
 	void incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ);
 
-	inline int numNodes(void) { return nodes.size(); }
+	inline int numNodes() { return nodes.size(); }
 
 	void debugStateTikz(unsigned int lim, bool debug = true);
-	void verify(void);
+	void verify();
 
 	// Wake up only parts relevant to this event
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		if (i == boolvars.size()) {
 			// Cost has changed.
 			assert(c & EVENT_U);
@@ -119,7 +119,9 @@ public:
 		} else {
 			assert(boolvars[i].isFixed());
 			assert(!boolvars[i].getVal());
-			if (fixedvars.elem(i)) return;
+			if (fixedvars.elem(i)) {
+				return;
+			}
 			clear_queue.push(i);
 			//      vals[i].val_lim = fixedvars.size();
 			fixedvars.insert(i);
@@ -141,12 +143,12 @@ public:
 	}
 
 	// Propagate woken up parts
-	bool propagate();
-	Clause* explain(Lit p, int inf);
-	Clause* explainConflict(void);
+	bool propagate() override;
+	Clause* explain(Lit p, int inf) override;
+	Clause* explainConflict();
 
 	// Clear intermediate states
-	void clearPropState() {
+	void clearPropState() override {
 		clear_queue.clear();
 		cost_changed = false;
 		in_queue = false;
@@ -208,8 +210,8 @@ protected:
 	void compact();
 
 	// Debug printout of the propagator state.
-	void debugStateDot(void);
-	void checkIncProp(void);
+	void debugStateDot();
+	void checkIncProp();
 
 	// Data
 	vec<IntView<> > intvars;

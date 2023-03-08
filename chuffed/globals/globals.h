@@ -44,7 +44,7 @@ void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y);
 
 // linear-bool-decomp.c
 void bool_linear_decomp(vec<BoolView>& x, IntRelType t, int k);
-void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* y);
+void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv);
 
 // minimum.c
 
@@ -63,14 +63,14 @@ void regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>&
 
 // disjunctive.c
 
-void disjunctive(vec<IntVar*>& s, vec<int>& d);
+void disjunctive(vec<IntVar*>& x, vec<int>& d);
 
 // cumulative.c
 
-void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b);
-void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b, std::list<std::string> opt);
-void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* b);
-void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* b,
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit);
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<std::string> opt);
+void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit);
+void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 								 std::list<std::string> opt);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal);

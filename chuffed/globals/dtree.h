@@ -20,7 +20,9 @@ protected:
 	bool test_ruf() {
 		for (int i = 0; i < nbEdges(); i++) {
 			if (getEdgeVar(i).isFixed() && getEdgeVar(i).isTrue()) {
-				if (!ruf.connected(getHead(i), getTail(i))) return false;
+				if (!ruf.connected(getHead(i), getTail(i))) {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -30,17 +32,17 @@ public:
 	DTreePropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 									vec<vec<edge_id> >& _out, vec<vec<int> >& _en);
 
-	virtual ~DTreePropagator();
+	~DTreePropagator() override;
 
-	virtual bool propagateNewEdge(int edge);
-	virtual bool propagateNewNode(int node);
+	bool propagateNewEdge(int edge) override;
+	bool propagateNewNode(int node) override;
 
 	virtual bool check_cycle(int e);
 	virtual void prevent_cycle(int e);
 
-	virtual bool propagate();
+	bool propagate() override;
 
-	virtual bool checkFinalSatisfied();
+	bool checkFinalSatisfied() override;
 };
 
 class DTreeParenthoodPropagator : public DTreePropagator {
@@ -57,19 +59,19 @@ public:
 	DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*>& parents,
 														vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en);
 
-	virtual ~DTreeParenthoodPropagator();
+	~DTreeParenthoodPropagator() override;
 
-	virtual bool propagateRemEdge(int edge);
-	virtual bool propagateNewEdge(int edge);
+	bool propagateRemEdge(int edge) override;
+	bool propagateNewEdge(int edge) override;
 	virtual bool propagateRemParent(int edge);
 	virtual bool propagateNewParent(int edge);
 
-	virtual bool propagate();
-	virtual void wakeup(int i, int c);
+	bool propagate() override;
+	void wakeup(int i, int c) override;
 
-	virtual void clearPropState();
+	void clearPropState() override;
 
-	virtual bool checkFinalSatisfied();
+	bool checkFinalSatisfied() override;
 };
 
 class PathDeg1 : public GraphPropagator {
@@ -82,10 +84,10 @@ public:
 	PathDeg1(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 					 vec<vec<edge_id> >& _out, vec<vec<int> >& _en);
 
-	virtual void wakeup(int i, int c);
-	virtual void clearPropState();
+	void wakeup(int i, int c) override;
+	void clearPropState() override;
 
-	virtual bool propagate();
+	bool propagate() override;
 };
 
 #endif

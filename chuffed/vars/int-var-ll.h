@@ -27,30 +27,30 @@ class IntVarLL : public IntVar {
 public:
 	IntVarLL(const IntVar& other);
 
-	VarType getType() { return INT_VAR_LL; }
+	VarType getType() override { return INT_VAR_LL; }
 
-	DecInfo* branch();
+	DecInfo* branch() override;
 
 	int getLitNode();
 	void freeLazyVar(int val);
 
 	// NOTE: No support for INT_VAR_LL vars yet.
 	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	Lit getLit(int64_t v, int t);
+	Lit getLit(int64_t v, int t) override;
 
-	Lit getMinLit() const { return Lit(ld[li].var, 0); }
-	Lit getMaxLit() const { return Lit(ld[hi].var, 1); }
-	Lit getValLit() const {
+	Lit getMinLit() const override { return Lit(ld[li].var, false); }
+	Lit getMaxLit() const override { return Lit(ld[hi].var, true); }
+	Lit getValLit() const override {
 		assert(isFixed());
 		return ~valLit;
 	}
-	Lit getFMinLit(int64_t v) { return getMinLit(); }
-	Lit getFMaxLit(int64_t v) { return getMaxLit(); }
+	Lit getFMinLit(int64_t v) override { return getMinLit(); }
+	Lit getFMaxLit(int64_t v) override { return getMaxLit(); }
 
-	bool setMin(int64_t v, Reason r = NULL, bool channel = true);
-	bool setMax(int64_t v, Reason r = NULL, bool channel = true);
-	bool setVal(int64_t v, Reason r = NULL, bool channel = true);
-	bool remVal(int64_t v, Reason r = NULL, bool channel = true);
+	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool setVal(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool remVal(int64_t v, Reason r = nullptr, bool channel = true) override;
 
 	Lit createLit(int v);
 };

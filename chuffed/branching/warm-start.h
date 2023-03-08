@@ -1,5 +1,5 @@
-#ifndef CHUFFED_WARMSTART__H
-#define CHUFFED_WARMSTART__H
+#ifndef CHUFFED_WARMSTART_H
+#define CHUFFED_WARMSTART_H
 
 #include <chuffed/branching/branching.h>
 #include <chuffed/core/sat.h>
@@ -17,23 +17,31 @@ public:
 	WarmStartBrancher(vec<IntVar*> xs, vec<int>& vs, bool _revive = false)
 			: revive(_revive), pos(0), init_conflicts(INT_MAX) {}
 
-	bool finished() {
+	bool finished() override {
 		// Already deactivated
-		if (engine.conflicts > init_conflicts) return true;
+		if (engine.conflicts > init_conflicts) {
+			return true;
+		}
 
 		if (pos < decs.size()) {
-			if (sat.value(decs[pos]) == l_Undef) return false;
-			if (engine.conflicts < init_conflicts) trailSave(pos);
+			if (sat.value(decs[pos]) == l_Undef) {
+				return false;
+			}
+			if (engine.conflicts < init_conflicts) {
+				trailSave(pos);
+			}
 			for (++pos; pos < decs.size(); ++pos) {
-				if (sat.value(decs[pos]) == l_Undef) return false;
+				if (sat.value(decs[pos]) == l_Undef) {
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	double getScore(VarBranch vb) { NEVER; }
+	double getScore(VarBranch vb) override { NEVER; }
 
-	DecInfo* branch() {
+	DecInfo* branch() override {
 		// Check if this is the first activation
 		if (engine.conflicts < init_conflicts) {
 			if (revive) {

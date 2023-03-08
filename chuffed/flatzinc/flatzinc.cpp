@@ -28,25 +28,45 @@
 
 using namespace std;
 
-void output_var(Branching* v);
-
 namespace FlatZinc {
 
 FlatZincSpace* s;
 
 VarBranch ann2ivarsel(AST::Node* ann) {
-	if (AST::Atom* s = dynamic_cast<AST::Atom*>(ann)) {
-		if (s->id == "input_order") return VAR_INORDER;
-		if (s->id == "first_fail") return VAR_SIZE_MIN;
-		if (s->id == "anti_first_fail") return VAR_SIZE_MAX;
-		if (s->id == "smallest") return VAR_MIN_MIN;
-		if (s->id == "smallest_largest") return VAR_MAX_MIN;
-		if (s->id == "largest") return VAR_MAX_MAX;
-		if (s->id == "largest_smallest") return VAR_MIN_MAX;
-		if (s->id == "occurrence") return VAR_DEGREE_MAX;
-		if (s->id == "most_constrained") return VAR_SIZE_MIN;
-		if (s->id == "max_regret") return VAR_REGRET_MIN_MAX;
-		if (s->id == "random_order") return VAR_RANDOM;
+	if (auto* s = dynamic_cast<AST::Atom*>(ann)) {
+		if (s->id == "input_order") {
+			return VAR_INORDER;
+		}
+		if (s->id == "first_fail") {
+			return VAR_SIZE_MIN;
+		}
+		if (s->id == "anti_first_fail") {
+			return VAR_SIZE_MAX;
+		}
+		if (s->id == "smallest") {
+			return VAR_MIN_MIN;
+		}
+		if (s->id == "smallest_largest") {
+			return VAR_MAX_MIN;
+		}
+		if (s->id == "largest") {
+			return VAR_MAX_MAX;
+		}
+		if (s->id == "largest_smallest") {
+			return VAR_MIN_MAX;
+		}
+		if (s->id == "occurrence") {
+			return VAR_DEGREE_MAX;
+		}
+		if (s->id == "most_constrained") {
+			return VAR_SIZE_MIN;
+		}
+		if (s->id == "max_regret") {
+			return VAR_REGRET_MIN_MAX;
+		}
+		if (s->id == "random_order") {
+			return VAR_RANDOM;
+		}
 #ifdef HAS_VAR_IMPACT
 		if (s->id == "impact") return VAR_IMPACT;
 #endif
@@ -58,20 +78,36 @@ VarBranch ann2ivarsel(AST::Node* ann) {
 }
 
 ValBranch ann2ivalsel(AST::Node* ann) {
-	if (AST::Atom* s = dynamic_cast<AST::Atom*>(ann)) {
-		if (s->id == "default") return VAL_DEFAULT;
-		if (s->id == "indomain") return VAL_MIN;
-		if (s->id == "indomain_min") return VAL_MIN;
-		if (s->id == "indomain_max") return VAL_MAX;
+	if (auto* s = dynamic_cast<AST::Atom*>(ann)) {
+		if (s->id == "default") {
+			return VAL_DEFAULT;
+		}
+		if (s->id == "indomain") {
+			return VAL_MIN;
+		}
+		if (s->id == "indomain_min") {
+			return VAL_MIN;
+		}
+		if (s->id == "indomain_max") {
+			return VAL_MAX;
+		}
 		// if (s->id == "indomain_middle") return VAL_MIDDLE;
-		if (s->id == "indomain_middle")
+		if (s->id == "indomain_middle") {
 			CHUFFED_ERROR("The value choice annotation 'indomain_middle' is not supported yet!\n");
-		if (s->id == "indomain_median") return VAL_MEDIAN;
-		if (s->id == "indomain_split") return VAL_SPLIT_MIN;
-		if (s->id == "indomain_reverse_split") return VAL_SPLIT_MAX;
+		}
+		if (s->id == "indomain_median") {
+			return VAL_MEDIAN;
+		}
+		if (s->id == "indomain_split") {
+			return VAL_SPLIT_MIN;
+		}
+		if (s->id == "indomain_reverse_split") {
+			return VAL_SPLIT_MAX;
+		}
 		// if (s->id == "indomain_random") return VAL_RANDOM;
-		if (s->id == "indomain_random")
+		if (s->id == "indomain_random") {
 			CHUFFED_ERROR("The value choice annotation 'indomain_random' is not supported yet!\n");
+		}
 	}
 	std::cerr << "% Warning, ignored search annotation: ";
 	ann->print(std::cerr);
@@ -86,7 +122,7 @@ FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int setVars)
 			iv_introduced(intVars),
 			bv(boolVars),
 			bv_introduced(boolVars),
-			output(NULL) {
+			output(nullptr) {
 	s = this;
 }
 
@@ -98,31 +134,38 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs) {
 		iv_introduced.resize(newSize);
 	}
 	bool considerIntroduced = false;
-	if (so.use_var_is_introduced)
+	if (so.use_var_is_introduced) {
 		considerIntroduced = vs->introduced;
-	else
+	} else {
 		considerIntroduced = !vs->output;
-	if (so.introduced_heuristic && vs->looks_introduced) considerIntroduced = true;
+	}
+	if (so.introduced_heuristic && vs->looks_introduced) {
+		considerIntroduced = true;
+	}
 	if (vs->alias) {
 		iv[intVarCount++] = iv[vs->i];
 	} else {
-		IntVar* v = NULL;
-		if (vs->assigned)
+		IntVar* v = nullptr;
+		if (vs->assigned) {
 			v = getConstant(vs->i);
-		else if (vs->domain()) {
+		} else if (vs->domain()) {
 			AST::SetLit* sl = vs->domain.some();
-			if (sl->interval)
+			if (sl->interval) {
 				v = ::newIntVar(sl->min, sl->max);
-			else {
+			} else {
 				vec<int> d;
-				for (unsigned int i = 0; i < sl->s.size(); i++) d.push(sl->s[i]);
+				for (int& i : sl->s) {
+					d.push(i);
+				}
 				sort((int*)d, (int*)d + d.size());
 				v = ::newIntVar(d[0], d.last());
 				if ((d.last() - d[0] >= d.size() * mylog2(d.size())) ||
 						(d.size() <= so.eager_limit && (d.last() - d[0] + 1) > so.eager_limit)) {
 					new (v) IntVarSL(*v, d);
 				} else {
-					if (!v->allowSet(d)) TL_FAIL();
+					if (!v->allowSet(d)) {
+						TL_FAIL();
+					}
 				}
 			}
 		} else {
@@ -130,8 +173,12 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs) {
 		}
 		/* std::cerr << "int var: " << intVarCount << " " << v << "\n"; */
 
-		if (so.exclude_introduced && considerIntroduced) v->should_be_learnable = false;
-		if (!so.decide_introduced && considerIntroduced) v->should_be_decidable = false;
+		if (so.exclude_introduced && considerIntroduced) {
+			v->should_be_learnable = false;
+		}
+		if (!so.decide_introduced && considerIntroduced) {
+			v->should_be_decidable = false;
+		}
 		iv[intVarCount++] = v;
 	}
 	iv_introduced[intVarCount - 1] = considerIntroduced;
@@ -145,11 +192,14 @@ void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
 		bv_introduced.resize(newSize);
 	}
 	bool considerIntroduced = false;
-	if (so.use_var_is_introduced)
+	if (so.use_var_is_introduced) {
 		considerIntroduced = vs->introduced;
-	else
+	} else {
 		considerIntroduced = !vs->output;
-	if (so.introduced_heuristic && vs->looks_introduced) considerIntroduced = true;
+	}
+	if (so.introduced_heuristic && vs->looks_introduced) {
+		considerIntroduced = true;
+	}
 	if (vs->alias) {
 		bv[boolVarCount++] = bv[vs->i];
 	} else {
@@ -183,16 +233,20 @@ void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
 #endif
 			v = ::newBoolVar();
 
-		if (vs->assigned)
-			v.setVal(vs->i);
-		else if (vs->domain()) {
+		if (vs->assigned) {
+			v.setVal(vs->i != 0);
+		} else if (vs->domain()) {
 			AST::SetLit* sl = vs->domain.some();
 			assert(sl->interval);
 			assert(sl->min <= 1);
 			assert(sl->max >= 0);
 			assert(sl->min <= sl->max);
-			if (sl->min == 1) v.setVal(true);
-			if (sl->max == 0) v.setVal(false);
+			if (sl->min == 1) {
+				v.setVal(true);
+			}
+			if (sl->max == 0) {
+				v.setVal(false);
+			}
 		}
 		if (so.exclude_introduced && considerIntroduced) {
 			v.setLearnable(false);
@@ -207,7 +261,7 @@ void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
 	bv_introduced[boolVarCount - 1] = considerIntroduced;
 }
 
-void FlatZincSpace::newSetVar(SetVarSpec*) {
+void FlatZincSpace::newSetVar(SetVarSpec* /*unused*/) {
 	throw FlatZinc::Error("LazyGeoff", "set variables not supported");
 }
 
@@ -231,17 +285,23 @@ void FlatZincSpace::parseSolveAnnIntSearch(AST::Node* elemAnn, BranchGroup* bran
 		AST::Array* args = call->getArgs(4);
 		AST::Array* vars = args->a[0]->getArray();
 		vec<Branching*> va;
-		for (unsigned int i = 0; i < vars->a.size(); i++) {
+		for (auto& i : vars->a) {
 			// Removal of constants
-			if (vars->a[i]->isInt()) continue;
-			IntVar* v = iv[vars->a[i]->getIntVar()];
+			if (i->isInt()) {
+				continue;
+			}
+			IntVar* v = iv[i->getIntVar()];
 			// Removal of fixed variables
-			if (v->isFixed()) continue;
+			if (v->isFixed()) {
+				continue;
+			}
 			va.push(v);
 		}
 		branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
-		if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-			if (s->s == "all") so.nof_solutions = 0;
+		if (auto* s = dynamic_cast<AST::String*>(args->a[3])) {
+			if (s->s == "all") {
+				so.nof_solutions = 0;
+			}
 		}
 		nbNonEmptySearchAnnotations++;
 	} catch (AST::TypeError& e) {
@@ -259,10 +319,14 @@ void FlatZincSpace::parseSolveAnnBoolSearch(AST::Node* elemAnn, BranchGroup* bra
 		AST::Array* args = call->getArgs(4);
 		AST::Array* vars = args->a[0]->getArray();
 		vec<Branching*> va(vars->a.size());
-		for (int i = vars->a.size(); i--;) va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
+		for (int i = vars->a.size(); (i--) != 0;) {
+			va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
+		}
 		branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
-		if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-			if (s->s == "all") so.nof_solutions = 0;
+		if (auto* s = dynamic_cast<AST::String*>(args->a[3])) {
+			if (s->s == "all") {
+				so.nof_solutions = 0;
+			}
 		}
 		nbNonEmptySearchAnnotations++;
 	} catch (AST::TypeError& e) {
@@ -284,27 +348,30 @@ void FlatZincSpace::parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup*
 		// NOTE that constants or fixed variables cannot be removed, because they act as
 		// delegates for choosing the branch group to search on next
 		vec<Branching*> va;
-		for (unsigned int i = 0; i < vars->a.size(); i++) {
+		for (auto& i : vars->a) {
 			// Removal of constants
-			IntVar* v = NULL;
-			if (vars->a[i]->isInt()) {
-				int value = vars->a[i]->getInt();
+			IntVar* v = nullptr;
+			if (i->isInt()) {
+				int value = i->getInt();
 				v = getConstant(value);
 			} else {
-				v = iv[vars->a[i]->getIntVar()];
+				v = iv[i->getIntVar()];
 			}
 			va.push(v);
 		}
 		// Create a new priority branch group and add to branching
-		PriorityBranchGroup* priorityBranching = new PriorityBranchGroup(va, ann2ivarsel(args->a[2]));
+		auto* priorityBranching = new PriorityBranchGroup(va, ann2ivarsel(args->a[2]));
 		// Parse search annotations
 		int nbChildSearchAnnotations = 0;
 		parseSolveAnn(annotations, priorityBranching, nbChildSearchAnnotations);
-		if (vars->a.size() != nbChildSearchAnnotations)
+		if (vars->a.size() != nbChildSearchAnnotations) {
 			throw FlatZinc::Error("Type error in priority_search annotation",
 														"Variable and annotation array must have the same size");
-		if (AST::String* s = dynamic_cast<AST::String*>(args->a[3])) {
-			if (s->s == "all") so.nof_solutions = 0;
+		}
+		if (auto* s = dynamic_cast<AST::String*>(args->a[3])) {
+			if (s->s == "all") {
+				so.nof_solutions = 0;
+			}
 		}
 		branching->add(priorityBranching);
 		nbNonEmptySearchAnnotations++;
@@ -399,36 +466,36 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
 
 void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching,
 																	int& nbNonEmptySearchAnnotations) {
-	if (ann) {
-		for (unsigned int i = 0; i < ann->a.size(); i++) {
-			if (ann->a[i]->isCall("restart_none") && so.restart_type_override) {
+	if (ann != nullptr) {
+		for (auto& i : ann->a) {
+			if (i->isCall("restart_none") && so.restart_type_override) {
 				so.restart_type = NONE;
-			} else if (ann->a[i]->isCall("restart_constant")) {
-				AST::Call* call = ann->a[i]->getCall("restart_constant");
+			} else if (i->isCall("restart_constant")) {
+				AST::Call* call = i->getCall("restart_constant");
 				if (so.restart_type_override) {
 					so.restart_type = CONSTANT;
 				}
 				if (so.restart_scale_override) {
 					so.restart_scale = static_cast<unsigned int>(call->args->getInt());
 				}
-			} else if (ann->a[i]->isCall("restart_linear")) {
-				AST::Call* call = ann->a[i]->getCall("restart_linear");
+			} else if (i->isCall("restart_linear")) {
+				AST::Call* call = i->getCall("restart_linear");
 				if (so.restart_type_override) {
 					so.restart_type = LINEAR;
 				}
 				if (so.restart_scale_override) {
 					so.restart_scale = static_cast<unsigned int>(call->args->getInt());
 				}
-			} else if (ann->a[i]->isCall("restart_luby")) {
-				AST::Call* call = ann->a[i]->getCall("restart_luby");
+			} else if (i->isCall("restart_luby")) {
+				AST::Call* call = i->getCall("restart_luby");
 				if (so.restart_type_override) {
 					so.restart_type = LUBY;
 				}
 				if (so.restart_scale_override) {
 					so.restart_scale = static_cast<unsigned int>(call->args->getInt());
 				}
-			} else if (ann->a[i]->isCall("restart_geometric")) {
-				AST::Call* call = ann->a[i]->getCall("restart_geometric");
+			} else if (i->isCall("restart_geometric")) {
+				AST::Call* call = i->getCall("restart_geometric");
 				if (so.restart_type_override) {
 					so.restart_type = GEOMETRIC;
 				}
@@ -442,30 +509,32 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching,
 				if (so.restart_scale_override) {
 					so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt());
 				}
-			} else if (ann->a[i]->isCall("assume")) {
-				AST::Call* call = ann->a[i]->getCall("assume");
+			} else if (i->isCall("assume")) {
+				AST::Call* call = i->getCall("assume");
 				AST::Array* vars = call->args->getArray();
-				for (int ii = 0; ii < vars->a.size(); ii++) {
-					assumptions.push(bv[vars->a[ii]->getBoolVar()]);
+				for (auto& ii : vars->a) {
+					assumptions.push(bv[ii->getBoolVar()]);
 				}
-			} else if (ann->a[i]->isCall("seq_search") || ann->a[i]->isCall("warm_start_array")) {
+			} else if (i->isCall("seq_search") || i->isCall("warm_start_array")) {
 				// Get the call
-				AST::Call* c = ann->a[i]->getCall();
+				AST::Call* c = i->getCall();
 				// Create a new branch group and add to the branching
-				BranchGroup* newBranching = new BranchGroup();
+				auto* newBranching = new BranchGroup();
 				branching->add(newBranching);
 				if (c->args->isArray()) {
 					// Parse annotation and add to the newly created branching
 					int nbChildSearchAnnotations = 0;
 					parseSolveAnn(c->args->getArray(), newBranching, nbChildSearchAnnotations);
-					if (nbChildSearchAnnotations > 0) nbNonEmptySearchAnnotations++;
+					if (nbChildSearchAnnotations > 0) {
+						nbNonEmptySearchAnnotations++;
+					}
 				} else {
 					// Parse annotation and add to the newly created branching
 					parseSolveAnnAux(c->args, newBranching, nbNonEmptySearchAnnotations);
 				}
 			} else {
 				// Parse annotation and add to the branching
-				parseSolveAnnAux(ann->a[i], branching, nbNonEmptySearchAnnotations);
+				parseSolveAnnAux(i, branching, nbNonEmptySearchAnnotations);
 			}
 		}
 	}
@@ -474,26 +543,40 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching,
 void FlatZincSpace::fixAllSearch() {
 	vec<Branching*> va;
 	for (int i = 0; i < intVarCount; i++) {
-		if (iv_introduced[i]) continue;
+		if (iv_introduced[i]) {
+			continue;
+		}
 		IntVar* v = iv[i];
-		if (v->isFixed()) continue;
+		if (v->isFixed()) {
+			continue;
+		}
 		va.push(v);
 	}
 	for (int i = 0; i < boolVarCount; i++) {
-		if (bv_introduced[i]) continue;
+		if (bv_introduced[i]) {
+			continue;
+		}
 		va.push(new BoolView(bv[i]));
 	}
-	for (int i = intVarCount; i--;) {
-		if (!iv_introduced[i]) continue;
+	for (int i = intVarCount; (i--) != 0;) {
+		if (!iv_introduced[i]) {
+			continue;
+		}
 		IntVar* v = iv[i];
-		if (v->isFixed()) continue;
+		if (v->isFixed()) {
+			continue;
+		}
 		va.push(v);
 	}
 	for (int i = 0; i < boolVarCount; i++) {
-		if (!bv_introduced[i]) continue;
+		if (!bv_introduced[i]) {
+			continue;
+		}
 		va.push(new BoolView(bv[i]));
 	}
-	if (va.size()) branch(va, VAR_INORDER, VAL_DEFAULT);
+	if (va.size() != 0) {
+		branch(va, VAR_INORDER, VAL_DEFAULT);
+	}
 }
 
 void FlatZincSpace::solve(AST::Array* ann) {
@@ -521,10 +604,11 @@ void FlatZincSpace::setOutputElem(AST::Node* ai) const {
 	}
 }
 
-void FlatZincSpace::setOutput() {
-	if (output == NULL) return;
-	for (unsigned int i = 0; i < output->a.size(); i++) {
-		AST::Node* ai = output->a[i];
+void FlatZincSpace::setOutput() const {
+	if (output == nullptr) {
+		return;
+	}
+	for (auto* ai : output->a) {
 		if (ai->isArray()) {
 			AST::Array* aia = ai->getArray();
 			int size = aia->a.size();

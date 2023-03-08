@@ -29,7 +29,9 @@ IntVarEL::IntVarEL(const IntVar& other)
 
 	if (so.debug) {
 		std::cerr << "created integer variable " << intVarString[(IntVar*)(&other)] << "\n";
-		if (intVarString[(IntVar*)(&other)] == "") abort();
+		if (intVarString[(IntVar*)(&other)].empty()) {
+			abort();
+		}
 	}
 
 	for (int v = lit_min; v <= lit_max; v++) {
@@ -97,7 +99,9 @@ IntVarEL::IntVarEL(const IntVar& other)
 // i.e. base_vlit = 2*(n - lit_min).
 
 void IntVarEL::initVLits() {
-	if (base_vlit != INT_MIN) return;
+	if (base_vlit != INT_MIN) {
+		return;
+	}
 	initVals();
 	if (lit_min == INT_MIN) {
 		lit_min = min;
@@ -106,9 +110,13 @@ void IntVarEL::initVLits() {
 	base_vlit = 2 * (sat.nVars() - lit_min);
 	sat.newVar(lit_max - lit_min + 1, ChannelInfo(var_id, 1, 0, lit_min));
 	for (int i = lit_min; i <= lit_max; i++) {
-		if (!indomain(i)) sat.cEnqueue(getNELit(i), NULL);
+		if (!indomain(i)) {
+			sat.cEnqueue(getNELit(i), nullptr);
+		}
 	}
-	if (isFixed()) sat.cEnqueue(getEQLit(min), NULL);
+	if (isFixed()) {
+		sat.cEnqueue(getEQLit(min), nullptr);
+	}
 }
 
 // Bounds literals are arranged similarly to the value/equality
@@ -137,7 +145,9 @@ void IntVarEL::initVLits() {
 // base_blit = 2*(n - lit_min) + 1.
 
 void IntVarEL::initBLits() {
-	if (base_blit != INT_MIN) return;
+	if (base_blit != INT_MIN) {
+		return;
+	}
 	if (lit_min == INT_MIN) {
 		lit_min = min;
 		lit_max = max;
@@ -145,34 +155,34 @@ void IntVarEL::initBLits() {
 	base_blit = 2 * (sat.nVars() - lit_min) + 1;
 	sat.newVar(lit_max - lit_min + 2, ChannelInfo(var_id, 1, 1, lit_min - 1));
 	for (int i = lit_min; i <= min; i++) {
-		sat.cEnqueue(getGELit(i), NULL);
+		sat.cEnqueue(getGELit(i), nullptr);
 	}
 	for (int i = max; i <= lit_max; i++) {
-		sat.cEnqueue(getLELit(i), NULL);
+		sat.cEnqueue(getLELit(i), nullptr);
 	}
 }
 
-void IntVarEL::setVLearnable(bool b) {
+void IntVarEL::setVLearnable(bool b) const {
 	for (int i = lit_min; i <= lit_max; i++) {
 		sat.flags[base_vlit / 2 + i].setLearnable(b);
 		sat.flags[base_vlit / 2 + i].setUIPable(b);
 	}
 }
 
-void IntVarEL::setBLearnable(bool b) {
+void IntVarEL::setBLearnable(bool b) const {
 	for (int i = lit_min; i <= lit_max + 1; i++) {
 		sat.flags[(base_blit - 1) / 2 + i].setLearnable(b);
 		sat.flags[(base_blit - 1) / 2 + i].setUIPable(b);
 	}
 }
 
-void IntVarEL::setVDecidable(bool b) {
+void IntVarEL::setVDecidable(bool b) const {
 	for (int i = lit_min; i <= lit_max; i++) {
 		sat.flags[base_vlit / 2 + i].setDecidable(b);
 	}
 }
 
-void IntVarEL::setBDecidable(bool b) {
+void IntVarEL::setBDecidable(bool b) const {
 	for (int i = lit_min; i <= lit_max + 1; i++) {
 		sat.flags[(base_blit - 1) / 2 + i].setDecidable(b);
 	}
@@ -180,8 +190,12 @@ void IntVarEL::setBDecidable(bool b) {
 
 Lit IntVarEL::getLit(int64_t v, int t) {
 	//    std::cerr << "IntVarEL::getLit\n";
-	if (v < lit_min) return toLit(1 ^ (t & 1));         // 1, 0, 1, 0
-	if (v > lit_max) return toLit(((t - 1) >> 1) & 1);  // 1, 0, 0, 1
+	if (v < lit_min) {
+		return toLit(1 ^ (t & 1));  // 1, 0, 1, 0
+	}
+	if (v > lit_max) {
+		return toLit(((t - 1) >> 1) & 1);  // 1, 0, 0, 1
+	}
 	switch (t) {
 		case 0:
 			return getNELit(v);
@@ -203,7 +217,9 @@ inline void IntVarEL::channelMin(int v) {
 	Reason r(~getGELit(v));
 	for (int i = v - 1; i > min; i--) {
 		sat.cEnqueue(getGELit(i), r);
-		if (vals[i]) sat.cEnqueue(getNELit(i), r);
+		if (vals[i] != 0) {
+			sat.cEnqueue(getNELit(i), r);
+		}
 	}
 	assert(vals[min]);
 	sat.cEnqueue(getNELit(min), r);
@@ -216,7 +232,9 @@ inline void IntVarEL::channelMax(int v) {
 	Reason r(~getLELit(v));
 	for (int i = v + 1; i < max; i++) {
 		sat.cEnqueue(getLELit(i), r);
-		if (vals[i]) sat.cEnqueue(getNELit(i), r);
+		if (vals[i] != 0) {
+			sat.cEnqueue(getNELit(i), r);
+		}
 	}
 	assert(vals[max]);
 	sat.cEnqueue(getNELit(max), r);
@@ -260,7 +278,7 @@ inline void IntVarEL::updateMax(int v, int i) {
 #else
 inline void IntVarEL::updateMin() {
 	int v = min;
-	while (!vals[v]) {
+	while (vals[v] == 0) {
 		// Set [x >= v+1] using [x >= v+1] \/ [x <= v-1] \/ [x = v]
 		Reason r(getLELit(v - 1), getEQLit(v));
 		sat.cEnqueue(getGELit(v + 1), r);
@@ -274,7 +292,7 @@ inline void IntVarEL::updateMin() {
 
 inline void IntVarEL::updateMax() {
 	int v = max;
-	while (!vals[v]) {
+	while (vals[v] == 0) {
 		// Set [x <= v-1] using [x <= v-1] \/ [x >= v+1] \/ [x = v]
 		Reason r(getGELit(v + 1), getEQLit(v));
 		sat.cEnqueue(getLELit(v - 1), r);
@@ -299,7 +317,9 @@ inline void IntVarEL::updateFixed() {
 
 bool IntVarEL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
-	if (channel) sat.cEnqueue(getLit(v, 2), r);
+	if (channel) {
+		sat.cEnqueue(getLit(v, 2), r);
+	}
 	if (v > max) {
 		assert(sat.confl);
 		return false;
@@ -323,7 +343,9 @@ bool IntVarEL::setMin(int64_t v, Reason r, bool channel) {
 
 bool IntVarEL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
-	if (channel) sat.cEnqueue(getLit(v, 3), r);
+	if (channel) {
+		sat.cEnqueue(getLit(v, 3), r);
+	}
 	if (v < min) {
 		assert(sat.confl);
 		return false;
@@ -347,7 +369,9 @@ bool IntVarEL::setMax(int64_t v, Reason r, bool channel) {
 
 bool IntVarEL::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
-	if (channel) sat.cEnqueue(getLit(v, 1), r);
+	if (channel) {
+		sat.cEnqueue(getLit(v, 1), r);
+	}
 	if (!indomain(v)) {
 		assert(sat.confl);
 		return false;
@@ -372,7 +396,9 @@ bool IntVarEL::setVal(int64_t v, Reason r, bool channel) {
 bool IntVarEL::remVal(int64_t v, Reason r, bool channel) {
 	assert(remValNotR(v));
 	assert(vals);
-	if (channel) sat.cEnqueue(getLit(v, 0), r);
+	if (channel) {
+		sat.cEnqueue(getLit(v, 0), r);
+	}
 	if (isFixed()) {
 		assert(sat.confl);
 		return false;
@@ -411,22 +437,32 @@ Lit IntVarEL::createSetLit(vec<Lit>& head) {
 	// process bounds lits first
 	for (int i = 0; i < head.size(); i++) {
 		ChannelInfo& ci = sat.c_info[var(head[i])];
-		if (ci.val_type == 0) continue;
+		if (ci.val_type == 0) {
+			continue;
+		}
 		int v = ci.val;
 		if (sign(head[i])) {
-			if (v < upper_bound) upper_bound = v;
+			if (v < upper_bound) {
+				upper_bound = v;
+			}
 		} else {
-			if (v + 1 > lower_bound) lower_bound = v + 1;
+			if (v + 1 > lower_bound) {
+				lower_bound = v + 1;
+			}
 		}
 	}
 
 	// process val lits
 	for (int i = 0; i < head.size(); i++) {
 		ChannelInfo& ci = sat.c_info[var(head[i])];
-		if (ci.val_type == 1) continue;
+		if (ci.val_type == 1) {
+			continue;
+		}
 		int v = ci.val;
 		if (sign(head[i])) {
-			if (v < lower_bound || v > upper_bound) continue;
+			if (v < lower_bound || v > upper_bound) {
+				continue;
+			}
 			if (v == lower_bound) {
 				lower_bound++;
 				continue;

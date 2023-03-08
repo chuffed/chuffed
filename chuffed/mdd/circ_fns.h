@@ -1,5 +1,5 @@
-#ifndef __CIRC_FNS_H__
-#define __CIRC_FNS_H__
+#ifndef CIRC_FNS_H_
+#define CIRC_FNS_H_
 #include <chuffed/support/vec.h>
 
 #include <cassert>
@@ -13,22 +13,26 @@ T card_range(T fff, vec<T>& args, unsigned int start, unsigned int end, unsigned
 	assert((int)start < args.size());
 	assert((int)end <= args.size());
 
-	if ((int)ub > args.size() - 1) ub = args.size() - 1;
+	if ((int)ub > args.size() - 1) {
+		ub = args.size() - 1;
+	}
 
 	// Should be able to formulate without, but... whatever.
 	T ttt(~fff);
 
 	vec<T> counts;
 	for (unsigned int cc = 0; cc <= ub; cc++) {
-		if (cc >= lb)
+		if (cc >= lb) {
 			counts.push(ttt);
-		else
+		} else {
 			counts.push(fff);
+		}
 	}
 
 	for (int ii = end - 1; ii >= ((int)start); ii--) {
-		for (unsigned int cc = 0; cc < ub; cc++)
+		for (unsigned int cc = 0; cc < ub; cc++) {
 			counts[cc] = (args[ii] & counts[cc + 1]) | ((~args[ii]) & counts[cc]);
+		}
 		counts[ub] = (~args[ii]) & counts[ub];
 	}
 

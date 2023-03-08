@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <queue>
+#include <utility>
 #include <vector>
 
 class Dijkstra {
@@ -55,7 +56,7 @@ public:
 	virtual void set_source(int s) { source = s; }
 	inline int parentOf(int n) { return pred[n]; }
 	inline int distTo(int n) { return cost[n]; }
-	inline int isInShortestPath(int tl, int hd) { return pred[hd] == tl; }
+	inline int isInShortestPath(int tl, int hd) { return static_cast<int>(pred[hd] == tl); }
 
 	virtual void on_visiting_node(int n) {}
 	virtual bool ignore_edge(int e) { return false; }
@@ -66,16 +67,18 @@ public:
 	void print_pred() const;
 	bool is_leaf(int n) const { return !has_kids[n]; }
 	inline virtual int weight(int e, unsigned int time = -1) {
-		if (ws.size()) {
+		if (static_cast<unsigned int>(!ws.empty()) != 0U) {
 			return ws[e];
-		} else if (wst.size()) {
-			return time >= 0 && time < wst[e].size() ? wst[e][time] : -1;
-		} else {
-			std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
-			return -1;
 		}
+		if (static_cast<unsigned int>(!wst.empty()) != 0U) {
+			return time >= 0 && time < wst[e].size() ? wst[e][time] : -1;
+		}
+		std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
+		return -1;
 	}
-	inline virtual int duration(int n) { return job.size() ? job[n] : 0; }
+	inline virtual int duration(int n) {
+		return static_cast<unsigned int>(!job.empty()) != 0U ? job[n] : 0;
+	}
 };
 
 // Use new SCC knowledge at each iteration to skip edges. This only
@@ -112,7 +115,7 @@ public:
 	struct tuple {
 		tuple() : node(-1), cost(-1) {}
 		tuple(int _node, int _cost, std::vector<bool> _path, std::vector<bool> _mand)
-				: node(_node), cost(_cost), path(_path), mand(_mand) {
+				: node(_node), cost(_cost), path(std::move(_path)), mand(std::move(_mand)) {
 			assert(cost >= 0);
 		}
 		int node;
@@ -139,9 +142,9 @@ private:
 		FilteredKosarajuSCC(DijkstraMandatory* _d, int v, std::vector<std::vector<int>> outgoing,
 												std::vector<std::vector<int>> ingoing, std::vector<std::vector<int>> ends)
 				: KosarajuSCC(v, outgoing, ingoing, ends), d(_d) {}
-		virtual bool ignore_edge(int e) { return d->ignore_edge_scc(e); }
-		virtual bool ignore_node(int u) { return d->ignore_node_scc(u); }
-		virtual bool mandatory_node(int u) { return d->mandatory_node(u); }
+		bool ignore_edge(int e) override { return d->ignore_edge_scc(e); }
+		bool ignore_node(int u) override { return d->ignore_node_scc(u); }
+		bool mandatory_node(int u) override { return d->mandatory_node(u); }
 	};
 	FilteredKosarajuSCC* sccs;
 
@@ -171,7 +174,7 @@ public:
 	int fake_start_point;
 	virtual int get_start_point() { return fake_start_point; }
 #else
-	virtual int run(bool* ok = NULL, bool use_set_target = false);
+	virtual int run(bool* ok = nullptr, bool use_set_target = false);
 #endif
 
 	virtual bool ignore_edge(int e) { return false; }
@@ -185,24 +188,30 @@ public:
 	static std::vector<int> DEFAULT_VECTOR;
 	virtual std::vector<int>& mandatory_nodes() { return DijkstraMandatory::DEFAULT_VECTOR; }
 	inline virtual int weight(int e, int time = -1) {
-		if (ws.size()) {
+		if (static_cast<unsigned int>(!ws.empty()) != 0U) {
 			return ws[e];
-		} else if (wst.size()) {
-			return time >= 0 && time < (int)wst[e].size() ? wst[e][time] : -1;
-		} else {
-			std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
-			return -1;
 		}
+		if (static_cast<unsigned int>(!wst.empty()) != 0U) {
+			return time >= 0 && time < (int)wst[e].size() ? wst[e][time] : -1;
+		}
+		std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
+		return -1;
 	}
-	inline virtual int duration(int n) { return job.size() ? job[n] : 0; }
+	inline virtual int duration(int n) {
+		return static_cast<unsigned int>(!job.empty()) != 0U ? job[n] : 0;
+	}
 
 	inline void set_target(const std::vector<int>& tar) {
 		target = std::vector<bool>(tar.size(), false);
-		for (unsigned int i = 0; i < tar.size(); i++) target[tar[i]] = 1;
+		for (int i : tar) {
+			target[i] = true;
+		}
 	}
 	inline void set_target(const std::vector<bool>& tar) {
 		target = std::vector<bool>(tar.size(), false);
-		for (unsigned int i = 0; i < tar.size(); i++) target[i] = tar[i];
+		for (unsigned int i = 0; i < tar.size(); i++) {
+			target[i] = tar[i];
+		}
 	}
 	inline const std::vector<bool>& get_target() { return target; }
 

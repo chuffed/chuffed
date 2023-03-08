@@ -8,19 +8,19 @@ class DAGPropagator : public DReachabilityPropagator {
 	class TrailedSuccList : public TrailedConstantAccessList<std::pair<int, int> > {
 	public:
 		TrailedSuccList(int n) : TrailedConstantAccessList(n) {}
-		virtual int key(std::pair<int, int> p) { return p.first; }
+		int key(std::pair<int, int> p) override { return p.first; }
 		void print() {
 			std::cout << "Size: " << size << std::endl;
 			;
 			std::cout << "Sparse: ";
-			for (int i = 0; i < sparse.size(); i++) {
-				std::cout << sparse[i] << " ";
+			for (int i : sparse) {
+				std::cout << i << " ";
 			}
 			std::cout << std::endl;
 
 			std::cout << "Dense: ";
-			for (int i = 0; i < dense.size(); i++) {
-				std::cout << "(" << dense[i].first << "," << dense[i].second << ") ";
+			for (auto& i : dense) {
+				std::cout << "(" << i.first << "," << i.second << ") ";
 			}
 			std::cout << std::endl;
 		}
@@ -28,19 +28,19 @@ class DAGPropagator : public DReachabilityPropagator {
 	class TrailedPredList : public TrailedConstantAccessList<int> {
 	public:
 		TrailedPredList(int n) : TrailedConstantAccessList(n) {}
-		virtual int key(int p) { return p; }
+		int key(int p) override { return p; }
 		void print() {
 			std::cout << "Size: " << size << std::endl;
 			;
 			std::cout << "Sparse: ";
-			for (int i = 0; i < sparse.size(); i++) {
-				std::cout << sparse[i] << " ";
+			for (int i : sparse) {
+				std::cout << i << " ";
 			}
 			std::cout << std::endl;
 
 			std::cout << "Dense: ";
-			for (int i = 0; i < dense.size(); i++) {
-				std::cout << dense[i] << " ";
+			for (int i : dense) {
+				std::cout << i << " ";
 			}
 			std::cout << std::endl;
 		}
@@ -78,17 +78,17 @@ public:
 	DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 								vec<vec<edge_id> >& _out, vec<vec<int> >& _en);
 
-	~DAGPropagator();
+	~DAGPropagator() override;
 
-	virtual bool propagateNewEdge(int e);
-	virtual bool propagateNewNode(int n);
+	bool propagateNewEdge(int e) override;
+	bool propagateNewNode(int n) override;
 
 	virtual bool check_cycle(int e);
 	virtual bool prevent_cycle(int e);
 
-	virtual bool propagate();
+	bool propagate() override;
 
-	virtual bool checkFinalSatisfied();
+	bool checkFinalSatisfied() override;
 };
 
 #endif

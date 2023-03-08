@@ -2,6 +2,7 @@
 #define int_var_el_h
 
 #include <chuffed/core/options.h>
+#include <chuffed/core/sat-types.h>
 
 class IntVarEL : public IntVar {
 	int lit_min;
@@ -34,33 +35,33 @@ public:
 
 	void initVLits();
 	void initBLits();
-	void setVLearnable(bool b = true);
-	void setBLearnable(bool b = true);
-	void setVDecidable(bool t);
-	void setBDecidable(bool t);
+	void setVLearnable(bool b = true) const;
+	void setBLearnable(bool b = true) const;
+	void setVDecidable(bool b) const;
+	void setBDecidable(bool b) const;
 
-	VarType getType() { return INT_VAR_EL; }
+	VarType getType() override { return INT_VAR_EL; }
 
-	int getBaseVLit() { return base_vlit; }
-	int getBaseBLit() { return base_blit; }
+	int getBaseVLit() const { return base_vlit; }
+	int getBaseBLit() const { return base_blit; }
 	Lit getEQLit2(int v) const { return toLit(base_vlit + 2 * v + 1); }
 
 	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	Lit getLit(int64_t v, int t);
+	Lit getLit(int64_t v, int t) override;
 
-	Lit getMinLit() const { return ~getGELit(min); }
-	Lit getMaxLit() const { return ~getLELit(max); }
-	Lit getValLit() const {
+	Lit getMinLit() const override { return ~getGELit(min); }
+	Lit getMaxLit() const override { return ~getLELit(max); }
+	Lit getValLit() const override {
 		assert(isFixed());
 		return ~getEQLit(min);
 	}
-	Lit getFMinLit(int64_t v) { return ~getLit(so.finesse ? v : (int)min, 2); }
-	Lit getFMaxLit(int64_t v) { return ~getLit(so.finesse ? v : (int)max, 3); }
+	Lit getFMinLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->min, 2); }
+	Lit getFMaxLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->max, 3); }
 
-	bool setMin(int64_t v, Reason r = NULL, bool channel = true);
-	bool setMax(int64_t v, Reason r = NULL, bool channel = true);
-	bool setVal(int64_t v, Reason r = NULL, bool channel = true);
-	bool remVal(int64_t v, Reason r = NULL, bool channel = true);
+	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool setVal(int64_t v, Reason r = nullptr, bool channel = true) override;
+	bool remVal(int64_t v, Reason r = nullptr, bool channel = true) override;
 
 	Lit createSetLit(vec<Lit>& head);
 };

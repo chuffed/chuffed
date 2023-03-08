@@ -55,12 +55,16 @@ public:
 			bool in[n_tasks];
 			for (int i = 0; i < n_tasks; i++) {
 				in[i] = (d[i] > 0 && rr[r][i] > 0);
-				if (in[i]) a.push(rr[r][i]);
+				if (in[i]) {
+					a.push(rr[r][i]);
+				}
 			}
 			for (int t = 0; t <= horizon; t++) {
 				vec<IntVar*> x;
 				for (int i = 0; i < n_tasks; i++) {
-					if (in[i]) x.push(o[i][t]);
+					if (in[i]) {
+						x.push(o[i][t]);
+					}
 				}
 				int_linear(a, x, IRT_LE, rc[r]);
 			}
@@ -69,7 +73,9 @@ public:
 		for (int i = 0; i < n_tasks; i++) {
 			for (int j = 0; j < succ[i].size(); j++) {
 				int k = succ[i][j];
-				if (k == n_tasks) continue;
+				if (k == n_tasks) {
+					continue;
+				}
 				int_rel(s[i], IRT_LE, s[k], -d[i]);
 			}
 		}
@@ -104,26 +110,31 @@ public:
 		succ.growTo(n_tasks);
 
 		rr.growTo(n_res);
-		for (int i = 0; i < n_res; i++) rr[i].growTo(n_tasks);
+		for (int i = 0; i < n_res; i++) {
+			rr[i].growTo(n_tasks);
+		}
 
 		assert(n_res == 4);
 		rassert(fscanf(fp, "%d %d %d %d\n", &rc[0], &rc[1], &rc[2], &rc[3]) == 4);
 
 		for (int i = 0; i < n_tasks; i++) {
 			//			printf("%d: ", i);
-			char temp[1000], *s;
+			char temp[1000];
+			char* s;
 			rassert(fgets(temp, 1000, fp));
-			if (i == 0) rassert(fgets(temp, 1000, fp));
+			if (i == 0) {
+				rassert(fgets(temp, 1000, fp));
+			}
 			s = strtok(temp, " \t\n");
 			d[i] = atoi(s);
 			for (int j = 0; j < n_res; j++) {
-				s = strtok(NULL, " \t\n");
+				s = strtok(nullptr, " \t\n");
 				rr[j][i] = atoi(s);
 			}
-			s = strtok(NULL, " \t\n");
+			s = strtok(nullptr, " \t\n");
 			int num_succ = atoi(s);
 			for (int j = 0; j < num_succ; j++) {
-				s = strtok(NULL, " \t\n");
+				s = strtok(nullptr, " \t\n");
 				succ[i].push(atoi(s) - 2);
 				//				printf("%d ", succ[i].last());
 			}
@@ -135,7 +146,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n_tasks; i++) {
 			os << s[i]->getVal() << ", ";
 		}

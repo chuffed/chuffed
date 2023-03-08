@@ -1,6 +1,8 @@
 #include <chuffed/core/propagator.h>
 #include <chuffed/mip/mip.h>
 
+#include <utility>
+
 // x >= y <- r
 
 template <int U, int V, int R = 0>
@@ -10,49 +12,67 @@ class BinGE : public Propagator {
 	BoolView r;
 
 public:
-	BinGE(IntView<U> _x, IntView<V> _y, BoolView _r = bv_true) : x(_x), y(_y), r(_r) {
+	BinGE(IntView<U> _x, IntView<V> _y, BoolView _r = bv_true) : x(_x), y(_y), r(std::move(_r)) {
 		x.attach(this, 0, EVENT_U);
 		y.attach(this, 1, EVENT_L);
-		if (R) r.attach(this, 2, EVENT_L);
+		if (R != 0) {
+			r.attach(this, 2, EVENT_L);
+		}
 	}
 
-	void wakeup(int i, int c) {
-		if (!R || !r.isFalse()) pushInQueue();
+	void wakeup(int i, int c) override {
+		if ((R == 0) || !r.isFalse()) {
+			pushInQueue();
+		}
 	}
 
-	bool propagate() {
-		if (R && r.isFalse()) return true;
+	bool propagate() override {
+		if ((R != 0) && r.isFalse()) {
+			return true;
+		}
 
 		int64_t x_max = x.getMax();
 		int64_t y_min = y.getMin();
 
 		// Can finesse!!
-		if (R && x_max < y_min) setDom(r, setVal, 0, x.getMaxLit(), y.getMinLit());
+		if ((R != 0) && x_max < y_min) {
+			setDom(r, setVal, 0, x.getMaxLit(), y.getMinLit());
+		}
 
-		if (R && !r.isTrue()) return true;
+		if ((R != 0) && !r.isTrue()) {
+			return true;
+		}
 
 		// Finesses x's lower bound
-		if (R)
+		if (R != 0) {
 			setDom(x, setMin, y_min, y.getMinLit(), r.getValLit());
-		else
+		} else {
 			setDom(x, setMin, y_min, y.getMinLit());
-		if (R)
+		}
+		if (R != 0) {
 			setDom(y, setMax, x_max, x.getMaxLit(), r.getValLit());
-		else
+		} else {
 			setDom(y, setMax, x_max, x.getMaxLit());
+		}
 
-		if (x.getMin() >= y.getMax()) satisfied = true;
+		if (x.getMin() >= y.getMax()) {
+			satisfied = true;
+		}
 
 		return true;
 	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
 		if (r.isFalse()) {
 			satisfied = true;
 			return 1;
 		}
-		if (x.getMin() >= y.getMax()) satisfied = true;
+		if (x.getMin() >= y.getMax()) {
+			satisfied = true;
+		}
 		return 3;
 	}
 };
@@ -68,59 +88,77 @@ public:
 	IntView<V> y;
 	BoolView r;
 
-	BinNE(IntView<U> _x, IntView<V> _y, BoolView _r = bv_true) : x(_x), y(_y), r(_r) {
+	BinNE(IntView<U> _x, IntView<V> _y, BoolView _r = bv_true) : x(_x), y(_y), r(std::move(_r)) {
 		x.attach(this, 0, EVENT_F);
 		y.attach(this, 1, EVENT_F);
-		if (R) r.attach(this, 2, EVENT_L);
+		if (R != 0) {
+			r.attach(this, 2, EVENT_L);
+		}
 		//		printf("BinNE: %d %d %d\n", U, V, R);
 	}
 
-	void wakeup(int i, int c) {
-		if (!R || !r.isFalse()) pushInQueue();
+	void wakeup(int i, int c) override {
+		if ((R == 0) || !r.isFalse()) {
+			pushInQueue();
+		}
 	}
 
-	bool propagate() {
-		if (R && r.isFalse()) return true;
+	bool propagate() override {
+		if ((R != 0) && r.isFalse()) {
+			return true;
+		}
 
 		if (x.isFixed() && y.isFixed() && x.getVal() == y.getVal()) {
 			setDom(r, setVal, 0, x.getValLit(), y.getValLit());
 		}
 
-		if (R && !r.isTrue()) return true;
+		if ((R != 0) && !r.isTrue()) {
+			return true;
+		}
 
 		if (x.isFixed()) {
-			if (R)
+			if (R != 0) {
 				setDom(y, remVal, x.getVal(), x.getValLit(), r.getValLit());
-			else
+			} else {
 				setDom(y, remVal, x.getVal(), x.getValLit());
+			}
 		}
 		if (y.isFixed()) {
-			if (R)
+			if (R != 0) {
 				setDom(x, remVal, y.getVal(), y.getValLit(), r.getValLit());
-			else
+			} else {
 				setDom(x, remVal, y.getVal(), y.getValLit());
+			}
 		}
 
 		return true;
 	}
 
-	bool check() {
-		if (R) NOT_SUPPORTED;
+	bool check() override {
+		if (R != 0) {
+			NOT_SUPPORTED;
+		}
 		return (x.getShadowVal() != y.getShadowVal());
 	}
 
-	int checkSatisfied() {
-		if (satisfied) return 1;
+	int checkSatisfied() override {
+		if (satisfied) {
+			return 1;
+		}
 		if (r.isFalse()) {
 			satisfied = true;
 			return 1;
 		}
-		if (x.getMin() > y.getMax() || x.getMax() < y.getMin()) satisfied = true;
+		if (x.getMin() > y.getMax() || x.getMax() < y.getMin()) {
+			satisfied = true;
+		}
 		return 3;
 	}
 };
 
 //-----
+
+// NOLINTBEGIN
 
 #define BinProp(prop, U, V)           \
 	if (u == U && v == V) {             \
@@ -130,9 +168,12 @@ public:
 			p = new prop<U, V, 1>(x, y, r); \
 	}
 
+// NOLINTEND
+
 void newBinGE(IntView<> x, IntView<> y, BoolView r = bv_true) {
-	int u = x.getType(), v = y.getType();
-	Propagator* p = NULL;
+	int u = x.getType();
+	int v = y.getType();
+	Propagator* p = nullptr;
 
 	BinProp(BinGE, 0, 0);
 	BinProp(BinGE, 0, 4);
@@ -145,8 +186,9 @@ void newBinGE(IntView<> x, IntView<> y, BoolView r = bv_true) {
 }
 
 void newBinNE(IntView<> x, IntView<> y, BoolView r = bv_true) {
-	int u = x.getType(), v = y.getType();
-	Propagator* p = NULL;
+	int u = x.getType();
+	int v = y.getType();
+	Propagator* p = nullptr;
 
 	BinProp(BinNE, 0, 0);
 	BinProp(BinNE, 0, 4);
@@ -213,7 +255,7 @@ struct IRR {
 	IntRelType t;
 	int c;
 	BoolView r;
-	IRR(IntVar* _x, IntRelType _t, int _c, BoolView _r) : x(_x), t(_t), c(_c), r(_r) {}
+	IRR(IntVar* _x, IntRelType _t, int _c, BoolView _r) : x(_x), t(_t), c(_c), r(std::move(_r)) {}
 };
 
 vec<IRR> ircs;
@@ -262,7 +304,6 @@ void int_rel(IntVar* x, IntRelType t, IntVar* y, int c) {
 
 	switch (t) {
 		case IRT_EQ:
-			break;
 		case IRT_NE:
 			break;
 		case IRT_LE:
@@ -394,7 +435,8 @@ void int_rel_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		int_rel_reif(x, t, v, r);
 		return;
 	}
-	BoolView b1(x->getLit(c, 2)), b2(x->getLit(c, 3));
+	BoolView b1(x->getLit(c, 2));
+	BoolView b2(x->getLit(c, 3));
 	switch (t) {
 		case IRT_EQ:
 			bool_rel(b1, BRT_AND, b2, r);
@@ -433,7 +475,8 @@ void int_rel_half_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		int_rel_half_reif(x, t, v, r);
 		return;
 	}
-	BoolView b1(x->getLit(c, 2)), b2(x->getLit(c, 3));
+	BoolView b1(x->getLit(c, 2));
+	BoolView b2(x->getLit(c, 3));
 	switch (t) {
 		case IRT_EQ:
 			bool_rel(b2, BRT_OR, ~r);

@@ -22,7 +22,7 @@ public:
 
 	//...
 
-	int diag(int i, int j) { return (i * (2 * n - i - 1)) / 2 + j - i - 1; }
+	int diag(int i, int j) const { return (i * (2 * n - i - 1)) / 2 + j - i - 1; }
 
 	GolombRuler(int _n) : n(_n) {
 		// Create vars
@@ -69,7 +69,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			os << x[i]->getVal() << ", ";
 		}

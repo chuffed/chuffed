@@ -9,19 +9,31 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 
 	// handle min, max and vals
 	int l = 0;
-	while (values[l] < min)
-		if (++l == values.size()) TL_FAIL();
-	while (!vals[values[l]])
-		if (++l == values.size()) TL_FAIL();
+	while (values[l] < min) {
+		if (++l == values.size()) {
+			TL_FAIL();
+		}
+	}
+	while (vals[values[l]] == 0) {
+		if (++l == values.size()) {
+			TL_FAIL();
+		}
+	}
 	min = values[l];
 
 	//	printf("l = %d\n", l);
 
 	int u = values.size() - 1;
-	while (values[u] > max)
-		if (u-- == 0) TL_FAIL();
-	while (!vals[values[u]])
-		if (u-- == 0) TL_FAIL();
+	while (values[u] > max) {
+		if (u-- == 0) {
+			TL_FAIL();
+		}
+	}
+	while (vals[values[u]] == 0) {
+		if (u-- == 0) {
+			TL_FAIL();
+		}
+	}
 	max = values[u];
 
 	//	printf("u = %d\n", u);
@@ -31,10 +43,12 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 			k++;
 			continue;
 		}
-		vals[i] = false;
+		vals[i] = 0;
 	}
 
-	for (int i = l; i <= u; i++) values[i - l] = values[i];
+	for (int i = l; i <= u; i++) {
+		values[i - l] = values[i];
+	}
 	values.resize(u - l + 1);
 
 	//	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
@@ -65,23 +79,30 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 }
 
 void IntVarSL::attach(Propagator* p, int pos, int eflags) {
-	if (isFixed())
+	if (isFixed()) {
 		p->wakeup(pos, eflags);
-	else
+	} else {
 		el->pinfo.push(PropInfo(p, pos, eflags));
+	}
 }
 
 int IntVarSL::transform(int v, int type) {
-	int l = 0, u = values.size() - 1, m;
+	int l = 0;
+	int u = values.size() - 1;
+	int m;
 	while (true) {
 		m = (l + u) / 2;
-		if (values[m] == v)
+		if (values[m] == v) {
 			return m;
-		else if (values[m] < v)
+		}
+		if (values[m] < v) {
 			l = m + 1;
-		else
+		} else {
 			u = m - 1;
-		if (u < l) break;
+		}
+		if (u < l) {
+			break;
+		}
 	}
 	switch (type) {
 		case 0:
@@ -118,7 +139,9 @@ bool IntVarSL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
 	//	debug();
 	//	printf("setMin: v = %d, u = %d\n", v, transform(v, 0));
-	if (!el->setMin(transform(v, 1), r, channel)) return false;
+	if (!el->setMin(transform(v, 1), r, channel)) {
+		return false;
+	}
 	min = values[el->min];
 	return true;
 }
@@ -127,7 +150,9 @@ bool IntVarSL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
 	//	debug();
 	//	printf("setMax: v = %d, u = %d\n", v, transform(v, 0));
-	if (!el->setMax(transform(v, 0), r, channel)) return false;
+	if (!el->setMax(transform(v, 0), r, channel)) {
+		return false;
+	}
 	max = values[el->max];
 	return true;
 }
@@ -136,13 +161,21 @@ bool IntVarSL::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
 	int u = transform(v, 2);
 	if (u == -1) {
-		if (channel) sat.cEnqueue(lit_False, r);
+		if (channel) {
+			sat.cEnqueue(lit_False, r);
+		}
 		assert(sat.confl);
 		return false;
 	}
-	if (!el->setVal(u, r, channel)) return false;
-	if (min < v) min = v;
-	if (max > v) max = v;
+	if (!el->setVal(u, r, channel)) {
+		return false;
+	}
+	if (min < v) {
+		min = v;
+	}
+	if (max > v) {
+		max = v;
+	}
 	return true;
 }
 
@@ -150,8 +183,10 @@ bool IntVarSL::remVal(int64_t v, Reason r, bool channel) {
 	assert(remValNotR(v));
 	int u = transform(v, 2);
 	assert(u != -1);
-	if (!el->remVal(u, r, channel)) return false;
-	vals[v] = false;
+	if (!el->remVal(u, r, channel)) {
+		return false;
+	}
+	vals[v] = 0;
 	min = values[el->min];
 	max = values[el->max];
 	return true;
@@ -161,7 +196,9 @@ void IntVarSL::channel(int val, int val_type, int sign) {
 	//	fprintf(stderr, "funny channel\n");
 	int type = val_type * 3 ^ sign;
 	el->set(val, type, false);
-	if (type == 0) vals[values[val]] = false;
+	if (type == 0) {
+		vals[values[val]] = 0;
+	}
 	min = values[el->min];
 	max = values[el->max];
 }
@@ -169,6 +206,8 @@ void IntVarSL::channel(int val, int val_type, int sign) {
 void IntVarSL::debug() {
 	printf("min = %d, max = %d, el->min = %d, el->max = %d\n", (int)min, (int)max, (int)el->min,
 				 (int)el->max);
-	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
+	for (int i = 0; i < values.size(); i++) {
+		printf("%d ", values[i]);
+	}
 	printf("\n");
 }

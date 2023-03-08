@@ -10,7 +10,7 @@ private:
 	T** inf;
 
 public:
-	FloydWarshall(int _n, int _e) : n(_n), e(_e), dist(NULL), inf(NULL) {
+	FloydWarshall(int _n, int _e) : n(_n), e(_e), dist(nullptr), inf(nullptr) {
 		dist = new T*[n];
 		inf = new T*[n];
 		for (int i = 0; i < n; i++) {
@@ -24,12 +24,16 @@ public:
 	}
 
 	virtual ~FloydWarshall() {
-		if (dist != NULL) {
-			for (int i = 0; i < n; i++) delete[] dist[i];
+		if (dist != nullptr) {
+			for (int i = 0; i < n; i++) {
+				delete[] dist[i];
+			}
 			delete[] dist;
 		}
-		if (inf != NULL) {
-			for (int i = 0; i < n; i++) delete[] inf[i];
+		if (inf != nullptr) {
+			for (int i = 0; i < n; i++) {
+				delete[] inf[i];
+			}
 			delete[] inf;
 		}
 	}
@@ -47,7 +51,9 @@ public:
 			}
 		}
 
-		for (int i = 0; i < n; i++) dist[i][i] = 0;
+		for (int i = 0; i < n; i++) {
+			dist[i][i] = 0;
+		}
 
 		for (int edge = 0; edge < e; edge++) {
 			if (exists(edge)) {

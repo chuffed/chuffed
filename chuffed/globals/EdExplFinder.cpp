@@ -37,8 +37,10 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 	min_id_cost = _min_id_cost;
 	dpMatrix = _dpMatrix;
 
-	seq1ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
-	seq2ExcludedCharacters = new std::vector<bool>(seqSize * (max_char + 1), false);
+	seq1ExcludedCharacters =
+			new std::vector<bool>(static_cast<size_t>(seqSize * (max_char + 1)), false);
+	seq2ExcludedCharacters =
+			new std::vector<bool>(static_cast<size_t>(seqSize * (max_char + 1)), false);
 
 	// do breadth first search fill inequality vector
 	bfs_shortest_path();
@@ -157,11 +159,12 @@ int EdExplFinder::excludedCharCoord(int i, int c) const { return i * (max_char +
 int EdExplFinder::substCoord(int c1, int c2) const { return (c1 - 1) * max_char + (c2 - 1); }
 
 void EdExplFinder::bfs_shortest_path() {
-	auto shortestPathMatrix = new std::vector<int>(((seqSize + 1) * (seqSize + 1)), lb + 1);
+	auto* shortestPathMatrix =
+			new std::vector<int>(static_cast<size_t>((seqSize + 1) * (seqSize + 1)), lb + 1);
 	// set shortest path for bottom right position to 0 cost
 	(*shortestPathMatrix)[matrixCoord(seqSize, seqSize)] = 0;
 
-	auto nodeQueue = new std::queue<std::pair<int, int> >();
+	auto* nodeQueue = new std::queue<std::pair<int, int> >();
 	std::set<std::pair<int, int> > node_set;
 	// start with bottom right position
 	std::pair<int, int> start_node = std::pair<int, int>(seqSize, seqSize);

@@ -23,7 +23,9 @@ public:
 		vec<Lit> ps(r->size());
 		for (int i = 1; i < r->size(); i++) {
 			ps[i] = getSymLit((*r)[i], r1, r2);
-			if (sat.value(ps[i]) != l_False) return NULL;
+			if (sat.value(ps[i]) != l_False) {
+				return nullptr;
+			}
 		}
 		ps[0] = getSymLit((*r)[0], r1, r2);
 		return Clause_new(ps, true);
@@ -34,13 +36,19 @@ public:
 
 void LDSB::init() {
 	ldsb_time = duration::zero();
-	for (int i = 0; i < engine.vars.size(); i++) lookupTable.push();
-	for (int i = 0; i < symmetries.size(); i++) symmetries[i]->init();
+	for (int i = 0; i < engine.vars.size(); i++) {
+		lookupTable.push();
+	}
+	for (int i = 0; i < symmetries.size(); i++) {
+		symmetries[i]->init();
+	}
 }
 
 void LDSB::processDec(Lit p) {
 	int var_id = sat.c_info[var(p)].cons_id;
-	if (var_id == -1) NOT_SUPPORTED;
+	if (var_id == -1) {
+		NOT_SUPPORTED;
+	}
 
 	vec<pair<int, int> >& syms = lookupTable[var_id];
 
@@ -63,14 +71,18 @@ bool LDSB::processImpl(Clause* c) {
 
 		int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
-			if (LDSB_DEBUG) printf("Implication ignored\n");
+			if (LDSB_DEBUG) {
+				printf("Implication ignored\n");
+			}
 			continue;
 		}
 
 		vec<pair<int, int> >& syms = lookupTable[var_id];
 
 		for (int i = 0; i < syms.size(); i++) {
-			if (syms[i].first == sl_origin[k]) continue;
+			if (syms[i].first == sl_origin[k]) {
+				continue;
+			}
 			if (!symmetries[syms[i].first]->processImpl(sym_learnts[k], syms[i].second)) {
 				ldsb_time += std::chrono::duration_cast<duration>(chuffed_clock::now() - start);
 				return false;
@@ -96,11 +108,17 @@ bool LDSB::processImpl(Clause* c) {
 void LDSB::addLearntClause(Clause& c, int sym_id) {
 	sym_learnts.push(&c);
 	sl_origin.push(sym_id);
-	if (sym_id == -1) return;
+	if (sym_id == -1) {
+		return;
+	}
 	c.activity() = 1;
 	if (c.size() >= 2) {
-		if (so.learn) sat.addClause(c, so.one_watch);
-		if (!so.learn || c.size() == 2) sat.rtrail.last().push(&c);
+		if (so.learn) {
+			sat.addClause(c, so.one_watch);
+		}
+		if (!so.learn || c.size() == 2) {
+			sat.rtrail.last().push(&c);
+		}
 	}
 	sat.enqueue(c[0], &c);
 }
@@ -118,56 +136,78 @@ public:
 		active = (Tchar*)malloc(n * sizeof(Tchar));
 		for (int i = 0; i < n; i++) {
 			vars[i] = v[i]->var_id;
-			active[i] = true;
+			active[i] = 1;
 			// this is not quite good enough
-			if (v[i]->getMin() != v[0]->getMin()) NOT_SUPPORTED;
-			if (v[i]->getMax() != v[0]->getMax()) NOT_SUPPORTED;
+			if (v[i]->getMin() != v[0]->getMin()) {
+				NOT_SUPPORTED;
+			}
+			if (v[i]->getMax() != v[0]->getMax()) {
+				NOT_SUPPORTED;
+			}
 		}
 	}
 
-	void init() {
+	void init() override {
 		for (int i = 0; i < n; i++) {
 			assert(engine.vars[vars[i]]->getType() == INT_VAR_EL);
 			ldsb.lookupTable[vars[i]].push(pair<int, int>(sym_id, i));
 		}
 	}
 
-	void processDec(Lit p, int pos) {
+	void processDec(Lit p, int pos) override {
 		assert(active[pos]);
 		active[pos] = 0;
-		if (LDSB_DEBUG) printf("VarSym: %d, %d broken\n", sym_id, pos);
+		if (LDSB_DEBUG) {
+			printf("VarSym: %d, %d broken\n", sym_id, pos);
+		}
 	}
 
-	bool processImpl(Clause* r, int pos) {
-		if (!so.ldsbta && !active[pos]) return true;
+	bool processImpl(Clause* r, int pos) override {
+		if (!so.ldsbta && (active[pos] == 0)) {
+			return true;
+		}
 
 		Lit p = (*r)[0];
 
 		for (int i = 0; i < n; i++) {
-			if (!so.ldsbta && !active[i]) continue;
-			if (i == pos) continue;
+			if (!so.ldsbta && (active[i] == 0)) {
+				continue;
+			}
+			if (i == pos) {
+				continue;
+			}
 			Lit q = getSymLit(p, vars[pos], vars[i]);
 			lbool b = sat.value(q);
-			if (b == l_True) continue;
+			if (b == l_True) {
+				continue;
+			}
 			if (b == l_False) {
 				// can fail here!
 				Clause* c = getSymClause(r, vars[pos], vars[i]);
-				if (!c) {
-					if (LDSB_DEBUG) printf("Skip VarSym Failure\n");
+				if (c == nullptr) {
+					if (LDSB_DEBUG) {
+						printf("Skip VarSym Failure\n");
+					}
 					continue;
 				}
 				c->temp_expl = 1;
 				sat.rtrail.last().push(c);
 				sat.confl = c;
-				if (LDSB_DEBUG) printf("VarSym Failure\n");
+				if (LDSB_DEBUG) {
+					printf("VarSym Failure\n");
+				}
 				return false;
 			}
 			Clause* s = getSymClause(r, vars[pos], vars[i]);
-			if (!s) {
-				if (LDSB_DEBUG) printf("Skip VarSym Implication");
+			if (s == nullptr) {
+				if (LDSB_DEBUG) {
+					printf("Skip VarSym Implication");
+				}
 				continue;
 			}
-			if (LDSB_DEBUG) printf("Extra VarSym implication\n");
+			if (LDSB_DEBUG) {
+				printf("Extra VarSym implication\n");
+			}
 			assert((*s)[0] == q);
 			//			if (!active[pos] || !active[i]) printf("Extra!\n");
 			ldsb.addLearntClause(*s, sym_id);
@@ -176,7 +216,7 @@ public:
 		return true;
 	}
 
-	Lit getSymLit(Lit p, int a, int b) {
+	Lit getSymLit(Lit p, int a, int b) override {
 		int var_id = sat.c_info[var(p)].cons_id;
 		Lit q = p;
 		// Not very safe!!!!
@@ -216,18 +256,24 @@ public:
 		active = (bool*)malloc((max - min + 1) * sizeof(bool));
 		for (int i = 0; i < n; i++) {
 			vars[i] = v[i]->var_id;
-			if (v[i]->getMin() > min) NOT_SUPPORTED;
+			if (v[i]->getMin() > min) {
+				NOT_SUPPORTED;
+			}
 			if (v[i]->getMax() < max) {
 				printf("%d %d\n", v[i]->getMax(), max);
 				NOT_SUPPORTED;
 			}
 		}
-		for (int i = min; i <= max; i++) active[i - min] = true;
+		for (int i = min; i <= max; i++) {
+			active[i - min] = true;
+		}
 	}
 
-	void init() {
+	void init() override {
 		which_vars = (bool*)malloc(engine.vars.size() * sizeof(bool));
-		for (int i = 0; i < engine.vars.size(); i++) which_vars[i] = false;
+		for (int i = 0; i < engine.vars.size(); i++) {
+			which_vars[i] = false;
+		}
 		for (int i = 0; i < n; i++) {
 			assert(engine.vars[vars[i]]->getType() == INT_VAR_EL);
 			ldsb.lookupTable[vars[i]].push(pair<int, int>(sym_id, i));
@@ -235,58 +281,79 @@ public:
 		}
 	}
 
-	void processDec(Lit p, int pos) {
+	void processDec(Lit p, int pos) override {
 		int v = getLitVal(p);
-		if (v == not_a_val) NOT_SUPPORTED;
+		if (v == not_a_val) {
+			NOT_SUPPORTED;
+		}
 		assert(engine.vars[sat.c_info[var(p)].cons_id]->getVal() == v);
-		if (v < min || v > max) return;
+		if (v < min || v > max) {
+			return;
+		}
 		if (active[v - min]) {
-			active[v - min] = 0;
+			active[v - min] = false;
 			//			printf("Level %d, ValSym: %d, %d broken\n", engine.decisionLevel(), sym_id, v);
 		}
 	}
 
-	bool processImpl(Clause* r, int pos) {
+	bool processImpl(Clause* r, int pos) override {
 		Lit p = (*r)[0];
 
 		int v = getLitVal(p);
 		assert(v != not_a_val);
 		if (v < min || v > max) {
-			if (LDSB_DEBUG) printf("Skip PValSym oor\n");
+			if (LDSB_DEBUG) {
+				printf("Skip PValSym oor\n");
+			}
 			return true;
 		}
-		if (!so.ldsbta && !active[v - min]) return true;
+		if (!so.ldsbta && !active[v - min]) {
+			return true;
+		}
 
 		//		Clause *rc = cleanClause(r);
 		Clause* rc = r;
 
 		for (int i = min; i <= max; i++) {
-			if (!so.ldsbta && !active[i - min]) continue;
-			if (i == v) continue;
+			if (!so.ldsbta && !active[i - min]) {
+				continue;
+			}
+			if (i == v) {
+				continue;
+			}
 			//		printf("try %d\n", i);
 			Lit q = getSymLit(p, v, i);
 			lbool b = sat.value(q);
-			if (b == l_True) continue;
+			if (b == l_True) {
+				continue;
+			}
 			if (b == l_False) {
 				Clause* c = getSymClause(rc, v, i);
-				if (!c) {
-					if (LDSB_DEBUG) printf("Skip ValSym Failure\n");
+				if (c == nullptr) {
+					if (LDSB_DEBUG) {
+						printf("Skip ValSym Failure\n");
+					}
 					continue;
 				}
 				c->temp_expl = 1;
 				sat.rtrail.last().push(c);
 				sat.confl = c;
-				if (LDSB_DEBUG) printf("ValSym Failure\n");
+				if (LDSB_DEBUG) {
+					printf("ValSym Failure\n");
+				}
 				//				free(rc);
 				return false;
 			}
 			Clause* s = getSymClause(rc, v, i);
-			if (!s) {
-				if (LDSB_DEBUG) printf("Skip ValSym implication");
+			if (s == nullptr) {
+				if (LDSB_DEBUG) {
+					printf("Skip ValSym implication");
+				}
 				continue;
 			}
-			if (LDSB_DEBUG)
+			if (LDSB_DEBUG) {
 				printf("Level %d, Extra ValSym implication %d -> %d\n", engine.decisionLevel(), v, i);
+			}
 			assert((*s)[0] == q);
 			//			if (!active[v-min] || !active[i-min]) printf("Extra!\n");
 			ldsb.addLearntClause(*s, sym_id);
@@ -297,7 +364,7 @@ public:
 		return true;
 	}
 
-	Clause* cleanClause(Clause* r) {
+	Clause* cleanClause(Clause* r) const {
 		vec<Lit> ps;
 		ps.push((*r)[0]);
 
@@ -319,7 +386,7 @@ public:
 			}
 			// Not ok, must be bounds lit
 			if (sat.c_info[var(c[i])].val_type) {
-				IntVarEL* var = (IntVarEL*)engine.vars[var_id];
+				auto* var = (IntVarEL*)engine.vars[var_id];
 				int v = (toInt(c[i]) - ((IntVarEL*)engine.vars[var_id])->getBaseBLit());
 				if (v % 2 == 1) {
 					v /= 2;
@@ -349,11 +416,15 @@ public:
 		return cc;
 	}
 
-	Lit getSymLit(Lit p, int a, int b) {
+	Lit getSymLit(Lit p, int a, int b) override {
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (!which_vars[var_id]) return p;
+		if (!which_vars[var_id]) {
+			return p;
+		}
 		int v = getLitVal(p);
-		if (v == not_a_val) NOT_SUPPORTED;
+		if (v == not_a_val) {
+			NOT_SUPPORTED;
+		}
 		Lit q = p;
 		if (v == a) {
 			q = toLit(toInt(p) - a * 2 + b * 2);
@@ -368,10 +439,14 @@ public:
 		return q;
 	}
 
-	int getLitVal(Lit p) {
+	static int getLitVal(Lit p) {
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (var_id == -1) return not_a_val;
-		if (sat.c_info[var(p)].val_type) return not_a_val;
+		if (var_id == -1) {
+			return not_a_val;
+		}
+		if (sat.c_info[var(p)].val_type) {
+			return not_a_val;
+		}
 		return (toInt(p) - ((IntVarEL*)engine.vars[var_id])->getBaseVLit()) / 2;
 	}
 };
@@ -389,7 +464,9 @@ public:
 	vec<vec<Tint> > values;
 
 	VarSeqSym(int _n, int _m, vec<IntVar*>& v) : n(_n), m(_m) {
-		if (n * m != v.size()) printf("n = %d, m = %d, v.size() = %d\n", n, m, v.size());
+		if (n * m != v.size()) {
+			printf("n = %d, m = %d, v.size() = %d\n", n, m, v.size());
+		}
 		rassert(n * m == v.size());
 		vars = (IntVar***)malloc(n * sizeof(IntVar**));
 		for (int i = 0; i < n; i++) {
@@ -401,11 +478,15 @@ public:
 			}
 		}
 		priority = 2;
-		for (int i = 0; i < v.size(); i++) v[i]->attach(this, i, EVENT_F);
+		for (int i = 0; i < v.size(); i++) {
+			v[i]->attach(this, i, EVENT_F);
+		}
 	}
 
-	void init() {
-		for (int i = 0; i < engine.vars.size(); i++) occ.push();
+	void init() override {
+		for (int i = 0; i < engine.vars.size(); i++) {
+			occ.push();
+		}
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				assert(vars[i][j]->getType() == INT_VAR_EL);
@@ -415,50 +496,66 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) {
+	void wakeup(int i, int c) override {
 		assert(values[i / m][i % m] == unfixed);
 		values[i / m][i % m] = vars[i / m][i % m]->getVal();
 	}
 
-	bool propagate() { return true; }
+	bool propagate() override { return true; }
 
-	void processDec(Lit p, int pos) {}
+	void processDec(Lit p, int pos) override {}
 
-	bool processImpl(Clause* r, int pos) {
+	bool processImpl(Clause* r, int pos) override {
 		Lit p = (*r)[0];
 
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (var_id == -1) return true;
+		if (var_id == -1) {
+			return true;
+		}
 
 		//	printf("processing var %d implication\n", sat.c_info[var(p)].cons_id);
 
 		for (int i = 0; i < occ[var_id].size(); i++) {
 			int r1 = occ[var_id][i] / m;
 			for (int r2 = 0; r2 < n; r2++) {
-				if (r1 == r2) continue;
+				if (r1 == r2) {
+					continue;
+				}
 				Lit q = getSymLit(p, r1, r2);
 				lbool b = sat.value(q);
-				if (b == l_True) continue;
-				if (!so.ldsbta && !rowMatch(r1, r2)) continue;
+				if (b == l_True) {
+					continue;
+				}
+				if (!so.ldsbta && !rowMatch(r1, r2)) {
+					continue;
+				}
 				if (b == l_False) {
 					// can fail here!
 					Clause* c = getSymClause(r, r1, r2);
-					if (!c) {
-						if (LDSB_DEBUG) printf("Skip VarSeqSym Failure\n");
+					if (c == nullptr) {
+						if (LDSB_DEBUG) {
+							printf("Skip VarSeqSym Failure\n");
+						}
 						continue;
 					}
 					c->temp_expl = 1;
 					sat.rtrail.last().push(c);
 					sat.confl = c;
-					if (LDSB_DEBUG) printf("VarSeqSym Failure\n");
+					if (LDSB_DEBUG) {
+						printf("VarSeqSym Failure\n");
+					}
 					return false;
 				}
 				Clause* s = getSymClause(r, r1, r2);
-				if (!s) {
-					if (LDSB_DEBUG) printf("Skip VarSeqSym implication");
+				if (s == nullptr) {
+					if (LDSB_DEBUG) {
+						printf("Skip VarSeqSym implication");
+					}
 					continue;
 				}
-				if (LDSB_DEBUG) printf("Extra VarSeqSym implication\n");
+				if (LDSB_DEBUG) {
+					printf("Extra VarSeqSym implication\n");
+				}
 				assert((*s)[0] == q);
 				//				if (!rowMatch(r1, r2)) printf("Extra!\n");
 				ldsb.addLearntClause(*s, sym_id);
@@ -483,16 +580,22 @@ public:
 				}
 		*/
 		for (int i = 0; i < m; i++) {
-			if (values[r1][i] != values[r2][i]) return false;
+			if (values[r1][i] != values[r2][i]) {
+				return false;
+			}
 		}
 
 		return true;
 	}
 
-	Lit getSymLit(Lit p, int r1, int r2) {
+	Lit getSymLit(Lit p, int r1, int r2) override {
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (var_id == -1) return p;
-		if (occ[var_id].size() == 0) return p;
+		if (var_id == -1) {
+			return p;
+		}
+		if (occ[var_id].size() == 0) {
+			return p;
+		}
 
 		for (int i = 0; i < occ[var_id].size(); i++) {
 			//		printf("%d %d %d %d\n", var_id, occ.size(), i, occ[var_id].size());
@@ -535,10 +638,16 @@ public:
 		min = 1000000000;
 		max = -1000000000;
 		for (int i = 0; i < a.size(); i++) {
-			if (a[i] < min) min = a[i];
-			if (a[i] > max) max = a[i];
+			if (a[i] < min) {
+				min = a[i];
+			}
+			if (a[i] > max) {
+				max = a[i];
+			}
 		}
-		for (int i = min; i <= max; i++) occ.push();
+		for (int i = min; i <= max; i++) {
+			occ.push();
+		}
 		for (int i = 0; i < n; i++) {
 			valseqs.push();
 			for (int j = 0; j < m; j++) {
@@ -550,16 +659,20 @@ public:
 			vars.push(v[i]);
 		}
 		active = (Tchar*)malloc(n * sizeof(Tchar));
-		for (int i = 0; i < n; i++) active[i] = true;
+		for (int i = 0; i < n; i++) {
+			active[i] = 1;
+		}
 		for (int i = 0; i < v.size(); i++) {
 			assert(v[i]->getMin() == min);
 			assert(v[i]->getMax() == max);
 		}
 	}
 
-	void init() {
+	void init() override {
 		which_vars = (bool*)malloc(engine.vars.size() * sizeof(bool));
-		for (int i = 0; i < engine.vars.size(); i++) which_vars[i] = false;
+		for (int i = 0; i < engine.vars.size(); i++) {
+			which_vars[i] = false;
+		}
 		for (int i = 0; i < vars.size(); i++) {
 			assert(vars[i]->getType() == INT_VAR_EL);
 			ldsb.lookupTable[vars[i]->var_id].push(pair<int, int>(sym_id, i));
@@ -567,52 +680,76 @@ public:
 		}
 	}
 
-	void processDec(Lit p, int pos) {
+	void processDec(Lit p, int pos) override {
 		int v = getLitVal(p);
-		if (v == not_a_val) NOT_SUPPORTED;
+		if (v == not_a_val) {
+			NOT_SUPPORTED;
+		}
 		assert(engine.vars[sat.c_info[var(p)].cons_id]->getVal() == v);
-		if (v < min || v > max) return;
+		if (v < min || v > max) {
+			return;
+		}
 		for (int i = 0; i < occ[v - min].size(); i++) {
 			int p = occ[v - min][i];
-			if (active[p / m]) active[p / m] = 0;
+			if (active[p / m] != 0) {
+				active[p / m] = 0;
+			}
 		}
 	}
 
-	bool processImpl(Clause* r, int pos) {
+	bool processImpl(Clause* r, int pos) override {
 		Lit p = (*r)[0];
 
 		int v = getLitVal(p);
-		if (v == not_a_val) return true;
-		if (v < min || v > max) return true;
+		if (v == not_a_val) {
+			return true;
+		}
+		if (v < min || v > max) {
+			return true;
+		}
 
 		Clause* rc = cleanClause(r);
 
 		for (int k = 0; k < occ[v - min].size(); k++) {
 			int r1 = occ[v - min][k] / m;
-			if (!so.ldsbta && !active[r1]) continue;
+			if (!so.ldsbta && (active[r1] == 0)) {
+				continue;
+			}
 
 			for (int r2 = 0; r2 < n; r2++) {
-				if (!so.ldsbta && !active[r2]) continue;
-				if (r1 == r2) continue;
+				if (!so.ldsbta && (active[r2] == 0)) {
+					continue;
+				}
+				if (r1 == r2) {
+					continue;
+				}
 				Lit q = getSymLit(p, r1, r2);
 				lbool b = sat.value(q);
-				if (b == l_True) continue;
+				if (b == l_True) {
+					continue;
+				}
 				if (b == l_False) {
 					Clause* c = getSymClause(rc, r1, r2);
-					if (!c) {
-						if (LDSB_DEBUG) printf("Skip ValSeqSym Failure\n");
+					if (c == nullptr) {
+						if (LDSB_DEBUG) {
+							printf("Skip ValSeqSym Failure\n");
+						}
 						continue;
 					}
 					c->temp_expl = 1;
 					sat.rtrail.last().push(c);
 					sat.confl = c;
-					if (LDSB_DEBUG) printf("ValSeqSym Failure\n");
+					if (LDSB_DEBUG) {
+						printf("ValSeqSym Failure\n");
+					}
 					free(rc);
 					return false;
 				}
 				Clause* s = getSymClause(rc, r1, r2);
-				if (!s) {
-					if (LDSB_DEBUG) printf("Skip ValSeqSym implication");
+				if (s == nullptr) {
+					if (LDSB_DEBUG) {
+						printf("Skip ValSeqSym implication");
+					}
 					continue;
 				}
 				//		printf("Level %d, Extra ValSeqSym implication %d -> %d\n", engine.decisionLevel(), v,
@@ -627,7 +764,7 @@ public:
 		return true;
 	}
 
-	Clause* cleanClause(Clause* r) {
+	Clause* cleanClause(Clause* r) const {
 		vec<Lit> ps;
 		ps.push((*r)[0]);
 
@@ -649,7 +786,7 @@ public:
 			}
 			// Not ok, must be bounds lit
 			if (sat.c_info[var(c[i])].val_type) {
-				IntVarEL* var = (IntVarEL*)engine.vars[var_id];
+				auto* var = (IntVarEL*)engine.vars[var_id];
 				int v = (toInt(c[i]) - ((IntVarEL*)engine.vars[var_id])->getBaseBLit());
 				if (v % 2 == 1) {
 					v /= 2;
@@ -672,11 +809,15 @@ public:
 		return Clause_new(ps);
 	}
 
-	Lit getSymLit(Lit p, int r1, int r2) {
+	Lit getSymLit(Lit p, int r1, int r2) override {
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (!which_vars[var_id]) return p;
+		if (!which_vars[var_id]) {
+			return p;
+		}
 		int v = getLitVal(p);
-		if (v == not_a_val) NOT_SUPPORTED;
+		if (v == not_a_val) {
+			NOT_SUPPORTED;
+		}
 		for (int i = 0; i < occ[v - min].size(); i++) {
 			int r = occ[v - min][i] / m;
 			int c = occ[v - min][i] % m;
@@ -692,10 +833,14 @@ public:
 		return p;
 	}
 
-	int getLitVal(Lit p) {
+	static int getLitVal(Lit p) {
 		int var_id = sat.c_info[var(p)].cons_id;
-		if (var_id == -1) return not_a_val;
-		if (sat.c_info[var(p)].val_type) return not_a_val;
+		if (var_id == -1) {
+			return not_a_val;
+		}
+		if (sat.c_info[var(p)].val_type) {
+			return not_a_val;
+		}
 		return (toInt(p) - ((IntVarEL*)engine.vars[var_id])->getBaseVLit()) / 2;
 	}
 };

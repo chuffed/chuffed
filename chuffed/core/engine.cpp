@@ -116,7 +116,9 @@ enum RewindStyle { REWIND_OMIT_SKIPPED, REWIND_SEND_SKIPPED };
 std::string showVector(const std::vector<int>& v) {
 	stringstream ss;
 	for (int i = 0; i < v.size(); i++) {
-		if (i > 0) ss << " ";
+		if (i > 0) {
+			ss << " ";
+		}
 		ss << v[i];
 	}
 	return ss.str();
@@ -125,7 +127,9 @@ std::string showVector(const std::vector<int>& v) {
 std::string showVec(const vec<int>& v) {
 	stringstream ss;
 	for (int i = 0; i < v.size(); i++) {
-		if (i > 0) ss << " ";
+		if (i > 0) {
+			ss << " ";
+		}
 		ss << v[i];
 	}
 	return ss.str();
@@ -162,8 +166,8 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 			while (nodepath.size() > decisionLevelTip[newDecisionLevel]) {
 				int nodeid = nextnodeid;
 				nextnodeid++;
-				int parent = (nodepath.size() == 0) ? (-1) : (nodepath[nodepath.size() - 1]);
-				int myalt = (altpath.size() == 0) ? (-1) : (altpath[altpath.size() - 1]);
+				int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
+				int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
 
 				// myalt is the alternative that led to the failure; the
 				// skipped node is conceptually the next alternative.
@@ -194,10 +198,10 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 
 Engine::Engine()
 		: finished_init(false),
-			problem(NULL),
-			opt_var(NULL),
+			problem(nullptr),
+			opt_var(nullptr),
 			best_sol(-1),
-			last_prop(NULL)
+			last_prop(nullptr)
 
 			,
 			start_time(chuffed_clock::now()),
@@ -215,7 +219,9 @@ Engine::Engine()
 #endif
 {
 	p_queue.growTo(num_queues);
-	for (int i = 0; i < 64; i++) bit[i] = ((long long)1 << i);
+	for (int i = 0; i < 64; i++) {
+		bit[i] = ((long long)1 << i);
+	}
 	branching = new BranchGroup();
 	mip = new MIP();
 }
@@ -232,7 +238,9 @@ inline void Engine::newDecisionLevel() {
 		std::cerr << "trail_lim is now: " << showVec(trail_lim) << "\n";
 	}
 	sat.newDecisionLevel();
-	if (so.mip) mip->newDecisionLevel();
+	if (so.mip) {
+		mip->newDecisionLevel();
+	}
 	assert(dec_info.size() == decisionLevel());
 	peak_depth = max(peak_depth, decisionLevel());
 }
@@ -251,7 +259,7 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
 	vec<int> sizes(0);
 	if (last_int) last_int->updateImpact(processImpact(var_sizes, getVarSizes(sizes)));
 #endif
-	if (di.var) {
+	if (di.var != nullptr) {
 #if DEBUG_VERBOSE
 		std::cerr << "makeDecision: " << intVarString[(IntVar*)di.var] << " / " << di.val << " (" << alt
 							<< ")" << std::endl;
@@ -304,7 +312,9 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
 #endif
 		sat.enqueue(toLit(di.val ^ alt));
 	}
-	if (so.ldsb && di.var && di.type == 1) ldsb.processDec(sat.trail.last()[0]);
+	if (so.ldsb && (di.var != nullptr) && di.type == 1) {
+		ldsb.processDec(sat.trail.last()[0]);
+	}
 	//  if (opt_var && di.var == opt_var && ((IntVar*) di.var)->isFixed()) printf("objective = %d\n",
 	//  ((IntVar*) di.var)->getVal());
 }
@@ -340,23 +350,30 @@ inline bool Engine::constrain() {
 	//  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
 
 	if (so.lazy) {
-		Lit p = opt_type ? opt_var->getLit(best_sol + 1, 2) : opt_var->getLit(best_sol - 1, 3);
+		Lit p = opt_type != 0 ? opt_var->getLit(best_sol + 1, 2) : opt_var->getLit(best_sol - 1, 3);
 		// GKG: Preserves existing assumptions, but assumes we've reserved
 		// space at the end for the objective bound.
-		if (assumptions.size() == 0)
+		if (assumptions.size() == 0) {
 			assumptions.push(toInt(p));
-		else
+		} else {
 			assumptions.last() = toInt(p);
+		}
 	} else {
 		// Special-case, since get-lit breaks if lazy is false.
-		if (opt_type) {  // maximize
-			if (!opt_var->setMin(best_sol + 1)) return false;
+		if (opt_type != 0) {  // maximize
+			if (!opt_var->setMin(best_sol + 1)) {
+				return false;
+			}
 		} else {
-			if (!opt_var->setMax(best_sol - 1)) return false;
+			if (!opt_var->setMax(best_sol - 1)) {
+				return false;
+			}
 		}
 	}
 
-	if (so.mip) mip->setObjective(best_sol);
+	if (so.mip) {
+		mip->setObjective(best_sol);
+	}
 
 	/* return (opt_type ? opt_var->setMin(best_sol+1) : opt_var->setMax(best_sol-1)); */
 	return true;
@@ -377,29 +394,35 @@ bool Engine::propagate() {
 		return false;
 	}
 
-	last_prop = NULL;
+	last_prop = nullptr;
 
 WakeUp:
 
-	if (!sat.consistent() && !sat.propagate()) return false;
+	if (!sat.consistent() && !sat.propagate()) {
+		return false;
+	}
 
 	for (int i = 0; i < v_queue.size(); i++) {
 		v_queue[i]->wakePropagators();
 	}
 	v_queue.clear();
 
-	if (sat.confl) return false;
+	if (sat.confl != nullptr) {
+		return false;
+	}
 
-	last_prop = NULL;
+	last_prop = nullptr;
 
 	for (int i = 0; i < num_queues; i++) {
-		if (p_queue[i].size()) {
+		if (p_queue[i].size() != 0) {
 			Propagator* p = p_queue[i].last();
 			p_queue[i].pop();
 			propagations++;
 			bool ok = p->propagate();
 			p->clearPropState();
-			if (!ok) return false;
+			if (!ok) {
+				return false;
+			}
 			goto WakeUp;
 		}
 	}
@@ -409,11 +432,15 @@ WakeUp:
 
 // Clear all uncleared intermediate propagation states
 void Engine::clearPropState() {
-	for (int i = 0; i < v_queue.size(); i++) v_queue[i]->clearPropState();
+	for (int i = 0; i < v_queue.size(); i++) {
+		v_queue[i]->clearPropState();
+	}
 	v_queue.clear();
 
 	for (int i = 0; i < num_queues; i++) {
-		for (int j = 0; j < p_queue[i].size(); j++) p_queue[i][j]->clearPropState();
+		for (int j = 0; j < p_queue[i].size(); j++) {
+			p_queue[i][j]->clearPropState();
+		}
 		p_queue[i].clear();
 	}
 }
@@ -429,7 +456,9 @@ void Engine::btToLevel(int level) {
 	if (so.debug) {
 		std::cerr << "Engine::btToLevel( " << level << ")\n";
 	}
-	if (decisionLevel() == 0 && level == 0) return;
+	if (decisionLevel() == 0 && level == 0) {
+		return;
+	}
 	assert(decisionLevel() > level);
 
 	btToPos(trail_lim[level]);
@@ -446,7 +475,9 @@ void Engine::btToLevel(int level) {
 void Engine::topLevelCleanUp() {
 	trail.clear();
 
-	if (so.fd_simplify && propagations >= next_simp_db) simplifyDB();
+	if (so.fd_simplify && propagations >= next_simp_db) {
+		simplifyDB();
+	}
 
 	sat.topLevelCleanUp();
 }
@@ -476,10 +507,14 @@ void Engine::blockCurrentSol() {
 		} else {
 			c[i] = ((IntVar*)outputs[i])->getValLit();
 		}
-		if (!sat.isRootLevel(var(c[i]))) root_failure = false;
+		if (!sat.isRootLevel(var(c[i]))) {
+			root_failure = false;
+		}
 		assert(sat.value(c[i]) == l_False);
 	}
-	if (root_failure) sat.btToLevel(0);
+	if (root_failure) {
+		sat.btToLevel(0);
+	}
 	sat.confl = &c;
 }
 
@@ -515,19 +550,23 @@ unsigned int Engine::getRestartLimit(unsigned int i) {
 	NEVER;
 }
 
-void Engine::toggleVSIDS() {
+void Engine::toggleVSIDS() const {
 	if (!so.vsids) {
 		vec<Branching*> old_x;
 		branching->x.moveTo(old_x);
 		branching->add(&sat);
-		for (int i = 0; i < old_x.size(); i++) branching->add(old_x[i]);
+		for (int i = 0; i < old_x.size(); i++) {
+			branching->add(old_x[i]);
+		}
 		branching->fin = 0;
 		branching->cur = -1;
 		so.vsids = true;
 	} else {
 		vec<Branching*> old_x;
 		branching->x.moveTo(old_x);
-		for (int i = 1; i < old_x.size(); i++) branching->add(old_x[i]);
+		for (int i = 1; i < old_x.size(); i++) {
+			branching->add(old_x[i]);
+		}
 		branching->fin = 0;
 		branching->cur = -1;
 		so.vsids = false;
@@ -537,10 +576,14 @@ void Engine::toggleVSIDS() {
 void Engine::set_assumptions(vec<BoolView>& xs) {
 	// Push the assumptions, then search as usual.
 	assumptions.clear();
-	for (int li = 0; li < xs.size(); li++) assumptions.push(toInt(xs[li].getLit(true)));
+	for (int li = 0; li < xs.size(); li++) {
+		assumptions.push(toInt(xs[li].getLit(true)));
+	}
 	// constrain will overwrite the last assumption;
 	// make sure there is a placeholder to overwrite.
-	if (opt_var) assumptions.push(toInt(lit_True));
+	if (opt_var != nullptr) {
+		assumptions.push(toInt(lit_True));
+	}
 }
 
 void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
@@ -561,10 +604,14 @@ void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
 	// pushback_reason([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
 	pushback_reason_lazy([](Lit p) { return sat.seen[var(p)] & 2; }, q, out_nogood);
 
-	for (int ii = 0; ii < out_nogood.size(); ii++) xs.push(out_nogood[ii]);
+	for (int ii = 0; ii < out_nogood.size(); ii++) {
+		xs.push(out_nogood[ii]);
+	}
 
 	// Finally, clear the marked assumptions
-	for (int ii = 0; ii < assump_sz; ii++) sat.seen[engine.assumptions[ii] >> 1] = 2;
+	for (int ii = 0; ii < assump_sz; ii++) {
+		sat.seen[engine.assumptions[ii] >> 1] = 2;
+	}
 }
 
 #ifdef HAS_VAR_IMPACT
@@ -617,9 +664,9 @@ RESULT Engine::search(const std::string& problemLabel) {
 	while (true) {
 		int nodeid = nextnodeid;
 		nextnodeid++;
-		int parent = (nodepath.size() == 0) ? (-1) : (nodepath[nodepath.size() - 1]);
+		int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
 		nodepath.push_back(nodeid);
-		int myalt = (altpath.size() == 0) ? (-1) : (altpath[altpath.size() - 1]);
+		int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
 #if DEBUG_VERBOSE
 		std::cerr << "propagate (";
 		for (int i = 0; i < nodepath.size(); i++) std::cerr << " " << nodepath[i];
@@ -628,7 +675,9 @@ RESULT Engine::search(const std::string& problemLabel) {
 		for (int i = 0; i < altpath.size(); i++) std::cerr << " " << altpath[i];
 		std::cerr << ")\n";
 #endif
-		if (decisionLevel() >= decisionLevelTip.size()) decisionLevelTip.resize(decisionLevel() + 1);
+		if (decisionLevel() >= decisionLevelTip.size()) {
+			decisionLevelTip.resize(decisionLevel() + 1);
+		}
 		decisionLevelTip[decisionLevel()] = nodepath.size();
 #if DEBUG_VERBOSE
 		std::cerr << "setting decisionLevelTip[" << decisionLevel() << "] to " << nodepath.size()
@@ -684,12 +733,12 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
 				if (doProfiling()) {
 					std::stringstream ss;
-					for (int i = 0; i < sat.out_learnt.size(); i++)
+					for (int i = 0; i < sat.out_learnt.size(); i++) {
 						ss << " " << getLitString(toInt(sat.out_learnt[i]));
+					}
 					std::stringstream contribString;
 					contribString << "{\"nogoods\":[";
-					for (std::set<int>::const_iterator it = contributingNogoods.begin();
-							 it != contributingNogoods.end(); it++) {
+					for (auto it = contributingNogoods.begin(); it != contributingNogoods.end(); it++) {
 						contribString << (it == contributingNogoods.begin() ? "" : ",") << *it;
 					}
 					contribString << "],";
@@ -778,7 +827,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 					mostRecentLabel = "";
 				}
 #endif
-				sat.confl = NULL;
+				sat.confl = nullptr;
 				DecInfo& di = dec_info.last();
 				sat.btToLevel(decisionLevel() - 1);
 #ifdef HAS_PROFILER
@@ -791,8 +840,12 @@ RESULT Engine::search(const std::string& problemLabel) {
 			}
 
 			if (!so.vsids && !so.toggle_vsids && conflictC >= so.switch_to_vsids_after) {
-				if (so.restart_scale >= 1000000000) so.restart_scale = 100;
-				if (so.verbosity >= 2) std::cerr << "restarting and switching to VSIDS\n";
+				if (so.restart_scale >= 1000000000) {
+					so.restart_scale = 100;
+				}
+				if (so.verbosity >= 2) {
+					std::cerr << "restarting and switching to VSIDS\n";
+				}
 				sat.btToLevel(0);
 				restart_count++;
 				nodepath.resize(0);
@@ -808,7 +861,9 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 		} else {
 			if (conflictC >= nof_conflicts) {
-				if (so.verbosity >= 2) std::cerr << "restarting due to number of conflicts\n";
+				if (so.verbosity >= 2) {
+					std::cerr << "restarting due to number of conflicts\n";
+				}
 				starts++;
 				nof_conflicts += getRestartLimit(starts);
 				sat.btToLevel(0);
@@ -822,20 +877,22 @@ RESULT Engine::search(const std::string& problemLabel) {
 				}
 #endif
 
-				sat.confl = NULL;
-				if (so.lazy && so.toggle_vsids && (starts % 2 == 1)) toggleVSIDS();
+				sat.confl = nullptr;
+				if (so.lazy && so.toggle_vsids && (starts % 2 == 1)) {
+					toggleVSIDS();
+				}
 				continue;
 			}
 
 			if (decisionLevel() == 0) {
 				topLevelCleanUp();
-				if (opt_var && so.verbosity >= 3) {
+				if ((opt_var != nullptr) && so.verbosity >= 3) {
 					printf("%% root level bounds on objective: min %d max %d\n", opt_var->getMin(),
 								 opt_var->getMax());
 				}
 			}
 
-			DecInfo* di = NULL;
+			DecInfo* di = nullptr;
 
 			// Propagate assumptions
 			while (decisionLevel() < assumptions.size()) {
@@ -843,21 +900,23 @@ RESULT Engine::search(const std::string& problemLabel) {
 				if (sat.value(toLit(p)) == l_True) {
 					// Dummy decision level:
 					assert(sat.trail.last().size() == sat.qhead.last());
-					engine.dec_info.push(DecInfo(NULL, p));
+					engine.dec_info.push(DecInfo(nullptr, p));
 					newDecisionLevel();
 				} else if (sat.value(toLit(p)) == l_False) {
 					return RES_LUN;
 				} else {
-					di = new DecInfo(NULL, p);
+					di = new DecInfo(nullptr, p);
 					break;
 				}
 			}
 
-			if (!di) di = branching->branch();
+			if (di == nullptr) {
+				di = branching->branch();
+			}
 
-			if (!di) {
+			if (di == nullptr) {
 				solutions++;
-				if (std::stringstream* oss = dynamic_cast<std::stringstream*>(output_stream)) {
+				if (auto* oss = dynamic_cast<std::stringstream*>(output_stream)) {
 					oss->str("");
 				}
 				if (so.print_sol) {
@@ -876,8 +935,8 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 #ifdef HAS_PROFILER
 				if (doProfiling()) {
-					FlatZinc::FlatZincSpace* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
-					if (fzs != NULL) {
+					auto* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
+					if (fzs != nullptr) {
 						std::stringstream s;
 						fzs->printDomains(s);
 						sendNode(profilerConnector
@@ -924,9 +983,13 @@ RESULT Engine::search(const std::string& problemLabel) {
 #endif
 
 				mostRecentLabel = "";
-				if (!opt_var) {
-					if (solutions == so.nof_solutions) return RES_SAT;
-					if (so.lazy) blockCurrentSol();
+				if (opt_var == nullptr) {
+					if (solutions == so.nof_solutions) {
+						return RES_SAT;
+					}
+					if (so.lazy) {
+						blockCurrentSol();
+					}
 					goto Conflict;
 				}
 				if (!constrain()) {
@@ -949,8 +1012,8 @@ RESULT Engine::search(const std::string& problemLabel) {
 			if (doProfiling()) {
 				string info;
 				if (so.send_domains) {
-					FlatZinc::FlatZincSpace* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
-					if (fzs != NULL) {
+					auto* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
+					if (fzs != nullptr) {
 						info = fzs->getDomainsString();
 					}
 				}
@@ -977,7 +1040,7 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 
 	// Setting the random seed
 	if (so.rnd_seed == 0) {
-		so.rnd_seed = time(0);
+		so.rnd_seed = time(nullptr);
 	}
 	srand(so.rnd_seed);
 
@@ -1004,17 +1067,20 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 	if (so.learnt_stats) {
 		learntStatsStream.open("learnt-stats.csv");
 		learntStatsStream << "id,length,block";
-		if (so.learnt_stats_nogood) learntStatsStream << ",nogood";
+		if (so.learnt_stats_nogood) {
+			learntStatsStream << ",nogood";
+		}
 		learntStatsStream << ",rawActivity\n";
 	}
 
 	// sequential
 	status = search(problemLabel);
 	if (status == RES_GUN || status == RES_LUN) {
-		if (solutions > 0)
+		if (solutions > 0) {
 			(*output_stream) << "==========\n";
-		else
+		} else {
 			(*output_stream) << "=====UNSATISFIABLE=====\n";
+		}
 	}
 
 	if (so.learnt_stats) {
@@ -1040,5 +1106,7 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 	delete profilerConnector;
 #endif
 
-	if (so.verbosity >= 1) printStats();
+	if (so.verbosity >= 1) {
+		printStats();
+	}
 }

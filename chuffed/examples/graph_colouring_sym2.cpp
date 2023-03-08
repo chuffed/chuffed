@@ -25,8 +25,9 @@ public:
 		// ignore comments
 
 		char temp[1000];
-		while (fgets(temp, 1000, fp) && temp[0] == 'c')
+		while ((fgets(temp, 1000, fp) != nullptr) && temp[0] == 'c') {
 			;
+		}
 
 		// get instance size
 
@@ -44,7 +45,8 @@ public:
 
 		for (int i = 0; i < e; i++) {
 			rassert(fgets(temp, 1000, fp));
-			int v1, v2;
+			int v1;
+			int v2;
 			rassert(sscanf(temp, "e %d %d\n", &v1, &v2) == 2);
 			int_rel(x[v1 - 1], IRT_NE, x[v2 - 1]);
 		}
@@ -75,9 +77,11 @@ public:
 		}
 	}
 
-	void restrict_learnable() {
+	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
-		for (int i = 0; i < sat.nVars(); i++) sat.flags[i] = 0;
+		for (int i = 0; i < sat.nVars(); i++) {
+			sat.flags[i] = 0;
+		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
@@ -87,7 +91,7 @@ public:
 
 	// Function to print out solution
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < v; i++) {
 			os << x[i]->getVal() << ", ";
 		}

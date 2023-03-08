@@ -17,16 +17,24 @@ void timed_cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b) {
 	vec<int> a;
 	for (int i = 0; i < s.size(); i++) {
 		in[i] = (d[i] > 0 && r[i] > 0);
-		if (!in[i]) continue;
-		if (s[i]->getMin() < min) min = s[i]->getMin();
-		if (s[i]->getMax() + d[i] > max) max = s[i]->getMax() + d[i];
+		if (!in[i]) {
+			continue;
+		}
+		if (s[i]->getMin() < min) {
+			min = s[i]->getMin();
+		}
+		if (s[i]->getMax() + d[i] > max) {
+			max = s[i]->getMax() + d[i];
+		}
 		s[i]->specialiseToEL();
 		a.push(r[i]);
 	}
 	for (int t = min; t <= max; t++) {
 		vec<IntVar*> x;
 		for (int i = 0; i < s.size(); i++) {
-			if (!in[i]) continue;
+			if (!in[i]) {
+				continue;
+			}
 			BoolView b1(s[i]->getLit(t, 3));
 			BoolView b2(s[i]->getLit(t - d[i] + 1, 2));
 			BoolView b3 = newBoolVar();
@@ -73,7 +81,7 @@ class CumulativeProp : public Propagator {
 		int tw_end;
 		bool is_lb_update;
 		TTEFUpdate(int _t, int _n, int _b, int _e, int _l)
-				: task(_t), bound_new(_n), tw_begin(_b), tw_end(_e), is_lb_update(_l) {}
+				: task(_t), bound_new(_n), tw_begin(_b), tw_end(_e), is_lb_update(_l != 0) {}
 	};
 	// Compulsory Part of a Task
 	struct CompPart {
@@ -148,13 +156,13 @@ public:
 	// Inline functions
 	struct SortEstAsc {
 		CumulativeProp* p;
-		bool operator()(int i, int j) { return p->est(i) < p->est(j); }
+		bool operator()(int i, int j) const { return p->est(i) < p->est(j); }
 		SortEstAsc(CumulativeProp* _p) : p(_p) {}
 	} sort_est_asc;
 
 	struct SortLctAsc {
 		CumulativeProp* p;
-		bool operator()(int i, int j) { return p->lct(i) < p->lct(j); }
+		bool operator()(int i, int j) const { return p->lct(i) < p->lct(j); }
 		SortLctAsc(CumulativeProp* _p) : p(_p) {}
 	} sort_lct_asc;
 
@@ -162,8 +170,7 @@ public:
 	//
 	CumulativeProp(CUMU_ARR_INTVAR& _start, CUMU_ARR_INTVAR& _dur, CUMU_ARR_INTVAR& _usage,
 								 CUMU_INTVAR _limit, list<string> opt)
-			: name(""),
-				start(_start),
+			: start(_start),
 				dur(_dur),
 				usage(_usage),
 				limit(_limit),
@@ -180,21 +187,24 @@ public:
 				sort_est_asc(this),
 				sort_lct_asc(this) {
 		// Overriding option defaults
-		for (list<string>::iterator it = opt.begin(); it != opt.end(); it++) {
-			if (!(*it).compare("tt_filt_on"))
+		for (auto& it : opt) {
+			if (it == "tt_filt_on") {
 				tt_filt = true;
-			else if (!(*it).compare("tt_filt_off"))
+			} else if (it == "tt_filt_off") {
 				tt_filt = false;
-			if (!(*it).compare("ttef_check_on"))
+			}
+			if (it == "ttef_check_on") {
 				ttef_check = true;
-			else if (!(*it).compare("ttef_check_off"))
+			} else if (it == "ttef_check_off") {
 				ttef_check = false;
-			if (!(*it).compare("ttef_filt_on"))
+			}
+			if (it == "ttef_filt_on") {
 				ttef_filt = true;
-			else if (!(*it).compare("ttef_filt_off"))
+			} else if (it == "ttef_filt_off") {
 				ttef_filt = false;
-			else if ((*it).find("__name__") == 0)
-				name = (*it).substr(8);
+			} else if (it.find("__name__") == 0) {
+				name = it.substr(8);
+			}
 		}
 		// ttef_expl_deg = ED_NAIVE;
 		// ttef_expl_deg = ED_NORMAL;
@@ -212,14 +222,14 @@ public:
 				new_est = (int*)malloc(start.size() * sizeof(int));
 				new_lct = (int*)malloc(start.size() * sizeof(int));
 			} else {
-				new_est = NULL;
-				new_lct = NULL;
+				new_est = nullptr;
+				new_lct = nullptr;
 			}
 			// XXX Check for successful memory allocation
 		} else {
-			task_id_est = NULL;
-			task_id_lct = NULL;
-			tt_after_est = NULL;
+			task_id_est = nullptr;
+			task_id_lct = nullptr;
+			tt_after_est = nullptr;
 		}
 
 		// Priority of the propagator
@@ -233,8 +243,12 @@ public:
 			fprintf(stderr, "\t%d: %p\n", i, start[i]);
 #endif
 			start[i]->attach(this, i, EVENT_LU);
-			if (min_dur(i) < max_dur(i)) dur[i]->attach(this, i, EVENT_LF);
-			if (min_usage(i) < max_usage(i)) usage[i]->attach(this, i, EVENT_LF);
+			if (min_dur(i) < max_dur(i)) {
+				dur[i]->attach(this, i, EVENT_LF);
+			}
+			if (min_usage(i) < max_usage(i)) {
+				usage[i]->attach(this, i, EVENT_LF);
+			}
 		}
 		limit->attach(this, start.size(), EVENT_UF);
 
@@ -245,13 +259,19 @@ public:
 	}
 
 	// Statistics
-	void printStats() {
+	void printStats() override {
 		fprintf(stderr, "%% Cumulative propagator statistics");
-		if (name != "") cerr << " for " << name;
+		if (!name.empty()) {
+			cerr << " for " << name;
+		}
 		fprintf(stderr, ":\n");
 		fprintf(stderr, "%%\t#TT incons.: %ld\n", nb_tt_incons);
-		if (tt_filt) fprintf(stderr, "%%\t#TT prop.: %ld\n", nb_tt_filt);
-		if (ttef_check || ttef_filt) fprintf(stderr, "%%\t#TTEF incons.: %ld\n", nb_ttef_incons);
+		if (tt_filt) {
+			fprintf(stderr, "%%\t#TT prop.: %ld\n", nb_tt_filt);
+		}
+		if (ttef_check || ttef_filt) {
+			fprintf(stderr, "%%\t#TTEF incons.: %ld\n", nb_ttef_incons);
+		}
 		if (ttef_filt) {
 			fprintf(stderr, "%%\t#TTEF prop.: %ld\n", nb_ttef_filt);
 		}
@@ -289,13 +309,13 @@ public:
 	inline CUMU_INT max_usage(CUMU_INT i) { return CUMU_PT_GETMAX(usage[i]); }
 	inline CUMU_INT min_usage0(CUMU_INT i) { return CUMU_PT_GETMIN0(usage[i]); }
 
-	inline CUMU_INT min_limit() { return CUMU_PT_GETMIN(limit); }
-	inline CUMU_INT max_limit() { return CUMU_PT_GETMAX(limit); }
-	inline CUMU_INT max_limit0() { return CUMU_PT_GETMAX0(limit); }
+	inline CUMU_INT min_limit() const { return CUMU_PT_GETMIN(limit); }
+	inline CUMU_INT max_limit() const { return CUMU_PT_GETMAX(limit); }
+	inline CUMU_INT max_limit0() const { return CUMU_PT_GETMAX0(limit); }
 
 	// Cumulative Propagator
 	CUMU_BOOL
-	propagate() {
+	propagate() override {
 #if CUMUVERB > 0
 		fprintf(stderr, "Entering cumulative propagation\n");
 #endif
@@ -378,15 +398,25 @@ public:
 
 	// Comparison between two compulsory parts
 	static bool compare_CompParts(CompPart cp1, CompPart cp2) {
-		if (cp1.begin < cp2.begin) return true;
-		if (cp1.begin > cp2.begin) return false;
+		if (cp1.begin < cp2.begin) {
+			return true;
+		}
+		if (cp1.begin > cp2.begin) {
+			return false;
+		}
 		// ASSUMPTION
 		// - cp1.begin == cp2.begin
-		if (cp1.end < cp2.end) return true;
-		if (cp1.end > cp2.end) return false;
+		if (cp1.end < cp2.end) {
+			return true;
+		}
+		if (cp1.end > cp2.end) {
+			return false;
+		}
 		// ASSUMPTION
 		// - cp1.end == cp2.end
-		if (cp1.task < cp2.task) return true;
+		if (cp1.task < cp2.task) {
+			return true;
+		}
 		return false;
 	}
 
@@ -460,8 +490,8 @@ public:
 	// Sets for each profile part its begin and end time in chronological order
 	// Runtime complexity: O(n)
 	//
-	void create_profile(list<ProfileChangePt>& changes) {
-		list<ProfileChangePt>::iterator iter = changes.begin();
+	void create_profile(list<ProfileChangePt>& changes) const {
+		auto iter = changes.begin();
 		int cur_profile = 0;
 		int cur_time = iter->time;
 		ProfileChange cur_change = iter->change;
@@ -482,7 +512,7 @@ public:
 		}
 	}
 
-	inline void set_times_for_profile(int i, CUMU_INT begin, CUMU_INT end) {
+	inline void set_times_for_profile(int i, CUMU_INT begin, CUMU_INT end) const {
 		tt_profile[i].begin = begin;
 		tt_profile[i].end = end;
 		tt_profile[i].level = 0;
@@ -497,7 +527,8 @@ public:
 												int& i_max_usage) {
 		list<CUMU_INT>::iterator iter;
 		int i = 0;
-		CUMU_INT lst_i, ect_i;
+		CUMU_INT lst_i;
+		CUMU_INT ect_i;
 
 #if CUMUVERB > 2
 		fprintf(stderr, "\t\tstart filling profiles (size %d)\n", size);
@@ -542,7 +573,8 @@ public:
 					vec<Lit> expl;
 					if (so.lazy) {
 						CUMU_INT lift_usage = profile[i].level - max_limit() - 1;
-						CUMU_INT begin1, end1;
+						CUMU_INT begin1;
+						CUMU_INT end1;
 						// TODO Different choices to pick the interval
 						// Pointwise explanation
 						begin1 = profile[i].begin + ((profile[i].end - profile[i].begin) / 2);
@@ -569,7 +601,7 @@ public:
 	// Finds the profile part that begins at the time unit "lst"
 	// Complexity: O(log(high - low + 1))
 	//
-	int find_first_profile(ProfilePart* profile, int low, int high, CUMU_INT lst) {
+	static int find_first_profile(ProfilePart* profile, int low, int high, CUMU_INT lst) {
 		int median = 0;
 		while (profile[low].begin != lst) {
 			median = low + (high - low + 1) / 2;
@@ -584,8 +616,8 @@ public:
 
 	// Counting the number of profiles
 	//
-	int count_profile(list<ProfileChangePt>& changes) {
-		list<ProfileChangePt>::iterator iter = changes.begin();
+	static int count_profile(list<ProfileChangePt>& changes) {
+		auto iter = changes.begin();
 		int cur_time = iter->time;
 		int next_time;
 		ProfileChange cur_change = iter->change;
@@ -625,7 +657,9 @@ public:
 	}
 
 	static bool compare_ProfileChangePt(ProfileChangePt& pt1, ProfileChangePt& pt2) {
-		if (pt1.time == pt2.time && pt1.change == PROFDEC && pt2.change == PROFINC) return true;
+		if (pt1.time == pt2.time && pt1.change == PROFDEC && pt2.change == PROFINC) {
+			return true;
+		}
 		return pt1.time < pt2.time;
 	}
 
@@ -644,8 +678,8 @@ public:
 	CUMU_BOOL
 	time_table_filtering_ub(ProfilePart profile[], int low, int high, int task);
 
-	int find_first_profile_for_lb(ProfilePart profile[], int low, int high, CUMU_INT t);
-	int find_first_profile_for_ub(ProfilePart profile[], int low, int high, CUMU_INT t);
+	static int find_first_profile_for_lb(ProfilePart profile[], int low, int high, CUMU_INT t);
+	static int find_first_profile_for_ub(ProfilePart profile[], int low, int high, CUMU_INT t);
 
 	// Time-table filtering for optional tasks
 	CUMU_BOOL
@@ -660,8 +694,8 @@ public:
 															 CUMU_INT begin, CUMU_INT end);
 	void analyse_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks, CUMU_INT lift_usage, CUMU_INT begin,
 										 CUMU_INT end);
-	void submit_conflict_explanation(vec<Lit>& expl);
-	Clause* get_reason_for_update(vec<Lit>& expl);
+	static void submit_conflict_explanation(vec<Lit>& expl);
+	static Clause* get_reason_for_update(vec<Lit>& expl);
 
 	// TODO Disentailment check
 	// CUMU_INT
@@ -672,12 +706,12 @@ public:
 	//}
 
 	// Wrapper to get the negated literal -[[v <= val]] = [[v >= val + 1]]
-	inline Lit getNegLeqLit(CUMU_INTVAR v, CUMU_INT val) {
+	static inline Lit getNegLeqLit(CUMU_INTVAR v, CUMU_INT val) {
 		// return v->getLit(val + 1, 2);
 		return (INT_VAR_LL == v->getType() ? v->getMaxLit() : v->getLit(val + 1, 2));
 	}
 	// Wrapper to get the negated literal -[[v >= val]] = [[ v <= val - 1]]
-	inline Lit getNegGeqLit(CUMU_INTVAR v, CUMU_INT val) {
+	static inline Lit getNegGeqLit(CUMU_INTVAR v, CUMU_INT val) {
 		// return v->getLit(val - 1, 3);
 		return (INT_VAR_LL == v->getType() ? v->getMinLit() : v->getLit(val - 1, 3));
 	}
@@ -708,12 +742,11 @@ public:
 
 	// TTEF Generation of explanations
 	//
-	void ttef_analyse_limit_and_tasks(const int begin, const int end, list<TaskDur>& tasks_tw,
+	void ttef_analyse_limit_and_tasks(int begin, int end, list<TaskDur>& tasks_tw,
 																		list<TaskDur>& tasks_cp, int& en_lift, vec<Lit>& expl);
-	void ttef_analyse_tasks(const int begin, const int end, list<TaskDur>& tasks, int& en_lift,
-													vec<Lit>& expl);
+	void ttef_analyse_tasks(int begin, int end, list<TaskDur>& tasks, int& en_lift, vec<Lit>& expl);
 
-	inline bool is_intersecting(const int begin1, const int end1, const int begin2, const int end2);
+	static inline bool is_intersecting(int begin1, int end1, int begin2, int end2);
 
 	// Shift functions
 	//
@@ -759,8 +792,8 @@ void CumulativeProp::get_compulsory_parts2(list<ProfileChangePt>& changes,
 			// Add task to the list
 			comp_task.push_back(task[i]);
 			// Add time points to change lists
-			changes.push_back(ProfileChangePt(lst(task[i]), PROFINC));
-			changes.push_back(ProfileChangePt(ect(task[i]), PROFDEC));
+			changes.emplace_back(lst(task[i]), PROFINC);
+			changes.emplace_back(ect(task[i]), PROFDEC);
 		}
 	}
 #if CUMUVERB > 2
@@ -775,7 +808,7 @@ void CumulativeProp::get_compulsory_parts2(list<ProfileChangePt>& changes,
 CUMU_BOOL
 CumulativeProp::filter_limit(ProfilePart* profile, int& i) {
 	if (min_limit() < profile[i].level) {
-		Clause* reason = NULL;
+		Clause* reason = nullptr;
 		nb_tt_filt++;
 		if (so.lazy) {
 			// Lower bound can be updated
@@ -807,7 +840,9 @@ CumulativeProp::time_table_filtering(ProfilePart profile[], int size, CUMU_ARR_I
 																		 int i_start, int i_end, CUMU_INT max_usage) {
 	for (int i = i_start; i <= i_end; i++) {
 		// Skipping tasks with zero duration or usage
-		if (min_dur(task[i]) <= 0 || min_usage(task[i]) <= 0) continue;
+		if (min_dur(task[i]) <= 0 || min_usage(task[i]) <= 0) {
+			continue;
+		}
 #if CUMUVERB > 0
 		fprintf(stderr, "TT Filtering of task %d\n", task[i]);
 #endif
@@ -880,7 +915,7 @@ CumulativeProp::time_table_filtering_lb(ProfilePart profile[], int low, int high
 							min_dur(task));
 #endif
 			int expl_end = profile[i].end;
-			Clause* reason = NULL;
+			Clause* reason = nullptr;
 			if (so.lazy) {
 				// XXX Assumption for the remaining if-statement
 				//   No compulsory part of task in profile[i]!
@@ -896,10 +931,13 @@ CumulativeProp::time_table_filtering_lb(ProfilePart profile[], int low, int high
 #endif
 				expl.push(getNegGeqLit(start[task], expl_end - min_dur(task)));
 				// Get the negated literal for [[dur[task] >= min_dur(task)]]
-				if (min_dur0(task) < min_dur(task)) expl.push(getNegGeqLit(dur[task], min_dur(task)));
+				if (min_dur0(task) < min_dur(task)) {
+					expl.push(getNegGeqLit(dur[task], min_dur(task)));
+				}
 				// Get the negated literal for [[usage[task] >= min_usage(task)]]
-				if (min_usage0(task) < min_usage(task))
+				if (min_usage0(task) < min_usage(task)) {
 					expl.push(getNegGeqLit(usage[task], min_usage(task)));
+				}
 				// Get the negated literals for the tasks in the profile and the resource limit
 				analyse_limit_and_tasks(expl, profile[i].tasks, lift_usage, expl_begin, expl_end);
 #if CUMUVERB > 1
@@ -954,7 +992,7 @@ CumulativeProp::time_table_filtering_ub(ProfilePart profile[], int low, int high
 				continue;
 			}
 			int expl_begin = profile[i].begin;
-			Clause* reason = NULL;
+			Clause* reason = nullptr;
 			if (so.lazy) {
 				// ASSUMPTION for the remaining if-statement
 				// - No compulsory part of task in profile[i]
@@ -967,10 +1005,13 @@ CumulativeProp::time_table_filtering_ub(ProfilePart profile[], int low, int high
 				// Get the negated literal for [[start[task] <= expl_begin]]
 				expl.push(getNegLeqLit(start[task], expl_begin));
 				// Get the negated literal for [[dur[task] >= min_dur(task)]]
-				if (min_dur0(task) < min_dur(task)) expl.push(getNegGeqLit(dur[task], min_dur(task)));
+				if (min_dur0(task) < min_dur(task)) {
+					expl.push(getNegGeqLit(dur[task], min_dur(task)));
+				}
 				// Get the negated literal for [[usage[task] >= min_usage(task)]]
-				if (min_usage0(task) < min_usage(task))
+				if (min_usage0(task) < min_usage(task)) {
 					expl.push(getNegGeqLit(usage[task], min_usage(task)));
+				}
 				// Get the negated literals for the tasks in the profile and the resource limit
 				analyse_limit_and_tasks(expl, profile[i].tasks, lift_usage, expl_begin, expl_end);
 				// Transform literals to a clause
@@ -1006,7 +1047,9 @@ CumulativeProp::tt_optional_task_propagation() {
 			// Getting the smallest non-zero value for the usage
 			const int usage_smallest = max(1, min_usage(i));
 			// XXX Only for the moment to make the propagation easier
-			if (est(i) < lst(i)) continue;
+			if (est(i) < lst(i)) {
+				continue;
+			}
 			// Getting the starting profile index
 			const int index = find_first_profile_for_lb(tt_profile, 0, tt_profile_size - 1, est(i));
 			// TODO Check whether a task with a duration 'dur_smallest' and a usage 'usage_smallest'
@@ -1017,7 +1060,7 @@ CumulativeProp::tt_optional_task_propagation() {
 					tt_profile[index].level + usage_smallest > max_limit()) {
 				// Tasks cannot be performed on this resource
 
-				Clause* reason = NULL;
+				Clause* reason = nullptr;
 				if (so.lazy) {
 					// Explanation for the propagation required
 					vec<Lit> expl;
@@ -1036,11 +1079,13 @@ CumulativeProp::tt_optional_task_propagation() {
 					// Get the negated literal for [[start[task] <= expl_begin]]
 					expl.push(getNegLeqLit(start[i], expl_begin));
 					// Get the negated literal for [[dur[i] >= min_dur(i)]]
-					if (min_dur0(i) < min_dur(i) && 0 < min_dur(i))
+					if (min_dur0(i) < min_dur(i) && 0 < min_dur(i)) {
 						expl.push(getNegGeqLit(dur[i], min_dur(i)));
+					}
 					// Get the negated literal for [[usage[i] >= min_usage(i)]]
-					if (min_usage0(i) < min_usage(i) && 0 < min_usage(i))
+					if (min_usage0(i) < min_usage(i) && 0 < min_usage(i)) {
 						expl.push(getNegGeqLit(usage[i], min_usage(i)));
+					}
 
 					// Get the negated literals for the tasks in the profile and the resource limit
 					analyse_limit_and_tasks(expl, tt_profile[index].tasks, lift_usage, expl_begin, expl_end);
@@ -1186,21 +1231,24 @@ void CumulativeProp::analyse_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks, CUMU_IN
 				expl.push(getNegLeqLit(start[*iter], begin));
 			}
 			// Get the negated literal for [[dur[*iter] >= min_dur(*iter)]]
-			if (min_dur0(*iter) < min_dur(*iter)) expl.push(getNegGeqLit(dur[*iter], min_dur(*iter)));
+			if (min_dur0(*iter) < min_dur(*iter)) {
+				expl.push(getNegGeqLit(dur[*iter], min_dur(*iter)));
+			}
 			// Get the negated literal for [[usage[*iter] >= min_usage(*iter)]]
 			const CUMU_INT usage_diff = min_usage(*iter) - min_usage0(*iter);
 			if (usage_diff > 0) {
-				if (usage_diff <= lift_usage)
+				if (usage_diff <= lift_usage) {
 					lift_usage -= usage_diff;
-				else
+				} else {
 					expl.push(getNegGeqLit(usage[*iter], min_usage(*iter)));
+				}
 			}
 		}
 	}
 }
 
 void CumulativeProp::submit_conflict_explanation(vec<Lit>& expl) {
-	Clause* reason = NULL;
+	Clause* reason = nullptr;
 	if (so.lazy) {
 		reason = Reason_new(expl.size());
 		int i = 0;
@@ -1221,7 +1269,9 @@ Clause* CumulativeProp::get_reason_for_update(vec<Lit>& expl) {
 
 int fixed_profile_max(vec<int>& t, vec<int>& delta) {
 	vec<int> perm;
-	for (int ii = 0; ii < t.size(); ++ii) perm.push(ii);
+	for (int ii = 0; ii < t.size(); ++ii) {
+		perm.push(ii);
+	}
 	std::sort((int*)perm, ((int*)perm) + perm.size(), [&t](int i, int j) { return t[i] < t[j]; });
 
 	// Sweep over the profile
@@ -1232,7 +1282,9 @@ int fixed_profile_max(vec<int>& t, vec<int>& delta) {
 		int ti(perm[ii]);
 		assert(time <= t[ti]);
 		if (time < t[ti]) {
-			if (level > limit) limit = level;
+			if (level > limit) {
+				limit = level;
+			}
 			time = t[ti];
 		}
 		level += delta[ti];
@@ -1255,8 +1307,11 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<
 
 	// Option switch
 	if (so.cumu_global) {
-		vec<IntVar*> s_new, d_new, r_new;
-		vec<int> fix_t, fix_delta;
+		vec<IntVar*> s_new;
+		vec<IntVar*> d_new;
+		vec<IntVar*> r_new;
+		vec<int> fix_t;
+		vec<int> fix_delta;
 		IntVar* vlimit = newIntVar(limit, limit);
 		int r_sum = 0;
 
@@ -1277,13 +1332,17 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<
 			}
 		}
 		int fixed_top = fixed_profile_max(fix_t, fix_delta);
-		if (fixed_top > limit) TL_FAIL();
+		if (fixed_top > limit) {
+			TL_FAIL();
+		}
 
 		vec<int> fixed_t;
 		vec<int> fixed_delta;
 		for (int i = 0; i < s.size(); i++) {
 			if (r[i] > 0 && d[i] > 0) {
-				if (s[i]->getMax() + d[i] <= sMin || sMax <= s[i]->getMin()) continue;
+				if (s[i]->getMax() + d[i] <= sMin || sMax <= s[i]->getMin()) {
+					continue;
+				}
 				s_new.push(s[i]);
 				d_new.push(newIntVar(d[i], d[i]));
 				r_new.push(newIntVar(r[i], r[i]));
@@ -1291,13 +1350,16 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<
 			}
 		}
 
-		if (r_sum <= limit) return;
+		if (r_sum <= limit) {
+			return;
+		}
 
 		// Global cumulative constraint
 		new CumulativeProp(s_new, d_new, r_new, vlimit, opt);
 	} else {
 		vec<IntVar*> s_new;
-		vec<int> d_new, r_new;
+		vec<int> d_new;
+		vec<int> r_new;
 		int r_sum = 0;
 		for (int i = 0; i < s.size(); i++) {
 			if (r[i] > 0 && d[i] > 0) {
@@ -1308,7 +1370,9 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<
 			}
 		}
 
-		if (r_sum <= limit) return;
+		if (r_sum <= limit) {
+			return;
+		}
 
 		// Time-indexed decomposition
 		timed_cumulative(s_new, d_new, r_new, limit);
@@ -1327,8 +1391,11 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
 
-	vec<IntVar*> s_new, d_new, r_new;
-	vec<int> fix_t, fix_delta;
+	vec<IntVar*> s_new;
+	vec<IntVar*> d_new;
+	vec<IntVar*> r_new;
+	vec<int> fix_t;
+	vec<int> fix_delta;
 	int r_sum = 0;
 
 	int sMin = INT_MAX;
@@ -1352,7 +1419,9 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 	for (int i = 0; i < s.size(); i++) {
 		if (r[i]->getMax() > 0 && d[i]->getMax() > 0) {
 			// TODO: Check fixed section of the profile.
-			if (s[i]->getMax() + d[i]->getMax() <= sMin || sMax <= s[i]->getMin()) continue;
+			if (s[i]->getMax() + d[i]->getMax() <= sMin || sMax <= s[i]->getMin()) {
+				continue;
+			}
 
 			s_new.push(s[i]);
 			d_new.push(d[i]);
@@ -1361,7 +1430,9 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 		}
 	}
 
-	if (r_sum <= limit->getMin()) return;
+	if (r_sum <= limit->getMin()) {
+		return;
+	}
 
 	// Global cumulative constraint
 	new CumulativeProp(s_new, d_new, r_new, limit, opt);
@@ -1434,11 +1505,17 @@ void CumulativeProp::ttef_initialise_parameters() {
 bool CumulativeProp::ttef_consistency_check(int shift_in(const int, const int, const int, const int,
 																												 const int, const int, const int)) {
 	assert(last_unfixed > 0);
-	int begin, end;  // Begin and end of the time interval [begin, end)
+	int begin;
+	int end;  // Begin and end of the time interval [begin, end)
 	int est_idx_last = last_unfixed;
-	int i, j, en_req, en_avail;
+	int i;
+	int j;
+	int en_req;
+	int en_avail;
 	int en_req_free;
-	int min_en_avail = -1, lct_idx_last = last_unfixed, i_last = task_id_lct[lct_idx_last];
+	int min_en_avail = -1;
+	int lct_idx_last = last_unfixed;
+	int i_last = task_id_lct[lct_idx_last];
 	bool consistent = true;
 
 	end = lct(task_id_lct[last_unfixed]) + 1;
@@ -1447,25 +1524,33 @@ bool CumulativeProp::ttef_consistency_check(int shift_in(const int, const int, c
 	//
 	for (int ii = last_unfixed; ii >= 0; ii--) {
 		i = task_id_lct[ii];
-		if (end == lct(i) || min_energy(i) == 0) continue;
+		if (end == lct(i) || min_energy(i) == 0) {
+			continue;
+		}
 
 		// Check whether the current latest completion time have to be considered
 		int free =
 				max_limit() * (lct(i_last) - lct(i)) - (tt_after_lct[ii] - tt_after_lct[lct_idx_last]);
-		if (min_en_avail >= free) continue;
+		if (min_en_avail >= free) {
+			continue;
+		}
 		lct_idx_last = ii;
 		i_last = i;
 		min_en_avail = max_limit() * (lct(task_id_lct[last_unfixed]) - est(task_id_est[0]));
 
 		end = lct(i);
-		while (est(task_id_est[est_idx_last]) >= end) est_idx_last--;
+		while (est(task_id_est[est_idx_last]) >= end) {
+			est_idx_last--;
+		}
 		en_req_free = 0;
 
 		// Inner Loop: iterating over est in non-increasing order
 		//
 		for (int jj = est_idx_last; jj >= 0; jj--) {
 			j = task_id_est[jj];
-			if (min_energy(j) == 0) continue;
+			if (min_energy(j) == 0) {
+				continue;
+			}
 			assert(est(j) < end);
 			begin = est(j);
 			if (lct(j) <= end) {
@@ -1550,13 +1635,19 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 																														 const int),
 																								std::queue<TTEFUpdate>& update_queue) {
 	assert(last_unfixed > 0);
-	int begin, end;  // Begin and end of the time interval [begin, end)
+	int begin;
+	int end;  // Begin and end of the time interval [begin, end)
 	int est_idx_last = last_unfixed;
-	int i, j, en_req, en_avail;
+	int i;
+	int j;
+	int en_req;
+	int en_avail;
 	int en_req_free;
-	int update_en_req_start, update_idx;
+	int update_en_req_start;
+	int update_idx;
 	// int min_en_avail = -1, lct_idx_last = last_unfixed, i_last = task_id_lct[lct_idx_last];
-	int min_en_avail = -1, min_begin = -1;
+	int min_en_avail = -1;
+	int min_begin = -1;
 	bool consistent = true;
 
 	end = lct(task_id_lct[last_unfixed]) + 1;
@@ -1565,7 +1656,9 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 	//
 	for (int ii = last_unfixed; ii >= 0; ii--) {
 		i = task_id_lct[ii];
-		if (end == lct(i) || min_energy(i) == 0) continue;
+		if (end == lct(i) || min_energy(i) == 0) {
+			continue;
+		}
 
 		// Check whether the current latest completion time have to be considered
 		// int free = max_limit() * (lct(i_last) - lct(i)) - (tt_after_lct[ii] -
@@ -1575,7 +1668,9 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 		min_begin = -1;
 
 		end = lct(i);
-		while (est(task_id_est[est_idx_last]) >= end) est_idx_last--;
+		while (est(task_id_est[est_idx_last]) >= end) {
+			est_idx_last--;
+		}
 		// Initialisations for the inner loop
 		en_req_free = 0;
 		update_idx = -1;
@@ -1586,7 +1681,9 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 		for (int jj = est_idx_last; jj >= 0; jj--) {
 			j = task_id_est[jj];
 			assert(est(j) < end);
-			if (min_energy(j) == 0) continue;
+			if (min_energy(j) == 0) {
+				continue;
+			}
 			begin = est(j);
 
 			// Checking for TTEEF propagation on upper bound
@@ -1601,7 +1698,7 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 				// Check whether a new upper bound was found
 				if (lct_new < new_lct[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, lct_new, min_begin, end, false));
+					update_queue.push(TTEFUpdate(j, lct_new, min_begin, end, 0));
 					new_lct[j] = lct_new;
 					// int blah = max_limit() * (end - min_begin) - (min_en_avail + min_en_in);
 					// printf("%d: lct_new %d; dur_avail %d; en_req %d; [%d, %d)\n", j, lct_new, dur_avail,
@@ -1661,7 +1758,7 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 				// - nfnl-rule TODO
 				if (start_new > new_est[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, start_new, begin, end, true));
+					update_queue.push(TTEFUpdate(j, start_new, begin, end, 1));
 					new_est[j] = start_new;
 					// printf("XXXXXX\n");
 				}
@@ -1698,13 +1795,19 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 																														 const int),
 																								std::queue<TTEFUpdate>& update_queue) {
 	assert(last_unfixed > 0);
-	int begin, end;  // Begin and end of the time interval [begin, end)
+	int begin;
+	int end;  // Begin and end of the time interval [begin, end)
 	int lct_idx_last = 0;
-	int i, j, en_req, en_avail;
+	int i;
+	int j;
+	int en_req;
+	int en_avail;
 	int en_req_free;
-	int update_en_req_end, update_idx;
+	int update_en_req_end;
+	int update_idx;
 	// int min_en_avail = -1, lct_idx_last = last_unfixed, i_last = task_id_lct[lct_idx_last];
-	int min_en_avail = -1, min_end = -1;
+	int min_en_avail = -1;
+	int min_end = -1;
 	bool consistent = true;
 
 	begin = est(task_id_est[0]) - 1;
@@ -1713,7 +1816,9 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 	//
 	for (int ii = 0; ii <= last_unfixed; ii++) {
 		i = task_id_est[ii];
-		if (begin == est(i) || min_energy(i) == 0) continue;
+		if (begin == est(i) || min_energy(i) == 0) {
+			continue;
+		}
 
 		// Intialisation for the minimal avaible energy of a time interval starting
 		// at begin
@@ -1722,7 +1827,9 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 		min_end = -1;
 
 		begin = est(i);
-		while (lct(task_id_lct[lct_idx_last]) <= begin) lct_idx_last++;
+		while (lct(task_id_lct[lct_idx_last]) <= begin) {
+			lct_idx_last++;
+		}
 		// Initialisations for the inner loop
 		en_req_free = 0;
 		update_idx = -1;
@@ -1733,7 +1840,9 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 		for (int jj = lct_idx_last; jj <= last_unfixed; jj++) {
 			j = task_id_lct[jj];
 			assert(lct(j) > begin);
-			if (min_energy(j) == 0) continue;
+			if (min_energy(j) == 0) {
+				continue;
+			}
 			end = lct(j);
 
 			// Checking for TTEEF propagation on lower bounds
@@ -1748,7 +1857,7 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 				// Check whether a new lower bound was found
 				if (est_new > new_est[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, est_new, begin, min_end, true));
+					update_queue.push(TTEFUpdate(j, est_new, begin, min_end, 1));
 					new_est[j] = est_new;
 					// int blah = max_limit() * (end - min_begin) - (min_en_avail + min_en_in);
 					// printf("%d: lct_new %d; dur_avail %d; en_req %d; [%d, %d)\n", j, lct_new, dur_avail,
@@ -1808,7 +1917,7 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 				// - nfnl-rule TODO
 				if (end_new < new_lct[j]) {
 					// Push possible update into queue
-					update_queue.push(TTEFUpdate(j, end_new, begin, end, false));
+					update_queue.push(TTEFUpdate(j, end_new, begin, end, 0));
 					new_lct[j] = end_new;
 				}
 			}
@@ -1847,7 +1956,7 @@ bool CumulativeProp::ttef_update_bounds(int shift_in(const int, const int, const
 		int bound = queue_update.front().bound_new;
 		int begin = queue_update.front().tw_begin;
 		int end = queue_update.front().tw_end;
-		Clause* reason = NULL;
+		Clause* reason = nullptr;
 		if (queue_update.front().is_lb_update) {
 			// Lower bound update
 			if (new_est[task] == bound) {
@@ -1891,10 +2000,13 @@ bool CumulativeProp::ttef_update_bounds(int shift_in(const int, const int, const
 						expl.push(getNegGeqLit(start[task], expl_lb));
 					}
 					// Get the negated literal for [[dur[task] >= min_dur(task)]]
-					if (min_dur0(task) < min_dur(task)) expl.push(getNegGeqLit(dur[task], min_dur(task)));
+					if (min_dur0(task) < min_dur(task)) {
+						expl.push(getNegGeqLit(dur[task], min_dur(task)));
+					}
 					// Get the negated literal for [[usage[task] >= min_usage(task)]]
-					if (min_usage0(task) < min_usage(task))
+					if (min_usage0(task) < min_usage(task)) {
 						expl.push(getNegGeqLit(usage[task], min_usage(task)));
+					}
 					ttef_analyse_limit_and_tasks(begin, end, tasks_tw, tasks_cp, en_lift, expl);
 					reason = get_reason_for_update(expl);
 				}
@@ -1953,10 +2065,13 @@ bool CumulativeProp::ttef_update_bounds(int shift_in(const int, const int, const
 						expl.push(getNegLeqLit(start[task], expl_ub));
 					}
 					// Get the negated literal for [[dur[task] >= min_dur(task)]]
-					if (min_dur0(task) < min_dur(task)) expl.push(getNegGeqLit(dur[task], min_dur(task)));
+					if (min_dur0(task) < min_dur(task)) {
+						expl.push(getNegGeqLit(dur[task], min_dur(task)));
+					}
 					// Get the negated literal for [[usage[task] >= min_usage(task)]]
-					if (min_usage0(task) < min_usage(task))
+					if (min_usage0(task) < min_usage(task)) {
 						expl.push(getNegGeqLit(usage[task], min_usage(task)));
+					}
 					ttef_analyse_limit_and_tasks(begin, end, tasks_tw, tasks_cp, en_lift, expl);
 					reason = get_reason_for_update(expl);
 				}
@@ -1987,13 +2102,15 @@ int CumulativeProp::ttef_retrieve_tasks(int shift_in(const int, const int, const
 	//  Getting fixed tasks
 	for (int ii = 0; ii < task_id.size(); ii++) {
 		int i = task_id[ii];
-		if (i == fb_id || min_energy(i) == 0) continue;
+		if (i == fb_id || min_energy(i) == 0) {
+			continue;
+		}
 		// printf("\t%d: est %d;  ect %d; lst %d; lct %d (dur: %d; rr: %d; en: %d)\n", i, est(i),
 		// ect(i), lst(i), lct(i), 	min_dur(i), min_usage(i), min_energy(i));
 		if (begin <= est(i) && lct(i) <= end) {
 			// Task lies in the time interval [begin, end)
 			en_req += min_energy(i);
-			tasks_tw.push_back(TaskDur(i, min_dur(i)));
+			tasks_tw.emplace_back(i, min_dur(i));
 			// printf("\tFull %d: %d in [%d, %d)\n", i, min_energy(i), begin, end);
 			// printf("\t\t%d: est %d;  ect %d; lst %d; lct %d (dur: %d; rr: %d; en: %d)\n", i, est(i),
 			// ect(i), lst(i), lct(i), 	min_dur(i), min_usage(i), min_energy(i));
@@ -2003,7 +2120,7 @@ int CumulativeProp::ttef_retrieve_tasks(int shift_in(const int, const int, const
 			int dur_shift = shift_in(begin, end, est(i), ect(i), lst(i), lct(i), dur_comp);
 			int dur_in = dur_comp + dur_shift;
 			en_req += min_usage(i) * dur_in;
-			tasks_cp.push_back(TaskDur(i, dur_in));
+			tasks_cp.emplace_back(i, dur_in);
 			// printf("\tComp %d: %d in [%d, %d)\n", i, min_usage(i) * dur_in, begin, end);
 			// printf("\t\t%d: est %d;  ect %d; lst %d; lct %d (dur: %d; rr: %d; en: %d)\n", i, est(i),
 			// ect(i), lst(i), lct(i), 	min_dur(i), min_usage(i), min_energy(i));
@@ -2011,7 +2128,7 @@ int CumulativeProp::ttef_retrieve_tasks(int shift_in(const int, const int, const
 			// Task partially lies in [begin, end)
 			int dur_in = shift_in(begin, end, est(i), ect(i), lst(i), lct(i), 0);
 			en_req += min_usage(i) * dur_in;
-			tasks_tw.push_back(TaskDur(i, dur_in));
+			tasks_tw.emplace_back(i, dur_in);
 			// printf("Shift %d: %d in [%d, %d)\n", i, min_usage(i) * dur_in, begin, end);
 		}
 	}
@@ -2044,7 +2161,8 @@ void CumulativeProp::ttef_analyse_tasks(const int begin, const int end, list<Tas
 	while (!tasks.empty()) {
 		int i = tasks.front().task;
 		int dur_in = tasks.front().dur_in;
-		int expl_lb, expl_ub;
+		int expl_lb;
+		int expl_ub;
 		int est0 = min_start0(i);
 		int lst0 = max_start0(i);
 		// Calculate possible lifting
@@ -2089,9 +2207,13 @@ void CumulativeProp::ttef_analyse_tasks(const int begin, const int end, list<Tas
 			expl.push(getNegLeqLit(start[i], expl_ub));
 		}
 		// Get the negated literal for [[dur[i] >= min_dur(i)]]
-		if (min_dur0(i) < min_dur(i)) expl.push(getNegGeqLit(dur[i], min_dur(i)));
+		if (min_dur0(i) < min_dur(i)) {
+			expl.push(getNegGeqLit(dur[i], min_dur(i)));
+		}
 		// Get the negated literal for [[usage[i] >= min_usage(i)]]
-		if (min_usage0(i) < min_usage(i)) expl.push(getNegGeqLit(usage[i], min_usage(i)));
+		if (min_usage0(i) < min_usage(i)) {
+			expl.push(getNegGeqLit(usage[i], min_usage(i)));
+		}
 		// printf("\n");
 		tasks.pop_front();
 	}

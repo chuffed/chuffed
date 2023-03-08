@@ -123,7 +123,7 @@ Options::Options()
 }
 
 template <class T>
-inline bool assignStr(T*, const std::string) {
+inline bool assignStr(T* /*unused*/, const std::string /*unused*/) {
 	return false;
 }
 template <>
@@ -136,7 +136,7 @@ inline bool assignStr(std::string* pS, const std::string s) {
 class CLOParser {
 	int& i;  // current item
 	const int argc = 0;
-	const char* const* argv = 0;
+	const char* const* argv = nullptr;
 
 public:
 	CLOParser(int& ii, const int ac, const char* const* av) : i(ii), argc(ac), argv(av) {}
@@ -152,30 +152,41 @@ public:
 												Value* pResult = nullptr,    // pointer to value storage
 												bool fValueOptional = false  // if pResult, for non-string values
 	) {
-		assert(0 == strchr(names, ','));
-		assert(0 == strchr(names, ';'));
-		if (i >= argc) return false;
+		assert(nullptr == strchr(names, ','));
+		assert(nullptr == strchr(names, ';'));
+		if (i >= argc) {
+			return false;
+		}
 		assert(argv[i]);
 		std::string arg(argv[i]);
 		/// Separate keywords
 		std::string keyword;
 		std::istringstream iss(names);
 		while (iss >> keyword) {
-			if (((2 < keyword.size() || 0 == pResult) && arg != keyword) ||  // exact cmp
-					(0 != arg.compare(0, keyword.size(), keyword)))              // truncated cmp
+			if (((2 < keyword.size() || nullptr == pResult) && arg != keyword) ||  // exact cmp
+					(0 != arg.compare(0, keyword.size(), keyword))) {                  // truncated cmp
 				continue;
+			}
 			/// Process it
 			if (keyword.size() < arg.size()) {
-				if (0 == pResult) continue;
+				if (nullptr == pResult) {
+					continue;
+				}
 				arg.erase(0, keyword.size());
 			} else {
-				if (0 == pResult) return true;
+				if (nullptr == pResult) {
+					return true;
+				}
 				i++;
-				if (i >= argc) return fValueOptional;
+				if (i >= argc) {
+					return fValueOptional;
+				}
 				arg = argv[i];
 			}
 			assert(pResult);
-			if (assignStr(pResult, arg)) return true;
+			if (assignStr(pResult, arg)) {
+				return true;
+			}
 			std::istringstream iss(arg);
 			Value tmp;
 			if (!(iss >> tmp)) {
@@ -201,13 +212,19 @@ public:
 		std::string keyword;
 		while (iss >> keyword) {
 			if (keyword.size() <= 2) {
-				if (!shortOptions.empty()) shortOptions += " ";
+				if (!shortOptions.empty()) {
+					shortOptions += " ";
+				}
 				shortOptions += keyword;
 			} else {
-				if (!longOptions.empty()) longOptions += " ";
+				if (!longOptions.empty()) {
+					longOptions += " ";
+				}
 				longOptions += keyword;
 				if (keyword[0] == '-' && keyword[1] == '-') {
-					if (!negOptions.empty()) negOptions += " ";
+					if (!negOptions.empty()) {
+						negOptions += " ";
+					}
 					negOptions += "--no" + keyword.substr(1);
 				}
 			}
@@ -223,9 +240,7 @@ public:
 		}
 
 		if (getOption(longOptions.c_str(), &buffer)) {
-			if (buffer.empty()) {
-				result = true;
-			} else if (buffer == "true" || buffer == "on" || buffer == "1") {
+			if (buffer.empty() || (buffer == "true" || buffer == "on" || buffer == "1")) {
 				result = true;
 			} else if (buffer == "false" || buffer == "off" || buffer == "0") {
 				result = false;
@@ -242,7 +257,9 @@ public:
 void printHelp(int& argc, char**& argv, const std::string& fileExt) {
 	Options def;
 	std::cout << "Usage: " << argv[0] << " [options] ";
-	if (fileExt.size() > 0) std::cout << "<file>." << fileExt;
+	if (!fileExt.empty()) {
+		std::cout << "<file>." << fileExt;
+	}
 	std::cout << "\n";
 	std::cout << "Options:\n";
 	std::cout << "  -h, --help\n"
@@ -548,7 +565,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 		} else if (cop.get("-r --rnd-seed", &intBuffer)) {
 			so.rnd_seed = intBuffer;
 		} else if (cop.getBool("-v --verbose", boolBuffer)) {
-			so.verbosity = boolBuffer;
+			so.verbosity = static_cast<int>(boolBuffer);
 		} else if (cop.get("--verbosity", &intBuffer)) {
 			so.verbosity = intBuffer;
 		} else if (cop.getBool("--print-sol", boolBuffer)) {
@@ -703,10 +720,10 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 
 	argc = j;
 
-	if (fileArg != NULL) {
+	if (fileArg != nullptr) {
 		if (argc == 2) {
 			std::string filename(argv[1]);
-			if (fileExt.size() > 0) {
+			if (!fileExt.empty()) {
 				if (filename.size() <= fileExt.size() + 1 ||
 						filename.substr(filename.size() - fileExt.size() - 1) != "." + fileExt) {
 					std::cerr << argv[0] << ": cannot handle file extension for " << filename << "\n";
@@ -725,12 +742,22 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 
 	rassert(so.sym_static + so.ldsb + so.ldsbta + so.ldsbad <= 1);
 
-	if (so.ldsbta || so.ldsbad) so.ldsb = true;
-	if (so.ldsb) rassert(so.lazy);
-	if (so.mip_branch) rassert(so.mip);
-	if (so.vsids) engine.branching->add(&sat);
+	if (so.ldsbta || so.ldsbad) {
+		so.ldsb = true;
+	}
+	if (so.ldsb) {
+		rassert(so.lazy);
+	}
+	if (so.mip_branch) {
+		rassert(so.mip);
+	}
+	if (so.vsids) {
+		engine.branching->add(&sat);
+	}
 
-	if (so.learnt_stats_nogood) so.learnt_stats = true;
+	if (so.learnt_stats_nogood) {
+		so.learnt_stats = true;
+	}
 
 	// Warn user if SBPS is not used with an activity-based search and restarts
 	if (so.sbps) {

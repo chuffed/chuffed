@@ -14,38 +14,50 @@ public:
 	vec<Lit> ps;
 
 	BoolLinearLE(vec<BoolView>& _x, IntView<U> _y) : x(_x), y(_y), ones(0) {
-		for (int i = 0; i < x.size(); i++) x[i].attach(this, i, EVENT_L);
+		for (int i = 0; i < x.size(); i++) {
+			x[i].attach(this, i, EVENT_L);
+		}
 		y.attach(this, x.size(), EVENT_U);
 	}
 
-	void wakeup(int i, int c) {
-		if (i < x.size()) ones++;
+	void wakeup(int i, int c) override {
+		if (i < x.size()) {
+			ones++;
+		}
 		pushInQueue();
 	}
 
-	bool propagate() {
+	bool propagate() override {
 		int y_max = y.getMax();
 
-		if (ones > y_max) ones = y_max + 1;
+		if (ones > y_max) {
+			ones = y_max + 1;
+		}
 
 		setDom2(y, setMin, ones, 1);
 
 		if (ones == y_max) {
 			for (int i = 0; i < x.size(); i++) {
-				if (!x[i].isFixed()) x[i].setVal2(0, Reason(prop_id, 0));
+				if (!x[i].isFixed()) {
+					x[i].setVal2(false, Reason(prop_id, 0));
+				}
 			}
 		}
 
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) {
+	Clause* explain(Lit p, int inf_id) override {
 		ps.clear();
 		ps.growTo(ones + 1);
 		for (int i = 0, j = 1; j <= ones; i++) {
-			if (x[i].isTrue()) ps[j++] = ~x[i];
+			if (x[i].isTrue()) {
+				ps[j++] = ~x[i];
+			}
 		}
-		if (inf_id == 0) ps.push(y.getMaxLit());
+		if (inf_id == 0) {
+			ps.push(y.getMaxLit());
+		}
 		return Reason_new(ps);
 	}
 };
@@ -56,7 +68,9 @@ public:
 
 void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y) {
 	vec<BoolView> x2;
-	for (int i = 0; i < x.size(); i++) x2.push(~x[i]);
+	for (int i = 0; i < x.size(); i++) {
+		x2.push(~x[i]);
+	}
 	switch (t) {
 		case IRT_EQ:
 			// sum x_i = y <=> sum x_i <= y /\ sum (1-x_i) <= (-y+x.size())

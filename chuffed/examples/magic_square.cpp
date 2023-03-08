@@ -29,7 +29,8 @@ public:
 			int_linear(xt[i], IRT_EQ, sum);
 		}
 
-		vec<IntVar*> t1, t2;
+		vec<IntVar*> t1;
+		vec<IntVar*> t2;
 		for (int i = 0; i < n; i++) {
 			t1.push(x[i][i]);
 			t2.push(x[i][n - 1 - i]);
@@ -82,7 +83,7 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				os << x[i][j]->getVal() << ", ";

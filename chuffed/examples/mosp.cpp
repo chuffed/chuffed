@@ -49,8 +49,11 @@ public:
 		// Min constraints on s[i]
 		for (int i = 0; i < n; i++) {
 			vec<IntVar*> x;
-			for (int j = 0; j < n; j++)
-				if (g[i][j]) x.push(e[j]);
+			for (int j = 0; j < n; j++) {
+				if (g[i][j]) {
+					x.push(e[j]);
+				}
+			}
 			minimum(x, s[i]);
 		}
 
@@ -79,8 +82,11 @@ public:
 		for (int t = 0; t < n; t++) {
 			for (int i = 0; i < n; i++) {
 				vec<BoolView> a;
-				for (int j = 0; j < n; j++)
-					if (g[i][j]) a.push(sb[j][t]);
+				for (int j = 0; j < n; j++) {
+					if (g[i][j]) {
+						a.push(sb[j][t]);
+					}
+				}
 				a.push(eb[i][t]);
 				array_bool_and(a, r[i][t]);
 			}
@@ -90,8 +96,11 @@ public:
 		// and this one can, close it now
 		for (int t = 0; t < n - 1; t++) {
 			for (int i = 0; i < n; i++) {
-				vec<BoolView> a, b;
-				for (int j = 0; j < i; j++) a.push(r[j][t]);
+				vec<BoolView> a;
+				vec<BoolView> b;
+				for (int j = 0; j < i; j++) {
+					a.push(r[j][t]);
+				}
 				b.push(r[i][t]);
 				b.push(eb[i][t + 1]);
 				bool_clause(a, b);
@@ -112,24 +121,29 @@ public:
 		double density = (double)cust_per_prod / n;
 
 		a = (bool**)malloc(n * sizeof(bool*));
-		for (int i = 0; i < n; i++) a[i] = (bool*)malloc(m * sizeof(bool));
+		for (int i = 0; i < n; i++) {
+			a[i] = (bool*)malloc(m * sizeof(bool));
+		}
 
 		while (true) {
 			int b[m];
 
-			for (int j = 0; j < m; j++) b[j] = 0;
+			for (int j = 0; j < m; j++) {
+				b[j] = 0;
+			}
 
 			for (int j = 0; j < n; j++) {
 				int sum = 0;
 				for (int k = 0; k < m; k++) {
 					if (rand() < RAND_MAX * density) {
-						a[j][k] = 1;
+						a[j][k] = true;
 						b[k]++;
 						sum++;
-					} else
-						a[j][k] = 0;
+					} else {
+						a[j][k] = false;
+					}
 				}
-				if (!sum) {
+				if (sum == 0) {
 					j--;
 					continue;
 				}
@@ -138,8 +152,10 @@ public:
 			for (int j = 0; j < m; j++) {
 				while (b[j] < 2) {
 					int r = rand() % n;
-					if (a[r][j] == 1) continue;
-					a[r][j] = 1;
+					if (static_cast<int>(a[r][j]) == 1) {
+						continue;
+					}
+					a[r][j] = true;
 					b[j]++;
 				}
 			}
@@ -153,14 +169,16 @@ public:
 			}
 
 			for (int j = 0; j < m; j++) {
-				for (int k = 0; k < n; k++)
+				for (int k = 0; k < n; k++) {
 					if (a[k][j]) {
-						for (int l = k; l < n; l++)
+						for (int l = k; l < n; l++) {
 							if (a[l][j]) {
 								cross[l][k] = 1;
 								cross[k][l] = 1;
 							}
+						}
 					}
+				}
 			}
 
 			int connected[n];
@@ -168,7 +186,9 @@ public:
 			int qhead = 0;
 			int seen[n];
 
-			for (int j = 0; j < n; j++) seen[j] = 0;
+			for (int j = 0; j < n; j++) {
+				seen[j] = 0;
+			}
 
 			connected[num_connected++] = 0;
 			seen[0] = 1;
@@ -179,18 +199,21 @@ public:
 				int c = connected[qhead++];
 				assert(c >= 0);
 				assert(c < n);
-				for (int j = 0; j < n; j++)
-					if (cross[c][j] && !seen[j]) {
+				for (int j = 0; j < n; j++) {
+					if ((cross[c][j] != 0) && (seen[j] == 0)) {
 						connected[num_connected++] = j;
 						seen[j] = 1;
 					}
+				}
 			}
 
-			if (num_connected == n) break;
+			if (num_connected == n) {
+				break;
+			}
 		}
 	}
 
-	void print(std::ostream& os) {
+	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
 			int m = e[i]->getVal();
 			os << "e_" << i << " = " << m << ", ";

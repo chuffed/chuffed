@@ -14,7 +14,8 @@ void createVars(vec<vec<BoolView> >& x, int n, int m);
 template <class U>
 void transpose(vec<vec<U> >& x, vec<vec<U> >& y) {
 	assert(y.size() == 0);
-	int n = x[0].size(), m = x.size();
+	int n = x[0].size();
+	int m = x.size();
 	y.growTo(n);
 	for (int i = 0; i < n; i++) {
 		y[i].growTo(m);
@@ -27,7 +28,8 @@ void transpose(vec<vec<U> >& x, vec<vec<U> >& y) {
 template <class U>
 void flatten(vec<vec<U> >& x, vec<U>& y) {
 	assert(y.size() == 0);
-	int n = x.size(), m = x[0].size();
+	int n = x.size();
+	int m = x[0].size();
 	y.growTo(n * m);
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < m; j++) {

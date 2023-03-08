@@ -20,13 +20,21 @@ class SetFinder {
 		TrieNode* one;
 		TrieNode(SetFinder* sf, Type t, bool term = false)
 				: sf(sf), terminal(term), val(-1), type(t), zero(NULL), one(NULL) {
-			if (terminal) sf->_nb_terminals++;
+			if (terminal) {
+				sf->_nb_terminals++;
+			}
 		}
 		~TrieNode() {
-			if (terminal) sf->_nb_terminals--;
-			if (zero != NULL) delete zero;
+			if (terminal) {
+				sf->_nb_terminals--;
+			}
+			if (zero != NULL) {
+				delete zero;
+			}
 			zero = NULL;
-			if (one != NULL) delete one;
+			if (one != NULL) {
+				delete one;
+			}
 			one = NULL;
 		}
 	};
@@ -38,7 +46,9 @@ class SetFinder {
 			n->val = val;
 			return;
 		}
-		if (level >= N) return;
+		if (level >= N) {
+			return;
+		}
 		int bit = key[level];
 		if (bit == 0) {
 			if (n->zero == NULL) {
@@ -83,11 +93,14 @@ class SetFinder {
 	bool _subsets(std::bitset<N> key, std::vector<std::bitset<N> >& ss, std::vector<int>& vals,
 								TrieNode* n, int level, std::bitset<N> chain, bool remove = false,
 								int threshold = -1) {
-		if (level > N) return false;
-		if (n->type == ONE && level > 0)
+		if (level > N) {
+			return false;
+		}
+		if (n->type == ONE && level > 0) {
 			chain[level - 1] = 1;
-		else if (n->type == ZERO && level > 0)
+		} else if (n->type == ZERO && level > 0) {
 			chain[level - 1] = 0;
+		}
 
 		if (n->terminal) {
 			int last_bit = key[N - 1];
@@ -97,9 +110,8 @@ class SetFinder {
 				if (remove) {
 					if (threshold < n->val) {
 						return true;
-					} else {
-						return false;
 					}
+					return false;
 				}
 			}
 			return false;
@@ -112,7 +124,9 @@ class SetFinder {
 			if (remove && rem) {
 				delete n->zero;
 				n->zero = NULL;
-				if (n->one != NULL) rem = false;
+				if (n->one != NULL) {
+					rem = false;
+				}
 			}
 		}
 		if (bit == 1 && n->one != NULL) {
@@ -120,7 +134,9 @@ class SetFinder {
 			if (remove && rem) {
 				delete n->one;
 				n->one = NULL;
-				if (n->zero != NULL) rem = false;
+				if (n->zero != NULL) {
+					rem = false;
+				}
 			}
 		}
 
@@ -130,11 +146,14 @@ class SetFinder {
 	bool _supersets(std::bitset<N> key, std::vector<std::bitset<N> >& ss, std::vector<int>& vals,
 									TrieNode* n, int level, std::bitset<N> chain, bool remove = false,
 									int threshold = -1) {
-		if (level > N) return false;
-		if (n->type == ONE && level > 0)
+		if (level > N) {
+			return false;
+		}
+		if (n->type == ONE && level > 0) {
 			chain[level - 1] = 1;
-		else if (n->type == ZERO && level > 0)
+		} else if (n->type == ZERO && level > 0) {
 			chain[level - 1] = 0;
+		}
 
 		if (n->terminal) {
 			int last_bit = key[N - 1];
@@ -144,9 +163,8 @@ class SetFinder {
 				if (remove) {
 					if (threshold < n->val) {
 						return true;
-					} else {
-						return false;
 					}
+					return false;
 				}
 			}
 			return false;
@@ -159,7 +177,9 @@ class SetFinder {
 			if (remove && rem) {
 				delete n->one;
 				n->one = NULL;
-				if (n->zero != NULL) rem = false;
+				if (n->zero != NULL) {
+					rem = false;
+				}
 			}
 		}
 		if (bit == 0 && n->zero != NULL) {
@@ -167,7 +187,9 @@ class SetFinder {
 			if (remove && rem) {
 				delete n->zero;
 				n->zero = NULL;
-				if (n->one != NULL) rem = false;
+				if (n->one != NULL) {
+					rem = false;
+				}
 			}
 		}
 
@@ -197,14 +219,19 @@ public:
 		if (n == NULL) {
 			std::cout << "R" << std::endl;
 			n = &root;
-		} else if (n->type == ONE)
+		} else if (n->type == ONE) {
 			std::cout << s << "1"
 								<< "(" << n->val << ")" << std::endl;
-		else if (n->type == ZERO)
+		} else if (n->type == ZERO) {
 			std::cout << s << "0"
 								<< "(" << n->val << ")" << std::endl;
-		if (n->one != NULL) print(n->one, s + "-");
-		if (n->zero != NULL) print(n->zero, s + "-");
+		}
+		if (n->one != NULL) {
+			print(n->one, s + "-");
+		}
+		if (n->zero != NULL) {
+			print(n->zero, s + "-");
+		}
 	}
 };
 
