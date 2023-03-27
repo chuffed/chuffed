@@ -5,8 +5,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <ctime>
 #include <map>
+#include <random>
 #include <set>
 #include <vector>
 
@@ -89,7 +91,8 @@ public:
 		cluster_id.clear();
 
 		// Initialize: randomly choose centroids and cluster IDs
-		std::random_shuffle(to_cluster.begin(), to_cluster.end());
+		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		std::shuffle(to_cluster.begin(), to_cluster.end(), std::default_random_engine(seed));
 		for (unsigned int i = 0; i < this->clusters_count; i++) {
 			centroids[i] = to_cluster[i];
 			cluster_id[to_cluster[i]] = i;
