@@ -1,14 +1,7 @@
-#ifdef __APPLE__
-#include <memory>
-#define MEMCPY std::memcpy
-#else
-#include <cstring>
-#define MEMCPY memcpy
-#endif
-
 #include <chuffed/mdd/weighted_dfa.h>
 
 #include <algorithm>
+#include <cstring>
 
 #include <thirdparty/MurmurHash3/MurmurHash3.h>
 
@@ -100,7 +93,7 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 	// Otherwise, add it.
 	NodeRef node = allocNode(intermed->sz);
 
-	MEMCPY(node, intermed, sizeof(NodeInfo) + (((int)intermed->sz) - 1) * (sizeof(EInfo)));
+	std::memcpy(node, intermed, sizeof(NodeInfo) + (((int)intermed->sz) - 1) * (sizeof(EInfo)));
 
 	int nID = nodes.size();
 	cache[node] = nID;

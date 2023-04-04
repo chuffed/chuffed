@@ -1,17 +1,8 @@
-#include <iostream>
-
-#ifdef __APPLE__
-#include <memory>
-#define MEMCPY std::memcpy
-#else
-#include <cstring>
-#define MEMCPY memcpy
-#endif
-
 #include <chuffed/mdd/MDD.h>
 
 #include <cassert>
 #include <climits>
+#include <cstring>
 #include <iostream>
 
 #define OPCACHE_SZ 100000
@@ -116,7 +107,7 @@ MDDNodeInt MDDTable::insert(unsigned int var, unsigned int low, unsigned int sta
 
 	MDDNode act = allocNode(intermed->sz);
 
-	MEMCPY(act, intermed, sizeof(MDDNodeEl) + (((int)intermed->sz) - 1) * (sizeof(MDDEdge)));
+	std::memcpy(act, intermed, sizeof(MDDNodeEl) + (((int)intermed->sz) - 1) * (sizeof(MDDEdge)));
 
 	varcache[act] = nodes.size();
 	nodes.push_back(act);
