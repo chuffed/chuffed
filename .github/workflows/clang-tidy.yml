@@ -1,4 +1,4 @@
-name: Clang Tidy Review
+name: clang-tidy-review
 on: [pull_request]
 permissions:
   pull-requests: write
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: ZedThree/clang-tidy-review@v0.10.1
+    - uses: ZedThree/clang-tidy-review@v0.12.2
       id: review
       with:
         cmake_command: 'cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=on'
@@ -16,6 +16,5 @@ jobs:
         config_file: '.clang-tidy'
         exclude: 'chuffed/vars/int-var-*.h,thirdparty/**'
         apt_packages: 'zlib1g-dev'
-    # If there are any comments, fail the check
-    - if: steps.review.outputs.total_comments > 0
-      run: exit 1
+        split_workflow: true
+    - uses: ZedThree/clang-tidy-review/upload@v0.12.2
