@@ -1040,9 +1040,10 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 
 	// Setting the random seed
 	if (so.rnd_seed == 0) {
-		so.rnd_seed = time(nullptr);
+		std::random_device r;
+		so.rnd_seed = r();
 	}
-	srand(so.rnd_seed);
+	rnd = std::default_random_engine(so.rnd_seed);
 
 	init();
 

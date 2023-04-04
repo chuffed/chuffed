@@ -4,6 +4,7 @@
 #include <chuffed/support/misc.h>
 
 #include <functional>
+#include <random>
 #include <string>
 
 #define DEBUG 0
@@ -75,6 +76,8 @@ public:
 
 	std::ostream* output_stream;
 	std::function<void(Problem* p)> solution_callback;
+
+	std::default_random_engine rnd;
 
 private:
 	// Init

@@ -1,6 +1,7 @@
 #ifndef DYNAMICKMEANS_H
 #define DYNAMICKMEANS_H
 
+#include <chuffed/core/engine.h>
 #include <chuffed/support/floyd_warshall.h>
 
 #include <algorithm>
@@ -75,7 +76,6 @@ public:
 
 	void update_dists() override { fw->compute(); }
 	std::vector<int> cluster(std::vector<int> to_cluster) override {
-		srand(time(nullptr));
 		clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 		centroids = std::vector<int>(this->clusters_count, -1);
 		// Special case
@@ -91,8 +91,7 @@ public:
 		cluster_id.clear();
 
 		// Initialize: randomly choose centroids and cluster IDs
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		std::shuffle(to_cluster.begin(), to_cluster.end(), std::default_random_engine(seed));
+		std::shuffle(to_cluster.begin(), to_cluster.end(), engine.rnd);
 		for (unsigned int i = 0; i < this->clusters_count; i++) {
 			centroids[i] = to_cluster[i];
 			cluster_id[to_cluster[i]] = i;

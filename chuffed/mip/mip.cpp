@@ -273,13 +273,15 @@ long double MIP::getRC(IntVar* v) {
 	if (simplex.reduced_costs[r] >= 0) {
 		v->preferred_val = PV_MIN;
 		if (RAND_RC) {
-			return simplex.reduced_costs[r] * myrand(so.rnd_seed) / MYRAND_MAX;
+			std::uniform_real_distribution<double> myrand(0, MYRAND_MAX);
+			return simplex.reduced_costs[r] * myrand(engine.rnd);
 		}
 		return simplex.reduced_costs[r];
 	}
 	v->preferred_val = PV_MAX;
 	if (RAND_RC) {
-		return -simplex.reduced_costs[r] * myrand(so.rnd_seed) / MYRAND_MAX;
+		std::uniform_real_distribution<double> myrand(0, MYRAND_MAX);
+		return -simplex.reduced_costs[r] * myrand(engine.rnd);
 	}
 	return -simplex.reduced_costs[r];
 }

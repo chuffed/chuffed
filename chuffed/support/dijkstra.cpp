@@ -273,7 +273,8 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	if (mands.size() == 0) {
 		val = source;
 	} else {
-		val = mands[rand() % mands.size()];
+		std::uniform_int_distribution<int> rnd_mnds(0, mands.size() - 1);
+		val = mands[rnd_mnds()];
 	}
 	if (start != -1) val = start;
 	int source = val;

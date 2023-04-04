@@ -64,7 +64,8 @@ DecInfo* BranchGroup::branch() {
 		if (moves.size() == 0) {
 			return nullptr;
 		}
-		int best_i = moves[rand() % moves.size()];
+		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
+		int best_i = moves[rnd_move(engine.rnd)];
 		if (!terminal) {
 			cur = best_i;
 		}
@@ -93,7 +94,8 @@ DecInfo* BranchGroup::branch() {
 	int best_i = moves[0];
 	// Random selection of best move
 	if (so.branch_random) {
-		best_i = moves[rand() % moves.size()];
+		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
+		best_i = moves[rnd_move(engine.rnd)];
 	}
 
 	if (!terminal) {
@@ -193,10 +195,8 @@ DecInfo* PriorityBranchGroup::branch() {
 		if (moves.size() == 0) {
 			return nullptr;
 		}
-		int rand_int = rand();
-		int index = rand_int % moves.size();
-
-		int best_i = moves[rand() % moves.size()];
+		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
+		int best_i = moves[rnd_move(engine.rnd)];
 		if (!terminal) {
 			cur = best_i;
 		}
@@ -225,7 +225,8 @@ DecInfo* PriorityBranchGroup::branch() {
 	int best_i = moves[0];
 	// Special case of random selection of best moves
 	if (so.branch_random) {
-		best_i = moves[rand() % moves.size()];
+		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
+		best_i = moves[rnd_move(engine.rnd)];
 	}
 
 	if (!terminal) {

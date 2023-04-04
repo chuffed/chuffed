@@ -472,14 +472,17 @@ public:
 					}
 				}
 				if (options.size() > 0) {
-					root = options[(int)(((double)options.size()) * rand() / (RAND_MAX + 1.0))];
+					std::uniform_int_distribution<int> rnd_option(0, options.size() - 1);
+					root = options[rnd_option(engine.rnd)];
 				}
 				break;
 			case 7:  // first (even if fixed) - this is the default
 				break;
 			case 8:  // random (even if fixed)
-				root = options[(int)(((double)options.size()) * rand() / (RAND_MAX + 1.0))];
-				break;
+			{
+				std::uniform_int_distribution<int> rnd_option(0, options.size() - 1);
+				root = options[rnd_option(engine.rnd)];
+			} break;
 			case 9:  // largest domain
 				dom = x[root].size();
 				for (int i = 1; i < options.size(); i++) {
@@ -1060,7 +1063,8 @@ public:
 		}
 		if (selectionMethod == 6) {
 			// fprintf(stderr, "random\n");
-			int bestIndex = (int)(((double)options.size()) * rand() / (RAND_MAX + 1.0));
+			std::uniform_int_distribution<int> rnd_option(0, options.size() - 1);
+			int bestIndex = options[rnd_option(engine.rnd)];
 			return options[bestIndex];
 		}
 		return options[0];

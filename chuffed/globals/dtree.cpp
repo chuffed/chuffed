@@ -1101,21 +1101,19 @@ void reversedptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _
 
 // For teh tests against CPBioNet
 /*
-#include <time.h>
 void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
 							vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
 							vec< vec<int> >& _en) {
 
-		srand (time(NULL));
+		std::uniform_int_distribution<int> rndv(0, size - 1);
 
-
-		from = rand() % _vs.size();
-		to = rand() % _vs.size();
+		from = rndv(engine.rnd);
+		to = rndv(engine.rnd));
 
 		for (int j = 0; j < 5; j++) {
-				int other = rand() % _vs.size();
+				int other = rndv(engine.rnd);
 				while (_in[other].size() + _out[other].size() <= 10)
-						other = rand() % _vs.size();
+						other = rndv(engine.rnd);
 				if (_vs[other].setValNotR(true))
 						_vs[other].setVal(true,NULL);
 		}

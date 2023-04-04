@@ -60,7 +60,6 @@ public:
 				generaliseScc(so.sccoptions == 2 || so.sccoptions == 4),
 				size(_x.size()),
 				x(_x.release()) {
-		srand(so.rnd_seed);
 		priority = 5;
 		new_fixed.reserve(size);
 		prev.reserve(size);
@@ -430,12 +429,14 @@ public:
 				}
 				break;
 			case 2:  // random non-fixed
+			{
 				// has to be one of the chain ends
-				chosenChain = (int)(((double)chainEnds.size()) * rand() / (RAND_MAX + 1.0));
+				std::uniform_int_distribution<int> rnd_ce(0, chainEnds.size() - 1);
+				chosenChain = rnd_ce(engine.rnd);
 				// fprintf(stderr, "chose %d\n", chosenChain);
 				root = chainEnds[chosenChain];
 				// fprintf(stderr, "root is %d\n", root);
-				break;
+			} break;
 			case 3:  // end of shortest chain,
 				len = chainLengths[0];
 				root = chainEnds[0];
@@ -484,8 +485,10 @@ public:
 				root = 0;
 				break;
 			case 8:  // random (even if fixed)
-				root = (int)(((double)size) * rand() / (RAND_MAX + 1.0));
-				break;
+			{
+				std::uniform_int_distribution<int> rnd_node(0, size - 1);
+				root = rnd_node(engine.rnd);
+			} break;
 			case 9:  // largest domain
 				len = x[0].size();
 				root = 0;

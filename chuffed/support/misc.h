@@ -79,12 +79,6 @@ struct STATIC_ASSERTION_FAILURE<true> {
 
 #define MYRAND_MAX 4294967296.0
 
-static inline unsigned int myrand(int& rseed) {
-	return (rseed = (long long)1103515245 * rseed + 12345);
-}
-
-#define irand(n) ((int)floor(myrand(so.rnd_seed) / MYRAND_MAX * (n)))
-
 //------
 
 using chuffed_clock = std::chrono::steady_clock;

@@ -262,8 +262,9 @@ double IntVar::getScore(VarBranch vb) {
 
 DecInfo* IntVar::branch() {
 	//	vec<int> possible;
+	// std::uniform_int_distribution<int> rnd_pos(0, possible.size() - 1);
 	//	for (int i = min; i <= max; i++) if (indomain(i)) possible.push(i);
-	//	return new DecInfo(this, possible[rand()%possible.size()], 1);
+	//	return new DecInfo(this, possible[rnd_pos(engine.rnd)], 1);
 
 	// Solution-based phase saving
 	if (sbps_value_selection) {
