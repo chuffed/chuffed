@@ -8,6 +8,7 @@
 
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <set>
 #include <sstream>
@@ -66,7 +67,7 @@ public:
 
 	vec<ChannelInfo> c_info;       // Channel info
 	vec<vec<WatchElem> > watches;  // Watched lists
-	vec<char> assigns;             // The current assignments
+	vec<int8_t> assigns;           // The current assignments
 	vec<Reason> reason;            // explanation for the variable's current value, or 'NULL' if none
 	vec<int> trailpos;             // the trailPos at which the assignment was made
 	vec<LitFlags> flags;           // Info about literal
