@@ -8,6 +8,7 @@
 // so that they can be used as array indices.
 
 #include <cassert>
+#include <cstdint>
 #include <cstdlib>
 #include <new>
 
@@ -70,7 +71,7 @@ const Lit lit_True(0, true);
 // Lifted booleans:
 
 class lbool {
-	char value;
+	int8_t value;
 	explicit lbool(int v) : value(v) {}
 
 public:
