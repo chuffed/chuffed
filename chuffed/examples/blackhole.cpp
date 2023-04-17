@@ -35,10 +35,13 @@ public:
 		for (bool& i : dealt) {
 			i = false;
 		}
+
+		std::default_random_engine rnd_engine;
+		std::uniform_int_distribution<int> rnd_card(1, cards);
 		for (int i = 0; i < piles; i++) {
 			for (int j = 0; j < layers; j++) {
 				int r;
-				while (dealt[r = myrand(so.rnd_seed) % (cards - 1) + 1]) {
+				while (dealt[r = rnd_card(rnd_engine)]) {
 					;
 				}
 				dealt[r] = true;

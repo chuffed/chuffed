@@ -183,10 +183,10 @@ public:
 	void prod(RSym p, const Rule& r) {
 		int r_id = rules.size();
 		rules.push_back(r.syms);
-		prods[symID(p.sym)].push_back(ProdInfo(p.cond, r_id));
+		prods[symID(p.sym)].emplace_back(p.cond, r_id);
 	}
 
-	void rulePush(int id, Sym r) { rules[id].push_back(r); }
+	void rulePush(int id, Sym r) { rules[id].emplace_back(r); }
 
 	void normalize() {
 		for (unsigned int ii = 0; ii < rules.size(); ii++) {
@@ -198,9 +198,9 @@ public:
 				nr[0] = rules[ii].back();
 				rules[ii].pop_back();
 
-				rules[ii].push_back(next);
+				rules[ii].emplace_back(next);
 				rules.push_back(nr);
-				prods[symID(next)].push_back(ProdInfo(nullptr, rules.size() - 1));
+				prods[symID(next)].emplace_back(nullptr, rules.size() - 1);
 			}
 		}
 	}
