@@ -133,7 +133,8 @@ int main(int argc, char** argv) {
 #ifdef WIN32
 		SetConsoleCtrlHandler((PHANDLER_ROUTINE)SIGINT_handler, true);
 #else
-		std::signal(SIGINT, SIGINT_handler);
+		// TODO: Make signal handler use C linkage
+		std::signal(SIGINT, SIGINT_handler);  // NOLINT(bugprone-signal-handler)
 #endif
 
 		engine.set_assumptions(FlatZinc::s->assumptions);

@@ -1119,8 +1119,8 @@ public:
 				}
 				// n is mand
 				if (!visited[n]) {
-					leaving_cc[last_t].push_back(vector<pair<int, int> >());
-					border_cc[last_t].push_back(vector<int>());
+					leaving_cc[last_t].emplace_back();
+					border_cc[last_t].emplace_back();
 					int last_cc = leaving_cc[last_t].size() - 1;
 					std::queue<int> q;
 					q.push(n);
@@ -1131,7 +1131,7 @@ public:
 						vector<int> adj = p->getAdjacentEdges(c);
 						for (int e : adj) {
 							if (!p->getEdgeVar(e).isFixed()) {
-								leaving_cc[last_t][last_cc].push_back(make_pair(e, p->getOtherEndnode(e, c)));
+								leaving_cc[last_t][last_cc].emplace_back(e, p->getOtherEndnode(e, c));
 								if (border_cc[last_t][last_cc].empty() || border_cc[last_t][last_cc].back() != c) {
 									border_cc[last_t][last_cc].push_back(c);
 								}

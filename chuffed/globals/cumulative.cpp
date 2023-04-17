@@ -1698,7 +1698,7 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 				// Check whether a new upper bound was found
 				if (lct_new < new_lct[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, lct_new, min_begin, end, 0));
+					update_queue.emplace(j, lct_new, min_begin, end, 0);
 					new_lct[j] = lct_new;
 					// int blah = max_limit() * (end - min_begin) - (min_en_avail + min_en_in);
 					// printf("%d: lct_new %d; dur_avail %d; en_req %d; [%d, %d)\n", j, lct_new, dur_avail,
@@ -1758,7 +1758,7 @@ bool CumulativeProp::ttef_bounds_propagation_lb(int shift_in(const int, const in
 				// - nfnl-rule TODO
 				if (start_new > new_est[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, start_new, begin, end, 1));
+					update_queue.emplace(j, start_new, begin, end, 1);
 					new_est[j] = start_new;
 					// printf("XXXXXX\n");
 				}
@@ -1857,7 +1857,7 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 				// Check whether a new lower bound was found
 				if (est_new > new_est[j]) {
 					// Push possible update into the queue
-					update_queue.push(TTEFUpdate(j, est_new, begin, min_end, 1));
+					update_queue.emplace(j, est_new, begin, min_end, 1);
 					new_est[j] = est_new;
 					// int blah = max_limit() * (end - min_begin) - (min_en_avail + min_en_in);
 					// printf("%d: lct_new %d; dur_avail %d; en_req %d; [%d, %d)\n", j, lct_new, dur_avail,
@@ -1917,7 +1917,7 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 				// - nfnl-rule TODO
 				if (end_new < new_lct[j]) {
 					// Push possible update into queue
-					update_queue.push(TTEFUpdate(j, end_new, begin, end, 0));
+					update_queue.emplace(j, end_new, begin, end, 0);
 					new_lct[j] = end_new;
 				}
 			}
