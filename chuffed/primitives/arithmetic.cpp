@@ -31,7 +31,7 @@ public:
 			int64_t t = (-l > u ? -l : u);
 			setDom(y, setMax, t, x.getMaxLit(), x.getMinLit());
 			//			setDom(y, setMax, t, x.getFMaxLit(t), x.getFMinLit(-t));
-			//			setDom(y, setMax, t, x.getLit(t+1, 2), x.getLit(-t-1, 3));
+			//			setDom(y, setMax, t, x.getLit(t+1, LR_GE), x.getLit(-t-1, LR_LE));
 		}
 
 		setDom(x, setMax, y.getMax(), y.getMaxLit());
@@ -768,5 +768,5 @@ void bool2int(BoolView x, IntVar* y) {
 	int_rel(y, IRT_GE, 0);
 	int_rel(y, IRT_LE, 1);
 	y->specialiseToEL();
-	bool_rel(x, BRT_EQ, BoolView(y->getLit(1, 2)));
+	bool_rel(x, BRT_EQ, BoolView(y->getLit(1, LR_GE)));
 }

@@ -1070,13 +1070,13 @@ public:
 
 	// Wrapper to get the negated literal -[[v <= val]] = [[v >= val + 1]]
 	static inline Lit getNegLeqLit(CUMU_INTVAR v, CUMU_INT val) {
-		// return v->getLit(val + 1, 2);
-		return (INT_VAR_LL == v->getType() ? v->getMaxLit() : v->getLit(val + 1, 2));
+		// return v->getLit(val + 1, LR_GE);
+		return (INT_VAR_LL == v->getType() ? v->getMaxLit() : v->getLit(val + 1, LR_GE));
 	}
 	// Wrapper to get the negated literal -[[v >= val]] = [[ v <= val - 1]]
 	static inline Lit getNegGeqLit(CUMU_INTVAR v, CUMU_INT val) {
-		// return v->getLit(val - 1, 3);
-		return (INT_VAR_LL == v->getType() ? v->getMinLit() : v->getLit(val - 1, 3));
+		// return v->getLit(val - 1, LR_LE);
+		return (INT_VAR_LL == v->getType() ? v->getMinLit() : v->getLit(val - 1, LR_LE));
 	}
 };
 

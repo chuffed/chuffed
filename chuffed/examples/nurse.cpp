@@ -137,7 +137,7 @@ public:
 
 					vec<BoolView> rostered;
 					for (int k = 0; k < nNurses; k++) {
-						rostered.push(xs[(nNurses * j) + k]->getLit(i, 1));  // [[ nurse_shift = i ]]
+						rostered.push(xs[(nNurses * j) + k]->getLit(i, LR_EQ));  // [[ nurse_shift = i ]]
 					}
 					bool_linear_decomp(rostered, IRT_GE, req);
 #if 0

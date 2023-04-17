@@ -21,16 +21,16 @@ public:
 	VarType getType() override { return INT_VAR_SL; }
 
 	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	Lit getLit(int64_t v, int t) override;
+	Lit getLit(int64_t v, LitRel t) override;
 
 	Lit getMinLit() const override { return el->getMinLit(); }
 	Lit getMaxLit() const override { return el->getMaxLit(); }
 	Lit getValLit() const override { return el->getValLit(); }
 	Lit getFMinLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(transform(v, 0), 2) : el->getMinLit();
+		return so.finesse ? ~el->getLit(transform(v, 0), LR_GE) : el->getMinLit();
 	}
 	Lit getFMaxLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(transform(v, 1), 3) : el->getMaxLit();
+		return so.finesse ? ~el->getLit(transform(v, 1), LR_LE) : el->getMaxLit();
 	}
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;

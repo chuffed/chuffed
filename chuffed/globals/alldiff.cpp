@@ -32,7 +32,7 @@ public:
 			for (int i = 0; i < range; i++) {
 				vec<Lit> ps(sz);
 				for (int j = 0; j < sz; j++) {
-					ps[j] = x[j].getLit(i, 1);
+					ps[j] = x[j].getLit(i, LR_EQ);
 				}
 				sat.addClause(ps);
 			}
@@ -258,13 +258,13 @@ public:
 					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(2 + (hall_max - hall_min) * 2);
-					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, 2);
+					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, LR_GE);
 					int m = 2;
 					for (int k = w; bounds[k] > hall_min; --k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
-							(*r)[m++] = ~x[l].getLit(hall_min, 2);
-							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
+							(*r)[m++] = ~x[l].getLit(hall_min, LR_GE);
+							(*r)[m++] = ~x[l].getLit(hall_max - 1, LR_LE);
 						}
 					}
 					assert(m == 2 + (hall_max - hall_min) * 2);
@@ -327,13 +327,13 @@ public:
 					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(2 + (hall_max - hall_min) * 2);
-					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, 3);
+					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, LR_LE);
 					int m = 2;
 					for (int k = w; bounds[k] < hall_max; ++k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
-							(*r)[m++] = ~x[l].getLit(hall_min, 2);
-							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
+							(*r)[m++] = ~x[l].getLit(hall_min, LR_GE);
+							(*r)[m++] = ~x[l].getLit(hall_max - 1, LR_LE);
 						}
 					}
 					assert(m == 2 + (hall_max - hall_min) * 2);
@@ -560,13 +560,13 @@ public:
 				int k = 1;
 				for (int j = scc; j >= 0; j = var_nodes[j].next) {
 					if (j < sz) {
-						(*r)[k++] = ~x[j].getLit(min_val, 2);
+						(*r)[k++] = ~x[j].getLit(min_val, LR_GE);
 						for (int v = min_val + 1; v < max_val; ++v) {
 							if (!scoreboard[v]) {
-								(*r)[k++] = ~x[j].getLit(v, 0);
+								(*r)[k++] = ~x[j].getLit(v, LR_NE);
 							}
 						}
-						(*r)[k++] = ~x[j].getLit(max_val, 3);
+						(*r)[k++] = ~x[j].getLit(max_val, LR_LE);
 					}
 				}
 				assert(k == 1 + vars * (2 + (max_val + 1 - min_val) - vals));
@@ -792,13 +792,13 @@ public:
 					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(3 + (hall_max - hall_min) * 2);
-					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, 2);
+					(*r)[1] = ~x[maxsorted[i]].getLit(hall_min, LR_GE);
 					int m = 3;
 					for (int k = w; bounds[k] > hall_min; --k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
-							(*r)[m++] = ~x[l].getLit(hall_min, 2);
-							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
+							(*r)[m++] = ~x[l].getLit(hall_min, LR_GE);
+							(*r)[m++] = ~x[l].getLit(hall_max - 1, LR_LE);
 						}
 					}
 					assert(m == 3 + (hall_max - hall_min) * 2);
@@ -819,7 +819,7 @@ public:
 					pathset(h, minrank, w, w);  // path compression
 				} else {
 					if (x[maxsorted[i]].getMax() < hall_max) {
-						(*r)[2] = x[maxsorted[i]].getLit(hall_max, 2);
+						(*r)[2] = x[maxsorted[i]].getLit(hall_max, LR_GE);
 						return b.setVal(false, r);
 					}
 				}
@@ -870,13 +870,13 @@ public:
 					}
 					// fprintf(stderr, "  in hall [%d, %d):\n", hall_min, hall_max);
 					r = Reason_new(3 + (hall_max - hall_min) * 2);
-					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, 3);
+					(*r)[1] = ~x[minsorted[i]].getLit(hall_max - 1, LR_LE);
 					int m = 3;
 					for (int k = w; bounds[k] < hall_max; ++k) {
 						for (int l = bucket[k]; l >= 0; l = iv[l].next) {
 							// fprintf(stderr, "    var %d [%d, %d)\n", l, iv[l].min, iv[l].max);
-							(*r)[m++] = ~x[l].getLit(hall_min, 2);
-							(*r)[m++] = ~x[l].getLit(hall_max - 1, 3);
+							(*r)[m++] = ~x[l].getLit(hall_min, LR_GE);
+							(*r)[m++] = ~x[l].getLit(hall_max - 1, LR_LE);
 						}
 					}
 					assert(m == 3 + (hall_max - hall_min) * 2);
@@ -897,7 +897,7 @@ public:
 					pathset(h, maxrank, w, w);  // path compression
 				} else {
 					if (x[maxsorted[i]].getMin() > hall_min + 1) {
-						(*r)[2] = x[maxsorted[i]].getLit(hall_min + 1, 3);
+						(*r)[2] = x[maxsorted[i]].getLit(hall_min + 1, LR_LE);
 						return static_cast<int>(b.setVal(false, r));
 					}
 				}
@@ -1086,8 +1086,8 @@ void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 	}
 	for (int i = 0; i < x.size(); i++) {
 		for (int j = 0; j < y.size(); j++) {
-			sat.addClause(x[i]->getLit(o1 + j, 0), y[j]->getLit(o2 + i, 1));
-			sat.addClause(x[i]->getLit(o1 + j, 1), y[j]->getLit(o2 + i, 0));
+			sat.addClause(x[i]->getLit(o1 + j, LR_NE), y[j]->getLit(o2 + i, LR_EQ));
+			sat.addClause(x[i]->getLit(o1 + j, LR_EQ), y[j]->getLit(o2 + i, LR_NE));
 		}
 	}
 }

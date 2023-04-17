@@ -435,8 +435,8 @@ void int_rel_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		int_rel_reif(x, t, v, r);
 		return;
 	}
-	BoolView b1(x->getLit(c, 2));
-	BoolView b2(x->getLit(c, 3));
+	BoolView b1(x->getLit(c, LR_GE));
+	BoolView b2(x->getLit(c, LR_LE));
 	switch (t) {
 		case IRT_EQ:
 			bool_rel(b1, BRT_AND, b2, r);
@@ -475,8 +475,8 @@ void int_rel_half_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		int_rel_half_reif(x, t, v, r);
 		return;
 	}
-	BoolView b1(x->getLit(c, 2));
-	BoolView b2(x->getLit(c, 3));
+	BoolView b1(x->getLit(c, LR_GE));
+	BoolView b2(x->getLit(c, LR_LE));
 	switch (t) {
 		case IRT_EQ:
 			bool_rel(b2, BRT_OR, ~r);

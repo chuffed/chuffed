@@ -47,7 +47,7 @@ public:
 	Lit getEQLit2(int v) const { return toLit(base_vlit + 2 * v + 1); }
 
 	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	Lit getLit(int64_t v, int t) override;
+	Lit getLit(int64_t v, LitRel t) override;
 
 	Lit getMinLit() const override { return ~getGELit(min); }
 	Lit getMaxLit() const override { return ~getLELit(max); }
@@ -55,8 +55,8 @@ public:
 		assert(isFixed());
 		return ~getEQLit(min);
 	}
-	Lit getFMinLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->min, 2); }
-	Lit getFMaxLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->max, 3); }
+	Lit getFMinLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->min, LR_GE); }
+	Lit getFMaxLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->max, LR_LE); }
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
 	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;

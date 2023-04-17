@@ -190,7 +190,7 @@ public:
 				if (A[a] != a1 || B[b] != b1) {
 					assert(!x[A[a]].indomain(B[b]));
 					//  fprintf(stderr, "add %d not equal to %d\n", A[a], B[b]);
-					(*reason)[reasonIndex++] = ~x[A[a]].getLit(B[b], 0);
+					(*reason)[reasonIndex++] = ~x[A[a]].getLit(B[b], LR_NE);
 				} else {
 					found = true;
 				}
@@ -1061,12 +1061,12 @@ public:
 				for (int i = 0; i < chainLength; i++) {
 					int start = i * (2 + outsidebetween.size());
 					int varIndex = bestCycle[i];
-					if (i > 0) {                                            // leave out first literal
-						(*r)[start] = x[varIndex].getLit(smallestIn - 1, 3);  // x <= smallest-1
+					if (i > 0) {                                                // leave out first literal
+						(*r)[start] = x[varIndex].getLit(smallestIn - 1, LR_LE);  // x <= smallest-1
 					}
-					(*r)[start + 1] = x[varIndex].getLit(largestIn + 1, 2);  // x >= largest+1
+					(*r)[start + 1] = x[varIndex].getLit(largestIn + 1, LR_GE);  // x >= largest+1
 					for (int j = 0; j < outsidebetween.size(); j++) {
-						(*r)[start + 2 + j] = x[varIndex].getLit(outsidebetween[j], 1);  // x == k
+						(*r)[start + 2 + j] = x[varIndex].getLit(outsidebetween[j], LR_EQ);  // x == k
 					}
 				}
 

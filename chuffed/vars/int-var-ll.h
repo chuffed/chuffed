@@ -36,7 +36,7 @@ public:
 
 	// NOTE: No support for INT_VAR_LL vars yet.
 	// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-	Lit getLit(int64_t v, int t) override;
+	Lit getLit(int64_t v, LitRel t) override;
 
 	Lit getMinLit() const override { return Lit(ld[li].var, false); }
 	Lit getMaxLit() const override { return Lit(ld[hi].var, true); }

@@ -69,7 +69,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 #ifndef NDEBUG
 			std::cout << "x_" << i << " >= " << l << std::endl;
 #endif
-			litVector.push_back(seq1[i].getLit(l - 1, 3));
+			litVector.push_back(seq1[i].getLit(l - 1, LR_LE));
 		}
 
 		// create x_i <= u
@@ -78,7 +78,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 #ifndef NDEBUG
 			std::cout << "x_" << i << " <= " << u << std::endl;
 #endif
-			litVector.push_back(seq1[i].getLit(u + 1, 2));
+			litVector.push_back(seq1[i].getLit(u + 1, LR_GE));
 		}
 
 		// create remaining inequalities (x_i != c1)
@@ -88,7 +88,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 				std::cout << "x_" << i << " != " << c1 << std::endl;
 #endif
 				// we insert x_i = c1, as we have to actually negate the inequality
-				litVector.push_back(seq1[i].getLit(c1, 1));
+				litVector.push_back(seq1[i].getLit(c1, LR_EQ));
 			}
 		}
 	}
@@ -115,7 +115,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 			std::cout << "y_" << j << " >= " << l << std::endl;
 #endif
 			// we insert y_i <= l-1, as we have to actually negate the inequality
-			litVector.push_back(seq2[j].getLit(l - 1, 3));
+			litVector.push_back(seq2[j].getLit(l - 1, LR_LE));
 		}
 		// create y_i <= u
 		if (u < max_char && l <= u) {
@@ -123,7 +123,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 			std::cout << "y_" << j << " <= " << u << std::endl;
 #endif
 			// we insert y_i >= u+1, as we have to actually negate the inequality
-			litVector.push_back(seq2[j].getLit(u + 1, 2));
+			litVector.push_back(seq2[j].getLit(u + 1, LR_GE));
 		}
 
 		// create remaining inequalities (y_i != c1)
@@ -133,7 +133,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 				std::cout << "y_" << j << " != " << c1 << std::endl;
 #endif
 				// we insert y_i = c1, as we have to actually negate the inequality
-				litVector.push_back(seq2[j].getLit(c1, 1));
+				litVector.push_back(seq2[j].getLit(c1, LR_EQ));
 			}
 		}
 	}

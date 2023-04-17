@@ -188,7 +188,7 @@ void IntVarEL::setBDecidable(bool b) const {
 	}
 }
 
-Lit IntVarEL::getLit(int64_t v, int t) {
+Lit IntVarEL::getLit(int64_t v, LitRel t) {
 	//    std::cerr << "IntVarEL::getLit\n";
 	if (v < lit_min) {
 		return toLit(1 ^ (t & 1));  // 1, 0, 1, 0
@@ -197,13 +197,13 @@ Lit IntVarEL::getLit(int64_t v, int t) {
 		return toLit(((t - 1) >> 1) & 1);  // 1, 0, 0, 1
 	}
 	switch (t) {
-		case 0:
+		case LR_NE:
 			return getNELit(v);
-		case 1:
+		case LR_EQ:
 			return getEQLit(v);
-		case 2:
+		case LR_GE:
 			return getGELit(v);
-		case 3:
+		case LR_LE:
 			return getLELit(v);
 		default:
 			NEVER;
@@ -318,7 +318,7 @@ inline void IntVarEL::updateFixed() {
 bool IntVarEL::setMin(int64_t v, Reason r, bool channel) {
 	assert(setMinNotR(v));
 	if (channel) {
-		sat.cEnqueue(getLit(v, 2), r);
+		sat.cEnqueue(getLit(v, LR_GE), r);
 	}
 	if (v > max) {
 		assert(sat.confl);
@@ -344,7 +344,7 @@ bool IntVarEL::setMin(int64_t v, Reason r, bool channel) {
 bool IntVarEL::setMax(int64_t v, Reason r, bool channel) {
 	assert(setMaxNotR(v));
 	if (channel) {
-		sat.cEnqueue(getLit(v, 3), r);
+		sat.cEnqueue(getLit(v, LR_LE), r);
 	}
 	if (v < min) {
 		assert(sat.confl);
@@ -370,7 +370,7 @@ bool IntVarEL::setMax(int64_t v, Reason r, bool channel) {
 bool IntVarEL::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
 	if (channel) {
-		sat.cEnqueue(getLit(v, 1), r);
+		sat.cEnqueue(getLit(v, LR_EQ), r);
 	}
 	if (!indomain(v)) {
 		assert(sat.confl);
@@ -397,7 +397,7 @@ bool IntVarEL::remVal(int64_t v, Reason r, bool channel) {
 	assert(remValNotR(v));
 	assert(vals);
 	if (channel) {
-		sat.cEnqueue(getLit(v, 0), r);
+		sat.cEnqueue(getLit(v, LR_NE), r);
 	}
 	if (isFixed()) {
 		assert(sat.confl);

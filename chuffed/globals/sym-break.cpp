@@ -44,8 +44,8 @@ void val_sym_break(vec<IntVar*>& x, int l, int u) {
 	}
 	for (int i = l; i <= u; i++) {
 		for (int j = 0; j < x.size(); j++) {
-			bool_rel(y[i - l]->getLit(j, 1), BRT_R_IMPL, x[j]->getLit(i, 1));
-			bool_rel(x[j]->getLit(i, 1), BRT_R_IMPL, y[i - l]->getLit(j, 3));
+			bool_rel(y[i - l]->getLit(j, LR_EQ), BRT_R_IMPL, x[j]->getLit(i, LR_EQ));
+			bool_rel(x[j]->getLit(i, LR_EQ), BRT_R_IMPL, y[i - l]->getLit(j, LR_LE));
 		}
 	}
 	for (int i = 0; i < u - l; i++) {

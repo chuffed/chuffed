@@ -39,10 +39,10 @@ public:
 					for (int c2 = c1 + 1; c2 < m; c2++) {
 						for (int z = 1; z <= c; z++) {
 							vec<BoolView> a;
-							a.push(BoolView(x[r1][c1]->getLit(z, 0)));
-							a.push(BoolView(x[r2][c1]->getLit(z, 0)));
-							a.push(BoolView(x[r1][c2]->getLit(z, 0)));
-							a.push(BoolView(x[r2][c2]->getLit(z, 0)));
+							a.push(BoolView(x[r1][c1]->getLit(z, LR_NE)));
+							a.push(BoolView(x[r2][c1]->getLit(z, LR_NE)));
+							a.push(BoolView(x[r1][c2]->getLit(z, LR_NE)));
+							a.push(BoolView(x[r2][c2]->getLit(z, LR_NE)));
 							bool_clause(a);
 						}
 					}
@@ -58,7 +58,7 @@ public:
 				for (int z = 1; z <= c; z++) {
 					vec<BoolView> a;
 					for (int j = 0; j < m; j++) {
-						a.push(BoolView(x[i][j]->getLit(z, 1)));
+						a.push(BoolView(x[i][j]->getLit(z, LR_EQ)));
 					}
 					bool_linear(a, IRT_LE, ulimit);
 					bool_linear(a, IRT_GE, llimit);

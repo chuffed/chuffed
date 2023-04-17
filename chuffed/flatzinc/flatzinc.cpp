@@ -209,22 +209,22 @@ void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
 			iv[vs->alias_var]->specialiseToEL();
 			switch (vs->alias_irt) {
 				case IRT_EQ:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, 1));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, LR_EQ));
 					break;
 				case IRT_NE:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, 0));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, LR_NE));
 					break;
 				case IRT_GE:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, 2));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, LR_GE));
 					break;
 				case IRT_GT:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val + 1, 2));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val + 1, LR_GE));
 					break;
 				case IRT_LE:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, 3));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val, LR_LE));
 					break;
 				case IRT_LT:
-					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val - 1, 3));
+					v = BoolView(iv[vs->alias_var]->getLit(vs->alias_val - 1, LR_LE));
 					break;
 				default:
 					NEVER;
@@ -410,7 +410,7 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 			switch (x->getType()) {
 				case INT_VAR_EL:
 				case INT_VAR_SL:
-					decs.push(x->getLit(k, 1));
+					decs.push(x->getLit(k, LR_EQ));
 					break;
 				default:
 					// Fallback. TODO: Do something nicer here.

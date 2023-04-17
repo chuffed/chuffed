@@ -79,7 +79,7 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 		varinfo.push(info);
 
 		for (int j = min; j <= max; j++) {
-			boolvars.push(intvars[i].getLit(j, 1));  // v[i] \eq j
+			boolvars.push(intvars[i].getLit(j, LR_EQ));  // v[i] \eq j
 			boolvars.last().attach(this, boolvars.size() - 1, EVENT_U);
 			val_edges.push();
 		}
@@ -1308,17 +1308,17 @@ void WMDDProp::collect_lits(vec<Lit>& expln) {
 		Val& vinfo(vals[vv]);
 #ifndef WEAKNOGOOD
 		if (vinfo.status != 0U) {
-			expln.push(intvars[vinfo.var].getLit(vinfo.val, 1));
+			expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 			vinfo.status = 0;
 		}
 #else
 		switch (vinfo.status) {
 			case VAL_LOCKED:
 				// vinfo.status is set to 2 if the literal is negated
-				expln.push(intvars[vinfo.var].getLit(vinfo.val, 1));
+				expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 				break;
 			case VAL_WEAK:
-				expln.push(intvars[vinfo.var].getLit(vinfo.val, 0));
+				expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_NE));
 				break;
 			default:
 				break;
@@ -1335,7 +1335,7 @@ Clause* WMDDProp::explainConflict() {
 	int maxC = mark_frontier(-1, -1);
 #if 1
 	if (maxC < INT_MAX) {
-		expln.push(cost.getLit(maxC, 2));
+		expln.push(cost.getLit(maxC, LR_GE));
 		maxC--;  // Force the assignment to be infeasible.
 	}
 #else
@@ -1352,7 +1352,7 @@ Clause* WMDDProp::explainConflict() {
 
 	int maxC = late_minC(-1, -1);
 	if (maxC < INT_MAX) {
-		expln.push(cost.getLit(maxC, 2));
+		expln.push(cost.getLit(maxC, LR_GE));
 	}
 	collect_lits(expln);
 #endif
@@ -1414,7 +1414,7 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 		int maxC = mark_frontier(var, val);
 #if 1
 		if (maxC < INT_MAX) {
-			expln.push(cost.getLit(maxC, 2));
+			expln.push(cost.getLit(maxC, LR_GE));
 			maxC--;
 		}
 #else
@@ -1432,7 +1432,7 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 
 		int maxC = late_minC(var, val);
 		if (maxC < INT_MAX) {
-			expln.push(cost.getLit(maxC, 2));
+			expln.push(cost.getLit(maxC, LR_GE));
 		}
 		collect_lits(expln);
 #endif
@@ -1633,7 +1633,7 @@ void WMDDProp::incExplainUp(vec<int>& upQ, vec<Lit>& expln) {
 	for (int vi = 0; vi < explVals.size(); vi++) {
 		int vv = explVals[vi];
 		Val& vinfo(vals[vv]);
-		expln.push(intvars[vinfo.var].getLit(vinfo.val, 1));
+		expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 
 		vinfo.status = 0;
 	}
@@ -1721,7 +1721,7 @@ void WMDDProp::incExplainDown(vec<int>& downQ, vec<Lit>& expln) {
 	for (int vi = 0; vi < explVals.size(); vi++) {
 		int vv = explVals[vi];
 		Val& vinfo(vals[vv]);
-		expln.push(intvars[vinfo.var].getLit(vinfo.val, 1));
+		expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 
 		vinfo.status = 0;
 	}

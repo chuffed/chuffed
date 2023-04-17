@@ -186,7 +186,7 @@ public:
 							v = x[v].getVal();
 						}
 
-						(*r)[chainLength] = ~x[evidenceVar].getLit(evidenceVar, 0);
+						(*r)[chainLength] = ~x[evidenceVar].getLit(evidenceVar, LR_NE);
 					} else {
 						// find the vars in the start of the chain and those not in the chain
 						vec<int> inStartChain;
@@ -208,7 +208,7 @@ public:
 						r = Reason_new(explSize);
 
 						explainAcantreachB(r, 1, inStartChain, outside);
-						(*r)[explSize - 1] = ~x[evidenceVar].getLit(evidenceVar, 0);
+						(*r)[explSize - 1] = ~x[evidenceVar].getLit(evidenceVar, LR_NE);
 					}
 				}
 
@@ -242,7 +242,7 @@ public:
 				}
 			}
 			assert(found);
-			Lit result = ~x[chosen].getLit(chosen, 0);
+			Lit result = ~x[chosen].getLit(chosen, LR_NE);
 			assert(result != lit_True);
 			return result;
 		}
@@ -263,7 +263,7 @@ public:
 				if (A[a] != a1 || B[b] != b1) {
 					assert(!x[A[a]].indomain(B[b]));
 					// fprintf(stderr, "add %d not equal to %d\n", A[a], B[b]);
-					(*reason)[reasonIndex++] = ~x[A[a]].getLit(B[b], 0);
+					(*reason)[reasonIndex++] = ~x[A[a]].getLit(B[b], LR_NE);
 				}
 			}
 		}
@@ -894,7 +894,7 @@ public:
 						// the first literal is an evidence literal from inside the circuit
 						// choose the one from the highest level?
 						int chosenVar = chooseEvidenceVar(inCycle, so.checkevidence);
-						(*r)[1] = x[chosenVar].getLit(chosenVar, 1);  // xi == i (is false)
+						(*r)[1] = x[chosenVar].getLit(chosenVar, LR_EQ);  // xi == i (is false)
 
 						if (so.checkexpl == 2) {  // inside can't reach out
 							doOutsideIn = false;
@@ -972,7 +972,7 @@ public:
 					 for(int i = 0; i < options.size(); i++)
 					 {
 								int v = options[i];
-								Lit p = x[v].getLit(v,0);
+								Lit p = x[v].getLit(v, LR_NE);
 								int satvar = var(p);
 							if(sat.activity[satvar] > highestAct)
 							{
@@ -985,12 +985,12 @@ public:
 			 else if(selectionMethod == 4)
 			 {
 					 // lowest activity
-					 double lowestAct = sat.activity[var(x[options[0]].getLit(options[0],0))];
+					 double lowestAct = sat.activity[var(x[options[0]].getLit(options[0], LR_NE))];
 					 int bestVar = options[0];
 					 for(int i = 1; i < options.size(); i++)
 					 {
 								int v = options[i];
-								Lit p = x[v].getLit(v,0);
+								Lit p = x[v].getLit(v, LR_NE);
 								int satvar = var(p);
 							if(sat.activity[satvar] < lowestAct)
 							{
@@ -1004,20 +1004,20 @@ public:
 			// highest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 			// Maybe it shoud be replaced by sat.getLevel(.)?
-			int highestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], 1))];
-			// int highestLevel = sat.getLevel(var(x[options[0]].getLit(options[0],1)));
+			int highestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))];
+			// int highestLevel = sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ)));
 			int bestVar = options[0];
 			for (int i = 0; i < options.size(); i++) {
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?
-				if (sat.trailpos[var(x[options[0]].getLit(options[0], 1))] !=
-						sat.trailpos[var(x[options[0]].getLit(options[0], 0))]) {
-					// if(sat.getLevel(var(x[options[0]].getLit(options[0],1))) !=
-					// sat.getLevel(var(x[options[0]].getLit(options[0],0))))
+				if (sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))] !=
+						sat.trailpos[var(x[options[0]].getLit(options[0], LR_NE))]) {
+					// if(sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ))) !=
+					// sat.getLevel(var(x[options[0]].getLit(options[0], LR_NE))))
 					fprintf(stderr, "not same\n");
 				}
 				int v = options[i];
-				Lit p = x[v].getLit(v, 1);
+				Lit p = x[v].getLit(v, LR_EQ);
 				int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?
@@ -1037,12 +1037,12 @@ public:
 			// lowest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 			// Maybe it shoud be replaced by sat.getLevel(.)?
-			int lowestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], 1))];
-			// int lowestLevel = sat.getLevel(var(x[options[0]].getLit(options[0],1)));
+			int lowestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))];
+			// int lowestLevel = sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ)));
 			int bestVar = options[0];
 			for (int i = 0; i < options.size(); i++) {
 				int v = options[i];
-				Lit p = x[v].getLit(v, 1);
+				Lit p = x[v].getLit(v, LR_EQ);
 				int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?

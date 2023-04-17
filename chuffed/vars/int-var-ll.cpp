@@ -151,7 +151,7 @@ inline Lit IntVarLL::getLELit(int v) {
 	return ~getGELit(v + 1);
 }
 
-Lit IntVarLL::getLit(int64_t v, int t) {
+Lit IntVarLL::getLit(int64_t v, LitRel t) {
 	// NOTE: Previous assertion that makes little sense. We should further
 	// investigate if the comparisons with min/max make sense at different
 	// decision levels.
@@ -164,9 +164,9 @@ Lit IntVarLL::getLit(int64_t v, int t) {
 		return toLit(t & 1);  // _, _, 0, 1
 	}
 	switch (t) {
-		case 2:
+		case LR_GE:
 			return getGELit(v);
-		case 3:
+		case LR_LE:
 			return getLELit(v);
 		default:
 			NEVER;

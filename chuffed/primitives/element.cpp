@@ -256,7 +256,7 @@ public:
 			int i = 0;
 			while (i <= a.size()) {
 				if (!x.indomain(i)) {
-					expl.push_back(x.getLit(i, 1));
+					expl.push_back(x.getLit(i, LR_EQ));
 				} else if (y.getMax() < a[i].getMin()) {
 					if (!push_max) {
 						expl.push_back(y.getMaxLit());
@@ -305,7 +305,7 @@ public:
 						r = Reason_new(a.size() + 2);
 						// Finesse lower bounds
 						for (int i = 0; i < a.size(); i++) {
-							(*r)[i + 2] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, 1);
+							(*r)[i + 2] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, LR_EQ);
 						}
 					}
 					return r;
@@ -350,7 +350,7 @@ public:
 						r = Reason_new(a.size() + 2);
 						// Finesse upper bounds
 						for (int i = 0; i < a.size(); i++) {
-							(*r)[i + 2] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
+							(*r)[i + 2] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, LR_EQ);
 						}
 					}
 					return r;
@@ -510,7 +510,7 @@ public:
 					r = Reason_new(a.size() + 1);
 					// Finesse lower bounds
 					for (int i = 0; i < a.size(); i++) {
-						(*r)[i + 1] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, 1);
+						(*r)[i + 1] = x.indomain(i) ? a[i].getFMinLit(new_m) : x.getLit(i, LR_EQ);
 					}
 				}
 				if (!y.setMin(new_m, r)) {
@@ -544,7 +544,7 @@ public:
 					r = Reason_new(a.size() + 1);
 					// Finesse upper bounds
 					for (int i = 0; i < a.size(); i++) {
-						(*r)[i + 1] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, 1);
+						(*r)[i + 1] = x.indomain(i) ? a[i].getFMaxLit(new_m) : x.getLit(i, LR_EQ);
 					}
 				}
 				if (!y.setMax(new_m, r)) {
@@ -645,13 +645,12 @@ public:
 					(*r)[1] = x.getMinLit();
 					(*r)[2] = x.getMaxLit();
 					for (int i = x.getMin(); i <= x.getMax(); i++) {
-						//(*r)[3 + i - x.getMin()] = x.indomain(i) ? ~a[i].getLit(v, 0) : ~x.getLit(i, 0);
 						int reasonIndex = 3 + i - x.getMin();
 						if (x.indomain(i)) {
-							Lit l = ~a[i].getLit(v, 0);
+							Lit l = ~a[i].getLit(v, LR_NE);
 							(*r)[reasonIndex] = l;
 						} else {
-							Lit l = ~x.getLit(i, 0);
+							Lit l = ~x.getLit(i, LR_NE);
 							(*r)[reasonIndex] = l;
 						}
 					}
@@ -689,7 +688,8 @@ public:
 			for (typename IntView<W>::iterator i = a[v].begin(); i != a[v].end();) {
 				int w = *i++;
 				if (!y.indomain(w) &&
-						!a[v].remVal(w, so.lazy ? Reason(~y.getLit(w, 0), ~x.getLit(v, 1)) : Reason())) {
+						!a[v].remVal(w,
+												 so.lazy ? Reason(~y.getLit(w, LR_NE), ~x.getLit(v, LR_EQ)) : Reason())) {
 					return false;
 				}
 			}

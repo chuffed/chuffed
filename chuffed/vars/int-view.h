@@ -268,10 +268,11 @@ public:
 		if ((type & 1) != 0) {
 			v = -v;
 			if (t >= 2) {
-				return var->getLit(v, 5 - t);
+				assert(5 - t >= 0 && 5 - t <= 3);
+				return var->getLit(v, static_cast<LitRel>(5 - t));
 			}
 		}
-		return var->getLit(v, t);
+		return var->getLit(v, static_cast<LitRel>(t));
 	}
 
 	// Set ![y <= m-1]
@@ -347,8 +348,8 @@ public:
 		return var->remVal(v, r, channel);
 	}
 
-	Lit operator=(int val) const { return getLit(val, 1); }
-	Lit operator!=(int val) const { return getLit(val, 0); }
+	Lit operator=(int val) const { return getLit(val, LR_EQ); }
+	Lit operator!=(int val) const { return getLit(val, LR_NE); }
 };
 
 const IntView<> iv_null;

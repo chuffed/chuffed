@@ -19,7 +19,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 		for (int i = 0; i < t.size(); i++) {
 			sat.newVar();
 			for (int j = 0; j < x.size(); j++) {
-				sat.addClause(toLit(base_lit + 2 * i), x[j]->getLit(t[i][j], 1));
+				sat.addClause(toLit(base_lit + 2 * i), x[j]->getLit(t[i][j], LR_EQ));
 			}
 		}
 	}
@@ -42,7 +42,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 				continue;
 			}
 			if (x.size() == 2) {
-				sup[k].push(x[1 - w]->getLit(t[i][1 - w], 1));
+				sup[k].push(x[1 - w]->getLit(t[i][1 - w], LR_EQ));
 			} else {
 				sup[k].push(toLit(base_lit + 2 * i + 1));
 			}
@@ -54,7 +54,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 			}
 			assert(sup[i].size() >= 1);
 			assert(i + sup_off <= x[w]->getMax());
-			sup[i].push(x[w]->getLit(i + sup_off, 0));
+			sup[i].push(x[w]->getLit(i + sup_off, LR_NE));
 			Lit p = sup[i][0];
 			sup[i][0] = sup[i].last();
 			sup[i].last() = p;

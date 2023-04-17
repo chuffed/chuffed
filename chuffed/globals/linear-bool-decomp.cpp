@@ -90,7 +90,7 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 
 	vec<Lit> terminals;
 	for (int ii = 0; ii <= k; ii++) {
-		terminals.push(kv->getLit(ii, 2));  // kv >= ii
+		terminals.push(kv->getLit(ii, LR_GE));  // kv >= ii
 	}
 
 	vec<Lit> xv;

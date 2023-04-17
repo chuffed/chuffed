@@ -134,7 +134,7 @@ public:
 
 	inline Lit get_val_lit(int v) {
 #ifndef WEAKNOGOOD
-		return intvars[val_entries[v].var].getLit(val_entries[v].val, 1);
+		return intvars[val_entries[v].var].getLit(val_entries[v].val, LR_EQ);
 #else
 		int eval = v < 0 ? -1 * (v + 2) : v;
 		return intvars[val_entries[eval].var].getLit(val_entries[eval].val, v < 0 ? 0 : 1);

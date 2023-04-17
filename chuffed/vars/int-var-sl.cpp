@@ -63,11 +63,11 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 
 	// rechannel channel info
 	for (int i = 0; i < values.size(); i++) {
-		Lit p = el->getLit(i, 0);
+		Lit p = el->getLit(i, LR_NE);
 		sat.c_info[var(p)].cons_id = var_id;
 	}
 	for (int i = 0; i <= values.size(); i++) {
-		Lit p = el->getLit(i, 2);
+		Lit p = el->getLit(i, LR_GE);
 		sat.c_info[var(p)].cons_id = var_id;
 	}
 
@@ -117,19 +117,19 @@ int IntVarSL::transform(int v, int type) {
 }
 
 // t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-Lit IntVarSL::getLit(int64_t v, int t) {
+Lit IntVarSL::getLit(int64_t v, LitRel t) {
 	int u;
 	switch (t) {
-		case 0:
+		case LR_NE:
 			u = transform(v, 2);
-			return (u == -1 ? lit_True : el->getLit(u, 0));
-		case 1:
+			return (u == -1 ? lit_True : el->getLit(u, LR_NE));
+		case LR_EQ:
 			u = transform(v, 2);
-			return (u == -1 ? lit_False : el->getLit(u, 1));
-		case 2:
-			return el->getLit(transform(v, 1), 2);
-		case 3:
-			return el->getLit(transform(v, 0), 3);
+			return (u == -1 ? lit_False : el->getLit(u, LR_EQ));
+		case LR_GE:
+			return el->getLit(transform(v, 1), LR_LE);
+		case LR_LE:
+			return el->getLit(transform(v, 0), LR_GE);
 		default:
 			NEVER;
 	}

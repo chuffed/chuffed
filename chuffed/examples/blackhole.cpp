@@ -90,7 +90,8 @@ public:
 						if ((j + 1) % 13 == k % 13) {
 							continue;
 						}
-						bool_rel(BoolView(y[i]->getLit(j, 1)), BRT_R_IMPL, BoolView(y[i + 1]->getLit(k, 0)));
+						bool_rel(BoolView(y[i]->getLit(j, LR_EQ)), BRT_R_IMPL,
+										 BoolView(y[i + 1]->getLit(k, LR_NE)));
 					}
 				}
 			}

@@ -149,8 +149,8 @@ MDDProp<U>::MDDProp(MDDTemplate* _templ, vec<IntView<U> >& _intvars, const MDDOp
 	for (int i = 0; i < intvars.size(); i++) {
 		for (int j = 0; j < _templ->_doms[i]; j++) {
 			//         assert( intvars[i].getMin() <= j && j <= intvars[i].getMax() );
-			boolvars.push(intvars[i].getLit(j, 1));  // v[i] \eq j
-																							 //         attach(boolvars.last(), EVENT_U);
+			boolvars.push(intvars[i].getLit(j, LR_EQ));  // v[i] \eq j
+																									 //         attach(boolvars.last(), EVENT_U);
 			boolvars.last().attach(this, boolvars.size() - 1, EVENT_U);
 
 			activity.push(0);
@@ -1008,7 +1008,7 @@ bool MDDProp<U>::fullProp() {
 			for (int i = 0; i < expl.size(); i++) {
 				// Fixme: adjust to handle WEAKNOGOOD
 #ifndef WEAKNOGOOD
-				(*r)[i] = intvars[val_entries[expl[i]].var].getLit(val_entries[expl[i]].val, 1);
+				(*r)[i] = intvars[val_entries[expl[i]].var].getLit(val_entries[expl[i]].val, LR_EQ);
 #else
 				int eval = expl[i] < 0 ? -1 * (expl[i] + 2) : expl[i];
 				(*r)[i] = intvars[val_entries[eval].var].getLit(val_entries[eval].val, expl[i] < 0 ? 0 : 1);
@@ -1037,7 +1037,7 @@ bool MDDProp<U>::fullProp() {
 
                for( int k = 1; k < expl.size(); k++ )
                {
-                  (*r)[k] = intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val,1);
+                  (*r)[k] = intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val, LR_EQ);
                }
 #endif
 			}
@@ -1258,7 +1258,7 @@ bool MDDProp<U>::propagate() {
 				// Fixme: adjust to handle WEAKNOGOOD
 				//               (*r)[i] = boolvars[expl[i]].getLit(0);
 				(*r)[i] = expl[i] >= 0
-											? intvars[val_entries[expl[i]].var].getLit(val_entries[expl[i]].val, 1)
+											? intvars[val_entries[expl[i]].var].getLit(val_entries[expl[i]].val, LR_EQ)
 											: intvars[val_entries[-1 * expl[i] - 2].var].getLit(
 														val_entries[-1 * expl[i] - 2].val, 0);
 			}
@@ -1478,8 +1478,8 @@ bool MDDProp<U>::propagate() {
                {
 //                  (*r)[k] = boolvars[expl[k]].getLit(0);
                   (*r)[k] = expl[k] >= 0
-                       ? intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val,1)
-                       : intvars[val_entries[-1*expl[k] - 2].var].getLit(val_entries[-1*expl[k] - 2].val,0);
+                       ? intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val, LR_EQ)
+                       : intvars[val_entries[-1*expl[k] - 2].var].getLit(val_entries[-1*expl[k] - 2].val, LR_NE);
                }
 #endif
 			}
@@ -1819,7 +1819,7 @@ void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 		sat.addClause(nodevars[e.end], ~edgevars[ei]);
 
 		// ~val -> ~e
-		Lit vlit = xs[vals[e.val].var]->getLit(vals[e.val].val, 1);
+		Lit vlit = xs[vals[e.val].var]->getLit(vals[e.val].val, LR_EQ);
 		sat.addClause(vlit, ~edgevars[ei]);
 
 		// ~parent -> ~e
@@ -1868,7 +1868,7 @@ void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 	// Val constraints
 	for (int vi = 0; vi < vals.size(); vi++) {
 		val_entry& vinfo(vals[vi]);
-		Lit vlit = xs[vinfo.var]->getLit(vinfo.val, 1);
+		Lit vlit = xs[vinfo.var]->getLit(vinfo.val, LR_EQ);
 		if (vinfo.count > 0) {
 			vec<Lit> cl;
 			cl.push(~vlit);

@@ -192,7 +192,7 @@ public:
 			for (int act = 0; act < acts; act++) {
 				vec<BoolView> bv;
 				for (int ww = 0; ww < staff; ww++) {
-					bv.push(xv[ww][ss]->getLit(act, 1));
+					bv.push(xv[ww][ss]->getLit(act, LR_EQ));
 				}
 
 				bool_linear_decomp(bv, IRT_GE, demand[ss][act]);
@@ -208,7 +208,7 @@ public:
 			}
 
 			for (int ww = 0; ww < staff; ww++) {
-				rostered.push(xv[ww][ss]->getLit(acts - 1, 3));
+				rostered.push(xv[ww][ss]->getLit(acts - 1, LR_LE));
 			}
 		}
 
@@ -232,7 +232,7 @@ public:
       for(int ww = 0; ww < staff; ww++)
       {
         IntVar* sv = newIntVar(0,1);
-        bool2int(xv[ww][ss]->getLit(acts-1,3),sv);
+        bool2int(xv[ww][ss]->getLit(acts-1, LR_LE),sv);
         rostered_int.push(sv);
       }
     }

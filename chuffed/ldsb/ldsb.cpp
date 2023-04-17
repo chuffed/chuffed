@@ -392,13 +392,13 @@ public:
 					v /= 2;
 					// lit means <= v, and is false
 					for (int j = min; j <= v; j++) {
-						ps.push(var->getLit(j, 1));
+						ps.push(var->getLit(j, LR_EQ));
 					}
 				} else {
 					v /= 2;
 					// lit means >= v, and is false
 					for (int j = v; j <= max; j++) {
-						ps.push(var->getLit(j, 1));
+						ps.push(var->getLit(j, LR_EQ));
 					}
 				}
 				continue;

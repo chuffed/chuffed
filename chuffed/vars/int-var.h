@@ -321,7 +321,7 @@ public:
 
 		// NOTE: No support for INT_VAR_LL vars yet!
 		// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-		virtual Lit getLit(int64_t v, int t) { NEVER; }
+		virtual Lit getLit(int64_t v, LitRel t) { NEVER; }
 
 		//--------------------------------------------------
 		// Domain operations
@@ -341,16 +341,16 @@ public:
 
 		virtual void channel(int val, int val_type, int sign) { set(val, val_type * 3 ^ sign, false); }
 
-		Lit operator>=(int val) { return getLit(val, 2); }
-		Lit operator<=(int val) { return getLit(val, 3); }
-		Lit operator>(int val) { return getLit(val + 1, 2); }
-		Lit operator<(int val) { return getLit(val - 1, 3); }
-		Lit operator=(int val) { return getLit(val, 1); }
-		Lit operator!=(int val) { return getLit(val, 0); }
+		Lit operator>=(int val) { return getLit(val, LR_GE); }
+		Lit operator<=(int val) { return getLit(val, LR_LE); }
+		Lit operator>(int val) { return getLit(val + 1, LR_GE); }
+		Lit operator<(int val) { return getLit(val - 1, LR_LE); }
+		Lit operator=(int val) { return getLit(val, LR_EQ); }
+		Lit operator!=(int val) { return getLit(val, LR_NE); }
 
 		operator BoolView() {
 			assert(min >= 0 && max <= 1);
-			return getLit(1, 2);
+			return getLit(1, LR_GE);
 		}
 
 		//--------------------------------------------------

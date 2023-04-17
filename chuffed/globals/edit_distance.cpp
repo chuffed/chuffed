@@ -357,13 +357,13 @@ private:
 		// insert all clauses for each variable in sequence 1
 		for (int i = 0; i < seqSize; i++) {
 			// x != val
-			(*r)[offset + i] = seq1[i].getLit(seq1[i].getVal(), 0);
+			(*r)[offset + i] = seq1[i].getLit(seq1[i].getVal(), LR_NE);
 		}
 		offset += seqSize;
 		// insert all clauses for each variable in sequence 2
 		for (int i = 0; i < seqSize; i++) {
 			// x != val
-			(*r)[offset + i] = seq2[i].getLit(seq2[i].getVal(), 0);
+			(*r)[offset + i] = seq2[i].getLit(seq2[i].getVal(), LR_NE);
 		}
 
 		return r;
@@ -442,15 +442,15 @@ void edit_distance(int max_char, vec<int>& insertion_cost, vec<int>& deletion_co
 	for (int i = 0; i < seq1.size() - 1; i++) {
 		// x_i >= 1 v x_i+1 <= 0
 		vec<Lit> cl;
-		cl.push(seq1[i]->getLit(1, 2));
-		cl.push(seq1[i + 1]->getLit(0, 3));
+		cl.push(seq1[i]->getLit(1, LR_GE));
+		cl.push(seq1[i + 1]->getLit(0, LR_LE));
 		sat.addClause(cl);
 	}
 	for (int i = 0; i < seq2.size() - 1; i++) {
 		// x_i >= 1 v x_i+1 <= 0
 		vec<Lit> cl;
-		cl.push(seq2[i]->getLit(1, 2));
-		cl.push(seq2[i + 1]->getLit(0, 3));
+		cl.push(seq2[i]->getLit(1, LR_GE));
+		cl.push(seq2[i + 1]->getLit(0, LR_LE));
 		sat.addClause(cl);
 	}
 

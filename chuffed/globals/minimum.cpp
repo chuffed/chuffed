@@ -78,7 +78,7 @@ public:
 					for (int i = 0; i < sz; i++) {
 						(*r)[i + 1] = x[i].getFMinLit(m);
 					}
-					//					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getLit(m-1, 3);
+					//					for (int i = 0; i < sz; i++) (*r)[i+1] = x[i].getLit(m-1, LR_LE);
 				}
 				if (!y.setMin(m, r)) {
 					return false;

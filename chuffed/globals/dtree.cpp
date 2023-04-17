@@ -291,7 +291,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 	for (int i = 0; i < nbNodes(); i++) {
 		parents[i]->specialiseToEL();
 		for (int val = 0; val < nbNodes(); val++) {
-			equalities.push(parents[i]->getLit(val, 1));  // parents[i] == val
+			equalities.push(parents[i]->getLit(val, LR_EQ));  // parents[i] == val
 			equalities.last().attach(this, count, EVENT_LU);
 			event2parrel[count] = std::make_pair(i, val);
 			count++;
@@ -430,7 +430,7 @@ bool DTreeParenthoodPropagator::propagateNewParent(int e) {
 			vec<Lit> ps;
 			ps.push();
 			// Because I am my own parent, every edge is false (except self loop)
-			ps.push(parents[chi]->getLit(par, 1));
+			ps.push(parents[chi]->getLit(par, LR_EQ));
 			r = Reason_new(ps);
 		}
 		for (unsigned int i = 0; i < in[chi].size(); i++) {
@@ -445,7 +445,7 @@ bool DTreeParenthoodPropagator::propagateNewParent(int e) {
 					vec<Lit> ps;
 					// The fact that the parent of chi is not the
 					// tail of edge, when in the graph 'edge' exists
-					ps.push(parents[chi]->getLit(getTail(edge), 0));
+					ps.push(parents[chi]->getLit(getTail(edge), LR_NE));
 					ps.push(getEdgeVar(edge).getValLit());
 					Clause* expl = Clause_new(ps);
 					expl->temp_expl = 1;
@@ -464,15 +464,15 @@ bool DTreeParenthoodPropagator::propagateNewParent(int e) {
 		if (so.lazy) {
 			vec<Lit> ps;
 			ps.push();
-			ps.push(parents[chi]->getLit(par, 1));
+			ps.push(parents[chi]->getLit(par, LR_EQ));
 			r = Reason_new(ps);
 		}
 		getEdgeVar(e).setVal(true, r);
 	} else if (getEdgeVar(e).isFalse()) {
 		if (so.lazy) {
 			vec<Lit> ps;
-			ps.push(getEdgeVar(e).getValLit());     // par-->chi is out
-			ps.push(parents[chi]->getLit(par, 0));  // not(parents[chi] != par)
+			ps.push(getEdgeVar(e).getValLit());         // par-->chi is out
+			ps.push(parents[chi]->getLit(par, LR_NE));  // not(parents[chi] != par)
 			Clause* expl = Clause_new(ps);
 			expl->temp_expl = 1;
 			sat.rtrail.last().push(expl);
@@ -493,15 +493,15 @@ bool DTreeParenthoodPropagator::propagateRemParent(int e) {
 		if (so.lazy) {
 			vec<Lit> ps;
 			ps.push();
-			ps.push(parents[chi]->getLit(par, 0));
+			ps.push(parents[chi]->getLit(par, LR_NE));
 			r = Reason_new(ps);
 		}
 		getEdgeVar(e).setVal(false, r);
 	} else if (getEdgeVar(e).isTrue()) {
 		if (so.lazy) {
 			vec<Lit> ps;
-			ps.push(getEdgeVar(e).getValLit());     // par-->chi is in
-			ps.push(parents[chi]->getLit(par, 1));  // not(parents[chi] == par)
+			ps.push(getEdgeVar(e).getValLit());         // par-->chi is in
+			ps.push(parents[chi]->getLit(par, LR_EQ));  // not(parents[chi] == par)
 			Clause* expl = Clause_new(ps);
 			expl->temp_expl = 1;
 			sat.rtrail.last().push(expl);
@@ -667,7 +667,7 @@ void DTreeParenthoodPropagator::clearPropState() {
 //     for (int i = 0; i < nbNodes(); i++) {
 //         parents[i]->specialiseToEL();
 //         for (int val = 0; val < nbNodes(); val++) {
-//             equalities.push(parents[i]->getLit(val,1)); //parents[i] == val
+//             equalities.push(parents[i]->getLit(val, LR_EQ)); //parents[i] == val
 //             equalities.last().attach(this, count, EVENT_LU);
 //             event2parrel[count] = std::make_pair<int,int>(i,val);
 //             count++;
@@ -746,7 +746,7 @@ void DTreeParenthoodPropagator::clearPropState() {
 //         if (so.lazy) {
 //             vec<Lit> psfail;
 //             psfail.push(getEdgeVar(e).getValLit());
-//             //psfail.push(parents[getTail(e)]->getLit(getHead(e),1));
+//             //psfail.push(parents[getTail(e)]->getLit(getHead(e), LR_EQ));
 //             psfail.push(equalities[getTail(e)*nbNodes()+getHead(e)].getValLit()); //not(parent of
 //             tl is hd) Clause *expl = Clause_new(psfail); expl->temp_expl = 1;
 //             sat.rtrail.last().push(expl);
@@ -793,7 +793,7 @@ void DTreeParenthoodPropagator::clearPropState() {
 //     if (!getEdgeVar(e).isFixed()) {
 //         if (so.lazy) {
 //             vec<Lit> ps; ps.push();
-//             //ps.push(parents[getTail(e)]->getLit(getHead(e),1));
+//             //ps.push(parents[getTail(e)]->getLit(getHead(e), LR_EQ));
 //             ps.push(equalities[getTail(e)*nbNodes()+getHead(e)].getValLit());
 //             r = Reason_new(ps);
 //         }

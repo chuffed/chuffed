@@ -35,8 +35,8 @@ void timed_cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b) {
 			if (!in[i]) {
 				continue;
 			}
-			BoolView b1(s[i]->getLit(t, 3));
-			BoolView b2(s[i]->getLit(t - d[i] + 1, 2));
+			BoolView b1(s[i]->getLit(t, LR_LE));
+			BoolView b2(s[i]->getLit(t - d[i] + 1, LR_GE));
 			BoolView b3 = newBoolVar();
 			IntVar* v = newIntVar(0, 1);
 			bool_rel(b1, BRT_AND, b2, b3);
@@ -707,13 +707,13 @@ public:
 
 	// Wrapper to get the negated literal -[[v <= val]] = [[v >= val + 1]]
 	static inline Lit getNegLeqLit(CUMU_INTVAR v, CUMU_INT val) {
-		// return v->getLit(val + 1, 2);
-		return (INT_VAR_LL == v->getType() ? v->getMaxLit() : v->getLit(val + 1, 2));
+		// return v->getLit(val + 1, LR_GE);
+		return (INT_VAR_LL == v->getType() ? v->getMaxLit() : v->getLit(val + 1, LR_GE));
 	}
 	// Wrapper to get the negated literal -[[v >= val]] = [[ v <= val - 1]]
 	static inline Lit getNegGeqLit(CUMU_INTVAR v, CUMU_INT val) {
-		// return v->getLit(val - 1, 3);
-		return (INT_VAR_LL == v->getType() ? v->getMinLit() : v->getLit(val - 1, 3));
+		// return v->getLit(val - 1, LR_LE);
+		return (INT_VAR_LL == v->getType() ? v->getMinLit() : v->getLit(val - 1, LR_LE));
 	}
 
 	// TTEF Propagator

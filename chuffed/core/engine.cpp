@@ -350,7 +350,8 @@ inline bool Engine::constrain() {
 	//  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
 
 	if (so.lazy) {
-		Lit p = opt_type != 0 ? opt_var->getLit(best_sol + 1, 2) : opt_var->getLit(best_sol - 1, 3);
+		Lit p =
+				opt_type != 0 ? opt_var->getLit(best_sol + 1, LR_GE) : opt_var->getLit(best_sol - 1, LR_LE);
 		// GKG: Preserves existing assumptions, but assumes we've reserved
 		// space at the end for the objective bound.
 		if (assumptions.size() == 0) {

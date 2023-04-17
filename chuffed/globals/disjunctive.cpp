@@ -126,7 +126,7 @@ public:
 					BoolView& p = pred[i][pi.var];
 					if (p.isTrue() && est(i) >= pi.est) {
 						ps.push(p.getValLit());
-						ps.push(x[i]->getLit(pi.est-1, 3));
+						ps.push(x[i]->getLit(pi.est-1, LR_LE));
 					}
 				}
 		*/
@@ -456,11 +456,11 @@ public:
 		}
 
 		/*
-				ps.push(x[pi.var]->getLit(set_est, 2));
+				ps.push(x[pi.var]->getLit(set_est, LR_GE));
 				for (int i = 0; i < x.size(); i++) {
 					if (!in[i]) continue;
-					ps.push(x[i]->getLit(set_est, 2));
-					ps.push(x[i]->getLit(set_let - dur[i], 3));
+					ps.push(x[i]->getLit(set_est, LR_GE));
+					ps.push(x[i]->getLit(set_let - dur[i], LR_LE));
 				}
 		*/
 
@@ -573,11 +573,11 @@ public:
 		}
 
 		/*
-				ps.push(x[pi.var]->getLit(set_est, 2));
+				ps.push(x[pi.var]->getLit(set_est, LR_GE));
 				for (int i = 0; i < x.size(); i++) {
 					if (!in[i]) continue;
-					ps.push(x[i]->getLit(set_est, 2));
-					ps.push(x[i]->getLit(pi.let - dur[i], 3));
+					ps.push(x[i]->getLit(set_est, LR_GE));
+					ps.push(x[i]->getLit(pi.let - dur[i], LR_LE));
 				}
 		*/
 
