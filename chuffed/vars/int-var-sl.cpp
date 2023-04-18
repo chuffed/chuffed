@@ -127,9 +127,9 @@ Lit IntVarSL::getLit(int64_t v, LitRel t) {
 			u = transform(v, 2);
 			return (u == -1 ? lit_False : el->getLit(u, LR_EQ));
 		case LR_GE:
-			return el->getLit(transform(v, 1), LR_LE);
+			return el->getLit(transform(v, 1), LR_GE);
 		case LR_LE:
-			return el->getLit(transform(v, 0), LR_GE);
+			return el->getLit(transform(v, 0), LR_LE);
 		default:
 			NEVER;
 	}
