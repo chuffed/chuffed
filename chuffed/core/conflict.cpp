@@ -154,10 +154,14 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 
 #if DEBUG_VERBOSE
 	std::cerr << "out_learnt:";
-	for (int i = 0; i < out_learnt.size(); i++) std::cerr << " " << toInt(out_learnt[i]);
+	for (int i = 0; i < out_learnt.size(); i++) {
+		std::cerr << " " << toInt(out_learnt[i]);
+	}
 	std::cerr << "\n";
 	std::cerr << "out_learnt (interpreted):";
-	for (int i = 0; i < out_learnt.size(); i++) std::cerr << " " << litString[toInt(out_learnt[i])];
+	for (int i = 0; i < out_learnt.size(); i++) {
+		std::cerr << " " << litString[toInt(out_learnt[i])];
+	}
 	std::cerr << "\n";
 #endif
 

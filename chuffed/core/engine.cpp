@@ -670,10 +670,14 @@ RESULT Engine::search(const std::string& problemLabel) {
 		int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
 #if DEBUG_VERBOSE
 		std::cerr << "propagate (";
-		for (int i = 0; i < nodepath.size(); i++) std::cerr << " " << nodepath[i];
+		for (int i : nodepath) {
+			std::cerr << " " << i;
+		}
 		std::cerr << ")\n";
 		std::cerr << "altpath (";
-		for (int i = 0; i < altpath.size(); i++) std::cerr << " " << altpath[i];
+		for (int i : altpath) {
+			std::cerr << " " << i;
+		}
 		std::cerr << ")\n";
 #endif
 		if (decisionLevel() >= decisionLevelTip.size()) {
@@ -797,7 +801,9 @@ RESULT Engine::search(const std::string& problemLabel) {
 #if DEBUG_VERBOSE
 					std::cerr << "after analyze, decisionLevel() is " << decisionLevel() << "\n";
 					std::cerr << "decisionLevelTip:";
-					for (int i = 0; i < decisionLevelTip.size(); i++) std::cerr << " " << decisionLevelTip[i];
+					for (int i : decisionLevelTip) {
+						std::cerr << " " << i;
+					}
 					std::cerr << "\n";
 #endif
 
