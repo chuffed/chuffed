@@ -319,7 +319,7 @@ public:
 	void fixAllSearch();
 
 	/// Create new integer variable from specification
-	void newIntVar(IntVarSpec* vs);
+	void newIntVar(IntVarSpec* vs, const std::string& name);
 	/// Create new Boolean variable from specification
 	void newBoolVar(BoolVarSpec* vs);
 	/// Create new set variable from specification

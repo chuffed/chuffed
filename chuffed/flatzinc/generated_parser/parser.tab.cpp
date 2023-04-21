@@ -237,9 +237,7 @@ void initfg(ParserState* pp) {
     for (unsigned int i = 0; i < pp->intvars.size(); i++) {
         if (!pp->hadError) {
             try {
-                pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
             } catch (FlatZinc::Error& e) {
                 yyerror(pp, e.toString().c_str());
             }
@@ -961,22 +959,22 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   486,   486,   488,   490,   493,   494,   498,   503,   511,
-     512,   516,   521,   529,   530,   537,   539,   541,   544,   545,
-     548,   551,   552,   553,   554,   557,   558,   559,   560,   563,
-     564,   567,   568,   575,   607,   638,   645,   677,   703,   713,
-     726,   783,   834,   842,   896,   909,   922,   930,   945,   949,
-     964,   988,   991,   997,  1002,  1008,  1010,  1013,  1019,  1023,
-    1038,  1062,  1065,  1071,  1076,  1083,  1089,  1093,  1108,  1132,
-    1135,  1141,  1146,  1153,  1156,  1160,  1175,  1199,  1202,  1208,
-    1213,  1220,  1227,  1230,  1237,  1240,  1247,  1250,  1257,  1260,
-    1266,  1284,  1305,  1328,  1336,  1353,  1357,  1361,  1367,  1371,
-    1385,  1386,  1393,  1397,  1406,  1409,  1415,  1420,  1428,  1431,
-    1437,  1442,  1450,  1453,  1459,  1464,  1472,  1475,  1481,  1487,
-    1499,  1503,  1510,  1514,  1521,  1524,  1530,  1534,  1538,  1542,
-    1546,  1595,  1609,  1612,  1618,  1622,  1633,  1654,  1684,  1706,
-    1707,  1715,  1718,  1724,  1728,  1735,  1740,  1746,  1750,  1758,
-    1761,  1767,  1771,  1777,  1781,  1785,  1789,  1793,  1836,  1847
+       0,   484,   484,   486,   488,   491,   492,   496,   501,   509,
+     510,   514,   519,   527,   528,   535,   537,   539,   542,   543,
+     546,   549,   550,   551,   552,   555,   556,   557,   558,   561,
+     562,   565,   566,   573,   605,   636,   643,   675,   701,   711,
+     724,   781,   832,   840,   894,   907,   920,   928,   943,   947,
+     962,   986,   989,   995,  1000,  1006,  1008,  1011,  1017,  1021,
+    1036,  1060,  1063,  1069,  1074,  1081,  1087,  1091,  1106,  1130,
+    1133,  1139,  1144,  1151,  1154,  1158,  1173,  1197,  1200,  1206,
+    1211,  1218,  1225,  1228,  1235,  1238,  1245,  1248,  1255,  1258,
+    1264,  1282,  1303,  1326,  1334,  1351,  1355,  1359,  1365,  1369,
+    1383,  1384,  1391,  1395,  1404,  1407,  1413,  1418,  1426,  1429,
+    1435,  1440,  1448,  1451,  1457,  1462,  1470,  1473,  1479,  1485,
+    1497,  1501,  1508,  1512,  1519,  1522,  1528,  1532,  1536,  1540,
+    1544,  1593,  1607,  1610,  1616,  1620,  1631,  1650,  1678,  1700,
+    1701,  1709,  1712,  1718,  1722,  1729,  1734,  1740,  1744,  1752,
+    1755,  1761,  1765,  1771,  1775,  1779,  1783,  1787,  1830,  1841
 };
 #endif
 
@@ -3234,9 +3232,7 @@ yyreduce:
             if (pp->fg != NULL) {
                 // Add a new IntVar to the FlatZincSpace if it was already created
                 try {
-                    pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                    IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                    intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                    pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
                 } catch (FlatZinc::Error& e) {
                     yyerror(pp, e.toString().c_str());
                 }
@@ -3259,9 +3255,7 @@ yyreduce:
                 if (pp->fg != NULL) {
                     // Add a new IntVar to the FlatZincSpace if it was already created
                     try {
-                        pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                        IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                        intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                        pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
                     } catch (FlatZinc::Error& e) {
                         yyerror(pp, e.toString().c_str());
                     }

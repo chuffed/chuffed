@@ -195,9 +195,7 @@ void initfg(ParserState* pp) {
     for (unsigned int i = 0; i < pp->intvars.size(); i++) {
         if (!pp->hadError) {
             try {
-                pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
             } catch (FlatZinc::Error& e) {
                 yyerror(pp, e.toString().c_str());
             }
@@ -1642,9 +1640,7 @@ solve_expr:
             if (pp->fg != NULL) {
                 // Add a new IntVar to the FlatZincSpace if it was already created
                 try {
-                    pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                    IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                    intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                    pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
                 } catch (FlatZinc::Error& e) {
                     yyerror(pp, e.toString().c_str());
                 }
@@ -1665,9 +1661,7 @@ solve_expr:
                 if (pp->fg != NULL) {
                     // Add a new IntVar to the FlatZincSpace if it was already created
                     try {
-                        pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second));
-                        IntVar* newiv = pp->fg->iv[pp->fg->intVarCount-1];
-                        intVarString.insert(std::pair<IntVar*, std::string>(newiv, pp->intvars[i].first));
+                        pp->fg->newIntVar(static_cast<IntVarSpec*>(pp->intvars[i].second), pp->intvars[i].first);
                     } catch (FlatZinc::Error& e) {
                         yyerror(pp, e.toString().c_str());
                     }

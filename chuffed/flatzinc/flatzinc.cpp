@@ -126,7 +126,7 @@ FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int setVars)
 	s = this;
 }
 
-void FlatZincSpace::newIntVar(IntVarSpec* vs) {
+void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 	// Resizing of the vectors if required
 	if (intVarCount == iv.size()) {
 		const int newSize = intVarCount > 0 ? 2 * intVarCount : 1;
@@ -152,6 +152,7 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs) {
 			AST::SetLit* sl = vs->domain.some();
 			if (sl->interval) {
 				v = ::newIntVar(sl->min, sl->max);
+				intVarString.insert(std::pair<IntVar*, std::string>(v, name));
 			} else {
 				vec<int> d;
 				for (int& i : sl->s) {
@@ -159,6 +160,7 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs) {
 				}
 				sort((int*)d, (int*)d + d.size());
 				v = ::newIntVar(d[0], d.last());
+				intVarString.insert(std::pair<IntVar*, std::string>(v, name));
 				if ((d.last() - d[0] >= d.size() * mylog2(d.size())) ||
 						(d.size() <= so.eager_limit && (d.last() - d[0] + 1) > so.eager_limit)) {
 					new (v) IntVarSL(*v, d);
