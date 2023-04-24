@@ -100,8 +100,7 @@ inline void arg2BoolVarArgs(vec<BoolView>& ia, AST::Node* arg) {
 		if (a->a[i]->isBoolVar()) {
 			ia[i] = s->bv[a->a[i]->getBoolVar()];
 		} else {
-			bool value = a->a[i]->getBool();
-			ia[i] = newBoolVar(static_cast<int>(value), static_cast<int>(value));
+			ia[i] = a->a[i]->getBool() ? bv_true : bv_false;
 		}
 	}
 }
