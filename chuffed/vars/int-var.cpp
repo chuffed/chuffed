@@ -127,6 +127,13 @@ void IntVar::specialiseToSL(vec<int>& values) {
 	}
 	v.resize(j);
 
+	if (min < v[0]) {
+		min = v[0];
+	}
+	if (max > v[v.size() - 1]) {
+		max = v[v.size() - 1];
+	}
+
 	//	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
 	//	printf("\n");
 
