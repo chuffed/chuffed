@@ -26,12 +26,8 @@ public:
 	Lit getMinLit() const override { return el->getMinLit(); }
 	Lit getMaxLit() const override { return el->getMaxLit(); }
 	Lit getValLit() const override { return el->getValLit(); }
-	Lit getFMinLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(transform(v, 0), LR_GE) : el->getMinLit();
-	}
-	Lit getFMaxLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(transform(v, 1), LR_LE) : el->getMaxLit();
-	}
+	Lit getFMinLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->min, LR_GE); }
+	Lit getFMaxLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->max, LR_LE); }
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
 	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;
