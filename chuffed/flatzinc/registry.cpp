@@ -504,16 +504,26 @@ void p_set_in_reif(const ConExpr& ce, AST::Node* /*unused*/) {
 	AST::SetLit* sl = ce[1]->getSet();
 	IntVar* v = getIntVar(ce[0]);
 	BoolView r = getBoolVar(ce[2]);
+	// TODO: Seems a bit wastefull to create new boolvars here
+	auto add_reif_lbl = [](BoolView v, std::string&& label) {
+		std::string lbl = "(" + label + ")";
+		boolVarString.emplace(v, label);
+		litString.emplace(toInt(v.getLit(true)), lbl + "=true");
+		litString.emplace(toInt(v.getLit(false)), lbl + "=false");
+	};
 	if (sl->interval) {
 		BoolView r1 = newBoolVar();
-		BoolView r2 = newBoolVar();
 		int_rel_reif(v, IRT_GE, sl->min, r1);
+		add_reif_lbl(r1, intVarString[v] + ">=" + std::to_string(sl->min));
+		BoolView r2 = newBoolVar();
 		int_rel_reif(v, IRT_LE, sl->max, r2);
+		add_reif_lbl(r2, intVarString[v] + "<=" + std::to_string(sl->min));
 		bool_rel(r1, BRT_AND, r2, r);
 	} else {
 		vec<BoolView> rs;
 		for (int i : sl->s) {
 			rs.push(newBoolVar());
+			add_reif_lbl(rs.last(), intVarString[v] + "==" + std::to_string(i));
 			int_rel_reif(v, IRT_EQ, i, rs.last());
 		}
 		array_bool_or(rs, r);
