@@ -61,6 +61,16 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 	v->specialiseToEL();
 	el = (IntVarEL*)v;
 
+	// Override literal name values
+	std::string label = intVarString[el];
+	for (int i = 0; i < values.size(); i++) {
+		std::string val = std::to_string(values[i]);
+		litString[toInt(el->getLit(i, LR_NE))] = label + "!=" + val;
+		litString[toInt(el->getLit(i, LR_EQ))] = label + "==" + val;
+		litString[toInt(el->getLit(i, LR_GE))] = label + ">=" + val;
+		litString[toInt(el->getLit(i, LR_LE))] = label + "<=" + val;
+	}
+
 	// rechannel channel info
 	for (int i = 0; i < values.size(); i++) {
 		Lit p = el->getLit(i, LR_NE);
