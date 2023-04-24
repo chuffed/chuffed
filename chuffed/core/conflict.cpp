@@ -600,7 +600,8 @@ void SAT::printLit(Lit p) {
 	printf("%d:", toInt(p));
 	ChannelInfo& ci = c_info[var(p)];
 	if (ci.cons_type == 1) {
-		engine.vars[ci.cons_id]->printLit(ci.val, ci.val_type * 3 ^ static_cast<int>(sign(p)));
+		engine.vars[ci.cons_id]->printLit(
+				ci.val, static_cast<LitRel>(ci.val_type * 3 ^ static_cast<int>(sign(p))));
 	} else if (ci.cons_type == 2) {
 		engine.propagators[ci.cons_id]->printLit(ci.val, sign(p));
 	} else {

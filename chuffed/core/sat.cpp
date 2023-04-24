@@ -428,7 +428,8 @@ void SAT::enqueue(Lit p, Reason r) {
 	trail.last().push(p);
 	ChannelInfo& ci = c_info[v];
 	if (ci.cons_type == 1) {
-		engine.vars[ci.cons_id]->channel(ci.val, ci.val_type, static_cast<int>(sign(p)));
+		engine.vars[ci.cons_id]->channel(ci.val, static_cast<LitRel>(ci.val_type),
+																		 static_cast<int>(sign(p)));
 	}
 }
 

@@ -38,7 +38,7 @@ public:
 	bool setVal(int64_t v, Reason r = nullptr, bool channel = true) override;
 	bool remVal(int64_t v, Reason r = nullptr, bool channel = true) override;
 
-	void channel(int val, int val_type, int sign) override;
+	void channel(int val, LitRel val_type, int sign) override;
 	void debug();
 };
 

@@ -202,9 +202,9 @@ bool IntVarSL::remVal(int64_t v, Reason r, bool channel) {
 	return true;
 }
 
-void IntVarSL::channel(int val, int val_type, int sign) {
+void IntVarSL::channel(int val, LitRel val_type, int sign) {
 	//	fprintf(stderr, "funny channel\n");
-	int type = val_type * 3 ^ sign;
+	auto type = static_cast<LitRel>(static_cast<int>(val_type) * 3 ^ sign);
 	el->set(val, type, false);
 	if (type == 0) {
 		vals[values[val]] = 0;

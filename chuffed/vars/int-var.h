@@ -326,7 +326,7 @@ public:
 		//--------------------------------------------------
 		// Domain operations
 
-		void set(int val, int type, bool channel = true);
+		void set(int val, LitRel type, bool channel = true);
 
 		bool setMinNotR(int64_t v) const { return v > min; }
 		bool setMaxNotR(int64_t v) const { return v < max; }
@@ -339,7 +339,9 @@ public:
 		virtual bool remVal(int64_t v, Reason r = nullptr, bool channel = true);
 		virtual bool allowSet(vec<int>& v, Reason r = nullptr, bool channel = true);
 
-		virtual void channel(int val, int val_type, int sign) { set(val, val_type * 3 ^ sign, false); }
+		virtual void channel(int val, LitRel val_type, int sign) {
+			set(val, static_cast<LitRel>((static_cast<int>(val_type) * 3 ^ sign)), false);
+		}
 
 		Lit operator>=(int val) { return getLit(val, LR_GE); }
 		Lit operator<=(int val) { return getLit(val, LR_LE); }
@@ -356,7 +358,7 @@ public:
 		//--------------------------------------------------
 		// Debug
 
-		void printLit(int val, int type) const;
+		void printLit(int val, LitRel type) const;
 		void print() const;
 	};
 
@@ -375,18 +377,18 @@ public:
 		in_queue = false;
 	}
 
-	inline void IntVar::set(int val, int type, bool channel) {
+	inline void IntVar::set(int val, LitRel type, bool channel) {
 		switch (type) {
-			case 0:
+			case LR_NE:
 				remVal(val, nullptr, channel);
 				break;
-			case 1:
+			case LR_EQ:
 				setVal(val, nullptr, channel);
 				break;
-			case 2:
+			case LR_GE:
 				setMin(val + 1, nullptr, channel);
 				break;
-			case 3:
+			case LR_LE:
 				setMax(val, nullptr, channel);
 				break;
 			default:
@@ -394,19 +396,19 @@ public:
 		}
 	}
 
-	inline void IntVar::printLit(int val, int type) const {
+	inline void IntVar::printLit(int val, LitRel type) const {
 		printf("[v%d ", var_id);
 		switch (type) {
-			case 0:
+			case LR_NE:
 				printf("!= %d]", val);
 				break;
-			case 1:
+			case LR_EQ:
 				printf("== %d]", val);
 				break;
-			case 2:
+			case LR_GE:
 				printf(">= %d]", val + 1);
 				break;
-			case 3:
+			case LR_LE:
 				printf("<= %d]", val);
 				break;
 		}

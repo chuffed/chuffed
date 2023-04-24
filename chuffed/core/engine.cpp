@@ -294,7 +294,7 @@ inline void Engine::makeDecision(DecInfo& di, int alt) {
 		else
 			getVarSizes(var_sizes);
 #endif
-		((IntVar*)di.var)->set(di.val, di.type ^ alt);
+		((IntVar*)di.var)->set(di.val, static_cast<LitRel>(di.type ^ alt));
 	} else {
 #if DEBUG_VERBOSE
 		std::cerr << "enqueing SAT literal: " << di.val << "^" << alt << " = " << (di.val ^ alt)
