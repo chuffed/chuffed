@@ -134,9 +134,6 @@ void IntVar::specialiseToSL(vec<int>& values) {
 		max = v[v.size() - 1];
 	}
 
-	//	for (int i = 0; i < values.size(); i++) printf("%d ", values[i]);
-	//	printf("\n");
-
 	// determine whether it is sparse or dense
 	if (v.last() - v[0] >= v.size() * mylog2(v.size())) {
 		// fprintf(stderr, "SL\n");

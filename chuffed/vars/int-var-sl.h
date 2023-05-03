@@ -3,15 +3,17 @@
 
 #include <chuffed/core/options.h>
 
-// Integer variable with sparse domains.
+// A enumerated type use to distinguish between different rounding modes.
+enum RoundMode { ROUND_DOWN = 0, ROUND_UP = 1, ROUND_NONE = 2 };
 
+// Integer variable with sparse domains.
 class IntVarSL : public IntVar {
 	vec<int> values;  // values that the var can take in ascending order
 	IntVarEL* el;
 
-	// transform value into index, type determines return value when a hole is encountered
-	// 0: round down, 1: round up, 2: -1
-	int transform(int v, int type);
+	// Find the index value in `el` used for the value `v`, type determines return value when a hole
+	// is encountered
+	int find_index(int v, RoundMode type) const;
 
 public:
 	IntVarSL(const IntVar& other, vec<int>& values);
@@ -26,8 +28,12 @@ public:
 	Lit getMinLit() const override { return el->getMinLit(); }
 	Lit getMaxLit() const override { return el->getMaxLit(); }
 	Lit getValLit() const override { return el->getValLit(); }
-	Lit getFMinLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->min, LR_GE); }
-	Lit getFMaxLit(int64_t v) override { return ~getLit(so.finesse ? v : (int)this->max, LR_LE); }
+	Lit getFMinLit(int64_t v) override {
+		return so.finesse ? ~el->getLit(find_index(v, ROUND_UP), LR_GE) : el->getMinLit();
+	}
+	Lit getFMaxLit(int64_t v) override {
+		return so.finesse ? ~el->getLit(find_index(v, ROUND_DOWN), LR_LE) : el->getMaxLit();
+	}
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
 	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;
