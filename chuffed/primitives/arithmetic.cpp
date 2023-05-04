@@ -580,8 +580,7 @@ void int_times(IntVar* x, IntVar* y, IntVar* z) {
 		} else if (x_flip && y_flip && !z_flip) {
 			new Times<1, 1, 0>(IntView<>(x), IntView<>(y), IntView<>(z));
 		} else {
-			// as: This case is an inconsistency in the model!
-			CHUFFED_ERROR("Cannot handle this case\n");
+			new TimesAll<0, 0, 0>(IntView<>(x), IntView<>(y), IntView<>(z));
 		}
 	}
 }
