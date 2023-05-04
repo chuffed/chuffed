@@ -160,6 +160,8 @@ public:
 		int* data4 = (int*)data;
 		return data4[sz + 2];
 	}
+
+	void debug() const;
 };
 
 template <class V>

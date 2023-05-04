@@ -449,11 +449,19 @@ public:
 	}
 
 	void log_state() {
-		fprintf(stderr, "UB: [");
+		fprintf(stderr, "LB: [");
 		if (xs.size() > 0) {
 			fprintf(stderr, "%d", xs[0]->getMin());
 			for (int ii = 1; ii < xs.size(); ii++) {
 				fprintf(stderr, ", %d", xs[ii]->getMin());
+			}
+		}
+		fprintf(stderr, "]\n");
+		fprintf(stderr, "UB: [");
+		if (xs.size() > 0) {
+			fprintf(stderr, "%d", xs[0]->getMax());
+			for (int ii = 1; ii < xs.size(); ii++) {
+				fprintf(stderr, ", %d", xs[ii]->getMax());
 			}
 		}
 		fprintf(stderr, "]\n");
@@ -535,6 +543,10 @@ public:
 				limit_val(xs.size(), xs.size()) {
 		int sz = xs.size();
 		priority = 3;
+
+		// Set unused zero value out of range
+		first[0] = -1;
+		limit[0] = xs.size() + 1;
 
 		int M = 1;
 		// Initialize firsts.

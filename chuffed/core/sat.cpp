@@ -702,3 +702,13 @@ DecInfo* SAT::branch() {
 
 	return new DecInfo(nullptr, 2 * next + static_cast<int>(polarity[next]));
 }
+
+void Clause::debug() const {
+	for (size_t i = 0; i < size(); i++) {
+		if (i > 0) {
+			std::cerr << " \\/ ";
+		}
+		std::cerr << getLitString(toInt(operator[](i)));
+	}
+	std::cerr << "\n";
+}
