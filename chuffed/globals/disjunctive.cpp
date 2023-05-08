@@ -328,6 +328,11 @@ public:
 				// add task to priority queue
 				pqueue.insert(task);
 
+				// no inference possible when zero time elapses
+				if (dur[task] == 0) {
+					continue;
+				}
+
 				// infer precedences by looking for bound b s.t.
 				// cur_time + dur[task] + sum_{t | let(t) <= b} residual[t] > b
 				int lets_i;
