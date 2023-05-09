@@ -1039,7 +1039,11 @@ CumulativeProp::tt_optional_task_propagation() {
 	for (int ii = 0; ii <= last_unfixed; ii++) {
 		const int i = task_id[ii];
 		assert(max_dur(i) > 0 && max_usage(i) > 0);
-		if (min_dur(i) <= 0 || min_usage(i) <= 0) {
+
+		if ((min_dur(i) <= 0) != (min_usage(i) <= 0)) {
+			// Note:            ^^ XOR, if tasks is optional as both zero-duration AND zero-usage, then
+			// nothing can be propagated yet.
+
 			// fprintf(stderr, "task %d: start [%d, %d], dur %d, usage %d\n", i, est(i), lst(i),
 			// min_dur(i), min_usage(i));
 			//  Getting the smallest non-zero value for the duration
