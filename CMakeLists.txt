@@ -4,7 +4,7 @@ project(chuffed CXX C)
 # The version number.
 set(chuffed_VERSION_MAJOR 0)
 set(chuffed_VERSION_MINOR 12)
-set(chuffed_VERSION_PATCH 0)
+set(chuffed_VERSION_PATCH 1)
 
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
