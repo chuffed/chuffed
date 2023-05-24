@@ -58,7 +58,7 @@ public:
 	// For Branching:
 
 	bool finished() override { return isFixed(); }
-	double getScore(VarBranch vb) override { NOT_SUPPORTED; }
+	double getScore(VarBranch vb) override;
 	DecInfo* branch() override {
 		return new DecInfo(nullptr, 2 * v + static_cast<int>((sat.polarity[v])));
 	}
