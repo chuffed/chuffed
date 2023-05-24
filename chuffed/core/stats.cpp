@@ -82,6 +82,7 @@ void Engine::printStats() {
 			engine.propagators[i]->printStats();
 		}
 	}
+	printf("%%%%%%mzn-stat-end\n");
 }
 
 void Engine::checkMemoryUsage() {
