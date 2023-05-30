@@ -372,6 +372,40 @@ void p_bool_not(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_NOT, ce, ann
 void p_bool_or(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_OR, ce, ann, 3); }
 void p_bool_xor(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_XOR, ce, ann, 3); }
 void p_bool_eq(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_EQ, ce, ann, 2); }
+void p_bool_eq_imp(const ConExpr& ce, AST::Node* ann) {
+	if (ce[2]->isBool()) {
+		if (ce[2]->getBool()) {
+			p_bool_eq(ce, ann);
+		}
+		return;
+	}
+	vec<Lit> ps1;
+	ps1.push(~s->bv[ce[2]->getBoolVar()]);
+	if (ce[0]->isBoolVar()) {
+		if (ce[1]->isBoolVar()) {
+			ps1.push(~s->bv[ce[1]->getBoolVar()]);
+			ps1.push(s->bv[ce[0]->getBoolVar()]);
+			vec<Lit> ps2;
+			ps2.push(~s->bv[ce[2]->getBoolVar()]);
+			ps2.push(s->bv[ce[1]->getBoolVar()]);
+			ps2.push(~s->bv[ce[0]->getBoolVar()]);
+			sat.addClause(ps2);
+		} else {
+			if (ce[1]->getBool()) {
+				ps1.push(s->bv[ce[0]->getBoolVar()]);
+			} else {
+				ps1.push(~s->bv[ce[0]->getBoolVar()]);
+			}
+		}
+	} else {
+		if (ce[0]->getBool()) {
+			ps1.push(s->bv[ce[1]->getBoolVar()]);
+		} else {
+			ps1.push(~s->bv[ce[1]->getBoolVar()]);
+		}
+	}
+	sat.addClause(ps1);
+}
 void p_bool_eq_reif(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_EQ_REIF, ce, ann, 3); }
 void p_bool_ne(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_NE, ce, ann, 2); }
 void p_bool_ne_reif(const ConExpr& ce, AST::Node* ann) { p_bool_CMP(BRT_NE_REIF, ce, ann, 3); }
@@ -1815,6 +1849,7 @@ public:
 		registry().add("bool_or", &p_bool_or);
 		registry().add("bool_xor", &p_bool_xor);
 		registry().add("bool_eq", &p_bool_eq);
+		registry().add("bool_eq_imp", &p_bool_eq_imp);
 		registry().add("bool_eq_reif", &p_bool_eq_reif);
 		registry().add("bool_ne", &p_bool_ne);
 		registry().add("bool_ne_reif", &p_bool_ne_reif);
