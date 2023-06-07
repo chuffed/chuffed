@@ -1289,7 +1289,7 @@ void p_steiner_tree_new(const ConExpr& ce, AST::Node* ann) {
 	vec<int> to;
 	arg2intargs(to, ce[3]);
 	vec<int> ws;
-	arg2intargs(to, ce[4]);
+	arg2intargs(ws, ce[4]);
 	vec<BoolView> vs;
 	arg2BoolVarArgs(vs, ce[5]);
 	vec<BoolView> es;
@@ -1543,23 +1543,27 @@ void p_dag_new(const ConExpr& ce, AST::Node* ann) {
 	vec<BoolView> es;
 	arg2BoolVarArgs(es, ce[3]);
 	int nb_nodes = vs.size();
-	int nb_edges = es.size();
 
 	int extra = nb_nodes;  // Extra node with edges to everyone
 	vs.push(bv_true);
+	vec<BoolView> new_edges;
 	for (int i = 0; i < nb_nodes; i++) {
-		from.push(extra);
-		to.push(i);
-		es.push(bv_true);
+		from.push(extra + 1);
+		to.push(i + 1);
+		BoolView new_edge = newBoolVar();
+		es.push(new_edge);
+		new_edges.push(new_edge);
 	}
 
 	vec<vec<int> > en;
 	vec<vec<int> > in;
 	vec<vec<int> > ou;
+	nb_nodes = vs.size();
 	for (int i = 0; i < nb_nodes; i++) {
 		in.push(vec<int>());
 		ou.push(vec<int>());
 	}
+	int nb_edges = es.size();
 	for (int i = 0; i < nb_edges; i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
@@ -1570,6 +1574,7 @@ void p_dag_new(const ConExpr& ce, AST::Node* ann) {
 		ou[u].push(i);
 		in[v].push(i);
 	}
+	bool_linear(new_edges, IRT_LE, getConstant(1));
 	dag(extra, vs, es, in, ou, en);
 }
 

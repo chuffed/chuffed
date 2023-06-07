@@ -3,7 +3,6 @@ predicate chuffed_tree(
     int: E,
     array[int] of int: from,
     array[int] of int: to,
-    var int: r,
     array[int] of var bool: ns,
     array[int] of var bool: es,
 );
@@ -16,4 +15,4 @@ predicate fzn_tree(
     var int: r,
     array[int] of var bool: ns,
     array[int] of var bool: es,
-) = chuffed_tree(N, E, from, to, r, ns, es);
+) = ns[r] /\ chuffed_tree(N, E, from, to, ns, es);
