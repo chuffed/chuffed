@@ -65,9 +65,9 @@ protected:
 
 	int articulations(int n, std::vector<bool>& reachable, int& count);
 	bool reachable(int n, std::vector<bool>& blue, bool doDFS = false);
-	void unite(int u, int v);
-	bool cycle_detect(int edge);
-	void precycle_detect(int unk_edge);
+	virtual void unite(int u, int v);
+	virtual bool cycle_detect(int edge);
+	virtual void precycle_detect(int unk_edge);
 	int newNodeCompleteCheckup_Count;
 	bool newNodeCompleteCheckup;
 
@@ -113,8 +113,23 @@ public:
 
 class ConnectedPropagator : public TreePropagator {
 protected:
-	static bool cycle_detect(int edge) { return true; }
-	void precycle_detect(int unk_edge) {}
+	bool cycle_detect(int edge) override { return true; }
+	void precycle_detect(int unk_edge) override {}
+
+	void unite(int u, int v) override {
+		if (uf.connected(u, v)) {
+			return;
+		}
+		if (!getNodeVar(u).isFixed()) {
+			uf.unite(u, v);
+			ruf.unite(u, v);
+			assert(ruf.isRoot(v));
+		} else {
+			uf.unite(v, u);
+			ruf.unite(v, u);
+			assert(ruf.isRoot(u));
+		}
+	}
 
 public:
 	ConnectedPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj,
