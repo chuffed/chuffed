@@ -28,6 +28,10 @@ Options::Options()
 			sbps(false)
 
 			,
+			lookahead(false),
+			stop_lookahead_after(100000)
+
+			,
 			prop_fifo(false)
 
 			,
@@ -45,7 +49,7 @@ Options::Options()
 			lazy(true),
 			finesse(true),
 			learn(true),
-			vsids(false)
+			vsids(true)
 #if PHASE_SAVING
 			,
 			phase_saving(0)
@@ -363,6 +367,18 @@ void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
 				 "     value selection is the user-defined one. (default "
 			<< (def.sbps ? "on" : "off")
 			<< ").\n"
+				 "  --lookahead [on|off]\n"
+				 "     Use a lookahead approach for value selection for SAT variables. "
+				 " When branching on a variable, it branches on the value that after propagation, "
+				 "results in a domain that includes a more optimal answer for the optimization functrion."
+				 "In case of a tie, value selection is the user-defined one. (default "
+			<< (def.lookahead ? "on" : "off")
+			<< ").\n"
+				 "  --stop-lookahead-after <n>\n"
+				 "     Stops the lookahead value selection approach after a certain amount of conflicts caused with lookahead on.\n"
+				 "     (<0 = never stop) (default "
+			<< def.stop_lookahead_after
+			<< ").\n"
 				 "\n"
 				 "Learning Options:\n"
 				 "  --lazy [on|off], --no-lazy\n"
@@ -611,6 +627,10 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 			so.sat_polarity = intBuffer;
 		} else if (cop.getBool("--sbps", boolBuffer)) {
 			so.sbps = boolBuffer;
+		} else if (cop.getBool("--lookahead", boolBuffer)) {
+			so.lookahead = boolBuffer;
+		} else if (cop.get("--stop-lookahead-after", &intBuffer)) {
+			so.stop_lookahead_after = intBuffer;
 		} else if (cop.getBool("--prop-fifo", boolBuffer)) {
 			so.prop_fifo = boolBuffer;
 		} else if (cop.getBool("--disj-edge-find", boolBuffer)) {

@@ -388,6 +388,26 @@ void Engine::saveCurrentSolution() {
 	}
 }
 
+std::tuple<int, int, bool> Engine::propagate_lookahead(int lit) {
+	int max = opt_var->getMax();
+	int min = opt_var->getMin();
+	dec_info.push(DecInfo(NULL, lit));
+	newDecisionLevel();
+	sat.enqueue(toLit(lit));
+	bool conflict = !propagate();
+	int lower_bound = opt_var->getMin();
+	int upper_bound = opt_var->getMax();
+	clearPropState();
+
+	sat.btToLevel(engine.decisionLevel() - 1);
+	sat.confl = NULL;
+
+	int res = 0;
+	if (lower_bound == upper_bound) res = opt_type ? max + 1 + (upper_bound - min) : min - 1 - (max - lower_bound);
+	else res = opt_type ? upper_bound : lower_bound;
+	return std::make_tuple(res, upper_bound - lower_bound, conflict);
+}
+
 bool Engine::propagate() {
 	if (async_fail) {
 		async_fail = false;
@@ -710,6 +730,14 @@ RESULT Engine::search(const std::string& problemLabel) {
 		Conflict:
 			conflicts++;
 			conflictC++;
+			if (so.lookahead) {
+				if (so.vsids && solutions != 0)
+					lookahead_conflicts++;
+				if (so.stop_lookahead_after >= 0 && lookahead_conflicts > so.stop_lookahead_after) {
+					so.stop_lookahead_after = -1;
+					so.lookahead = false;
+				}
+			}
 
 			if (so.time_out > duration(0) && chuffed_clock::now() > time_out) {
 				(*output_stream) << "% Time limit exceeded!\n";

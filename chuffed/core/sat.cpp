@@ -29,6 +29,7 @@ cassert(sizeof(Reason) == 8);
 // inline methods
 
 inline void SAT::insertVarOrder(int x) {
+	if (lookahead && lookahead_var == x) return;
 	if (!order_heap.inHeap(x) && flags[x].decidable) {
 		order_heap.insert(x);
 	}
@@ -688,12 +689,73 @@ bool SAT::finished() {
 	return true;
 }
 
+int SAT::get_lookahead_next() {
+	//Ensure the same integer variable is not picked repeatedly.
+	double prev_activity;
+	bool dec_activity = false;
+	int next = order_heap[0];
+
+	if (c_info[next].cons_type != BOOL_VAR) {
+		for (int i = 0; i < order_heap.size(); i++) {
+			int li = order_heap[i];
+			if (activity[next] > activity[li]) break;
+			if (c_info[li].cons_type == BOOL_VAR && !assigns[li] && flags[li].decidable) {
+				prev_activity = activity[li];
+				dec_activity = true;
+				activity[li] = nextafter(prev_activity, HUGE_VAL); //Increment activity by a small amount
+				//activity[li] += std::max(var_inc * 10e-8, 1e-100);
+				order_heap.decrease(li);
+				break;
+			}
+		}
+	}
+	next = order_heap.removeMin();
+	if (dec_activity) activity[next] = prev_activity;
+	return next;
+}
+int SAT::lookahead_branch(int next) {
+	assert(!assigns[next]);
+	assert(flags[next].decidable);
+	ChannelInfo& ci = c_info[next];
+	lookahead = true;
+	lookahead_var = next;
+
+	int opt_type = engine.opt_type ? 1 : -1;
+
+	int l_0, d_0;
+	bool c_0;
+
+	std::tie(l_0, d_0, c_0) = engine.propagate_lookahead(2 * next + static_cast<int>(polarity[next]));
+	l_0 *= opt_type;
+	if (c_0) {
+		lookahead = false;
+		return  2 * next + static_cast<int>(polarity[next]);
+	}
+
+	int l_1, d_1;
+	bool c_1;
+
+	std::tie(l_1, d_1, c_1) = engine.propagate_lookahead(2 * next + static_cast<int>(!polarity[next]));
+	l_1 *= opt_type;
+	lookahead = false;
+
+	if (c_1 || (l_0 < l_1) || (l_0 == l_1 && d_0 > d_1)) {
+		return 2 * next + static_cast<int>(!polarity[next]);
+	}
+	return 2 * next + static_cast<int>(polarity[next]);
+}
+
 DecInfo* SAT::branch() {
 	if (!so.vsids) {
 		return nullptr;
 	}
 
 	assert(!order_heap.empty());
+
+	if (so.lookahead) {
+		int next = get_lookahead_next();
+		return new DecInfo(nullptr, lookahead_branch(next));
+	}
 
 	int next = order_heap.removeMin();
 

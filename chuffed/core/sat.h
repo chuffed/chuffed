@@ -100,6 +100,10 @@ public:
 	Clause* short_expl;
 	Clause* short_confl;
 
+	//Lookahead
+	bool lookahead = false;
+	int lookahead_var;
+
 	// VSIDS
 	double var_inc;        // Amount to bump variable with.
 	double cla_inc;        // Amount to bump clause with.
@@ -165,6 +169,10 @@ public:
 	bool finished() override;
 	double getScore(VarBranch vb) override { NEVER; }
 	DecInfo* branch() override;
+
+	//Lookahead branching
+	int get_lookahead_next();
+	int lookahead_branch(int next);
 
 	// Solution-based phase saving
 	void saveCurrentPolarities() {

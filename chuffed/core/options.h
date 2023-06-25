@@ -37,6 +37,10 @@ public:
 	int sat_polarity;  // Polarity of bool var to choose (0 = default, 1 = same, 2 = anti, 3 = random)
 	bool sbps;         // Use Solution-based phase saving
 
+	//lookahead
+	bool lookahead; //Performs lookahead propagation for SAT branching
+	int stop_lookahead_after; //Stops lookahead after a solution has been found and x amount of conflicts with lookahead. Use negative values to never stop lookahead
+
 	// Propagator options
 	bool prop_fifo;  // Propagators are queued in FIFO, otherwise LIFO
 

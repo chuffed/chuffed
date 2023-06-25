@@ -111,6 +111,10 @@ public:
 	// Solution-based phase saving
 	void saveCurrentSolution();
 
+	//Lookahead propagate
+	std::tuple<int, int, bool> propagate_lookahead(int lit);
+	int lookahead_conflicts = 0;
+
 	// Interface methods
 	RESULT search(const std::string& problemLabel = "chuffed");
 	void solve(Problem* p, const std::string& problemLabel = "chuffed");
