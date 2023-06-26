@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <unordered_set>
 
 // Propagator for the value_precede constraint.
 class value_precede : public Propagator {
@@ -551,8 +552,10 @@ public:
 		int M = 1;
 		// Initialize firsts.
 		for (int ii = 0; ii < sz; ii++) {
-			if (xs[ii]->setMaxNotR(M) && !xs[ii]->setMax(M)) {
-				TL_FAIL();
+			if (xs[ii]->setMaxNotR(M)) {
+				if (!xs[ii]->setMax(M)) {
+					TL_FAIL();
+				}
 			}
 			if (xs[ii]->indomain(M)) {
 				first[M] = ii;
@@ -691,8 +694,17 @@ public:
 };
 
 void value_precede_seq(vec<IntVar*>& xs) {
+	vec<IntVar*> nxs;
+	std::unordered_set<IntVar*> set;
+	for (size_t i = 0; i < xs.size(); ++i) {
+		if (set.find(xs[i]) != set.end()) {
+			continue;  // Same variable appears earlier in the same chain
+		}
+		nxs.push(xs[i]);
+		set.insert(xs[i]);
+	}
 	// new seq_precede_chain(xs);
-	new seq_precede_inc(xs);
+	new seq_precede_inc(nxs);
 }
 
 void value_precede_int(int s, int t, vec<IntVar*>& xs) { new value_precede(s, t, xs); }
