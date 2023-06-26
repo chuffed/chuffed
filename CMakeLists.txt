@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.1.0)
 project(chuffed CXX C)
 # The version number.
 set(chuffed_VERSION_MAJOR 0)
-set(chuffed_VERSION_MINOR 12)
-set(chuffed_VERSION_PATCH 1)
+set(chuffed_VERSION_MINOR 13)
+set(chuffed_VERSION_PATCH 10)
 
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
