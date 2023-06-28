@@ -389,11 +389,12 @@ class seq_precede_inc : public Propagator {
 			if (xs[ii]->indomain(l)) {
 				++l;
 			} else {
-				r.push(~xs[ii]->getLit(l, LR_EQ));
+				r.push(xs[ii]->getLit(l, LR_EQ));
 			}
 		}
-		r.push(~(xs[ii]->getLit(l, LR_LE)));
-		return Reason_new(r);
+		r.push(xs[ii]->getLit(l, LR_LE));
+		Clause* c = Reason_new(r);
+		return c;
 	}
 
 	struct tag_t {
