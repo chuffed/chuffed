@@ -939,7 +939,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 					engine.dec_info.push(DecInfo(nullptr, p));
 					newDecisionLevel();
 				} else if (sat.value(toLit(p)) == l_False) {
-					if (fzn != nullptr) {
+					if (fzn != nullptr && fzn->enable_on_restart) {
 						if (!fzn->solution_found || decisionLevel() != 0) {
 							sat.btToLevel(0);
 							restart_count++;

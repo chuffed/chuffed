@@ -695,7 +695,7 @@ void FlatZincSpace::storeSolution() {
 
 bool FlatZincSpace::onRestart(Engine* e) {
 	if (!enable_on_restart) {
-		return true;
+		return false;
 	}
 	if (mark_complete) {
 		return true;
