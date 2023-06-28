@@ -698,14 +698,17 @@ void value_precede_seq(vec<IntVar*>& xs) {
 	vec<IntVar*> nxs;
 	std::unordered_set<IntVar*> set;
 	for (size_t i = 0; i < xs.size(); ++i) {
-		if (set.find(xs[i]) != set.end()) {
-			continue;  // Same variable appears earlier in the same chain
+		if (set.find(xs[i]) != set.end()  // Same variable appears earlier in the same chain
+				|| xs[i]->getMax() < 1) {     // Variable cannot take a value that influences the chain
+			continue;
 		}
 		nxs.push(xs[i]);
 		set.insert(xs[i]);
 	}
-	// new seq_precede_chain(xs);
-	new seq_precede_inc(nxs);
+	if (nxs.size() > 0) {
+		// new seq_precede_chain(xs);
+		new seq_precede_inc(nxs);
+	}
 }
 
 void value_precede_int(int s, int t, vec<IntVar*>& xs) { new value_precede(s, t, xs); }
