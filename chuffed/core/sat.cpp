@@ -480,7 +480,7 @@ void SAT::btToLevel(int level) {
 #if DEBUG_VERBOSE
 	std::cerr << "SAT::btToLevel( " << level << ")\n";
 #endif
-	if (decisionLevel() <= level) {
+	if (decisionLevel() <= level || (lookahead && confl != NULL)) {
 		return;
 	}
 
@@ -725,7 +725,7 @@ int SAT::lookahead_branch(int next) {
 	int l_0, d_0;
 	bool c_0;
 
-	std::tie(l_0, d_0, c_0) = engine.propagate_lookahead(2 * next + static_cast<int>(polarity[next]));
+	std::tie(l_0, d_0, c_0) = engine.propagate_lookahead(2 * next + static_cast<int>(!polarity[next]));
 	l_0 *= opt_type;
 	if (c_0) {
 		lookahead = false;
@@ -735,11 +735,11 @@ int SAT::lookahead_branch(int next) {
 	int l_1, d_1;
 	bool c_1;
 
-	std::tie(l_1, d_1, c_1) = engine.propagate_lookahead(2 * next + static_cast<int>(!polarity[next]));
+	std::tie(l_1, d_1, c_1) = engine.propagate_lookahead(2 * next + static_cast<int>(polarity[next]));
 	l_1 *= opt_type;
 	lookahead = false;
 
-	if (c_1 || (l_0 < l_1) || (l_0 == l_1 && d_0 > d_1)) {
+	if (!c_1 && (l_0 > l_1) || (l_0 == l_1 && d_0 < d_1)) {
 		return 2 * next + static_cast<int>(!polarity[next]);
 	}
 	return 2 * next + static_cast<int>(polarity[next]);

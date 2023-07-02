@@ -399,6 +399,12 @@ std::tuple<int, int, bool> Engine::propagate_lookahead(int lit) {
 	int upper_bound = opt_var->getMax();
 	clearPropState();
 
+	if (conflict) {
+		std::set<int> contributingNogoods;
+		sat.analyze(nextnodeid - 1, contributingNogoods);
+	}
+
+	sat.confl = NULL;
 	sat.btToLevel(engine.decisionLevel() - 1);
 	sat.confl = NULL;
 
