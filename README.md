@@ -29,7 +29,8 @@ print a valid -- though not necessarily minimal -- nogood in terms of assumption
 
 ### Integration with CP Profiler
 
-The [CP Profiler tool](https://github.com/cp-profiler) can be used with Chuffed
+The *CP Profiler*, integrated into the
+[MiniZincIDE](https://github.com/MiniZinc/MiniZincIDE), can be used with Chuffed
 to visualise the search trees and analyse the nogoods that Chuffed explores when
 solving a problem. In order to enable profiling support, Chuffed includes
 profiler connection code. This has been included as a git subtree in
@@ -37,7 +38,7 @@ profiler connection code. This has been included as a git subtree in
 integration code, use the following command in the repository root.
 
 ```
-git subtree pull --prefix thirdparty/cp-profiler-integration https://github.com/cp-profiler/cpp-integration.git master --squash
+git subtree pull --prefix thirdparty/cp-profiler-integration https://github.com/MiniZinc/cpp-integration.git master --squash
 ```
 
 ## Compilation
