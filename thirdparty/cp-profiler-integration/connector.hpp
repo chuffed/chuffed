@@ -23,6 +23,7 @@ typedef SSIZE_T ssize_t;
 
 #include <netdb.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 #endif
 
