@@ -1100,44 +1100,41 @@ void reversedptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _
 }
 
 // For teh tests against CPBioNet
-/*
-void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
-							vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
-							vec< vec<int> >& _en) {
+// void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
+// 							vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
+// 							vec< vec<int> >& _en) {
 
-		std::uniform_int_distribution<int> rndv(0, size - 1);
+// 		std::uniform_int_distribution<int> rndv(0, size - 1);
 
-		from = rndv(engine.rnd);
-		to = rndv(engine.rnd));
+// 		from = rndv(engine.rnd);
+// 		to = rndv(engine.rnd));
 
-		for (int j = 0; j < 5; j++) {
-				int other = rndv(engine.rnd);
-				while (_in[other].size() + _out[other].size() <= 10)
-						other = rndv(engine.rnd);
-				if (_vs[other].setValNotR(true))
-						_vs[other].setVal(true,NULL);
-		}
-		if(false) {
-				for ( int i = 0; i < _vs.size(); i++) {
-						if (_in[i].size() + _out[i].size() <= 2){
-								if (_vs[i].setValNotR(true))
-										_vs[i].setVal(true,NULL);
-								continue;
-						}
-				}
-		}
+// 		for (int j = 0; j < 5; j++) {
+// 				int other = rndv(engine.rnd);
+// 				while (_in[other].size() + _out[other].size() <= 10)
+// 						other = rndv(engine.rnd);
+// 				if (_vs[other].setValNotR(true))
+// 						_vs[other].setVal(true,NULL);
+// 		}
+// 		if(false) {
+// 				for ( int i = 0; i < _vs.size(); i++) {
+// 						if (_in[i].size() + _out[i].size() <= 2){
+// 								if (_vs[i].setValNotR(true))
+// 										_vs[i].setVal(true,NULL);
+// 								continue;
+// 						}
+// 				}
+// 		}
 
-		if (_vs[from].setValNotR(true))
-				_vs[from].setVal(true,NULL);
-		if (_vs[to].setValNotR(true))
-				_vs[to].setVal(true,NULL);
+// 		if (_vs[from].setValNotR(true))
+// 				_vs[from].setVal(true,NULL);
+// 		if (_vs[to].setValNotR(true))
+// 				_vs[to].setVal(true,NULL);
 
-		dtree(from,_vs,_es,_in,_out,_en);
-		reversedtree(to,_vs,_es,_in,_out,_en);
-}
-//*/
+// 		dtree(from,_vs,_es,_in,_out,_en);
+// 		reversedtree(to,_vs,_es,_in,_out,_en);
+// }
 
-//*
 void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 					vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	if (_vs[from].setValNotR(true)) {
@@ -1152,24 +1149,21 @@ void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge
 	dtree(from, _vs, _es, _in, _out, _en);
 	reversedtree(to, _vs, _es, _in, _out, _en);
 }
-//*/
 
-#if 0
-//Experimental. Needs testing!!!
-void pathsucc(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, 
-              vec<IntVar*> _par,
-              vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out, 
-              vec< vec<int> >& _en) {
-    assert(false);
-    cerr<< "Warning: Do not use the pathsucc constraint"<<endl;
-    if (_vs[from].setValNotR(true))
-        _vs[from].setVal(true,NULL);
-    if (_vs[to].setValNotR(true))
-        _vs[to].setVal(true,NULL);
-    //dreachable(from,_vs,_es,_in,_out,_en);
-    //dtree(from,_vs,_es,_in,_out,_en);
-    //reversedptree(to,_vs,_es,_par,_in,_out,_en);
-    //reversedtree(to,_vs,_es,_in,_out,_en);
-    //dptree(from,_vs,_es,_par,_in,_out,_en);
-}
-#endif
+// //Experimental. Needs testing!!!
+// void pathsucc(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
+//               vec<IntVar*> _par,
+//               vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
+//               vec< vec<int> >& _en) {
+//     assert(false);
+//     cerr<< "Warning: Do not use the pathsucc constraint"<<endl;
+//     if (_vs[from].setValNotR(true))
+//         _vs[from].setVal(true,NULL);
+//     if (_vs[to].setValNotR(true))
+//         _vs[to].setVal(true,NULL);
+//     //dreachable(from,_vs,_es,_in,_out,_en);
+//     //dtree(from,_vs,_es,_in,_out,_en);
+//     //reversedptree(to,_vs,_es,_par,_in,_out,_en);
+//     //reversedtree(to,_vs,_es,_in,_out,_en);
+//     //dptree(from,_vs,_es,_par,_in,_out,_en);
+// }

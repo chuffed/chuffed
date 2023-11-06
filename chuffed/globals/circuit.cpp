@@ -499,6 +499,8 @@ public:
 					}
 				}
 				break;
+			default:  // no selection
+				break;
 		}
 		assert(root >= 0);
 		return root;
@@ -907,10 +909,6 @@ public:
 				int level;
 				double act;
 				switch (so.checkfailure) {
-					case 1:  // first (no score required)
-					case 2:  // smallest cycle
-					case 3:  // largest cycle
-						break;
 					case 4:  // cycle with lowest ave level,
 					case 5:  // cycle with highest ave level,
 						// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
@@ -943,6 +941,11 @@ public:
 						if (thisScore < level || noScoreYet) {
 							thisScore = level;
 						}
+						break;
+					default:  // no score required
+						// case 1:  // first
+						// case 2:  // smallest cycle
+						// case 3:  // largest cycle
 						break;
 				}
 				noScoreYet = false;
@@ -982,11 +985,12 @@ public:
 						thisScore = thisScore / thisCycle.size();
 						break;  // highest ave activity
 					// 8-last, 9-highest min level, 10-lowest max level
-					case 8:  // last cycle (no score - we just always overwrite the best)
-					case 9:  // highest min level - already done
-						break;
 					case 10:
 						thisScore = -1 * thisScore;  // lowest max level
+					default:                       // do nothing
+						// case 8:  // last cycle (no score - we just always overwrite the best)
+						// case 9:  // highest min level - already done
+						break;
 				}
 				// fprintf(stderr, "this score is %f\n", thisScore);
 				if (!foundSmallCycle || so.checkfailure == 1 || so.checkfailure == 8 ||

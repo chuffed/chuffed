@@ -30,21 +30,19 @@
 #define WATCHED_VALoAB(e) (((e)->watch_flags) & 6)
 #define WATCHED_VALoBE(e) (((e)->watch_flags) & 5)
 
-#if 0
-#define SET_WATCH_BE(e) (((e)->watch_flags) |= 1)
-#define SET_WATCH_AB(e) (((e)->watch_flags) |= 2)
-#define SET_WATCH_VAL(e) (((e)->watch_flags) |= 4)
-#define CLEAR_WATCH_BE(e) (((e)->watch_flags) &= 6)
-#define CLEAR_WATCH_AB(e) (((e)->watch_flags) &= 5)
-#define CLEAR_WATCH_VAL(e) (((e)->watch_flags) &= 3)
-#else
+// #define SET_WATCH_BE(e) (((e)->watch_flags) |= 1)
+// #define SET_WATCH_AB(e) (((e)->watch_flags) |= 2)
+// #define SET_WATCH_VAL(e) (((e)->watch_flags) |= 4)
+// #define CLEAR_WATCH_BE(e) (((e)->watch_flags) &= 6)
+// #define CLEAR_WATCH_AB(e) (((e)->watch_flags) &= 5)
+// #define CLEAR_WATCH_VAL(e) (((e)->watch_flags) &= 3)
+
 #define SET_WATCH_BE(n) ((edges[(n)].watch_flags) |= 1)
 #define SET_WATCH_AB(n) ((edges[(n)].watch_flags) |= 2)
 #define SET_WATCH_VAL(n) ((edges[(n)].watch_flags) |= 4)
 #define CLEAR_WATCH_BE(n) ((edges[(n)].watch_flags) &= 6)
 #define CLEAR_WATCH_AB(n) ((edges[(n)].watch_flags) &= 5)
 #define CLEAR_WATCH_VAL(n) ((edges[(n)].watch_flags) &= 3)
-#endif
 
 #define OUT_EDGES(n) (node_edges + nodes[(n)].out_start)
 #define OUT_END(n) (node_edges + nodes[(n)].out_start + nodes[(n)].num_out)
@@ -122,13 +120,9 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 
 template <int U>
 MDDProp<U>* MDDProp_new(MDDTemplate* _templ, vec<IntView<U> >& _intvars) {
-#if 0
-    void* mem = malloc(sizeof(MDDProp) +
-                    sizeof(inc_node)*((_prop->numNodes())-1));
-    return new (mem) MDDProp(_prop,_id,_sat_vars,_priority);
-#else
+	// void* mem = malloc(sizeof(MDDProp) + sizeof(inc_node) * ((_prop->numNodes()) - 1));
+	// return new (mem) MDDProp(_prop, _id, _sat_vars, _priority);
 	return new MDDProp<U>(_templ, _intvars);
-#endif
 }
 
 template <int U>
@@ -251,14 +245,12 @@ void MDDProp<U>::genReason(vec<int>& out, Value value) {
 	ValLimDesc ord(fixedvars);
 	std::sort(((int*)out) + slim, ((int*)out) + out.size(), ord);
 #endif
-#if 0
-    // Increasing order
-    std::sort(((int *) out) + slim, ((int *) out) + out.size(), ValAsc);
-#endif
-#if 0
-    // Decreasing order
-    std::sort(((int *) out) + slim, ((int *) out) + out.size(), ValDesc);
-#endif
+
+	// // Increasing order
+	// std::sort(((int*)out) + slim, ((int*)out) + out.size(), ValAsc);
+
+	// // Decreasing order
+	// std::sort(((int*)out) + slim, ((int*)out) + out.size(), ValDesc);
 
 #ifdef INSTRUMENT
 //    if( prop )
@@ -285,7 +277,6 @@ void MDDProp<U>::shrinkReason(vec<int>& reason, Value value, int threshold) {
 	int tcount = 0;
 	int nl = 0;
 
-#if 1
 	int temp = reason[0];
 	reason.clear();
 	reason.push(temp);
@@ -309,7 +300,6 @@ void MDDProp<U>::shrinkReason(vec<int>& reason, Value value, int threshold) {
 			lcount = 0;
 		}
 	}
-#endif
 
 	for (int v = 0; v < val_entries.size(); v++) {
 		assert(val_entries[v].stat_flag >= -1 && val_entries[v].stat_flag <= 1);
@@ -902,37 +892,29 @@ void MDDProp<U>::retrieveReason(vec<int>& out, int var, int val, int lim, int th
 	}
 }
 
-#if 0
-bool MDDProp<U>::checkReason(int var, Value val, int lim)
-{
-    // Assumes stat flags on vals are still set.
-    int* edge(&(val_edges.last()));  
-    int* val_start;
-    
-    for( int v = val_entries.size()-1; v >= 0; v-- )
-    {
-        if( val_entries[v].count == 0 )
-            continue;
+// bool MDDProp<U>::checkReason(int var, Value val, int lim) {
+// 	// Assumes stat flags on vals are still set.
+// 	int* edge(&(val_edges.last()));
+// 	int* val_start;
 
-        val_start = VAL_EDGES(v);
-        bool val_dead = (val != v) && ( val_entries[v].var == var || val_entries[v].stat_flag );
+// 	for (int v = val_entries.size() - 1; v >= 0; v--) {
+// 		if (val_entries[v].count == 0) continue;
 
-        if( val_dead )
-        {
-            for( ; edge >= val_start; edge-- )
-            {
-                nodes[edges[*edge].begin].stat_flag |= 2;
-            }
-        } else {
-            for( ; edge >= val_start; edge-- )
-            {
-                nodes[edges[*edge].begin].stat_flag |= nodes[edges[*edge].end].stat_flag;
-            }
-        }
-    }
-    return !(nodes[1].stat_flag&1);
-}
-#endif
+// 		val_start = VAL_EDGES(v);
+// 		bool val_dead = (val != v) && (val_entries[v].var == var || val_entries[v].stat_flag);
+
+// 		if (val_dead) {
+// 			for (; edge >= val_start; edge--) {
+// 				nodes[edges[*edge].begin].stat_flag |= 2;
+// 			}
+// 		} else {
+// 			for (; edge >= val_start; edge--) {
+// 				nodes[edges[*edge].begin].stat_flag |= nodes[edges[*edge].end].stat_flag;
+// 			}
+// 		}
+// 	}
+// 	return !(nodes[1].stat_flag & 1);
+// }
 
 template <int U>
 bool MDDProp<U>::fullProp() {
@@ -1029,17 +1011,14 @@ bool MDDProp<U>::fullProp() {
 			//            Clause* r = NULL;
 			Reason r = Reason(prop_id, val);
 			if (so.lazy) {
-#if 0
-               vec<int> expl;
-               genReason(expl, inferences[i]);
+				// vec<int> expl;
+				// genReason(expl, inferences[i]);
 
-               r = Reason_new(expl.size());
+				// r = Reason_new(expl.size());
 
-               for( int k = 1; k < expl.size(); k++ )
-               {
-                  (*r)[k] = intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val, LR_EQ);
-               }
-#endif
+				// for (int k = 1; k < expl.size(); k++) {
+				// 	(*r)[k] = intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val, LR_EQ);
+				// }
 			}
 
 			if (!intvars[v].remVal(val, r)) {
@@ -1468,20 +1447,18 @@ bool MDDProp<U>::propagate() {
 			//            Clause* r = NULL;
 			Reason r = Reason(prop_id, inferences[i]);
 			if (so.lazy) {
-#if 0
-               vec<int> expl;
-               genReason(expl, inferences[i]);
+				// vec<int> expl;
+				// genReason(expl, inferences[i]);
 
-               r = Reason_new(expl.size());
+				// r = Reason_new(expl.size());
 
-               for( int k = 1; k < expl.size(); k++ )
-               {
-//                  (*r)[k] = boolvars[expl[k]].getLit(0);
-                  (*r)[k] = expl[k] >= 0
-                       ? intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val, LR_EQ)
-                       : intvars[val_entries[-1*expl[k] - 2].var].getLit(val_entries[-1*expl[k] - 2].val, LR_NE);
-               }
-#endif
+				// for (int k = 1; k < expl.size(); k++) {
+				// 	//                  (*r)[k] = boolvars[expl[k]].getLit(0);
+				// 	(*r)[k] = expl[k] >= 0
+				// 								? intvars[val_entries[expl[k]].var].getLit(val_entries[expl[k]].val,
+				// LR_EQ) 								: intvars[val_entries[-1 * expl[k] - 2].var].getLit(
+				// val_entries[-1 * expl[k] - 2].val, LR_NE);
+				// }
 			}
 
 			if (!intvars[v].remVal(val, r)) {

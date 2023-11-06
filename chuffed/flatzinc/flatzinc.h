@@ -637,6 +637,7 @@ private:
 
 public:
 	Error(const std::string& where, const std::string& what) : msg(where + ": " + what) {}
+	~Error() throw() {}
 	const std::string& toString() const { return msg; }
 };
 

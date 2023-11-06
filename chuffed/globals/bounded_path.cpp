@@ -1043,19 +1043,17 @@ void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<
 	//     engine.propagators.push(bounded_path_p);
 }
 
-#if 0
-//Experimental, needs testing!!!
-void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, 
-                  vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out, 
-        vec< vec<int> >& _en, vec<vec< int> >& _ws, IntVar* w) {
+// //Experimental, needs testing!!!
+// void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
+//                   vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
+//         vec< vec<int> >& _en, vec<vec< int> >& _ws, IntVar* w) {
 
-    bp_path_helper(from,to,_vs,_es,_in,_out,_en);
+//     bp_path_helper(from,to,_vs,_es,_in,_out,_en);
 
-    bounded_path_p = new BoundedPathPropagator(from, to ,_vs,_es,_in,_out,_en,_ws,w);
-    if (so.check_prop)
-        engine.propagators.push(bounded_path_p);
-}
-#endif
+//     bounded_path_p = new BoundedPathPropagator(from, to ,_vs,_es,_in,_out,_en,_ws,w);
+//     if (so.check_prop)
+//         engine.propagators.push(bounded_path_p);
+// }
 
 class ShortestPathSearch : public BranchGroup {
 	vector<int> decisions;

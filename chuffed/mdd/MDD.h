@@ -91,37 +91,34 @@ typedef std::map<const MDDNode, int, ltnode> NodeCache;
 typedef std::unordered_map<const MDDNode, int, hashnode, eqnode> NodeCache;
 #endif
 
-#if 0
-class OpCache
-{
-public:
-   enum { OP_AND, OP_OR, OP_NOT, OP_BOUND, OP_EXIST, OP_EXPAND, OP_LEQ };
+// class OpCache {
+// public:
+// 	enum { OP_AND, OP_OR, OP_NOT, OP_BOUND, OP_EXIST, OP_EXPAND, OP_LEQ };
 
-   OpCache(unsigned int size);
-   ~OpCache(void);
-   
-   unsigned int check(char op, unsigned int a, unsigned int b); // Returns UINT_MAX on failure.
-   void insert(char op, unsigned int a, unsigned int b, unsigned int res);
-   
-   typedef struct {
-      unsigned int hash;
-      char op;
-      unsigned int a;
-      unsigned int b;
-      unsigned int res;
-   } cache_entry;
+// 	OpCache(unsigned int size);
+// 	~OpCache(void);
 
-private:
-   inline unsigned int hash(char op, unsigned int a, unsigned int b);
-   
-   // Implemented with sparse-array stuff. 
-   unsigned int tablesz;
+// 	unsigned int check(char op, unsigned int a, unsigned int b);  // Returns UINT_MAX on failure.
+// 	void insert(char op, unsigned int a, unsigned int b, unsigned int res);
 
-   unsigned int members;
-   unsigned int* indices;
-   cache_entry* entries;
-};
-#endif
+// 	typedef struct {
+// 		unsigned int hash;
+// 		char op;
+// 		unsigned int a;
+// 		unsigned int b;
+// 		unsigned int res;
+// 	} cache_entry;
+
+// private:
+// 	inline unsigned int hash(char op, unsigned int a, unsigned int b);
+
+// 	// Implemented with sparse-array stuff.
+// 	unsigned int tablesz;
+
+// 	unsigned int members;
+// 	unsigned int* indices;
+// 	cache_entry* entries;
+// };
 
 class MDDTable;
 
@@ -153,9 +150,7 @@ public:
 	void print_mdd(MDDNodeInt r);
 	static void print_mdd_tikz(MDDNodeInt r);
 	static void print_dot(MDDNodeInt r);
-#if 1
 	int cache_sz() { return cache.size(); }
-#endif
 
 	MDDNodeInt insert(unsigned int var, unsigned int low, unsigned int start, bool expand = false);
 

@@ -476,8 +476,6 @@ public:
 					root = options[rnd_option(engine.rnd)];
 				}
 				break;
-			case 7:  // first (even if fixed) - this is the default
-				break;
 			case 8:  // random (even if fixed)
 			{
 				std::uniform_int_distribution<int> rnd_option(0, options.size() - 1);
@@ -491,6 +489,8 @@ public:
 						root = options[i];
 					}
 				}
+				break;
+			default:  // first (even if fixed)
 				break;
 		}
 		return root;

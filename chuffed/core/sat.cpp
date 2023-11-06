@@ -406,6 +406,8 @@ string showReason(Reason r) {
 			ss << "two literals " << getLitString(toInt(~toLit((r.d.d1)))) << " & "
 				 << getLitString(toInt(~toLit((r.d.d2))));
 			break;
+		default:
+			assert(false);
 	}
 	return ss.str();
 }

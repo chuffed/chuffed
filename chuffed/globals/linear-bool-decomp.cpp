@@ -36,40 +36,38 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, int k) {
 		vs.push(x[ii].getLit(polarity));
 	}
 
-#if 1
 	vec<Lit> terminals;
 	for (int ii = 0; ii <= k; ii++) {
 		terminals.push(lit_True);
 	}
 
 	bool_linear_leq(terminals, vs, k);
-#else
-	// Special cases
-	if (k == 0) {
-		for (int ii = 0; ii < x.size(); ii++) sat.enqueue(~x[ii]);
-		return;
-	}
-	if (k >= x.size()) return;
 
-	/*
-		// Apparently wrong.
-		if(k == x.size()-1)
-		{
-			// sum_i x[i] < x.size()
-			// <=> sum_i ~x[i] > 0
-			vec<Lit> cl;
-			for(int ii = 0; ii < x.size(); ii++)
-				cl.push(~x[ii]);
-			sat.addClause(cl);
-			return;
-		}
-		*/
+	// // Special cases
+	// if (k == 0) {
+	// 	for (int ii = 0; ii < x.size(); ii++) sat.enqueue(~x[ii]);
+	// 	return;
+	// }
+	// if (k >= x.size()) return;
 
-	vec<Lit> out;
-	sorter(k, vs, out, SRT_CARDNET, SRT_HALF);
-	assert(out.size() > k);
-	sat.enqueue(~out[k]);
-#endif
+	// /*
+	// 	// Apparently wrong.
+	// 	if(k == x.size()-1)
+	// 	{
+	// 		// sum_i x[i] < x.size()
+	// 		// <=> sum_i ~x[i] > 0
+	// 		vec<Lit> cl;
+	// 		for(int ii = 0; ii < x.size(); ii++)
+	// 			cl.push(~x[ii]);
+	// 		sat.addClause(cl);
+	// 		return;
+	// 	}
+	// 	*/
+
+	// vec<Lit> out;
+	// sorter(k, vs, out, SRT_CARDNET, SRT_HALF);
+	// assert(out.size() > k);
+	// sat.enqueue(~out[k]);
 }
 
 void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
@@ -98,19 +96,17 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 		xv.push(x[ii].getLit(true));
 	}
 
-#if 1
 	bool_linear_leq_std(terminals, xv, k);
-//  bool_linear_leq(terminals, xv, k);
-#else
-	vec<Lit> vs;
-	sorter(k, xv, vs, SRT_CARDNET, SRT_FULL);
-	assert(k < vs.size());
-	assert(k < terminals.size());
-	for (int ii = 1; ii <= k; ii++) {
-		sat.addClause(vs[ii - 1], ~terminals[ii]);
-		sat.addClause(~vs[ii - 1], terminals[ii]);
-	}
-#endif
+	//  bool_linear_leq(terminals, xv, k);
+
+	// vec<Lit> vs;
+	// sorter(k, xv, vs, SRT_CARDNET, SRT_FULL);
+	// assert(k < vs.size());
+	// assert(k < terminals.size());
+	// for (int ii = 1; ii <= k; ii++) {
+	// 	sat.addClause(vs[ii - 1], ~terminals[ii]);
+	// 	sat.addClause(~vs[ii - 1], terminals[ii]);
+	// }
 }
 
 static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
@@ -207,20 +203,19 @@ static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 		}
 		return;
 	}
-#if 0
-  if(k >= xs.size())
-    return;
 
-  if(k == xs.size()-1)
-  {
-    // sum_i ~xs[i] >= 1
-    vec<Lit> cl;
-    for(int ii = 0; ii < xs.size(); ii++)
-      cl.push(~xs[ii]);
-    sat.addClause(cl);
-    return;
-  }
-#endif
+	// if(k >= xs.size())
+	//   return;
+
+	// if(k == xs.size()-1)
+	// {
+	//   // sum_i ~xs[i] >= 1
+	//   vec<Lit> cl;
+	//   for(int ii = 0; ii < xs.size(); ii++)
+	//     cl.push(~xs[ii]);
+	//   sat.addClause(cl);
+	//   return;
+	// }
 
 	SparseSet<> elts((k + 1) * xs.size());
 	vec<Lit> vs;
@@ -266,43 +261,6 @@ static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termin
 		ret = Lit(sat.newVar(), true);
 
 		// Introduce the clauses.
-#if 0
-    vec<Lit> cl;
-    cl.push(~xs[vv]);
-    cl.push(~high);
-    cl.push(ret);
-    sat.addClause(cl);
-
-    cl.clear();
-    cl.push(xs[vv]);
-    cl.push(~low);
-    cl.push(ret);
-    sat.addClause(cl);
-
-    cl.clear();
-    cl.push(~xs[vv]);
-    cl.push(high);
-    cl.push(~ret);
-    sat.addClause(cl);
-
-    cl.clear();
-    cl.push(xs[vv]);
-    cl.push(low);
-    cl.push(~ret);
-    sat.addClause(cl);
-
-    cl.clear();
-    cl.push(~high);
-    cl.push(~low);
-    cl.push(ret);
-    sat.addClause(cl);
-
-    cl.clear();
-    cl.push(high);
-    cl.push(low);
-    cl.push(~ret);
-    sat.addClause(cl);
-#else
 		if (low != lit_True) {
 			sat.addClause(low, ~ret);
 		}
@@ -312,7 +270,6 @@ static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termin
 		cl.push(~xs[vv]);
 		cl.push(~ret);
 		sat.addClause(cl);
-#endif
 	}
 
 	elts.insert(vv * (k + 1) + cc);

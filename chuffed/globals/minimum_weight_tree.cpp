@@ -2297,22 +2297,4 @@ void steiner_tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id>>& _ad
 
 	new TreePropagator(_vs, _es, _adj, _en);
 	new IncrementalMinimumWTreePropagator(_vs, _es, _adj, _en, _w, _ws);
-
-	/* This is deprecated as the MinimumWeightPropagator is worse than the
-	 * IncrementalMinimumWTreePropagator and the LPLBSteinerTreePropagator requires commercial licence
-	 * of CPLEX)
-	 * */
-#if 0
-    if (!so.steinerlp) {
-        new MinimumWTreePropagator(_vs,_es,_adj,_en,_w,_ws);
-    } else {
-#if CPLEX_AVAILABLE && LEMON_AVAILABLE
-        new LPLBSteinerTreePropagator(_vs,_es,_adj,_en,_w,_ws);
-#else
-        fprintf(stderr,"CPLEx or Lemon libraries not available."
-                "Using Traditional MinimumWeightPropagator instead.\n");
-            new MinimumWTreePropagator(_vs,_es,_adj,_en,_w,_ws);
-#endif
-    }
-#endif
 }

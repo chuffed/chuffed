@@ -229,17 +229,7 @@ unsigned int EVLayerGraph::hashnode::operator()(const NodeRef a1) const {
 
 	hash = ((hash << 5) + hash) + a1->var;
 	hash = ((hash << 5) + hash) + a1->sz;
-#if 0
-    for(unsigned int ii = 0; ii < a1->sz; ii++)
-    {
-        hash = ((hash << 5) + hash) + a1->edges[ii].val;
-        hash = ((hash << 5) + hash) + a1->edges[ii].weight;
-        hash = ((hash << 5) + hash) + a1->edges[ii].dest;
-    }
-    return (hash & 0x7FFFFFFF);
-#else
 	uint32_t ret;
 	MurmurHash3_x86_32(&(a1->edges), sizeof(EInfo) * a1->sz, hash, &ret);
 	return ret;
-#endif
 }

@@ -584,13 +584,10 @@ void MDDTable::clear_status(MDDNodeInt r) {
 }
 
 void MDDTable::print_nodes() {
-#if 1
 	for (unsigned int i = 2; i < nodes.size(); i++) {
 		print_node(i);
 	}
-#else
-	std::cout << nodes.size() << std::endl;
-#endif
+	// std::cout << nodes.size() << std::endl;
 }
 
 void MDDTable::print_node(MDDNodeInt r) {
@@ -631,163 +628,140 @@ void MDDTable::print_mdd(MDDNodeInt r) {
 
 void MDDTable::print_mdd_tikz(MDDNodeInt r) {
 	assert(0);
-#if 0
-   std::cout << "\\documentclass{article}\n";
+	// std::cout << "\\documentclass{article}\n";
 
-   std::cout << "\\usepackage{tikz}\n";
-   std::cout << "\\usetikzlibrary{arrows,shapes}\n";
-   std::cout << "\\begin{document}\n";
-   std::cout << "\\begin{tikzpicture}\n";
-   std::cout << "\\tikzstyle{vertex}=[draw,circle,fill=black!25,minimum size=20pt,inner sep=0pt]\n";
-   std::cout << "\\tikzstyle{smallvert}=[circle,fill=black!25,minimum size=5pt,inner sep=0pt]\n";
-   std::cout << "\\tikzstyle{edge} = [draw,thick,->]\n";
-   std::cout << "\\tikzstyle{kdedge} = [draw,thick,=>,color=red]\n";
-   std::cout << "\\tikzstyle{kaedge} = [draw,thick,=>,color=blue]\n";
-   std::cout << "\\tikzstyle{kbedge} = [draw,thick,=>,color=pinegreen!25]\n";
-   
-   std::vector<MDDNodeInt> queued;
-   queued.push_back(r);
-   status[0] = 1;
-   status[1] = 1;
-   status[r] = 1;
-   unsigned int head = 0;
-   std::cout << "\\foreach \\pos/\\name/\\stat in {";
-    
-   bool first = true;
-   
-   int off = 0;
-   unsigned int var = 0; 
-   while( head < queued.size() )
-   {
-      MDDNodeInt n = queued[head];
-      
-      if(first)
-      {
-         first = false;
-         std::cout << "{(0,0)/1/T}";
-      }
-      std::cout << ",";
+	// std::cout << "\\usepackage{tikz}\n";
+	// std::cout << "\\usetikzlibrary{arrows,shapes}\n";
+	// std::cout << "\\begin{document}\n";
+	// std::cout << "\\begin{tikzpicture}\n";
+	// std::cout << "\\tikzstyle{vertex}=[draw,circle,fill=black!25,minimum size=20pt,inner
+	// sep=0pt]\n"; std::cout << "\\tikzstyle{smallvert}=[circle,fill=black!25,minimum size=5pt,inner
+	// sep=0pt]\n"; std::cout << "\\tikzstyle{edge} = [draw,thick,->]\n"; std::cout <<
+	// "\\tikzstyle{kdedge} = [draw,thick,=>,color=red]\n"; std::cout << "\\tikzstyle{kaedge} =
+	// [draw,thick,=>,color=blue]\n"; std::cout << "\\tikzstyle{kbedge} =
+	// [draw,thick,=>,color=pinegreen!25]\n";
 
-      if( var != nodes[n][1] )
-      {
-         var = nodes[n][1];
-         off = 0;
-      }
+	// std::vector<MDDNodeInt> queued;
+	// queued.push_back(r);
+	// status[0] = 1;
+	// status[1] = 1;
+	// status[r] = 1;
+	// unsigned int head = 0;
+	// std::cout << "\\foreach \\pos/\\name/\\stat in {";
 
-      std::cout << "{(" << off << "," << 1.5*(nvars - nodes[n][1]) << ")/" << n << "/" << nodes[n][1] << "}";
-      off += 2;
+	// bool first = true;
 
-      for( unsigned int j = 2; j < nodes[n][0]; j += 2 )
-      {
-         if( status[nodes[n][j+1]] == 0 )
-         {
-            status[nodes[n][j+1]] = 1;
-            queued.push_back(nodes[n][j+1]);
-         }
-      }
-      head++;
-   }
-   std::cout << "}\n\t\t\\node[vertex] (\\name) at \\pos {$x_{\\stat}$};\n";
+	// int off = 0;
+	// unsigned int var = 0;
+	// while (head < queued.size()) {
+	// 	MDDNodeInt n = queued[head];
 
-   std::cout << "\\foreach \\source/\\dest/\\label in {";
-   
-   first = true;
-   for( unsigned int i = 0; i < queued.size(); i++ )
-   {
-      MDDNodeInt n = queued[i];
+	// 	if (first) {
+	// 		first = false;
+	// 		std::cout << "{(0,0)/1/T}";
+	// 	}
+	// 	std::cout << ",";
 
+	// 	if (var != nodes[n][1]) {
+	// 		var = nodes[n][1];
+	// 		off = 0;
+	// 	}
 
-      for( unsigned int j = 2; j < nodes[n][0]; j += 2 )
-      {
-         if(first)
-         {
-            first = false;
-         } else {
-            std::cout << ",";
-         }
+	// 	std::cout << "{(" << off << "," << 1.5 * (nvars - nodes[n][1]) << ")/" << n << "/"
+	// 						<< nodes[n][1] << "}";
+	// 	off += 2;
 
-         std::cout << "{" << n << "/" << nodes[n][j+1] << "/" << nodes[n][j] << "}" ;
-      }
-   }
-   std::cout << "}\n\t\t\\path[edge] (\\source) -- node {$\\label$} (\\dest);\n";
+	// 	for (unsigned int j = 2; j < nodes[n][0]; j += 2) {
+	// 		if (status[nodes[n][j + 1]] == 0) {
+	// 			status[nodes[n][j + 1]] = 1;
+	// 			queued.push_back(nodes[n][j + 1]);
+	// 		}
+	// 	}
+	// 	head++;
+	// }
+	// std::cout << "}\n\t\t\\node[vertex] (\\name) at \\pos {$x_{\\stat}$};\n";
 
-   std::cout << "\\end{tikzpicture}\n";
-   std::cout << "\\end{document}\n";
-#endif
+	// std::cout << "\\foreach \\source/\\dest/\\label in {";
+
+	// first = true;
+	// for (unsigned int i = 0; i < queued.size(); i++) {
+	// 	MDDNodeInt n = queued[i];
+
+	// 	for (unsigned int j = 2; j < nodes[n][0]; j += 2) {
+	// 		if (first) {
+	// 			first = false;
+	// 		} else {
+	// 			std::cout << ",";
+	// 		}
+
+	// 		std::cout << "{" << n << "/" << nodes[n][j + 1] << "/" << nodes[n][j] << "}";
+	// 	}
+	// }
+	// std::cout << "}\n\t\t\\path[edge] (\\source) -- node {$\\label$} (\\dest);\n";
+
+	// std::cout << "\\end{tikzpicture}\n";
+	// std::cout << "\\end{document}\n";
 }
 
 void MDDTable::print_dot(MDDNodeInt r) {
-#if 0
-  if(r < 2)
-    return;
+	// if (r < 2) return;
 
-  std::cout << "digraph ingraph { graph [ranksep=\"1.0 equally\"] " << std::endl;
-  
-  std::vector<int> queued;
-  queued.push_back(r);
+	// std::cout << "digraph ingraph { graph [ranksep=\"1.0 equally\"] " << std::endl;
 
-  status[r] = 1;
-  int nextid = 2;
-  unsigned int head = 0;
-  
-  for(head = 0; head < queued.size(); head++ )
-  {
-    int n_id = queued[head];
-    MDDNodeEl* node(nodes[n_id]);
-    printf("  { node [shape=record label=\"{<prefix>%d: x%d | {",n_id,node->var);
+	// std::vector<int> queued;
+	// queued.push_back(r);
 
-    bool first = true;
-    for( unsigned int ii = 0; ii < nodes[n_id]->sz; ii++ )
-    {
-      if( first )
-        first = false;
-      else
-        printf("|");
-      
-      printf("<p%d>",ii);
-      if(node->edges[ii].dest < 2)
-      {
-        if( node->edges[ii].dest == MDDTRUE )
-        {
-          printf("T");
-        } else {
-          assert(node->edges[ii].dest == MDDFALSE);
-          printf("F");
-        }
-      } else {
-        if(!status[node->edges[ii].dest])
-        {
-          status[node->edges[ii].dest] = nextid++;
-          queued.push_back(node->edges[ii].dest);
-        }
-        printf("%d",node->edges[ii].dest);
-      }
-    }
-    printf("} }\"] %d };\n", n_id);
-  }
-  
-  for(head = 0; head < queued.size(); head++ )
-  {
-    int n_id = queued[head];
-    MDDNodeEl* node(nodes[n_id]);
+	// status[r] = 1;
+	// int nextid = 2;
+	// unsigned int head = 0;
 
-    if(!(node->low < 2))
-    {
-      printf("\t%d:pL -> %d;\n",n_id,node->low);
-    }
+	// for (head = 0; head < queued.size(); head++) {
+	// 	int n_id = queued[head];
+	// 	MDDNodeEl* node(nodes[n_id]);
+	// 	printf("  { node [shape=record label=\"{<prefix>%d: x%d | {", n_id, node->var);
 
-    for( unsigned int ii = 0; ii < node->sz; ii++ )
-    {
-      if( !(node->edges[ii].dest < 2) )
-      {
-        printf("\t%d:p%d -> %d;\n",n_id,ii,node->edges[ii].dest);
-      }
-    }
-  }
-  std::cout << "};" << std::endl;
-  for( unsigned int ii = 0; ii < queued.size(); ii++ )
-    status[queued[ii]] = 0;
-#endif
+	// 	bool first = true;
+	// 	for (unsigned int ii = 0; ii < nodes[n_id]->sz; ii++) {
+	// 		if (first)
+	// 			first = false;
+	// 		else
+	// 			printf("|");
+
+	// 		printf("<p%d>", ii);
+	// 		if (node->edges[ii].dest < 2) {
+	// 			if (node->edges[ii].dest == MDDTRUE) {
+	// 				printf("T");
+	// 			} else {
+	// 				assert(node->edges[ii].dest == MDDFALSE);
+	// 				printf("F");
+	// 			}
+	// 		} else {
+	// 			if (!status[node->edges[ii].dest]) {
+	// 				status[node->edges[ii].dest] = nextid++;
+	// 				queued.push_back(node->edges[ii].dest);
+	// 			}
+	// 			printf("%d", node->edges[ii].dest);
+	// 		}
+	// 	}
+	// 	printf("} }\"] %d };\n", n_id);
+	// }
+
+	// for (head = 0; head < queued.size(); head++) {
+	// 	int n_id = queued[head];
+	// 	MDDNodeEl* node(nodes[n_id]);
+
+	// 	if (!(node->low < 2)) {
+	// 		printf("\t%d:pL -> %d;\n", n_id, node->low);
+	// 	}
+
+	// 	for (unsigned int ii = 0; ii < node->sz; ii++) {
+	// 		if (!(node->edges[ii].dest < 2)) {
+	// 			printf("\t%d:p%d -> %d;\n", n_id, ii, node->edges[ii].dest);
+	// 		}
+	// 	}
+	// }
+	// std::cout << "};" << std::endl;
+	// for (unsigned int ii = 0; ii < queued.size(); ii++) status[queued[ii]] = 0;
 }
 
 MDD operator|(const MDD& a, const MDD& b) {
