@@ -2,6 +2,7 @@
 #include <chuffed/globals/tree.h>
 #include <chuffed/support/union_find.h>
 
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <set>
@@ -13,8 +14,6 @@
 using namespace std;
 
 #define TREEPROP_DEBUG 0
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 /**
  * Detect that whe cannot reach some otehr node from 'node'
@@ -388,11 +387,11 @@ void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>
 				hits.pop();
 			}
 
-			low[u] = MIN(low[u], low[v]);
+			low[u] = std::min(low[u], low[v]);
 		} else if (parent[u] != v && depth[v] < depth[u]) {
 			// e is a backedge from u to its ancestor v
 			s.push(e);
-			low[u] = MIN(low[u], depth[v]);
+			low[u] = std::min(low[u], depth[v]);
 		}
 	}
 

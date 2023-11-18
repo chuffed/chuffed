@@ -2,14 +2,11 @@
 #include <chuffed/globals/tree.h>
 #include <chuffed/support/union_find.h>
 
-#include <algorithm>  // std::sort
+#include <algorithm>  // std::min, std::sort
 #include <iostream>
 #include <set>
 
 using namespace std;
-
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 #define MSTPROP_DEBUG 0
 
@@ -373,11 +370,11 @@ class DCMSTSearch : public BranchGroup {
 				int j = mst_p->getEndnode(e, 1);
 				// Is v the MIN or the SUM?? Its not clear from the paper that
 				// describes the searchs trategy....
-				int v = MIN(tmp[i].second, tmp[j].second);
+				int v = std::min(tmp[i].second, tmp[j].second);
 				sums.emplace_back(e, v);
 				vector<std::pair<int, int> > cost;
 				for (int k = 0; k < mst_p->nbNodes(); k++) {
-					cost.emplace_back(k, MIN(dist[i][k], dist[j][k]));
+					cost.emplace_back(k, std::min(dist[i][k], dist[j][k]));
 				}
 				sort(cost.begin(), cost.end(), sortPairKey2);
 				reverse(cost.begin(), cost.end());

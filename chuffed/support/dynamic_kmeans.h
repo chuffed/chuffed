@@ -13,8 +13,6 @@
 #include <set>
 #include <vector>
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 template <typename T>
 class ClusteringAlgorithm {
 protected:
@@ -114,7 +112,7 @@ public:
 				} else if ((inf == 0) && (inf2 != 0)) {
 					d = d1;
 				} else if ((inf == 0) && (inf2 == 0)) {
-					d = MIN(d1, d2);
+					d = std::min(d1, d2);
 				} else if ((inf != 0) && (inf2 != 0)) {
 					continue;  // Go to another cluster
 				}
@@ -158,7 +156,7 @@ public:
 						} else if ((inf == 0) && (inf2 != 0)) {
 							d = d1;
 						} else if ((inf == 0) && (inf2 == 0)) {
-							d = MIN(d1, d2);
+							d = std::min(d1, d2);
 						} else {
 							sum += d;
 						}
@@ -195,7 +193,7 @@ public:
 					} else if ((inf == 0) && (inf2 != 0)) {
 						d = d1;
 					} else if ((inf == 0) && (inf2 == 0)) {
-						d = MIN(d1, d2);
+						d = std::min(d1, d2);
 					} else if ((inf != 0) && (inf2 != 0)) {
 						continue;  // Go to another cluster
 					}

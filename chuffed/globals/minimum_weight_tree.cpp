@@ -27,8 +27,6 @@
 using namespace std;
 #define TREEPROP_DEBUG 0
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 //*
 // This version needs to work in conjucntion with a TreePropagator
 // It won't do the propagations of treeness, only inherits from it
