@@ -229,6 +229,15 @@ else()
   set(FLEX_FZNLexer_OUTPUTS ${PROJECT_SOURCE_DIR}/chuffed/flatzinc/generated_parser/lexer.yy.cpp)
 endif()
 
+# If CMAKE_UNITY_BUILD is enabled, we still want these files to be built separately
+# to avoid compilation errors.
+set_source_files_properties(
+    ${BISON_FZNParser_OUTPUTS}
+    ${FLEX_FZNLexer_OUTPUTS}
+  PROPERTIES
+    SKIP_UNITY_BUILD_INCLUSION ON
+)
+
 add_library(flatzinc_parser OBJECT
   ${FLEX_FZNLexer_OUTPUTS}
   ${BISON_FZNParser_OUTPUTS}
