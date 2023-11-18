@@ -1,3 +1,6 @@
+#ifndef LENGAUER_TARJAN_H
+#define LENGAUER_TARJAN_H
+
 #include <vector>
 
 class LengauerTarjan {
@@ -49,3 +52,5 @@ public:
 	virtual bool ignore_node(int u);
 	virtual bool ignore_edge(int e);
 };
+
+#endif
