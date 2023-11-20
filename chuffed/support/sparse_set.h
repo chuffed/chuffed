@@ -112,7 +112,7 @@ class TrailedSet : public SparseSet<0> {
 public:
 	TrailedSet(int sz) : SparseSet<0>(sz) {}
 
-	bool insert(int value) {
+	bool insert(unsigned int value) override {
 		// Assumes not FFSET.
 		assert(!elem(value));
 
