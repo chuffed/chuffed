@@ -21,47 +21,45 @@
 
 #define DISTINCT_REST
 
-#if 0
-template <class T>
-T circ_gcc(T fff, vec< vec<T> >& xs, IntRelType rel, const vec<int>& cards)
-{
-  assert(cards.size() > 0);
+// template <class T>
+// T circ_gcc(T fff, vec< vec<T> >& xs, IntRelType rel, const vec<int>& cards)
+// {
+//   assert(cards.size() > 0);
 
-  vec< vec<T> > vals(cards.size());
-  for(int ii = 0; ii < xs.size(); ii++)
-  {
-    assert(xs[ii].size() == cards.size());
-    for(int jj = 0; jj < cards.size(); jj++)
-    {
-      vals[jj].push(xs[ii][jj]);
-    }
-  }
+//   vec< vec<T> > vals(cards.size());
+//   for(int ii = 0; ii < xs.size(); ii++)
+//   {
+//     assert(xs[ii].size() == cards.size());
+//     for(int jj = 0; jj < cards.size(); jj++)
+//     {
+//       vals[jj].push(xs[ii][jj]);
+//     }
+//   }
 
-  T ret = card(fff, vals[0], rel, cards[0]);
-  for(int jj = 1; jj < cards.size(); jj++)
-  {
-    assert(vals[jj].size() == xs.size());
-    ret = ret&(card(fff,vals[jj],rel,cards[jj]));
-  }
-  return ret;
-}
+//   T ret = card(fff, vals[0], rel, cards[0]);
+//   for(int jj = 1; jj < cards.size(); jj++)
+//   {
+//     assert(vals[jj].size() == xs.size());
+//     ret = ret&(card(fff,vals[jj],rel,cards[jj]));
+//   }
+//   return ret;
+// }
 
-void mdd_gcc(vec<IntVar*>& vs, IntRelType rel, const vec<int>& cards)
-{
-  MDDTable tab(vs.size());
-  
-  vec< vec<MDD> > vars;
-  for(int ii = 0; ii < vs.size(); ii++)
-  {
-    vars.push();
-    for(int jj = 0; jj < cards.size(); jj++)
-      vars.last().push(tab.vareq(ii,jj));
-  }
-  MDD ret(circ_gcc(tab.fff(), vars, rel, cards));
-  
-  addMDD(vs, ret);
-}
-#endif
+// void mdd_gcc(vec<IntVar*>& vs, IntRelType rel, const vec<int>& cards)
+// {
+//   MDDTable tab(vs.size());
+
+//   vec< vec<MDD> > vars;
+//   for(int ii = 0; ii < vs.size(); ii++)
+//   {
+//     vars.push();
+//     for(int jj = 0; jj < cards.size(); jj++)
+//       vars.last().push(tab.vareq(ii,jj));
+//   }
+//   MDD ret(circ_gcc(tab.fff(), vars, rel, cards));
+
+//   addMDD(vs, ret);
+// }
 
 // Code for additional option handling.
 static char* hasPrefix(char* str, const char* prefix) {
@@ -121,37 +119,36 @@ public:
 		}
 		CFG::CFG g(buildSchedG(acts, first, last));
 
-#if 0
-    if(!(mode&USEMDD))
-    {
-      // Construct variables for the circuit
-      FDNNFTable tab;
-      std::vector< std::vector<FDNNF> > seq;
-      for(int ii = 0; ii < shifts; ii++)
-      {
-        seq.push_back( std::vector<FDNNF>() );
-        for(int kk = 0; kk < dom; kk++)
-        {
-          seq[ii].push_back(tab.vareq(ii, kk));
-        }
-      }
-      // Construct a circuit from the grammar.
-      FDNNF gcirc(parseCYK(tab.fff(), seq, g));
+		//     if(!(mode&USEMDD))
+		//     {
+		//       // Construct variables for the circuit
+		//       FDNNFTable tab;
+		//       std::vector< std::vector<FDNNF> > seq;
+		//       for(int ii = 0; ii < shifts; ii++)
+		//       {
+		//         seq.push_back( std::vector<FDNNF>() );
+		//         for(int kk = 0; kk < dom; kk++)
+		//         {
+		//           seq[ii].push_back(tab.vareq(ii, kk));
+		//         }
+		//       }
+		//       // Construct a circuit from the grammar.
+		//       FDNNF gcirc(parseCYK(tab.fff(), seq, g));
 
-      if(mode&DECOMP)
-      {
-        for(int ww = 0; ww < staff; ww++)
-        {
-//          nnf_decomp(xv[ww], gcirc);
-          nnf_decompGAC(xv[ww], gcirc);
-        }
-      } else {
-        // Enforce the schedule for each worker.
-        for(int ww = 0; ww < staff; ww++)
-          addNNF(xv[ww], gcirc);
-      }
-    } else {
-#endif
+		//       if(mode&DECOMP)
+		//       {
+		//         for(int ww = 0; ww < staff; ww++)
+		//         {
+		// //          nnf_decomp(xv[ww], gcirc);
+		//           nnf_decompGAC(xv[ww], gcirc);
+		//         }
+		//       } else {
+		//         // Enforce the schedule for each worker.
+		//         for(int ww = 0; ww < staff; ww++)
+		//           addNNF(xv[ww], gcirc);
+		//       }
+		//     } else {
+
 		// Construct variables for the circuit
 		MDDTable mdd_tab(shifts);
 		std::vector<std::vector<MDD> > seq;
@@ -168,9 +165,7 @@ public:
 		for (int ww = 0; ww < staff; ww++) {
 			addMDD(xv[ww], gcirc, opts);
 		}
-#if 0
-    }
-#endif
+		// }
 
 		for (int ww = 1; ww < staff; ww++) {
 			lex(xv[ww - 1], xv[ww], false);
@@ -222,22 +217,20 @@ public:
 		cost = newIntVar(cMin, (last - first + 1) * staff);
 		bool_linear_decomp(rostered, IRT_LE, cost);
 
-#if 0
-    vec<IntVar*> rostered_int;
-    for(int ss = 0; ss < shifts; ss++)
-    {
-      if(ss < first || ss > last)
-        continue;
+		// vec<IntVar*> rostered_int;
+		// for(int ss = 0; ss < shifts; ss++)
+		// {
+		//   if(ss < first || ss > last)
+		//     continue;
 
-      for(int ww = 0; ww < staff; ww++)
-      {
-        IntVar* sv = newIntVar(0,1);
-        bool2int(xv[ww][ss]->getLit(acts-1, LR_LE),sv);
-        rostered_int.push(sv);
-      }
-    }
-    int_linear(rostered_int, IRT_GE, cost);
-#endif
+		//   for(int ww = 0; ww < staff; ww++)
+		//   {
+		//     IntVar* sv = newIntVar(0,1);
+		//     bool2int(xv[ww][ss]->getLit(acts-1, LR_LE),sv);
+		//     rostered_int.push(sv);
+		//   }
+		// }
+		// int_linear(rostered_int, IRT_GE, cost);
 
 		vec<IntVar*> vs;
 		for (int ss = 0; ss < shifts; ss++) {
@@ -300,7 +293,6 @@ public:
 	}
 
 	void print(std::ostream& os) override {
-#if 1
 		for (int act = 0; act < acts; act++) {
 			os << "[";
 			for (int ss = 0; ss < shifts; ss++) {
@@ -308,7 +300,6 @@ public:
 			}
 			os << "]\n";
 		}
-#endif
 		os << "Hours worked: " << (1.0 * cost->getVal() / 4) << "\n";
 		for (int ww = 0; ww < xv.size(); ww++) {
 			os << "[";
@@ -334,10 +325,10 @@ public:
 						case G_R:
 							os << "R";
 							break;
+#endif
 						default:
 							assert(0);
 							break;
-#endif
 					}
 				}
 			}

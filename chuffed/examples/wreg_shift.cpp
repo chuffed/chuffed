@@ -141,22 +141,20 @@ public:
 		cost = newIntVar(cMin, (last - first + 1) * staff);
 		int_linear(staff_cost, IRT_LE, cost);
 
-#if 0
-    vec<IntVar*> rostered_int;
-    for(int ss = 0; ss < shifts; ss++)
-    {
-      if(ss < first || ss > last)
-        continue;
+		// vec<IntVar*> rostered_int;
+		// for(int ss = 0; ss < shifts; ss++)
+		// {
+		//   if(ss < first || ss > last)
+		//     continue;
 
-      for(int ww = 0; ww < staff; ww++)
-      {
-        IntVar* sv = newIntVar(0,1);
-        bool2int(xv[ww][ss]->getLit(acts-1, LR_LE),sv);
-        rostered_int.push(sv);
-      }
-    }
-    int_linear(rostered_int, IRT_GE, cost);
-#endif
+		//   for(int ww = 0; ww < staff; ww++)
+		//   {
+		//     IntVar* sv = newIntVar(0,1);
+		//     bool2int(xv[ww][ss]->getLit(acts-1, LR_LE),sv);
+		//     rostered_int.push(sv);
+		//   }
+		// }
+		// int_linear(rostered_int, IRT_GE, cost);
 
 		vec<IntVar*> vs;
 		for (int ss = 0; ss < shifts; ss++) {
@@ -219,7 +217,6 @@ public:
 	}
 
 	void print(std::ostream& os) override {
-#if 1
 		for (int act = 0; act < acts; act++) {
 			os << "[";
 			for (int ss = 0; ss < shifts; ss++) {
@@ -227,7 +224,6 @@ public:
 			}
 			os << "]\n";
 		}
-#endif
 		os << "Hours worked: " << (1.0 * cost->getVal() / 4) << "\n";
 		for (int ww = 0; ww < xv.size(); ww++) {
 			os << "[";
@@ -253,10 +249,10 @@ public:
 						case G_R:
 							os << "R";
 							break;
+#endif
 						default:
 							assert(0);
 							break;
-#endif
 					}
 				}
 			}

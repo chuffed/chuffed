@@ -140,16 +140,14 @@ public:
 						rostered.push(xs[(nNurses * j) + k]->getLit(i, LR_EQ));  // [[ nurse_shift = i ]]
 					}
 					bool_linear_decomp(rostered, IRT_GE, req);
-#if 0
-              fprintf(out, "bool_linear_ge(["); 
-              bool first = true;
-              for(int xi = 0; xi < nNurses; xi++)
-              {
-                fprintf(out, "%sx%d=%d", first ? "" : ", ", xs[nNurses*j + xi]->var_id, i);
-                first = false;
-              }
-              fprintf(out, "], %d)\n", req);
-#endif
+					// fprintf(out, "bool_linear_ge([");
+					// bool first = true;
+					// for(int xi = 0; xi < nNurses; xi++)
+					// {
+					//   fprintf(out, "%sx%d=%d", first ? "" : ", ", xs[nNurses*j + xi]->var_id, i);
+					//   first = false;
+					// }
+					// fprintf(out, "], %d)\n", req);
 				}
 			} else {
 				vec<int> lbs;

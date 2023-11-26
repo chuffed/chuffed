@@ -56,11 +56,9 @@ public:
 
 	hlnode(T _data, hlnode<T>* _next)
 			: extcount(0), length(_next ? _next->length + 1 : 1), data(std::move(_data)), next(_next) {
-#if 1
 		if (_next) {
 			(_next->extcount)++;
 		}
-#endif
 		//        fprintf(stdout,"Created: %d\n", _data);
 	}
 };
@@ -133,23 +131,19 @@ public:
 		if (root) {
 			(root->extcount)--;
 			assert(root->extcount >= 0);
-#if 1
 			if (!(root->extcount)) {
 				delete root;
 				root = nullptr;
 			}
-#endif
 		}
 	}
 
-#if 0
-   int count(void)
-   {
-      if( root )
-         return root->extcount;
-      return 0;
-   }
-#endif
+	//  int count(void)
+	//  {
+	//     if( root )
+	//        return root->extcount;
+	//     return 0;
+	//  }
 
 	hlist<T> cons(const T el) {
 		//      hlnode<T>* next = new hlnode<T>(el,root);
@@ -254,14 +248,12 @@ hlist<T> array2hl(const T* array, unsigned int sz) {
 
 template <class T>
 std::ostream& operator<<(std::ostream& out, hlist<T> list) {
-#if 0
-    if (list.is_empty())
-    {
-        out << "[]";
-    } else {
-        out << "(" << head(list) << "," << tail(list) << ")";
-    }
-#else
+	// if (list.is_empty())
+	// {
+	//     out << "[]";
+	// } else {
+	//     out << "(" << head(list) << "," << tail(list) << ")";
+	// }
 	out << "[";
 	bool first = true;
 	while (!list.is_empty()) {
@@ -275,7 +267,6 @@ std::ostream& operator<<(std::ostream& out, hlist<T> list) {
 		list = tail(list);
 	}
 	out << "]";
-#endif
 	return out;
 }
 
@@ -458,23 +449,22 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 
 	MDD restr = tab.ttt();
 
-#if 0
-   if( flags&RESTR )
-   {
-      std::vector<unsigned int> doms;
-      for( int i = 0; i < height*width; i++ )
-          doms.push_back(domain);
+	//  if( flags&RESTR )
+	//  {
+	//     std::vector<unsigned int> doms;
+	//     for( int i = 0; i < height*width; i++ )
+	//         doms.push_back(domain);
 
-      for( int i = 0; i < height; i++ )
-      {
-         for( int j = 0; j < width-1; j++ )
-         {
-            restr = tab.mdd_and( tab.mdd_not( doms, tab.mdd_vareq((i*width + j),domain - 1) ), restr );
-         }
-         restr = tab.mdd_and( tab.mdd_vareq( ((i+1)*width)-1,domain - 1 ), restr );
-      }
-   }
-#endif
+	//     for( int i = 0; i < height; i++ )
+	//     {
+	//        for( int j = 0; j < width-1; j++ )
+	//        {
+	//           restr = tab.mdd_and( tab.mdd_not( doms, tab.mdd_vareq((i*width + j),domain - 1) ),
+	//           restr );
+	//        }
+	//        restr = tab.mdd_and( tab.mdd_vareq( ((i+1)*width)-1,domain - 1 ), restr );
+	//     }
+	//  }
 
 	for (int i = 0; i < 4; i++) {
 		if (pattern.length() <= height && head(pattern).length() < width) {
@@ -694,21 +684,20 @@ public:
 		}
 
 		// Setup extra column.
-#if 0
-   vec<Lit> dead;
-   dead.push(Lit(0,0));
-   for( int i = 0; i < height; i++ )
-   {
-      dead[0] = Lit(deadcol[i][dom-1],1);
-      S.addClause(dead);
-   }
 
-   for( int i = 0; i < width*height; i++ )
-   {
-       dead[0] = Lit(sets[i][dom-1],0);
-       S.addClause(dead);
-   }
-#endif
+		//  vec<Lit> dead;
+		//  dead.push(Lit(0,0));
+		//  for( int i = 0; i < height; i++ )
+		//  {
+		//     dead[0] = Lit(deadcol[i][dom-1],1);
+		//     S.addClause(dead);
+		//  }
+
+		//  for( int i = 0; i < width*height; i++ )
+		//  {
+		//      dead[0] = Lit(sets[i][dom-1],0);
+		//      S.addClause(dead);
+		//  }
 
 		// Handle symmetry breaking.
 
