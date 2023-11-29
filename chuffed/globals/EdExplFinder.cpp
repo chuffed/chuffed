@@ -7,17 +7,17 @@
 #include <iostream>
 
 EdExplFinder::EdExplFinder()
-		: max_char(0),
+		: seq2(nullptr),
+			max_char(0),
+			min_id_cost(0),
 			insertion_cost(nullptr),
 			deletion_cost(nullptr),
 			substitution_cost(nullptr),
-			seq2(nullptr),
-			seqSize(-1),
-			lb(-1),
-			dpMatrix(nullptr),
 			seq1ExcludedCharacters(nullptr),
 			seq2ExcludedCharacters(nullptr),
-			min_id_cost(0) {}
+			dpMatrix(nullptr),
+			seqSize(-1),
+			lb(-1) {}
 
 Clause*
 

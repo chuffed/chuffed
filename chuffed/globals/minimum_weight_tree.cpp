@@ -328,9 +328,9 @@ public:
 				mw(0),
 				splb(0),
 				explv_sz(0),
-				w(_w),
 				ccs(0),
-				specialtint(0) {
+				specialtint(0),
+				w(_w) {
 		explvp.push();
 		priority = 5;
 		nb_innodes = 0;
