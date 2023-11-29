@@ -15,7 +15,7 @@ public:
 			: decs(_decs), pos(0), revive(_revive), init_conflicts(INT_MAX) {}
 
 	WarmStartBrancher(vec<IntVar*> xs, vec<int>& vs, bool _revive = false)
-			: revive(_revive), pos(0), init_conflicts(INT_MAX) {}
+			: pos(0), revive(_revive), init_conflicts(INT_MAX) {}
 
 	bool finished() override {
 		// Already deactivated

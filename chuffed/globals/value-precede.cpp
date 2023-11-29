@@ -8,7 +8,7 @@
 class value_precede : public Propagator {
 	// The only propagation which occurs is:
 	struct tag_t {
-		tag_t() : si(0), ti(0), flag(0) {}
+		tag_t() : flag(0), si(0), ti(0) {}
 		tag_t(int _si, int _ti, bool _flag) : flag(_flag), si(_si), ti(_ti) {}
 
 		unsigned flag : 1;
@@ -537,12 +537,12 @@ public:
 
 	seq_precede_inc(vec<IntVar*>& _xs)
 			: xs(_xs),
-				max_def(0),
-				max_val(xs.size()),
 				first(xs.size() + 1, 0),
 				limit(xs.size() + 1, xs.size()),
 				first_val(xs.size(), 0),
-				limit_val(xs.size(), xs.size()) {
+				limit_val(xs.size(), xs.size()),
+				max_val(xs.size()),
+				max_def(0) {
 		int sz = xs.size();
 		priority = 3;
 
