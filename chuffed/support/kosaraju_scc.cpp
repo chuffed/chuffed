@@ -3,10 +3,9 @@
 #include <cstring>
 #include <iostream>
 #include <utility>
-using namespace std;
 
-KosarajuSCC::KosarajuSCC(int v, vector<vector<int> > out, vector<vector<int> > in,
-												 vector<vector<int> > en)
+KosarajuSCC::KosarajuSCC(int v, std::vector<std::vector<int> > out,
+												 std::vector<std::vector<int> > in, std::vector<std::vector<int> > en)
 		: nb_nodes(v),
 			outgoing(std::move(out)),
 			ingoing(std::move(in)),
@@ -35,7 +34,7 @@ void KosarajuSCC::DFS(int v, bool visited[], int curr) {
 	}
 }
 
-void KosarajuSCC::fillOrder(int v, bool visited[], stack<int>& s) {
+void KosarajuSCC::fillOrder(int v, bool visited[], std::stack<int>& s) {
 	// Mark the current node as visited and print it
 	visited[v] = true;
 	// Recur for all the vertices adjacent to this vertex
@@ -60,9 +59,9 @@ void KosarajuSCC::fillOrder(int v, bool visited[], stack<int>& s) {
 // The main function that finds and prints all strongly connected
 // components
 void KosarajuSCC::run() {
-	scc = vector<int>(nb_nodes, -1);
+	scc = std::vector<int>(nb_nodes, -1);
 	sccs.clear();
-	stack<int> s;
+	std::stack<int> s;
 
 	// Mark all the vertices as not visited (For first DFS)
 	bool* visited = new bool[nb_nodes];

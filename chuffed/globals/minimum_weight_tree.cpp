@@ -24,7 +24,6 @@
  * the nodes of G, so the lower bound is different.
  */
 
-using namespace std;
 #define TREEPROP_DEBUG 0
 
 //*
@@ -62,17 +61,17 @@ protected:
 			uf.print();
 			for (int i = 0; i < nbNodes(); i++) {
 				if (getNodeVar(i).isFixed() && getNodeVar(i).isTrue()) {
-					cout << i << " ";
+					std::cout << i << " ";
 				}
 			}
-			cout << endl;
+			std::cout << std::endl;
 			for (int i = 0; i < nbNodes(); i++) {
 				if (spC[i] != -1) {
-					cout << i << " ";
+					std::cout << i << " ";
 				}
 			}
-			cout << endl;
-			cout << ccc << " " << ccs << endl;
+			std::cout << std::endl;
+			std::cout << ccc << " " << ccs << std::endl;
 		}
 		assert(ccc == ccs);
 		for (int i = 0; i < nbNodes(); i++) {
@@ -84,7 +83,7 @@ protected:
 					if (ccs > 1) {
 						if (!(spC[i] > 0 && spTo[i] != -1 && spTo[i] != i)) {
 							uf.print();
-							cout << "Node " << i << " " << spC[i] << " " << spTo[i] << endl;
+							std::cout << "Node " << i << " " << spC[i] << " " << spTo[i] << std::endl;
 						}
 						assert(spC[i] > 0 && spTo[i] != -1 && spTo[i] != i);
 						int s = 0;
@@ -96,19 +95,19 @@ protected:
 						}
 						if (s != spC[i]) {
 							uf.print();
-							cout << "Node " << i << " " << spC[i] << " " << spTo[i] << " " << s << endl;
+							std::cout << "Node " << i << " " << spC[i] << " " << spTo[i] << " " << s << std::endl;
 						}
 						assert(s == spC[i]);
 					} else {
 						if (!(spC[i] == -1 && spTo[i] == -1)) {
 							uf.print();
-							cout << "Node " << i << " " << spC[i] << " " << spTo[i] << endl;
+							std::cout << "Node " << i << " " << spC[i] << " " << spTo[i] << std::endl;
 							for (int j = 0; j < nbNodes(); j++) {
 								if (getNodeVar(j).isFixed() && getNodeVar(j).isTrue()) {
-									cout << j << " ";
+									std::cout << j << " ";
 								}
 							}
-							cout << endl;
+							std::cout << std::endl;
 						}
 						assert(spC[i] == -1 && spTo[i] == -1);
 						for (int j = 0; j < nbEdges(); j++) {
@@ -148,7 +147,7 @@ protected:
 	}
 	class comp {
 	public:
-		bool operator()(const pair<int, int>& lhs, const pair<int, int>& rhs) const {
+		bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) const {
 			return lhs.second > rhs.second;
 		}
 	};
@@ -217,7 +216,7 @@ protected:
 				if (costs[curr] + cost < costs[other]) {
 					edge[other] = e;
 					costs[other] = costs[curr] + cost;
-					pair<int, int> val(other, costs[other]);
+					std::pair<int, int> val(other, costs[other]);
 					q.push(val);
 				}
 			}
@@ -312,7 +311,7 @@ protected:
 				if (costs[curr] + cost < costs[other]) {
 					edge[other] = e;
 					costs[other] = costs[curr] + cost;
-					pair<int, int> val(other, costs[other]);
+					std::pair<int, int> val(other, costs[other]);
 					q.push(val);
 				}
 			}
@@ -543,7 +542,7 @@ public:
 		cout<<endl;
 		//*/
 
-		unordered_set<int>::iterator it;
+		std::unordered_set<int>::iterator it;
 
 		// cout<<"1. spC[0] = "<<spC[0]<<endl;
 		// uf.print();
@@ -781,7 +780,7 @@ protected:
 							r = Reason_new(ps);
 						}
 						if (TREEPROP_DEBUG) {
-							cout << "STEINER " << e << endl;
+							std::cout << "STEINER " << e << std::endl;
 						}
 						getEdgeVar(e).setVal(true, r);  // New edge in (bridge)
 					}
@@ -874,9 +873,10 @@ public:
 	void wakeup(int i, int c) override {
 		if (i == totalWeightVarID) {
 			if (TREEPROP_DEBUG) {
-				cout << "Wakeup" << endl;
-				cout << __FILE__ << " " << __LINE__ << " totalWeight " << totalWeight->getMax() << endl;
-				cout << "event Upperbound" << endl;
+				std::cout << "Wakeup" << std::endl
+									<< __FILE__ << " " << __LINE__ << " totalWeight " << totalWeight->getMax()
+									<< std::endl
+									<< "event Upperbound" << std::endl;
 			}
 			pushInQueue();
 		} else {
@@ -897,7 +897,7 @@ public:
 
 	class comp {
 	public:
-		bool operator()(const pair<int, int>& lhs, const pair<int, int>& rhs) const {
+		bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) const {
 			return lhs.second > rhs.second;
 		}
 	};
@@ -969,7 +969,7 @@ public:
 					res[other].edge = e;
 					res[other].cost = res[curr].cost + cost;
 
-					pair<int, int> val(other, res[other].cost);
+					std::pair<int, int> val(other, res[other].cost);
 
 					q.push(val);
 				}
@@ -1025,7 +1025,7 @@ public:
 					res[other].edge = e;
 					res[other].cost = res[curr].cost + cost;
 
-					pair<int, int> val(other, res[other].cost);
+					std::pair<int, int> val(other, res[other].cost);
 
 					q.push(val);
 				}
@@ -1047,7 +1047,7 @@ public:
 		if (getNodeVar(i).isFixed() && getNodeVar(i).isTrue() &&
 				(/*shortestPathsInfo[i][0] != -1 ||*/ ruf.isRoot(i))) {
 			if (TREEPROP_DEBUG) {
-				cout << "elementary update of #" << i << " (isRoot:" << ruf.isRoot(i) << endl;
+				std::cout << "elementary update of #" << i << " (isRoot:" << ruf.isRoot(i) << std::endl;
 			}
 			int rep = i;
 			std::vector<DijkstraInfo> dijkstraPath(nbNodes());
@@ -1098,9 +1098,9 @@ public:
 						shortestPathsEdges[repN][i] = tmp[i];
 					}
 					if (TREEPROP_DEBUG) {
-						cout << "been here6 " << repN << " " << shortestPathsInfo[repN][1] << " " << other
-								 << "prev cost: " << shortestPathsInfo[repN][0]
-								 << "new cost: " << dijkstraPath[other].cost << endl;
+						std::cout << "been here6 " << repN << " " << shortestPathsInfo[repN][1] << " " << other
+											<< "prev cost: " << shortestPathsInfo[repN][0]
+											<< "new cost: " << dijkstraPath[other].cost << std::endl;
 					}
 					shortestPathsInfo[repN][0] = dijkstraPath[other].cost;
 					shortestPathsInfo[repN][1] = other;
@@ -1123,7 +1123,7 @@ public:
 
 	bool updateLowerBound() {
 		if (TREEPROP_DEBUG) {
-			cout << "update all" << endl;
+			std::cout << "update all" << std::endl;
 		}
 		lowerBound = 0;
 		// For each repr of any CC:
@@ -1179,7 +1179,7 @@ public:
 						assert(count <= nbNodes());
 					}
 					if (TREEPROP_DEBUG) {
-						cout << "been here5 " << i << endl;
+						std::cout << "been here5 " << i << std::endl;
 					}
 					shortestPathsInfo[i][0] = dijkstraPath[i].cost;
 					shortestPathsInfo[i][1] = repN;
@@ -1199,7 +1199,7 @@ public:
 				assert(count <= nbNodes());
 			}
 			if (TREEPROP_DEBUG) {
-				cout << "been here4 " << repN << endl;
+				std::cout << "been here4 " << repN << std::endl;
 			}
 			shortestPathsInfo[repN][0] = dijkstraPath[argmin].cost;
 			shortestPathsInfo[repN][1] = argmin;
@@ -1209,7 +1209,7 @@ public:
 
 	bool propagateNewEdge(int e) override {
 		if (TREEPROP_DEBUG) {
-			cout << "newEdge" << endl;
+			std::cout << "newEdge" << std::endl;
 		}
 		int rep0 = ruf.find(getEndnode(e, 0));
 		int rep1 = ruf.find(getEndnode(e, 1));
@@ -1235,7 +1235,7 @@ public:
 			int maxR = (shortestPathsInfo[rep0][0] > shortestPathsInfo[rep1][0]) ? rep0 : rep1;
 			int minR = (maxR == rep0) ? rep1 : rep0;
 			if (TREEPROP_DEBUG) {
-				cout << "been here3 " << maxR << endl;
+				std::cout << "been here3 " << maxR << std::endl;
 			}
 			std::memset(shortestPathsEdges[maxR], 0, sizeof(Tint) * nbEdges());
 			shortestPathsInfo[maxR][0] = -1;
@@ -1248,7 +1248,7 @@ public:
 			}
 			if (count > 1) {  // More than one CC
 				if (TREEPROP_DEBUG) {
-					cout << "been here2 " << newR << endl;
+					std::cout << "been here2 " << newR << std::endl;
 				}
 				std::memcpy(shortestPathsEdges[newR], shortestPathsEdges[minR], sizeof(Tint) * nbEdges());
 				shortestPathsInfo[newR][0] = shortestPathsInfo[minR][0];
@@ -1256,7 +1256,7 @@ public:
 			}
 			if (minR != newR) {
 				if (TREEPROP_DEBUG) {
-					cout << "been here1 " << minR << endl;
+					std::cout << "been here1 " << minR << std::endl;
 				}
 				std::memset(shortestPathsEdges[minR], 0, sizeof(Tint) * nbEdges());
 				shortestPathsInfo[minR][0] = -1;
@@ -1266,7 +1266,7 @@ public:
 			int newR = ruf.find(e0);
 			assert(newR == e0 || newR == e1);
 			if (TREEPROP_DEBUG) {
-				cout << "maybe here?" << endl;
+				std::cout << "maybe here?" << std::endl;
 			}
 
 			if (wasE0Fixed && !wasE1Fixed) {
@@ -1307,7 +1307,7 @@ public:
 
 	bool propagateRemNode(int n) override {
 		if (TREEPROP_DEBUG) {
-			cout << "remNode " << n << endl;
+			std::cout << "remNode " << n << std::endl;
 		}
 		bool ok = TreePropagator::propagateRemNode(n);
 		if (!ok) {
@@ -1330,7 +1330,7 @@ public:
 
 	bool propagateRemEdge(int e) override {
 		if (TREEPROP_DEBUG) {
-			cout << "remEdge " << e << endl;
+			std::cout << "remEdge " << e << std::endl;
 		}
 		bool ok = TreePropagator::propagateRemEdge(e);
 		if (!ok) {
@@ -1358,37 +1358,38 @@ public:
 
 	void printEdgesMatrix() {
 		for (int i = 0; i < nbNodes(); i++) {
-			cout << ((getNodeVar(i).isFixed() && getNodeVar(i).getVal() == 1 && ruf.isRoot(i)) ? "R "
-																																												 : "  ");
+			std::cout << ((getNodeVar(i).isFixed() && getNodeVar(i).getVal() == 1 && ruf.isRoot(i))
+												? "R "
+												: "  ");
 		}
-		cout << endl;
+		std::cout << std::endl;
 		for (int i = 0; i < nbNodes(); i++) {
-			cout << ((getNodeVar(i).isFixed() && getNodeVar(i).getVal() == 1 &&
-								shortestPathsInfo[i][0] != -1)
-									 ? "R "
-									 : "  ");
+			std::cout << ((getNodeVar(i).isFixed() && getNodeVar(i).getVal() == 1 &&
+										 shortestPathsInfo[i][0] != -1)
+												? "R "
+												: "  ");
 		}
-		cout << endl;
+		std::cout << std::endl;
 		for (int i = 0; i < nbNodes(); i++) {
-			cout << ((shortestPathsInfo[i][0] != -1) ? "R " : "  ");
+			std::cout << ((shortestPathsInfo[i][0] != -1) ? "R " : "  ");
 		}
-		cout << endl;
+		std::cout << std::endl;
 		for (int i = 0; i < nbEdges(); i++) {
 			for (int j = 0; j < nbNodes(); j++) {
-				cout << shortestPathsEdges[j][i] << " ";
+				std::cout << shortestPathsEdges[j][i] << " ";
 			}
-			cout << endl;
+			std::cout << std::endl;
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 
 	bool propagate() override {
 		if (TREEPROP_DEBUG) {
-			cout << "ppgate" << endl;
+			std::cout << "ppgate" << std::endl;
 		}
 
 		bool computeLBFromScratch = true;  //(newFixedN.size() > 0);
-		unordered_set<int>::iterator it;
+		std::unordered_set<int>::iterator it;
 		for (it = newFixedN.begin(); it != newFixedN.end(); ++it) {
 			int j = *it;  // newFixedN[i];
 
@@ -1498,8 +1499,8 @@ public:
 		// Update the mandatory weight.
 		int total = lowerBound / 2 + mandatoryWeight;
 		if (TREEPROP_DEBUG) {
-			cout << total << " " << lowerBound << " " << totalWeight->getMax() << " " << mandatoryWeight
-					 << endl;
+			std::cout << total << " " << lowerBound << " " << totalWeight->getMax() << " "
+								<< mandatoryWeight << std::endl;
 		}
 
 		if (total > totalWeight->getMax()) {  // Not going to be a good solution!
@@ -1532,7 +1533,8 @@ public:
 				sat.confl = expl;
 			}
 			if (TREEPROP_DEBUG) {
-				cout << "                                                           SAVED" << endl;
+				std::cout << "                                                           SAVED"
+									<< std::endl;
 			}
 			// cout << lb <<" " <<totalWeight->getMax()<<" " <<mandatoryWeight<<endl;
 			return false;

@@ -5,8 +5,6 @@
 #include <queue>
 #include <set>
 
-using namespace std;
-
 #define CUMUVERB 0
 
 // Data types for the Chuffed solver
@@ -63,7 +61,7 @@ class CumulativeCalProp : public Propagator {
 		CUMU_INT begin;
 		CUMU_INT end;
 		CUMU_INT level;
-		set<CUMU_INT> tasks;
+		std::set<CUMU_INT> tasks;
 		ProfilePart(CUMU_INT b, CUMU_INT e, CUMU_INT l, CUMU_INT t) : begin(b), end(e), level(l) {
 			tasks.insert(t);
 		};
@@ -80,7 +78,7 @@ class CumulativeCalProp : public Propagator {
 	Tint last_unfixed;
 
 public:
-	string name;  // Name of the cumulative constraint for printing statistics
+	std::string name;  // Name of the cumulative constraint for printing statistics
 
 	// Constant Data
 	CUMU_ARR_INTVAR start;      // Start time variables of the tasks
@@ -159,7 +157,7 @@ public:
 	// Constructor
 	CumulativeCalProp(CUMU_ARR_INTVAR& _start, CUMU_ARR_INTVAR& _dur, CUMU_ARR_INTVAR& _usage,
 										CUMU_INTVAR _limit, CUMU_MATRIX_INT& _cal, CUMU_ARR_INT& _taskCal,
-										CUMU_INT _rho, CUMU_INT _resCalendar, list<string> opt)
+										CUMU_INT _rho, CUMU_INT _resCalendar, std::list<std::string> opt)
 			: start(_start),
 				dur(_dur),
 				usage(_usage),
@@ -343,7 +341,7 @@ public:
 	void printStats() override {
 		fprintf(stderr, "%% Cumulative propagator with calendars statistics");
 		if (!name.empty()) {
-			cerr << " for " << name;
+			std::cerr << " for " << name;
 		}
 		fprintf(stderr, ":\n");
 		fprintf(stderr, "%%\t#TT incons.: %ld\n", nb_tt_incons);
@@ -449,7 +447,7 @@ public:
 				end++;
 			}
 			assert(workDays == duration);
-			distance = min(distance, end - time);
+			distance = std::min(distance, end - time);
 		}
 		if (distance > min_energy2_global[i]) {
 			min_energy2_global[i] = distance;
@@ -460,11 +458,11 @@ public:
 	int retrieveFreeEnergy(const int i) {
 		if (rho == 1) {
 			// Resource stays engaged
-			return (min_energy2[i] - min_usage(i) * max(0, ect_2[i] - lst_2[i]));
+			return (min_energy2[i] - min_usage(i) * std::max(0, ect_2[i] - lst_2[i]));
 		}  // Resource is released
 		int workDays = workingPeriods[taskCalendar[i] - 1][lst_2[i]] -
 									 workingPeriods[taskCalendar[i] - 1][ect_2[i]];
-		return (min_energy2[i] - min_usage(i) * max(0, workDays));
+		return (min_energy2[i] - min_usage(i) * std::max(0, workDays));
 	}
 
 	void retrieveEnergyParameters(const int i) {
@@ -530,11 +528,11 @@ public:
 				if (calendar[taskCalendar[i] - 1][t] == 1) {
 					j++;
 				} else if (calendar[taskCalendar[i] - 1][t + 1] == 1) {
-					next = min(next, t + 1);
+					next = std::min(next, t + 1);
 				}
 				t++;
 			}
-			distance = min(distance, t - tau);
+			distance = std::min(distance, t - tau);
 			if (distance == duration) {
 				return min_usage(i) * duration;
 			}
@@ -545,12 +543,12 @@ public:
 	// Free Energy
 	inline CUMU_INT free_energy(CUMU_INT i) {
 		if (rho == 1) {
-			return (min_energy(i) - min_usage(i) * max(0, ect(i) - lst(i)));
+			return (min_energy(i) - min_usage(i) * std::max(0, ect(i) - lst(i)));
 		}
 		int breaks =
 				ect(i) - lst(i) -
 				(workingPeriods[taskCalendar[i] - 1][lst(i)] - workingPeriods[taskCalendar[i] - 1][ect(i)]);
-		return (min_energy(i) - min_usage(i) * max(0, ect(i) - lst(i) - breaks));
+		return (min_energy(i) - min_usage(i) * std::max(0, ect(i) - lst(i) - breaks));
 	}
 
 	/**
@@ -590,14 +588,15 @@ public:
 	void ttef_explanation_for_update_ub(int shift_in, int begin, int end, int task, int& bound,
 																			vec<Lit>& expl);
 
-	int ttef_retrieve_tasks(int shift_in, int begin, int end, int fb_id, list<TaskDur>& tasks_tw,
-													list<TaskDur>& tasks_cp);
+	int ttef_retrieve_tasks(int shift_in, int begin, int end, int fb_id, std::list<TaskDur>& tasks_tw,
+													std::list<TaskDur>& tasks_cp);
 
 	// TTEF Generation of explanations
 	// TTEF_cal: consider breaks between begin and end
-	void ttef_analyse_limit_and_tasks(int begin, int end, int breaks, list<TaskDur>& tasks_tw,
-																		list<TaskDur>& tasks_cp, int& en_lift, vec<Lit>& expl);
-	void ttef_analyse_tasks(int begin, int end, list<TaskDur>& tasks, int& en_lift, vec<Lit>& expl);
+	void ttef_analyse_limit_and_tasks(int begin, int end, int breaks, std::list<TaskDur>& tasks_tw,
+																		std::list<TaskDur>& tasks_cp, int& en_lift, vec<Lit>& expl);
+	void ttef_analyse_tasks(int begin, int end, std::list<TaskDur>& tasks, int& en_lift,
+													vec<Lit>& expl);
 	int ttef_analyse_tasks_left_shift(int begin, int end, int dur_in, int task, int max_dur_lift,
 																		int& last_dur);
 	int ttef_analyse_tasks_right_shift(int begin, int end, int dur_in, int task, int max_dur_lift,
@@ -660,8 +659,8 @@ public:
 				retrieveCoreParameters(i);
 			}
 			// Compute the time window for consideration
-			tw_begin = min(tw_begin, est_2[i]);
-			tw_end = max(tw_end, lct_2[i]);
+			tw_begin = std::min(tw_begin, est_2[i]);
+			tw_end = std::max(tw_end, lct_2[i]);
 			// Check whether the task 'i' is fixed
 			if ((CUMU_PT_ISFIXED(start[i]) && CUMU_PT_ISFIXED(dur[i]) && CUMU_PT_ISFIXED(usage[i])) ||
 					max_dur(i) <= 0 || max_usage(i) <= 0) {
@@ -788,8 +787,8 @@ public:
 	// and propagator
 	CUMU_BOOL
 	time_table_propagation(CUMU_ARR_INT& task, const int tw_begin, const int tw_end) {
-		list<ProfileChangePt> changes;
-		list<CUMU_INT> comp_task;
+		std::list<ProfileChangePt> changes;
+		std::list<CUMU_INT> comp_task;
 		// int size_profile = 0;
 #if CUMUVERB > 10
 		fprintf(stderr, "\tCompulsory Parts ...\n");
@@ -847,14 +846,14 @@ public:
 		return true;
 	}
 
-	void get_compulsory_parts2(list<ProfileChangePt>& changes, list<CUMU_INT>& comp_task,
+	void get_compulsory_parts2(std::list<ProfileChangePt>& changes, std::list<CUMU_INT>& comp_task,
 														 CUMU_ARR_INT& task, CUMU_INT i_start, CUMU_INT i_end, int tw_begin,
 														 int tw_end);
 
 	// Sets for each profile part its begin and end time in chronological order
 	// Runtime complexity: O(n)
 	//
-	void create_profile(list<ProfileChangePt>& changes) const {
+	void create_profile(std::list<ProfileChangePt>& changes) const {
 		auto iter = changes.begin();
 		int cur_profile = 0;
 		int cur_time = iter->time;
@@ -886,9 +885,9 @@ public:
 	// Filling the profile parts with compulsory parts and checking for a resource
 	// overload
 	CUMU_BOOL
-	fill_in_profile_parts(ProfilePart* profile, int size, list<CUMU_INT> comp_task,
+	fill_in_profile_parts(ProfilePart* profile, int size, std::list<CUMU_INT> comp_task,
 												int& i_max_usage) {
-		list<CUMU_INT>::iterator iter;
+		std::list<CUMU_INT>::iterator iter;
 		int i = 0;
 		CUMU_INT lst_i;
 		CUMU_INT ect_i;
@@ -983,7 +982,7 @@ public:
 
 	// Counting the number of profiles
 	//
-	static int count_profile(list<ProfileChangePt>& changes) {
+	static int count_profile(std::list<ProfileChangePt>& changes) {
 		auto iter = changes.begin();
 		int cur_time = iter->time;
 		int next_time;
@@ -1053,9 +1052,9 @@ public:
 	//
 	// Explanation is created for the time interval [begin, end), i.e., exluding end.
 	//
-	void analyse_limit_and_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks, CUMU_INT lift_usage,
+	void analyse_limit_and_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks, CUMU_INT lift_usage,
 															 CUMU_INT begin, CUMU_INT end);
-	void analyse_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks, CUMU_INT lift_usage, CUMU_INT begin,
+	void analyse_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks, CUMU_INT lift_usage, CUMU_INT begin,
 										 CUMU_INT end);
 	static void submit_conflict_explanation(vec<Lit>& expl);
 	static Clause* get_reason_for_update(vec<Lit>& expl);
@@ -1084,8 +1083,8 @@ public:
  * Functions related to the Time-Table Consistency Check and Propagation
  ****/
 
-void CumulativeCalProp::get_compulsory_parts2(list<ProfileChangePt>& changes,
-																							list<CUMU_INT>& comp_task, CUMU_ARR_INT& task,
+void CumulativeCalProp::get_compulsory_parts2(std::list<ProfileChangePt>& changes,
+																							std::list<CUMU_INT>& comp_task, CUMU_ARR_INT& task,
 																							CUMU_INT i_start, CUMU_INT i_end, const int tw_begin,
 																							const int tw_end) {
 #if CUMUVERB > 2
@@ -1231,7 +1230,7 @@ CumulativeCalProp::time_table_filtering_lb(ProfilePart profile[], int low, int h
 			}
 			const int cal_idx = taskCalendar[task] - 1;
 			const int* wPeriods = workingPeriods[cal_idx];
-			const int end = min(ect_2[task], profile[i].end);
+			const int end = std::min(ect_2[task], profile[i].end);
 			if (rho == 0 && wPeriods[profile[i].begin] == wPeriods[end]) {
 				continue;
 			}
@@ -1322,7 +1321,7 @@ CumulativeCalProp::time_table_filtering_ub(ProfilePart profile[], int low, int h
 			// Check whether the task has a working period in the profile part
 			// if the resource is released
 			const int cal_idx = taskCalendar[task] - 1;
-			const int begin = max(lst_2[task], profile[i].begin);
+			const int begin = std::max(lst_2[task], profile[i].begin);
 			if (rho == 0 && workingPeriods[cal_idx][begin] == workingPeriods[cal_idx][profile[i].end]) {
 				continue;
 			}
@@ -1452,7 +1451,7 @@ int CumulativeCalProp::find_first_profile_for_ub(ProfilePart profile[], int low,
  * their explanations                                                   *
  ************************************************************************/
 
-void CumulativeCalProp::analyse_limit_and_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks,
+void CumulativeCalProp::analyse_limit_and_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks,
 																								CUMU_INT lift_usage, CUMU_INT begin, CUMU_INT end) {
 	CUMU_INT diff_limit = max_limit0() - max_limit();
 	if (diff_limit > 0) {
@@ -1472,9 +1471,9 @@ void CumulativeCalProp::analyse_limit_and_tasks(vec<Lit>& expl, set<CUMU_INT>& t
 	analyse_tasks(expl, tasks, lift_usage, begin, end);
 }
 
-void CumulativeCalProp::analyse_tasks(vec<Lit>& expl, set<CUMU_INT>& tasks, CUMU_INT lift_usage,
-																			CUMU_INT begin, CUMU_INT end) {
-	set<CUMU_INT>::iterator iter;
+void CumulativeCalProp::analyse_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks,
+																			CUMU_INT lift_usage, CUMU_INT begin, CUMU_INT end) {
+	std::set<CUMU_INT>::iterator iter;
 	for (iter = tasks.begin(); iter != tasks.end(); iter++) {
 		const int i = *iter;
 #if CUMUVERB > 10
@@ -1543,13 +1542,13 @@ Clause* CumulativeCalProp::get_reason_for_update(vec<Lit>& expl) {
 
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in) {
-	list<string> opt;
+	std::list<std::string> opt;
 	cumulative_cal(s, d, r, limit, cal, taskCal, rho_in, resCal_in);
 }
 
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in,
-										list<string> opt) {
+										std::list<std::string> opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
@@ -1603,8 +1602,8 @@ void CumulativeCalProp::ttef_initialise_parameters() {
 	}
 	// Sorting of the task id's arrays
 	//
-	sort(task_id_est, task_id_est + last_unfixed + 1, sort_est_asc);
-	sort(task_id_lct, task_id_lct + last_unfixed + 1, sort_lct_asc);
+	std::sort(task_id_est, task_id_est + last_unfixed + 1, sort_est_asc);
+	std::sort(task_id_lct, task_id_lct + last_unfixed + 1, sort_lct_asc);
 	// Calculation of 'tt_after_est'
 	//
 	for (int ii = last_unfixed; ii >= 0; ii--) {
@@ -1740,8 +1739,8 @@ bool CumulativeCalProp::ttef_consistency_check(int shift_in) {
 				dur_shift = get_free_dur_right_shift2(begin, end, j);
 				// Adjusting dur_shift if resource stays engaged
 				if (rho == 1) {
-					const int dur_fixed = max(0, ect_2[j] - lst_2[j]);
-					dur_shift = min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
+					const int dur_fixed = std::max(0, ect_2[j] - lst_2[j]);
+					dur_shift = std::min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
 				}
 				en_req_free += min_usage(j) * dur_shift;
 			}
@@ -1779,8 +1778,8 @@ bool CumulativeCalProp::ttef_consistency_check(int shift_in) {
 #if CUMUVERB > 0
 			fprintf(stderr, "Entering TTEF Inconsistent\n");
 #endif
-			list<TaskDur> tasks_tw;
-			list<TaskDur> tasks_cp;
+			std::list<TaskDur> tasks_tw;
+			std::list<TaskDur> tasks_cp;
 			int en_req1 = 0;
 			// Retrieve tasks involved
 			en_req1 = ttef_retrieve_tasks(shift_in, begin, end, -1, tasks_tw, tasks_cp);
@@ -1876,7 +1875,7 @@ bool CumulativeCalProp::ttef_bounds_propagation_lb(int shift_in,
 	int* sumFreeEnergy = new int[last_unfixed + 1];
 	for (int ii = 0; ii <= last_unfixed; ii++) {
 		const int i = task_id_est[ii];
-		maxEnergy = max(maxEnergy, min_usage(i) * (rho == 1 ? ect_2[i] - est_2[i] : min_dur(i)));
+		maxEnergy = std::max(maxEnergy, min_usage(i) * (rho == 1 ? ect_2[i] - est_2[i] : min_dur(i)));
 		sumFreeEnergy[ii] = (ii == 0 ? 0 : sumFreeEnergy[ii - 1]) + free_energy2[i];
 	}
 
@@ -1953,11 +1952,11 @@ bool CumulativeCalProp::ttef_bounds_propagation_lb(int shift_in,
 				// Task might partially lie in the considered time interval
 				const int cal_idx = taskCalendar[j] - 1;
 				const int* wPeriods = workingPeriods[cal_idx];
-				const int ect_in = min(end, ect_2[j]);
+				const int ect_in = std::min(end, ect_2[j]);
 				int workDays_req_in = 0;
 				// Add the compulsory part of 'j' to the required energy in the time interval [begin, end)
 				if (lst_2[j] < ect_2[j]) {
-					const int begin_comp = min(end, lst_2[j]);
+					const int begin_comp = std::min(end, lst_2[j]);
 					workDays_req_in +=
 							(rho == 1 ? ect_in - begin_comp : wPeriods[begin_comp] - wPeriods[ect_in]);
 				}
@@ -1968,8 +1967,8 @@ bool CumulativeCalProp::ttef_bounds_propagation_lb(int shift_in,
 					dur_shift = get_free_dur_right_shift2(begin, end, j);
 					// Adjusting dur_shift if resource stays engaged
 					if (rho == 1) {
-						const int dur_fixed = max(0, ect_2[j] - lst_2[j]);
-						dur_shift = min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
+						const int dur_fixed = std::max(0, ect_2[j] - lst_2[j]);
+						dur_shift = std::min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
 					}
 					workDays_req_in += dur_shift;
 					en_req_free += min_usage(j) * dur_shift;
@@ -2036,8 +2035,8 @@ bool CumulativeCalProp::ttef_bounds_propagation_lb(int shift_in,
 		// Increment the inconsistency counter
 		nb_ttef_incons++;
 		if (so.lazy) {
-			list<TaskDur> tasks_tw;
-			list<TaskDur> tasks_cp;
+			std::list<TaskDur> tasks_tw;
+			std::list<TaskDur> tasks_cp;
 			int en_req1 = 0;
 			// Retrieve tasks involved
 			en_req1 = ttef_retrieve_tasks(shift_in, begin, end, -1, tasks_tw, tasks_cp);
@@ -2094,8 +2093,8 @@ bool CumulativeCalProp::ttef_bounds_propagation_ub(int shift_in,
 	sumFreeEnergy[last_unfixed + 1] = 0;
 	for (int ii = last_unfixed; ii >= 0; ii--) {
 		const int i = task_id_lct[ii];
-		maxLength = (rho == 1 ? max(lct_2[i] - lst_2[i], ect_2[i] - est_2[i]) : min_dur(i));
-		maxEnergy = max(maxEnergy, min_usage(i) * maxLength);
+		maxLength = (rho == 1 ? std::max(lct_2[i] - lst_2[i], ect_2[i] - est_2[i]) : min_dur(i));
+		maxEnergy = std::max(maxEnergy, min_usage(i) * maxLength);
 		sumFreeEnergy[ii] = sumFreeEnergy[ii + 1] + free_energy2[i];
 	}
 
@@ -2176,11 +2175,11 @@ bool CumulativeCalProp::ttef_bounds_propagation_ub(int shift_in,
 				// Task might partially lie in the considered time interval
 				const int cal_idx = taskCalendar[j] - 1;
 				const int* wPeriods = workingPeriods[cal_idx];
-				const int lst_in = max(begin, lst_2[j]);
+				const int lst_in = std::max(begin, lst_2[j]);
 				int workDays_req_in = 0;
 				// Add the compulsory part of 'j' to the required energy in the time interval [begin, end)
 				if (lst_2[j] < ect_2[j]) {
-					const int end_comp = max(begin, ect_2[j]);
+					const int end_comp = std::max(begin, ect_2[j]);
 					workDays_req_in += (rho == 1 ? end_comp - lst_in : wPeriods[lst_in] - wPeriods[end_comp]);
 				}
 
@@ -2190,8 +2189,8 @@ bool CumulativeCalProp::ttef_bounds_propagation_ub(int shift_in,
 					dur_shift = get_free_dur_left_shift2(begin, end, j);
 					// Adjusting dur_shift if resource stays engaged
 					if (rho == 1) {
-						const int dur_fixed = max(0, ect_2[j] - lst_2[j]);
-						dur_shift = min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
+						const int dur_fixed = std::max(0, ect_2[j] - lst_2[j]);
+						dur_shift = std::min(min_energy2[j] / min_usage(j) - dur_fixed, dur_shift);
 					}
 					workDays_req_in += dur_shift;
 					en_req_free += min_usage(j) * dur_shift;
@@ -2258,8 +2257,8 @@ bool CumulativeCalProp::ttef_bounds_propagation_ub(int shift_in,
 		// Increment the inconsistency counter
 		nb_ttef_incons++;
 		if (so.lazy) {
-			list<TaskDur> tasks_tw;
-			list<TaskDur> tasks_cp;
+			std::list<TaskDur> tasks_tw;
+			std::list<TaskDur> tasks_cp;
 			int en_req1 = 0;
 			// Retrieve tasks involved
 			en_req1 = ttef_retrieve_tasks(shift_in, begin, end, -1, tasks_tw, tasks_cp);
@@ -2292,14 +2291,14 @@ void CumulativeCalProp::tteef_bounds_propagation_lb(const int begin, const int e
 
 	// Some useful constants
 	const int* wPeriods = workingPeriods[taskCalendar[j] - 1];
-	const int est_in = max(begin, est_2[j]);
-	const int ect_in = min(end, ect_2[j]);
+	const int est_in = std::max(begin, est_2[j]);
+	const int ect_in = std::min(end, ect_2[j]);
 	assert(est_in <= ect_in);
 
 	// Computing the compulsory part in the time interval [begin, end)
 	int wdays_in = 0;
 	if (lst_2[j] < ect_2[j]) {
-		const int end_comp_in = max(begin, ect_in);
+		const int end_comp_in = std::max(begin, ect_in);
 		wdays_in += (rho == 1 ? end_comp_in - est_in : wPeriods[est_in] - wPeriods[end_comp_in]);
 	}
 
@@ -2333,13 +2332,13 @@ void CumulativeCalProp::tteef_bounds_propagation_ub(const int begin, const int e
 
 	// Some useful constants
 	const int* wPeriods = workingPeriods[taskCalendar[j] - 1];
-	const int lst_in = max(begin, lst_2[j]);
-	const int lct_in = min(end, lct_2[j]);
+	const int lst_in = std::max(begin, lst_2[j]);
+	const int lct_in = std::min(end, lct_2[j]);
 
 	// Computing the compulsory part in time interval [begin, end)
 	int wdays_in = 0;
 	if (lst_2[j] < ect_2[j]) {
-		const int end_comp_in = max(begin, lct_in);
+		const int end_comp_in = std::max(begin, lct_in);
 		wdays_in += (rho == 1 ? end_comp_in - lst_in : wPeriods[lst_in] - wPeriods[end_comp_in]);
 	}
 
@@ -2379,8 +2378,8 @@ int CumulativeCalProp::ttef_get_new_start_time(const int begin, const int end, c
 	}
 	// Resource stays engaged
 	const int* cal = calendar[taskCalendar[task] - 1];
-	const int begin_in = max(begin, est_2[task]);
-	const int end_in = min(end, ect_2[task]);
+	const int begin_in = std::max(begin, est_2[task]);
+	const int end_in = std::min(end, ect_2[task]);
 	assert(begin_in < end_in);
 	int wdays_in = end_in - begin_in;
 	assert(wdays_in > min_wdays_in);
@@ -2451,8 +2450,8 @@ int CumulativeCalProp::ttef_get_new_end_time(const int begin, const int end, con
 	}
 	// Resource stays engaged
 	const int* cal = calendar[taskCalendar[task] - 1];
-	const int begin_in = max(begin, lst_2[task]);
-	const int end_in = min(end, lct_2[task]);
+	const int begin_in = std::max(begin, lst_2[task]);
+	const int end_in = std::min(end, lct_2[task]);
 	assert(begin_in < end_in);
 	int wdays_in = end_in - begin_in;
 	assert(wdays_in > min_wdays_in);
@@ -2512,8 +2511,8 @@ void CumulativeCalProp::ttef_explanation_for_update_lb(int shift_in, const int b
 	const int* wPeriods = workingPeriods[taskCalendar[task] - 1];
 
 	// Some variables
-	list<TaskDur> tasks_tw;
-	list<TaskDur> tasks_cp;
+	std::list<TaskDur> tasks_tw;
+	std::list<TaskDur> tasks_cp;
 
 	// Retrieving tasks involved in the time interval [begin, end) excluding task 'task'
 	const int en_req = ttef_retrieve_tasks(shift_in, begin, end, task, tasks_tw, tasks_cp);
@@ -2533,9 +2532,9 @@ void CumulativeCalProp::ttef_explanation_for_update_lb(int shift_in, const int b
 	// Some consistency checks
 	assert(new_lb >= bound);
 	assert(rho == 0 ||
-				 en_avail < min_usage(task) * (min(end, ect_2[task]) - max(begin, est_2[task])));
-	assert(rho == 1 || en_avail < min_usage(task) * (wPeriods[max(begin, est_2[task])] -
-																									 wPeriods[min(end, ect_2[task])]));
+				 en_avail < min_usage(task) * (std::min(end, ect_2[task]) - std::max(begin, est_2[task])));
+	assert(rho == 1 || en_avail < min_usage(task) * (wPeriods[std::max(begin, est_2[task])] -
+																									 wPeriods[std::min(end, ect_2[task])]));
 
 	// Calculating the explanation lower bound on the start time
 	int expl_wdays_in;
@@ -2547,8 +2546,8 @@ void CumulativeCalProp::ttef_explanation_for_update_lb(int shift_in, const int b
 		case ED_NAIVE:
 		default:
 			expl_lb = est_2[task];
-			const int expl_begin = max(begin, expl_lb);
-			const int expl_end = min(end, ect_2[task]);
+			const int expl_begin = std::max(begin, expl_lb);
+			const int expl_end = std::min(end, ect_2[task]);
 			expl_wdays_in =
 					(rho == 1 ? expl_end - expl_begin : wPeriods[expl_begin] - wPeriods[expl_end]);
 	}
@@ -2590,8 +2589,8 @@ void CumulativeCalProp::ttef_explanation_for_update_ub(int shift_in, const int b
 	const int* wPeriods = workingPeriods[taskCalendar[task] - 1];
 
 	// Some variables
-	list<TaskDur> tasks_tw;
-	list<TaskDur> tasks_cp;
+	std::list<TaskDur> tasks_tw;
+	std::list<TaskDur> tasks_cp;
 
 	// Retrieving tasks involved in the time interval [begin, end) excluding task 'task'
 	const int en_req = ttef_retrieve_tasks(shift_in, begin, end, task, tasks_tw, tasks_cp);
@@ -2611,9 +2610,9 @@ void CumulativeCalProp::ttef_explanation_for_update_ub(int shift_in, const int b
 	// Some consistency checks
 	assert(new_lct <= bound);
 	assert(rho == 0 ||
-				 en_avail < min_usage(task) * (min(end, lct_2[task]) - max(begin, lst_2[task])));
-	assert(rho == 1 || en_avail < min_usage(task) * (wPeriods[max(begin, lst_2[task])] -
-																									 wPeriods[min(end, lct_2[task])]));
+				 en_avail < min_usage(task) * (std::min(end, lct_2[task]) - std::max(begin, lst_2[task])));
+	assert(rho == 1 || en_avail < min_usage(task) * (wPeriods[std::max(begin, lst_2[task])] -
+																									 wPeriods[std::min(end, lct_2[task])]));
 
 	// Calculating the explanation lower bound on the start time
 	int expl_wdays_in;
@@ -2625,8 +2624,8 @@ void CumulativeCalProp::ttef_explanation_for_update_ub(int shift_in, const int b
 		case ED_NAIVE:
 		default:
 			expl_ub = lst_2[task];
-			const int expl_begin = max(begin, expl_ub);
-			const int expl_end = min(end, lct_2[task]);
+			const int expl_begin = std::max(begin, expl_ub);
+			const int expl_end = std::min(end, lct_2[task]);
 			expl_wdays_in =
 					(rho == 1 ? expl_end - expl_begin : wPeriods[expl_begin] - wPeriods[expl_end]);
 	}
@@ -2717,8 +2716,8 @@ bool CumulativeCalProp::ttef_update_bounds(int shift_in, std::queue<TTEFUpdate>&
 }
 
 int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, const int end,
-																					 const int fb_id, list<TaskDur>& tasks_tw,
-																					 list<TaskDur>& tasks_cp) {
+																					 const int fb_id, std::list<TaskDur>& tasks_tw,
+																					 std::list<TaskDur>& tasks_cp) {
 	int en_req = 0;
 	int dur_comp;
 	int dur_shift;
@@ -2738,8 +2737,8 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 		}
 		if (lst_2[i] < ect_2[i] && is_intersecting(begin, end, lst_2[i], ect_2[i])) {
 			// Compulsory part partially or fully lies in [begin, end)
-			const int begin_comp = max(begin, lst_2[i]);
-			const int end_comp = min(end, ect_2[i]);
+			const int begin_comp = std::max(begin, lst_2[i]);
+			const int end_comp = std::min(end, ect_2[i]);
 			dur_comp = end_comp - begin_comp;
 			if (rho == 0) {
 				const int cal_idx = taskCalendar[i] - 1;
@@ -2751,16 +2750,16 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 				assert(begin <= est_2[i] || dur_shift == 0);
 				// Adjusting dur_shift if the resource stays engaged
 				if (rho == 1) {
-					const int dur_fixed = max(0, ect_2[i] - lst_2[i]);
-					dur_shift = min(min_energy2[i] / min_usage(i) - dur_fixed, dur_shift);
+					const int dur_fixed = std::max(0, ect_2[i] - lst_2[i]);
+					dur_shift = std::min(min_energy2[i] / min_usage(i) - dur_fixed, dur_shift);
 				}
 			} else {
 				assert(shift_in == 2);
 				dur_shift = get_free_dur_left_shift2(begin, end, i);
 				// Adjusting dur_shift if the resource stays engaged
 				if (rho == 1) {
-					const int dur_fixed = max(0, ect_2[i] - lst_2[i]);
-					dur_shift = min(min_energy2[i] / min_usage(i) - dur_fixed, dur_shift);
+					const int dur_fixed = std::max(0, ect_2[i] - lst_2[i]);
+					dur_shift = std::min(min_energy2[i] / min_usage(i) - dur_fixed, dur_shift);
 				}
 			}
 			dur_in = dur_comp + dur_shift;
@@ -2775,8 +2774,8 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 			assert(begin <= est_2[i] || dur_in == 0);
 			// Adjusting dur_shift if the resource stays engaged
 			if (rho == 1) {
-				const int dur_fixed = max(0, ect_2[i] - lst_2[i]);
-				dur_in = min(min_energy2[i] / min_usage(i) - dur_fixed, dur_in);
+				const int dur_fixed = std::max(0, ect_2[i] - lst_2[i]);
+				dur_in = std::min(min_energy2[i] / min_usage(i) - dur_fixed, dur_in);
 			}
 		} else {
 			assert(shift_in == 2);
@@ -2784,8 +2783,8 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 			assert(lct_2[i] <= end || dur_in == 0);
 			// Adjusting dur_shift if the resource stays engaged
 			if (rho == 1) {
-				const int dur_fixed = max(0, ect_2[i] - lst_2[i]);
-				dur_in = min(min_energy2[i] / min_usage(i) - dur_fixed, dur_in);
+				const int dur_fixed = std::max(0, ect_2[i] - lst_2[i]);
+				dur_in = std::min(min_energy2[i] / min_usage(i) - dur_fixed, dur_in);
 			}
 		}
 		if (0 < dur_in) {
@@ -2798,8 +2797,8 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 }
 
 void CumulativeCalProp::ttef_analyse_limit_and_tasks(const int begin, const int end,
-																										 const int breaks, list<TaskDur>& tasks_tw,
-																										 list<TaskDur>& tasks_cp, int& en_lift,
+																										 const int breaks, std::list<TaskDur>& tasks_tw,
+																										 std::list<TaskDur>& tasks_cp, int& en_lift,
 																										 vec<Lit>& expl) {
 	// Getting	explanation for tasks in the time window
 	ttef_analyse_tasks(begin, end, tasks_tw, en_lift, expl);
@@ -2809,7 +2808,7 @@ void CumulativeCalProp::ttef_analyse_limit_and_tasks(const int begin, const int 
 	int diff_limit = max_limit0() - max_limit();
 	if (diff_limit > 0) {
 		// Calculate possible lifting
-		int lift_limit = min(en_lift / (end - begin - breaks), diff_limit);
+		int lift_limit = std::min(en_lift / (end - begin - breaks), diff_limit);
 		en_lift -= lift_limit * (end - begin - breaks);
 		assert(en_lift >= 0);
 		if (lift_limit < diff_limit) {
@@ -2836,8 +2835,8 @@ int CumulativeCalProp::ttef_analyse_tasks_right_shift(const int begin, const int
 	const int* wPeriods = workingPeriods[cal_idx];
 	const int* tCal = calendar[cal_idx];
 	const int min_dur_in = dur_in - max_dur_lift;
-	const int begin_in = max(begin, min(lst_2[task], end));
-	const int end_in = min(lct_2[task], end);
+	const int begin_in = std::max(begin, std::min(lst_2[task], end));
+	const int end_in = std::min(lct_2[task], end);
 	// Defining some variables
 	int workDays = (rho == 1 ? end_in - begin_in : wPeriods[begin_in] - wPeriods[end_in]);
 	int last_lst = lst_2[task];
@@ -2885,8 +2884,9 @@ int CumulativeCalProp::ttef_analyse_tasks_right_shift(const int begin, const int
 
 		// Some cross checks
 		assert(min_dur(task) == wPeriods[last_lst] - wPeriods[lct]);
-		assert(rho == 0 || workDays == min(end, lct) - max(begin, last_lst));
-		assert(rho == 1 || workDays == wPeriods[max(begin, last_lst)] - wPeriods[min(end, lct)]);
+		assert(rho == 0 || workDays == std::min(end, lct) - std::max(begin, last_lst));
+		assert(rho == 1 ||
+					 workDays == wPeriods[std::max(begin, last_lst)] - wPeriods[std::min(end, lct)]);
 		assert(ttef_analyse_tasks_check_expl_ub(begin, end, task, min_dur_in, last_lst));
 	}
 	return last_lst;
@@ -2908,8 +2908,8 @@ int CumulativeCalProp::ttef_analyse_tasks_left_shift(const int begin, const int 
 	const int* wPeriods = workingPeriods[cal_idx];
 	const int* tCal = calendar[cal_idx];
 	const int min_dur_in = dur_in - max_dur_lift;
-	const int end_in = min(ect_2[task], end);
-	const int begin_in = max(est_2[task], begin);
+	const int end_in = std::min(ect_2[task], end);
+	const int begin_in = std::max(est_2[task], begin);
 	int wdays = (rho == 1 ? end_in - begin_in : wPeriods[begin_in] - wPeriods[end_in]);
 	int last_est = est_2[task];
 	last_dur = wdays;
@@ -2950,8 +2950,8 @@ int CumulativeCalProp::ttef_analyse_tasks_left_shift(const int begin, const int 
 		last_dur = wdays;
 		// Some consistency checks
 		assert(min_dur(task) == wPeriods[last_est] - wPeriods[ect]);
-		assert(rho == 1 || wdays == wPeriods[max(last_est, begin)] - wPeriods[min(ect, end)]);
-		assert(rho == 0 || wdays == min(ect, end) - max(last_est, begin));
+		assert(rho == 1 || wdays == wPeriods[std::max(last_est, begin)] - wPeriods[std::min(ect, end)]);
+		assert(rho == 0 || wdays == std::min(ect, end) - std::max(last_est, begin));
 		assert(ttef_analyse_tasks_check_expl_lb(begin, end, task, min_dur_in, last_est));
 	}
 	return last_est;
@@ -2962,8 +2962,8 @@ bool CumulativeCalProp::ttef_analyse_tasks_check_expl_lb(const int begin, const 
 																												 const int expl_lb) {
 	const int cal_idx = taskCalendar[task] - 1;
 	const int ect = getEndTimeForStartTime(task, expl_lb, min_dur(task));
-	const int begin_expl = max(begin, expl_lb);
-	const int end_expl = max(begin, min(end, ect));
+	const int begin_expl = std::max(begin, expl_lb);
+	const int end_expl = std::max(begin, std::min(end, ect));
 	const int dur_expl_in =
 			(rho == 1 ? end_expl - begin_expl
 								: workingPeriods[cal_idx][begin_expl] - workingPeriods[cal_idx][end_expl]);
@@ -2993,8 +2993,8 @@ bool CumulativeCalProp::ttef_analyse_tasks_check_expl_ub(const int begin, const 
 																												 const int expl_ub) {
 	const int cal_idx = taskCalendar[task] - 1;
 	const int lct = getEndTimeForStartTime(task, expl_ub, min_dur(task));
-	const int end_expl = min(lct, end);
-	const int lst = max(begin, min(end, expl_ub));
+	const int end_expl = std::min(lct, end);
+	const int lst = std::max(begin, std::min(end, expl_ub));
 	const int dur_expl_in =
 			(rho == 1 ? end_expl - lst
 								: workingPeriods[cal_idx][lst] - workingPeriods[cal_idx][end_expl]);
@@ -3019,8 +3019,9 @@ bool CumulativeCalProp::ttef_analyse_tasks_check_expl_ub(const int begin, const 
 	return true;
 }
 
-void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end, list<TaskDur>& tasks,
-																					 int& en_lift, vec<Lit>& expl) {
+void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end,
+																					 std::list<TaskDur>& tasks, int& en_lift,
+																					 vec<Lit>& expl) {
 	while (!tasks.empty()) {
 		const int i = tasks.front().task;
 		int dur_in = tasks.front().dur_in;
@@ -3050,7 +3051,7 @@ void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end, list<
 						}
 						t--;
 					}
-					expl_lb = min(est_2[i], t);
+					expl_lb = std::min(est_2[i], t);
 					expl_ub = lst_2[i];  // max(lst_2[i], end - dur_in);
 				} else {
 					// Resource is released
@@ -3063,7 +3064,7 @@ void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end, list<
 						}
 						t--;
 					}
-					expl_lb = min(est_2[i], t);
+					expl_lb = std::min(est_2[i], t);
 					sto1 = 0;
 					sto2 = dur_in;
 					t = end;
@@ -3073,7 +3074,7 @@ void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end, list<
 						}
 						t--;
 					}
-					expl_ub = max(lst_2[i], t);
+					expl_ub = std::max(lst_2[i], t);
 				}
 				// expl_lb = begin + dur_in - min_dur(i); expl_ub = end - dur_in;
 				break;
@@ -3089,10 +3090,12 @@ void CumulativeCalProp::ttef_analyse_tasks(const int begin, const int end, list<
 				// Some consistency checks
 				assert(dur_in - dur_in_lb <= max_lift);
 				assert(dur_in - dur_in_ub <= max_lift);
-				assert(ttef_analyse_tasks_check_expl_lb(begin, end, i, min(dur_in_lb, dur_in_ub), expl_lb));
-				assert(ttef_analyse_tasks_check_expl_ub(begin, end, i, min(dur_in_lb, dur_in_ub), expl_ub));
+				assert(ttef_analyse_tasks_check_expl_lb(begin, end, i, std::min(dur_in_lb, dur_in_ub),
+																								expl_lb));
+				assert(ttef_analyse_tasks_check_expl_ub(begin, end, i, std::min(dur_in_lb, dur_in_ub),
+																								expl_ub));
 				// Computing the used lift
-				const int dur_lift = dur_in - min(dur_in_lb, dur_in_ub);
+				const int dur_lift = dur_in - std::min(dur_in_lb, dur_in_ub);
 				// Updating the remaining energy for lifting
 				en_lift -= min_usage(i) * dur_lift;
 			} break;

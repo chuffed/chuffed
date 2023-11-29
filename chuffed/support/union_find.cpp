@@ -4,8 +4,6 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-
 template <>
 UF<Tint>::~UF() {
 	// delete[] id;

@@ -2,8 +2,6 @@
 
 #define DISJ_DEBUG 0
 
-using namespace std;
-
 // propagates bounds given precedences
 class DisjunctiveBP : public Propagator {
 	// structure to store propagation info for lazy explanation
@@ -484,8 +482,8 @@ public:
 		trailed_pinfo_sz = false;
 
 		// sort vars based on est and let
-		sort(ests, ests + x.size(), sort_est_asc);
-		sort(lets, lets + x.size(), sort_let_dsc);
+		std::sort(ests, ests + x.size(), sort_est_asc);
+		std::sort(lets, lets + x.size(), sort_let_dsc);
 
 		//		if (!findBasicPrecedences()) return false;
 		if (so.disj_edge_find && !doEdgeFinding()) {

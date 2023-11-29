@@ -1,7 +1,6 @@
 #include <chuffed/globals/graph.h>
 
 #include <iostream>
-using namespace std;
 
 #define GRAPHPROP_DEBUG 0
 
@@ -17,7 +16,7 @@ void GraphPropagator::fullExpl(vec<Lit>& ps) {
 		}
 	}
 }
-void GraphPropagator::fullExpl(vector<Lit>& ps) {
+void GraphPropagator::fullExpl(std::vector<Lit>& ps) {
 	for (int i = 0; i < nbNodes(); i++) {
 		if (getNodeVar(i).isFixed()) {
 			ps.push_back(getNodeVar(i).getValLit());
@@ -30,8 +29,8 @@ void GraphPropagator::fullExpl(vector<Lit>& ps) {
 	}
 }
 
-vector<Lit> GraphPropagator::fullExpl(bool fail) {
-	vector<Lit> ps;
+std::vector<Lit> GraphPropagator::fullExpl(bool fail) {
+	std::vector<Lit> ps;
 	if (!fail) {
 		ps.emplace_back();
 	}
@@ -58,7 +57,7 @@ GraphPropagator::GraphPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec
 	}
 	if (DEBUG) {
 		for (int i = 0; i < nbEdges(); i++) {
-			cout << i << " " << _en[i][0] << " " << _en[i][1] << endl;
+			std::cout << i << " " << _en[i][0] << " " << _en[i][1] << std::endl;
 		}
 	}
 
@@ -98,7 +97,7 @@ bool GraphPropagator::propagate() {
 }
 
 bool GraphPropagator::coherence_outedges(int node) {
-	vector<int> useless;
+	std::vector<int> useless;
 	return coherence_outedges(node, useless);
 }
 
@@ -106,7 +105,7 @@ bool GraphPropagator::coherence_outedges(int node) {
  * Forces the incident edges to 'node' to be out-edges when 'node' is an outnode
  * return true if no conflict, false otherwise (explanation built inside)
  */
-bool GraphPropagator::coherence_outedges(int node, vector<edge_id>& remvd_e) {
+bool GraphPropagator::coherence_outedges(int node, std::vector<edge_id>& remvd_e) {
 	for (int i = 0; i < adj[node].size(); i++) {
 		edge_id edge = adj[node][i];
 		// Edge with missing an endnode
@@ -130,7 +129,7 @@ bool GraphPropagator::coherence_outedges(int node, vector<edge_id>& remvd_e) {
 				(*r)[1] = vs[node].getValLit();
 			}
 			if (GRAPHPROP_DEBUG) {
-				cout << "COHERENCE (E) " << edge << endl;
+				std::cout << "COHERENCE (E) " << edge << std::endl;
 			}
 			es[edge].setVal2(false, r);
 			remvd_e.push_back(edge);
@@ -140,7 +139,7 @@ bool GraphPropagator::coherence_outedges(int node, vector<edge_id>& remvd_e) {
 }
 
 bool GraphPropagator::coherence_innodes(int edge) {
-	vector<int> useless;
+	std::vector<int> useless;
 	return coherence_innodes(edge, useless);
 }
 
@@ -148,7 +147,7 @@ bool GraphPropagator::coherence_innodes(int edge) {
  * Forces the endnodes of 'edge' to be innodes when 'edge' is an inedge
  * return true if no conflict, false otherwise (explanation built inside)
  */
-bool GraphPropagator::coherence_innodes(int edge, vector<node_id>& added_n) {
+bool GraphPropagator::coherence_innodes(int edge, std::vector<node_id>& added_n) {
 	for (int i = 0; i < endnodes[edge].size(); i++) {
 		int u = endnodes[edge][i];
 		if (vs[u].isFixed() && vs[u].getVal() == 0) {
@@ -170,7 +169,7 @@ bool GraphPropagator::coherence_innodes(int edge, vector<node_id>& added_n) {
 				(*r)[1] = es[edge].getValLit();
 			}
 			if (GRAPHPROP_DEBUG) {
-				cout << "COHERENCE (N) " << u << endl;
+				std::cout << "COHERENCE (N) " << u << std::endl;
 			}
 			vs[u].setVal2(true, r);
 			added_n.push_back(u);
@@ -182,19 +181,19 @@ bool GraphPropagator::coherence_innodes(int edge, vector<node_id>& added_n) {
 void GraphPropagator::clearPropState() { Propagator::clearPropState(); }
 
 std::string GraphPropagator::available_to_dot() {
-	string res = "graph {\n";
+	std::string res = "graph {\n";
 	for (int n = 0; n < nbNodes(); n++) {
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isTrue()) {
-			res += " " + to_string(n) + " [color = red];\n";
+			res += " " + std::to_string(n) + " [color = red];\n";
 		}
 	}
 	for (int e = 0; e < nbEdges(); e++) {
 		if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
-			res += " " + to_string(getTail(e)) + " -- " + to_string(getHead(e));
+			res += " " + std::to_string(getTail(e)) + " -- " + std::to_string(getHead(e));
 			if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 				res += " [color = red] ";
 			}
-			res += "[label = \"" + to_string(e) + "\"]";
+			res += "[label = \"" + std::to_string(e) + "\"]";
 			res += ";\n";
 		}
 	}
@@ -204,23 +203,23 @@ std::string GraphPropagator::available_to_dot() {
 }
 
 std::string GraphPropagator::all_to_dot() {
-	string res = "graph {\n";
+	std::string res = "graph {\n";
 	for (int n = 0; n < nbNodes(); n++) {
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isTrue()) {
-			res += " " + to_string(n) + " [color = red];\n";
+			res += " " + std::to_string(n) + " [color = red];\n";
 		}
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isFalse()) {
-			res += " " + to_string(n) + " [color = yellow];\n";
+			res += " " + std::to_string(n) + " [color = yellow];\n";
 		}
 	}
 	for (int e = 0; e < nbEdges(); e++) {
-		res += " " + to_string(getTail(e)) + " -- " + to_string(getHead(e));
+		res += " " + std::to_string(getTail(e)) + " -- " + std::to_string(getHead(e));
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 			res += " [color = red] ";
 		} else if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			res += " [color = yellow] ";
 		}
-		res += "[label = \"" + to_string(e) + "\"]";
+		res += "[label = \"" + std::to_string(e) + "\"]";
 		res += ";\n";
 	}
 	res += "}";
@@ -229,19 +228,19 @@ std::string GraphPropagator::all_to_dot() {
 }
 
 std::string GraphPropagator::available_to_dot(int* arr) {
-	string res = "graph {\n";
+	std::string res = "graph {\n";
 	for (int n = 0; n < nbNodes(); n++) {
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isTrue()) {
-			res += " " + to_string(n) + " [color = red];\n";
+			res += " " + std::to_string(n) + " [color = red];\n";
 		}
 	}
 	for (int e = 0; e < nbEdges(); e++) {
 		if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
-			res += " " + to_string(getTail(e)) + " -- " + to_string(getHead(e));
+			res += " " + std::to_string(getTail(e)) + " -- " + std::to_string(getHead(e));
 			if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 				res += " [color = red] ";
 			}
-			res += "[label = \"" + to_string(arr[e]) + "\"]";
+			res += "[label = \"" + std::to_string(arr[e]) + "\"]";
 			res += ";\n";
 		}
 	}
@@ -251,23 +250,23 @@ std::string GraphPropagator::available_to_dot(int* arr) {
 }
 
 std::string GraphPropagator::all_to_dot(int* arr) {
-	string res = "graph {\n";
+	std::string res = "graph {\n";
 	for (int n = 0; n < nbNodes(); n++) {
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isTrue()) {
-			res += " " + to_string(n) + " [color = red];\n";
+			res += " " + std::to_string(n) + " [color = red];\n";
 		}
 		if (getNodeVar(n).isFixed() && getNodeVar(n).isFalse()) {
-			res += " " + to_string(n) + " [color = yellow];\n";
+			res += " " + std::to_string(n) + " [color = yellow];\n";
 		}
 	}
 	for (int e = 0; e < nbEdges(); e++) {
-		res += " " + to_string(getTail(e)) + " -- " + to_string(getHead(e));
+		res += " " + std::to_string(getTail(e)) + " -- " + std::to_string(getHead(e));
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 			res += " [color = red] ";
 		} else if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			res += " [color = yellow] ";
 		}
-		res += "[label = \"" + to_string(arr[e]) + "\"]";
+		res += "[label = \"" + std::to_string(arr[e]) + "\"]";
 		res += ";\n";
 	}
 	res += "}";

@@ -46,8 +46,6 @@
 #include <sys/stat.h>
 #endif
 
-using namespace std;
-
 int yyparse(void*);
 int yylex(YYSTYPE*, void* scanner);
 int yylex_init (void** scanner);
@@ -82,9 +80,9 @@ void yyassert(ParserState* pp, bool cond, const char* str)
  *
  */
 
-AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
+AST::Node* getArrayElement(ParserState* pp, std::string id, unsigned int offset) {
     if (offset > 0) {
-        vector<int> tmp;
+        std::vector<int> tmp;
         if (pp->intvararrays.get(id, tmp) && offset<= tmp.size())
             return new AST::IntVar(tmp[offset-1]);
         if (pp->boolvararrays.get(id, tmp) && offset<= tmp.size())
@@ -96,7 +94,7 @@ AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
             return new AST::IntLit(tmp[offset-1]);
         if (pp->boolvalarrays.get(id, tmp) && offset<= tmp.size())
             return new AST::BoolLit(tmp[offset-1]);
-        vector<AST::SetLit> tmpS;
+        std::vector<AST::SetLit> tmpS;
         if (pp->setvalarrays.get(id, tmpS) && offset<= tmpS.size())
             return new AST::SetLit(tmpS[offset-1]);      
     }
@@ -107,7 +105,7 @@ AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
     pp->hadError = true;
     return new AST::IntVar(0); // keep things consistent
 }
-AST::Node* getVarRefArg(ParserState* pp, string id, bool annotation = false) {
+AST::Node* getVarRefArg(ParserState* pp, std::string id, bool annotation = false) {
     int tmp;
     if (pp->intvarTable.get(id, tmp))
         return new AST::IntVar(tmp);
@@ -214,7 +212,7 @@ void initfg(ParserState* pp) {
                     boolVarString.insert(std::pair<BoolView, std::string>(newiv, "ASSIGNED_AT_ROOT"));
                 else
                     boolVarString.insert(std::pair<BoolView, std::string>(newiv, pp->boolvars[i].first));
-                string label;
+                std::string label;
                 label = pp->boolvars[i].first;
                 label.append("=true");
                 litString.insert(std::pair<int,std::string>(toInt(newiv.getLit(true)), label));
@@ -319,16 +317,16 @@ namespace FlatZinc {
         struct stat sbuf;
         fd = open(filename.c_str(), O_RDONLY);
         if (fd == -1) {
-            err << "Cannot open file " << filename << endl;
+            err << "Cannot open file " << filename << std::endl;
             exit(0);
         }
         if (stat(filename.c_str(), &sbuf) == -1) {
-            err << "Cannot stat file " << filename << endl;
+            err << "Cannot stat file " << filename << std::endl;
             return;          
         }
         data = (char*)mmap((caddr_t)0, sbuf.st_size, PROT_READ, MAP_SHARED, fd,0);
         if (data == (caddr_t)(-1)) {
-            err << "Cannot mmap file " << filename << endl;
+            err << "Cannot mmap file " << filename << std::endl;
             return;          
         }
 
@@ -337,11 +335,11 @@ namespace FlatZinc {
         std::ifstream file;
         file.open(filename.c_str());
         if (!file.is_open()) {
-            err << "Cannot open file " << filename << endl;
+            err << "Cannot open file " << filename << std::endl;
             exit(0);
         }
-        std::string s = string(istreambuf_iterator<char>(file),
-                                                     istreambuf_iterator<char>());
+        std::string s = std::string(std::istreambuf_iterator<char>(file),
+                                                     std::istreambuf_iterator<char>());
         ParserState pp(s, err);
 #endif
         yylex_init(&pp.yyscanner);
@@ -357,8 +355,8 @@ namespace FlatZinc {
     }
 
     void solve(std::istream& is, std::ostream& err) {
-        std::string s = string(istreambuf_iterator<char>(is),
-                               istreambuf_iterator<char>());
+        std::string s = std::string(std::istreambuf_iterator<char>(is),
+                               std::istreambuf_iterator<char>());
 
         ParserState pp(s, err);
         yylex_init(&pp.yyscanner);
@@ -728,11 +726,11 @@ vardecl_item :
             yyassert(pp, $3 == 1, "Arrays must start at 1");
             if (!pp->hadError) {
                 bool print = $12 && $12->hasCall("output_array");
-                vector<int> vars($5);
+                std::vector<int> vars($5);
                 yyassert(pp, !$9() || !$9.some()->empty(), "Empty var int domain.");
                 if (!pp->hadError) {
                     if ($13()) {
-                        vector<VarSpec*>* vsv = $13.some();
+                        std::vector<VarSpec*>* vsv = $13.some();
                         yyassert(pp, vsv->size() == static_cast<unsigned int>($5),
                             "Initializer size does not match array dimension");
                         if (!pp->hadError) {
@@ -754,7 +752,7 @@ vardecl_item :
                         delete vsv;
                     } else {
                         IntVarSpec* ispec = new IntVarSpec($9,print,!print,false);
-                        string arrayname = "["; arrayname += $11;
+                        std::string arrayname = "["; arrayname += $11;
                         for (int i = 0; i < $5-1; i++) {
                             vars[i] = pp->intvars.size();
                             pp->intvars.push_back(varspec(arrayname, ispec));
@@ -785,9 +783,9 @@ vardecl_item :
             bool print = $12 && $12->hasCall("output_array");
             yyassert(pp, $3 == 1, "Arrays must start at 1");
             if (!pp->hadError) {
-                vector<int> vars($5);
+                std::vector<int> vars($5);
                 if ($13()) {
-                    vector<VarSpec*>* vsv = $13.some();
+                    std::vector<VarSpec*>* vsv = $13.some();
                     yyassert(pp, vsv->size() == static_cast<unsigned int>($5),
                         "Initializer size does not match array dimension");
                     if (!pp->hadError) {
@@ -844,9 +842,9 @@ vardecl_item :
             bool print = $14 && $14->hasCall("output_array");
             yyassert(pp, $3 == 1, "Arrays must start at 1");
             if (!pp->hadError) {
-                vector<int> vars($5);
+                std::vector<int> vars($5);
                 if ($15()) {
-                    vector<VarSpec*>* vsv = $15.some();
+                    std::vector<VarSpec*>* vsv = $15.some();
                     yyassert(pp, vsv->size() == static_cast<unsigned int>($5),
                         "Initializer size does not match array dimension");
                     if (!pp->hadError) {
@@ -868,7 +866,7 @@ vardecl_item :
                     delete vsv;
                 } else {
                     SetVarSpec* ispec = new SetVarSpec($11,print,!print, false);
-                    string arrayname = "["; arrayname += $13;
+                    std::string arrayname = "["; arrayname += $13;
                     for (int i = 0; i < $5-1; i++) {
                         vars[i] = pp->setvars.size();
                         pp->setvars.push_back(varspec(arrayname, ispec));
@@ -961,7 +959,7 @@ int_init :
         }
     |   ID '[' INT_LIT ']'
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, v)) {
                 yyassert(pp,static_cast<unsigned int>($3) > 0 && 
@@ -984,7 +982,7 @@ int_init :
 int_init_list :
         /* empty */
         { 
-            $$ = new vector<VarSpec*>(0); 
+            $$ = new std::vector<VarSpec*>(0); 
         }
     |   int_init_list_head list_tail
         { 
@@ -994,7 +992,7 @@ int_init_list :
 int_init_list_head :
         int_init
         { 
-            $$ = new vector<VarSpec*>(1); 
+            $$ = new std::vector<VarSpec*>(1); 
             (*$$)[0] = $1; 
         }
     |   int_init_list_head ',' int_init
@@ -1035,7 +1033,7 @@ float_init :
         }
     |   ID '[' INT_LIT ']'
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->floatvararrays.get($1, v)) {
                 yyassert(pp,static_cast<unsigned int>($3) > 0 && 
@@ -1058,7 +1056,7 @@ float_init :
 float_init_list :
         /* empty */
         { 
-            $$ = new vector<VarSpec*>(0); 
+            $$ = new std::vector<VarSpec*>(0); 
         }
     |   float_init_list_head list_tail
         { 
@@ -1068,7 +1066,7 @@ float_init_list :
 float_init_list_head :
         float_init
         {   
-            $$ = new vector<VarSpec*>(1); 
+            $$ = new std::vector<VarSpec*>(1); 
             (*$$)[0] = $1; 
         }
     |   float_init_list_head ',' float_init
@@ -1105,7 +1103,7 @@ bool_init :
         }
     |   ID '[' INT_LIT ']'
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->boolvararrays.get($1, v)) {
                 yyassert(pp,static_cast<unsigned int>($3) > 0 && 
@@ -1128,7 +1126,7 @@ bool_init :
 bool_init_list :
         /* empty */
         { 
-            $$ = new vector<VarSpec*>(0); 
+            $$ = new std::vector<VarSpec*>(0); 
         }
     |   bool_init_list_head list_tail
         { 
@@ -1138,7 +1136,7 @@ bool_init_list :
 bool_init_list_head :
         bool_init
         { 
-            $$ = new vector<VarSpec*>(1); 
+            $$ = new std::vector<VarSpec*>(1); 
             (*$$)[0] = $1; 
         }
     |   bool_init_list_head ',' bool_init
@@ -1172,7 +1170,7 @@ set_init :
         }
     |   ID '[' INT_LIT ']'
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->setvararrays.get($1, v)) {
                 yyassert(pp,static_cast<unsigned int>($3) > 0 && 
@@ -1195,7 +1193,7 @@ set_init :
 set_init_list :
         /* empty */
         { 
-            $$ = new vector<VarSpec*>(0); 
+            $$ = new std::vector<VarSpec*>(0); 
         }
     |   set_init_list_head list_tail
         { 
@@ -1205,7 +1203,7 @@ set_init_list :
 set_init_list_head :
         set_init
         { 
-            $$ = new vector<VarSpec*>(1); 
+            $$ = new std::vector<VarSpec*>(1); 
             (*$$)[0] = $1; 
         }
     |   set_init_list_head ',' set_init
@@ -1223,41 +1221,41 @@ set_var_array_literal :
 vardecl_int_var_array_init :
         /* empty */
         { 
-            $$ = Option<vector<VarSpec*>* >::none(); 
+            $$ = Option<std::vector<VarSpec*>* >::none(); 
         }
     |   '=' int_var_array_literal
         { 
-            $$ = Option<vector<VarSpec*>* >::some($2); 
+            $$ = Option<std::vector<VarSpec*>* >::some($2); 
         }
 
 vardecl_bool_var_array_init :
         /* empty */
         { 
-            $$ = Option<vector<VarSpec*>* >::none(); 
+            $$ = Option<std::vector<VarSpec*>* >::none(); 
         }
     |   '=' bool_var_array_literal
         { 
-            $$ = Option<vector<VarSpec*>* >::some($2); 
+            $$ = Option<std::vector<VarSpec*>* >::some($2); 
         }
 
 vardecl_float_var_array_init :
         /* empty */
         { 
-            $$ = Option<vector<VarSpec*>* >::none(); 
+            $$ = Option<std::vector<VarSpec*>* >::none(); 
         }
     |   '=' float_var_array_literal
         { 
-            $$ = Option<vector<VarSpec*>* >::some($2); 
+            $$ = Option<std::vector<VarSpec*>* >::some($2); 
         }
 
 vardecl_set_var_array_init :
         /* empty */
         { 
-            $$ = Option<vector<VarSpec*>* >::none(); 
+            $$ = Option<std::vector<VarSpec*>* >::none(); 
         }
     |   '=' set_var_array_literal
         { 
-            $$ = Option<vector<VarSpec*>* >::some($2); 
+            $$ = Option<std::vector<VarSpec*>* >::some($2); 
         }
 
 constraint_item :
@@ -1429,7 +1427,7 @@ set_literal :
 int_list :
         /* empty */
         { 
-            $$ = new vector<int>(0); 
+            $$ = new std::vector<int>(0); 
         }
     |   int_list_head list_tail
         { 
@@ -1439,7 +1437,7 @@ int_list :
 int_list_head :
         INT_LIT
         { 
-            $$ = new vector<int>(1); 
+            $$ = new std::vector<int>(1); 
             (*$$)[0] = $1; 
         }
     |   int_list_head ',' INT_LIT
@@ -1451,7 +1449,7 @@ int_list_head :
 bool_list :
         /* empty */
         { 
-            $$ = new vector<int>(0); 
+            $$ = new std::vector<int>(0); 
         }
     |   bool_list_head list_tail
         { 
@@ -1461,7 +1459,7 @@ bool_list :
 bool_list_head :
         BOOL_LIT
         { 
-            $$ = new vector<int>(1); 
+            $$ = new std::vector<int>(1); 
             (*$$)[0] = $1; 
         }
     |   bool_list_head ',' BOOL_LIT
@@ -1473,7 +1471,7 @@ bool_list_head :
 float_list :
         /* empty */
         { 
-            $$ = new vector<double>(0); 
+            $$ = new std::vector<double>(0); 
         }
     |   float_list_head list_tail
         { 
@@ -1483,7 +1481,7 @@ float_list :
 float_list_head :
         FLOAT_LIT
         {
-            $$ = new vector<double>(1); 
+            $$ = new std::vector<double>(1); 
             (*$$)[0] = $1; 
         }
     |   float_list_head ',' FLOAT_LIT
@@ -1495,7 +1493,7 @@ float_list_head :
 set_literal_list :
         /* empty */
         { 
-            $$ = new vector<AST::SetLit>(0); 
+            $$ = new std::vector<AST::SetLit>(0); 
         }
     |   set_literal_list_head list_tail
         { 
@@ -1505,7 +1503,7 @@ set_literal_list :
 set_literal_list_head :
         set_literal
         { 
-            $$ = new vector<AST::SetLit>(1); 
+            $$ = new std::vector<AST::SetLit>(1); 
             (*$$)[0] = *$1; 
             delete $1; 
         }
@@ -1570,7 +1568,7 @@ non_array_expr :
         }
     |   ID /* variable, possibly array */
         { 
-            vector<int> as;
+            std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
                 AST::Array *ia = new AST::Array(as.size());
@@ -1704,7 +1702,7 @@ solve_expr:
         }
     |   ID '[' INT_LIT ']'
         {
-            vector<int> tmp;
+            std::vector<int> tmp;
             ParserState *pp = static_cast<ParserState*>(parm);
             if (!pp->intvararrays.get($1, tmp)) {
                 pp->err << "Error: unknown integer variable array " << $1
@@ -1813,7 +1811,7 @@ ann_non_array_expr :
         }
     |   ID /* variable, possibly array */
         { 
-            vector<int> as;
+            std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
                 AST::Array *ia = new AST::Array(as.size());

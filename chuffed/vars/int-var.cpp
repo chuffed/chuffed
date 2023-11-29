@@ -10,9 +10,7 @@
 // (There is not too much penalty if INT_DOMAIN_LIST enabled in int-var.h).
 #define INT_BRANCH_HOLES 0
 
-using namespace std;
-
-map<int, IntVar*> ic_map;
+std::map<int, IntVar*> ic_map;
 
 extern std::map<IntVar*, std::string> intVarString;
 
@@ -76,7 +74,7 @@ IntVar* getConstant(int v) {
 	intVarString[var] = ss.str();
 
 	var->specialiseToEL();
-	ic_map.insert(pair<int, IntVar*>(v, var));
+	ic_map.emplace(v, var);
 
 	return var;
 }

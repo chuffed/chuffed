@@ -6,8 +6,6 @@
 #include <iostream>
 #include <set>
 
-using namespace std;
-
 #define MSTPROP_DEBUG 0
 
 struct sorter {
@@ -20,7 +18,7 @@ typedef std::pair<int, iipair> iiipair;
  * Returns the weight of an MST (pure MST)
  */
 std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
-																	 std::vector<vector<int> >& ends) {
+																	 std::vector<std::vector<int> >& ends) {
 	std::vector<iipair> sorted;
 
 	for (unsigned int i = 0; i < weights.size(); i++) {
@@ -62,7 +60,7 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 	}
 
 	// cout <<"Solution is: "<<cost<<endl;
-	return make_pair(cost, cost2);
+	return std::make_pair(cost, cost2);
 }
 
 class MSTPropagator : public TreePropagator {
@@ -166,7 +164,7 @@ public:
 				}
 				// I wanted to connected them, but I can't bc They are already connected
 				else if (connected) {
-					vector<int> path = ruf.connectionsFromTo(u, v);
+					std::vector<int> path = ruf.connectionsFromTo(u, v);
 					int arg_maxw = findEdge(path[0], path[1]);
 					// int below_cost = 0;
 					// int above_cost = 0;
@@ -281,14 +279,14 @@ void mst(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj, vec<v
 	mst_p = new MSTPropagator(_vs, _es, _adj, _en, _w, _ws);
 }
 
-bool sortPairKey2(std::pair<int, int> u, pair<int, int> v) { return u.second < v.second; }
+bool sortPairKey2(std::pair<int, int> u, std::pair<int, int> v) { return u.second < v.second; }
 
 class DCMSTSearch : public BranchGroup {
 	IntVar* root;
 	std::vector<int>& ws;
 	std::vector<std::vector<int> > dist;
-	vector<std::pair<int, int> > sums;
-	vector<std::vector<std::pair<int, int> > > costs;
+	std::vector<std::pair<int, int> > sums;
+	std::vector<std::vector<std::pair<int, int> > > costs;
 
 	int int_cur;
 	Tint curr_root_idx;
@@ -347,7 +345,7 @@ class DCMSTSearch : public BranchGroup {
 			// cout<<endl;
 
 			for (int i = 0; i < mst_p->nbNodes(); i++) {
-				vector<std::pair<int, int> > cost;
+				std::vector<std::pair<int, int> > cost;
 				for (int j = 0; j < mst_p->nbNodes(); j++) {
 					cost.emplace_back(j, dist[i][j]);
 				}
@@ -372,7 +370,7 @@ class DCMSTSearch : public BranchGroup {
 				// describes the searchs trategy....
 				int v = std::min(tmp[i].second, tmp[j].second);
 				sums.emplace_back(e, v);
-				vector<std::pair<int, int> > cost;
+				std::vector<std::pair<int, int> > cost;
 				for (int k = 0; k < mst_p->nbNodes(); k++) {
 					cost.emplace_back(k, std::min(dist[i][k], dist[j][k]));
 				}

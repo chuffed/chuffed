@@ -5,12 +5,10 @@
 #include <map>
 #include <utility>
 
-using namespace std;
-
 // The label on each node counts the cost of its duration! (i.e. Duration included)
 //  i.e. the label on each node says when will you be done with it.
 
-Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<int>& _ws)
+Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<int>& _ws)
 		: source(_s),
 			nb_nodes(_in.size()),
 			en(std::move(_en)),
@@ -18,7 +16,7 @@ Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<int>& _ws)
 			out(std::move(_ou)),
 			ws(_ws),
 			verbose(false) {}
-Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<vector<int> >& _wst,
+Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<std::vector<int> >& _wst,
 									 std::vector<int> d)
 		: source(_s),
 			nb_nodes(_in.size()),
@@ -31,13 +29,13 @@ Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, vector<vector<int> >
 
 void Dijkstra::run() {
 	q = std::priority_queue<tuple, std::vector<tuple>, Dijkstra::Priority>();
-	vector<bool> vis = vector<bool>(nb_nodes, false);
+	std::vector<bool> vis = std::vector<bool>(nb_nodes, false);
 
 	int count = 0;
 
-	pred = vector<int>(nb_nodes, -1);
-	has_kids = vector<bool>(nb_nodes, false);
-	cost = vector<int>(nb_nodes, -1);
+	pred = std::vector<int>(nb_nodes, -1);
+	has_kids = std::vector<bool>(nb_nodes, false);
+	cost = std::vector<int>(nb_nodes, -1);
 
 	pred[source] = source;
 	cost[source] = duration(source);
@@ -45,7 +43,7 @@ void Dijkstra::run() {
 	q.push(initial);
 
 	if (verbose) {
-		cout << "START" << endl;
+		std::cout << "START" << std::endl;
 	}
 
 	while (!q.empty() && count < nb_nodes) {
@@ -62,8 +60,8 @@ void Dijkstra::run() {
 		count++;
 
 		if (verbose) {
-			cout << "Visiting " << curr << " from " << pred[curr] << "(cost: " << cost[curr] << ")"
-					 << endl;
+			std::cout << "Visiting " << curr << " from " << pred[curr] << "(cost: " << cost[curr] << ")"
+								<< std::endl;
 		}
 
 		for (unsigned int i = 0; i < out[curr].size(); i++) {
@@ -71,7 +69,8 @@ void Dijkstra::run() {
 			assert(en[e][0] == curr);
 			if (ignore_edge(e) || weight(e) < 0) {
 				if (verbose) {
-					cout << "Ignoring edge " << e << " from " << en[e][0] << " to " << en[e][1] << endl;
+					std::cout << "Ignoring edge " << e << " from " << en[e][0] << " to " << en[e][1]
+										<< std::endl;
 				}
 				on_ignore_edge(e);
 				continue;
@@ -91,7 +90,8 @@ void Dijkstra::run() {
 				pred[other] = curr;
 				has_kids[curr] = true;
 				if (verbose) {
-					cout << "Marked " << other << " from " << curr << " of cost " << cost[other] << endl;
+					std::cout << "Marked " << other << " from " << curr << " of cost " << cost[other]
+										<< std::endl;
 				}
 				tuple new_node(other, cost[other]);
 				enqueue(new_node);
@@ -218,9 +218,9 @@ int main(int argc, char* argv[]) {
 }
 //*/
 
-vector<int> DijkstraMandatory::DEFAULT_VECTOR;
+std::vector<int> DijkstraMandatory::DEFAULT_VECTOR;
 DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
-																		 vector<int> _ws)
+																		 std::vector<int> _ws)
 		: source(_s),
 			dest(_d),
 			nb_nodes(_in.size()),
@@ -242,7 +242,7 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t
 #endif
 }
 DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
-																		 vector<vector<int> > _wst, vector<int> _ds)
+																		 std::vector<std::vector<int> > _wst, std::vector<int> _ds)
 		: source(_s),
 			dest(_d),
 			nb_nodes(_in.size()),
@@ -295,12 +295,13 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	// vector<SetFinder<BITSET_SIZE> > tries =
 	//     vector<SetFinder<BITSET_SIZE> >(nb_nodes, SetFinder<BITSET_SIZE>());
 
-	table = vector<std::unordered_map<size_t, tuple> >(nb_nodes, std::unordered_map<size_t, tuple>());
+	table = std::vector<std::unordered_map<size_t, tuple> >(nb_nodes,
+																													std::unordered_map<size_t, tuple>());
 
 	if (!use_set_target) {  // Create the target bitset here
 
 		target = std::vector<bool>(target.size(), false);
-		vector<int>& mands = mandatory_nodes();
+		std::vector<int>& mands = mandatory_nodes();
 
 #ifdef CLUSTERING
 		// Cluster mands if only one SCC

@@ -88,8 +88,6 @@
 #include <sys/stat.h>
 #endif
 
-using namespace std;
-
 int yyparse(void*);
 int yylex(YYSTYPE*, void* scanner);
 int yylex_init (void** scanner);
@@ -124,9 +122,9 @@ void yyassert(ParserState* pp, bool cond, const char* str)
  *
  */
 
-AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
+AST::Node* getArrayElement(ParserState* pp, std::string id, unsigned int offset) {
     if (offset > 0) {
-        vector<int> tmp;
+        std::vector<int> tmp;
         if (pp->intvararrays.get(id, tmp) && offset<= tmp.size())
             return new AST::IntVar(tmp[offset-1]);
         if (pp->boolvararrays.get(id, tmp) && offset<= tmp.size())
@@ -138,7 +136,7 @@ AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
             return new AST::IntLit(tmp[offset-1]);
         if (pp->boolvalarrays.get(id, tmp) && offset<= tmp.size())
             return new AST::BoolLit(tmp[offset-1]);
-        vector<AST::SetLit> tmpS;
+        std::vector<AST::SetLit> tmpS;
         if (pp->setvalarrays.get(id, tmpS) && offset<= tmpS.size())
             return new AST::SetLit(tmpS[offset-1]);      
     }
@@ -149,7 +147,7 @@ AST::Node* getArrayElement(ParserState* pp, string id, unsigned int offset) {
     pp->hadError = true;
     return new AST::IntVar(0); // keep things consistent
 }
-AST::Node* getVarRefArg(ParserState* pp, string id, bool annotation = false) {
+AST::Node* getVarRefArg(ParserState* pp, std::string id, bool annotation = false) {
     int tmp;
     if (pp->intvarTable.get(id, tmp))
         return new AST::IntVar(tmp);
@@ -256,7 +254,7 @@ void initfg(ParserState* pp) {
                     boolVarString.insert(std::pair<BoolView, std::string>(newiv, "ASSIGNED_AT_ROOT"));
                 else
                     boolVarString.insert(std::pair<BoolView, std::string>(newiv, pp->boolvars[i].first));
-                string label;
+                std::string label;
                 label = pp->boolvars[i].first;
                 label.append("=true");
                 litString.insert(std::pair<int,std::string>(toInt(newiv.getLit(true)), label));
@@ -361,16 +359,16 @@ namespace FlatZinc {
         struct stat sbuf;
         fd = open(filename.c_str(), O_RDONLY);
         if (fd == -1) {
-            err << "Cannot open file " << filename << endl;
+            err << "Cannot open file " << filename << std::endl;
             exit(0);
         }
         if (stat(filename.c_str(), &sbuf) == -1) {
-            err << "Cannot stat file " << filename << endl;
+            err << "Cannot stat file " << filename << std::endl;
             return;          
         }
         data = (char*)mmap((caddr_t)0, sbuf.st_size, PROT_READ, MAP_SHARED, fd,0);
         if (data == (caddr_t)(-1)) {
-            err << "Cannot mmap file " << filename << endl;
+            err << "Cannot mmap file " << filename << std::endl;
             return;          
         }
 
@@ -379,11 +377,11 @@ namespace FlatZinc {
         std::ifstream file;
         file.open(filename.c_str());
         if (!file.is_open()) {
-            err << "Cannot open file " << filename << endl;
+            err << "Cannot open file " << filename << std::endl;
             exit(0);
         }
-        std::string s = string(istreambuf_iterator<char>(file),
-                                                     istreambuf_iterator<char>());
+        std::string s = std::string(std::istreambuf_iterator<char>(file),
+                                                     std::istreambuf_iterator<char>());
         ParserState pp(s, err);
 #endif
         yylex_init(&pp.yyscanner);
@@ -399,8 +397,8 @@ namespace FlatZinc {
     }
 
     void solve(std::istream& is, std::ostream& err) {
-        std::string s = string(istreambuf_iterator<char>(is),
-                               istreambuf_iterator<char>());
+        std::string s = std::string(std::istreambuf_iterator<char>(is),
+                               std::istreambuf_iterator<char>());
 
         ParserState pp(s, err);
         yylex_init(&pp.yyscanner);
@@ -959,22 +957,22 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   484,   484,   486,   488,   491,   492,   496,   501,   509,
-     510,   514,   519,   527,   528,   535,   537,   539,   542,   543,
-     546,   549,   550,   551,   552,   555,   556,   557,   558,   561,
-     562,   565,   566,   573,   605,   636,   643,   675,   701,   711,
-     724,   781,   832,   840,   894,   907,   920,   928,   943,   947,
-     962,   986,   989,   995,  1000,  1006,  1008,  1011,  1017,  1021,
-    1036,  1060,  1063,  1069,  1074,  1081,  1087,  1091,  1106,  1130,
-    1133,  1139,  1144,  1151,  1154,  1158,  1173,  1197,  1200,  1206,
-    1211,  1218,  1225,  1228,  1235,  1238,  1245,  1248,  1255,  1258,
-    1264,  1307,  1328,  1351,  1360,  1378,  1382,  1386,  1392,  1396,
-    1410,  1411,  1418,  1422,  1431,  1434,  1440,  1445,  1453,  1456,
-    1462,  1467,  1475,  1478,  1484,  1489,  1497,  1500,  1506,  1512,
-    1524,  1528,  1535,  1539,  1546,  1549,  1555,  1559,  1563,  1567,
-    1571,  1620,  1634,  1637,  1643,  1647,  1658,  1677,  1705,  1727,
-    1728,  1736,  1739,  1745,  1749,  1756,  1761,  1767,  1771,  1779,
-    1782,  1788,  1792,  1798,  1802,  1806,  1810,  1814,  1857,  1868
+       0,   482,   482,   484,   486,   489,   490,   494,   499,   507,
+     508,   512,   517,   525,   526,   533,   535,   537,   540,   541,
+     544,   547,   548,   549,   550,   553,   554,   555,   556,   559,
+     560,   563,   564,   571,   603,   634,   641,   673,   699,   709,
+     722,   779,   830,   838,   892,   905,   918,   926,   941,   945,
+     960,   984,   987,   993,   998,  1004,  1006,  1009,  1015,  1019,
+    1034,  1058,  1061,  1067,  1072,  1079,  1085,  1089,  1104,  1128,
+    1131,  1137,  1142,  1149,  1152,  1156,  1171,  1195,  1198,  1204,
+    1209,  1216,  1223,  1226,  1233,  1236,  1243,  1246,  1253,  1256,
+    1262,  1305,  1326,  1349,  1358,  1376,  1380,  1384,  1390,  1394,
+    1408,  1409,  1416,  1420,  1429,  1432,  1438,  1443,  1451,  1454,
+    1460,  1465,  1473,  1476,  1482,  1487,  1495,  1498,  1504,  1510,
+    1522,  1526,  1533,  1537,  1544,  1547,  1553,  1557,  1561,  1565,
+    1569,  1618,  1632,  1635,  1641,  1645,  1656,  1675,  1703,  1725,
+    1726,  1734,  1737,  1743,  1747,  1754,  1759,  1765,  1769,  1777,
+    1780,  1786,  1790,  1796,  1800,  1804,  1808,  1812,  1855,  1866
 };
 #endif
 
@@ -2248,11 +2246,11 @@ yyreduce:
             yyassert(pp, (yyvsp[-10].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
                 bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
-                vector<int> vars((yyvsp[-8].iValue));
+                std::vector<int> vars((yyvsp[-8].iValue));
                 yyassert(pp, !(yyvsp[-4].oSet)() || !(yyvsp[-4].oSet).some()->empty(), "Empty var int domain.");
                 if (!pp->hadError) {
                     if ((yyvsp[0].oVarSpecVec)()) {
-                        vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
+                        std::vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
                         yyassert(pp, vsv->size() == static_cast<unsigned int>((yyvsp[-8].iValue)),
                             "Initializer size does not match array dimension");
                         if (!pp->hadError) {
@@ -2274,7 +2272,7 @@ yyreduce:
                         delete vsv;
                     } else {
                         IntVarSpec* ispec = new IntVarSpec((yyvsp[-4].oSet),print,!print,false);
-                        string arrayname = "["; arrayname += (yyvsp[-2].sValue);
+                        std::string arrayname = "["; arrayname += (yyvsp[-2].sValue);
                         for (int i = 0; i < (yyvsp[-8].iValue)-1; i++) {
                             vars[i] = pp->intvars.size();
                             pp->intvars.push_back(varspec(arrayname, ispec));
@@ -2306,9 +2304,9 @@ yyreduce:
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
             yyassert(pp, (yyvsp[-10].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
-                vector<int> vars((yyvsp[-8].iValue));
+                std::vector<int> vars((yyvsp[-8].iValue));
                 if ((yyvsp[0].oVarSpecVec)()) {
-                    vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
+                    std::vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
                     yyassert(pp, vsv->size() == static_cast<unsigned int>((yyvsp[-8].iValue)),
                         "Initializer size does not match array dimension");
                     if (!pp->hadError) {
@@ -2367,9 +2365,9 @@ yyreduce:
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasCall("output_array");
             yyassert(pp, (yyvsp[-12].iValue) == 1, "Arrays must start at 1");
             if (!pp->hadError) {
-                vector<int> vars((yyvsp[-10].iValue));
+                std::vector<int> vars((yyvsp[-10].iValue));
                 if ((yyvsp[0].oVarSpecVec)()) {
-                    vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
+                    std::vector<VarSpec*>* vsv = (yyvsp[0].oVarSpecVec).some();
                     yyassert(pp, vsv->size() == static_cast<unsigned int>((yyvsp[-10].iValue)),
                         "Initializer size does not match array dimension");
                     if (!pp->hadError) {
@@ -2391,7 +2389,7 @@ yyreduce:
                     delete vsv;
                 } else {
                     SetVarSpec* ispec = new SetVarSpec((yyvsp[-4].oSet),print,!print, false);
-                    string arrayname = "["; arrayname += (yyvsp[-2].sValue);
+                    std::string arrayname = "["; arrayname += (yyvsp[-2].sValue);
                     for (int i = 0; i < (yyvsp[-10].iValue)-1; i++) {
                         vars[i] = pp->setvars.size();
                         pp->setvars.push_back(varspec(arrayname, ispec));
@@ -2492,7 +2490,7 @@ yyreduce:
 
   case 50: /* int_init: ID '[' INT_LIT ']'  */
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[-3].sValue), v)) {
                 yyassert(pp,static_cast<unsigned int>((yyvsp[-1].iValue)) > 0 && 
@@ -2515,7 +2513,7 @@ yyreduce:
 
   case 51: /* int_init_list: %empty  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(0); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(0); 
         }
     break;
 
@@ -2527,7 +2525,7 @@ yyreduce:
 
   case 53: /* int_init_list_head: int_init  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(1); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
@@ -2570,7 +2568,7 @@ yyreduce:
 
   case 60: /* float_init: ID '[' INT_LIT ']'  */
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->floatvararrays.get((yyvsp[-3].sValue), v)) {
                 yyassert(pp,static_cast<unsigned int>((yyvsp[-1].iValue)) > 0 && 
@@ -2593,7 +2591,7 @@ yyreduce:
 
   case 61: /* float_init_list: %empty  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(0); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(0); 
         }
     break;
 
@@ -2605,7 +2603,7 @@ yyreduce:
 
   case 63: /* float_init_list_head: float_init  */
         {   
-            (yyval.varSpecVec) = new vector<VarSpec*>(1); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
@@ -2648,7 +2646,7 @@ yyreduce:
 
   case 68: /* bool_init: ID '[' INT_LIT ']'  */
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->boolvararrays.get((yyvsp[-3].sValue), v)) {
                 yyassert(pp,static_cast<unsigned int>((yyvsp[-1].iValue)) > 0 && 
@@ -2671,7 +2669,7 @@ yyreduce:
 
   case 69: /* bool_init_list: %empty  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(0); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(0); 
         }
     break;
 
@@ -2683,7 +2681,7 @@ yyreduce:
 
   case 71: /* bool_init_list_head: bool_init  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(1); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
@@ -2724,7 +2722,7 @@ yyreduce:
 
   case 76: /* set_init: ID '[' INT_LIT ']'  */
         { 
-            vector<int> v;
+            std::vector<int> v;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->setvararrays.get((yyvsp[-3].sValue), v)) {
                 yyassert(pp,static_cast<unsigned int>((yyvsp[-1].iValue)) > 0 && 
@@ -2747,7 +2745,7 @@ yyreduce:
 
   case 77: /* set_init_list: %empty  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(0); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(0); 
         }
     break;
 
@@ -2759,7 +2757,7 @@ yyreduce:
 
   case 79: /* set_init_list_head: set_init  */
         { 
-            (yyval.varSpecVec) = new vector<VarSpec*>(1); 
+            (yyval.varSpecVec) = new std::vector<VarSpec*>(1); 
             (*(yyval.varSpecVec))[0] = (yyvsp[0].varSpec); 
         }
     break;
@@ -2779,49 +2777,49 @@ yyreduce:
 
   case 82: /* vardecl_int_var_array_init: %empty  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::none(); 
         }
     break;
 
   case 83: /* vardecl_int_var_array_init: '=' int_var_array_literal  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
   case 84: /* vardecl_bool_var_array_init: %empty  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::none(); 
         }
     break;
 
   case 85: /* vardecl_bool_var_array_init: '=' bool_var_array_literal  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
   case 86: /* vardecl_float_var_array_init: %empty  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::none(); 
         }
     break;
 
   case 87: /* vardecl_float_var_array_init: '=' float_var_array_literal  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
   case 88: /* vardecl_set_var_array_init: %empty  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::none(); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::none(); 
         }
     break;
 
   case 89: /* vardecl_set_var_array_init: '=' set_var_array_literal  */
         { 
-            (yyval.oVarSpecVec) = Option<vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
+            (yyval.oVarSpecVec) = Option<std::vector<VarSpec*>* >::some((yyvsp[0].varSpecVec)); 
         }
     break;
 
@@ -2993,7 +2991,7 @@ yyreduce:
 
   case 104: /* int_list: %empty  */
         { 
-            (yyval.setValue) = new vector<int>(0); 
+            (yyval.setValue) = new std::vector<int>(0); 
         }
     break;
 
@@ -3005,7 +3003,7 @@ yyreduce:
 
   case 106: /* int_list_head: INT_LIT  */
         { 
-            (yyval.setValue) = new vector<int>(1); 
+            (yyval.setValue) = new std::vector<int>(1); 
             (*(yyval.setValue))[0] = (yyvsp[0].iValue); 
         }
     break;
@@ -3019,7 +3017,7 @@ yyreduce:
 
   case 108: /* bool_list: %empty  */
         { 
-            (yyval.setValue) = new vector<int>(0); 
+            (yyval.setValue) = new std::vector<int>(0); 
         }
     break;
 
@@ -3031,7 +3029,7 @@ yyreduce:
 
   case 110: /* bool_list_head: BOOL_LIT  */
         { 
-            (yyval.setValue) = new vector<int>(1); 
+            (yyval.setValue) = new std::vector<int>(1); 
             (*(yyval.setValue))[0] = (yyvsp[0].iValue); 
         }
     break;
@@ -3045,7 +3043,7 @@ yyreduce:
 
   case 112: /* float_list: %empty  */
         { 
-            (yyval.floatSetValue) = new vector<double>(0); 
+            (yyval.floatSetValue) = new std::vector<double>(0); 
         }
     break;
 
@@ -3057,7 +3055,7 @@ yyreduce:
 
   case 114: /* float_list_head: FLOAT_LIT  */
         {
-            (yyval.floatSetValue) = new vector<double>(1); 
+            (yyval.floatSetValue) = new std::vector<double>(1); 
             (*(yyval.floatSetValue))[0] = (yyvsp[0].dValue); 
         }
     break;
@@ -3071,7 +3069,7 @@ yyreduce:
 
   case 116: /* set_literal_list: %empty  */
         { 
-            (yyval.setValueList) = new vector<AST::SetLit>(0); 
+            (yyval.setValueList) = new std::vector<AST::SetLit>(0); 
         }
     break;
 
@@ -3083,7 +3081,7 @@ yyreduce:
 
   case 118: /* set_literal_list_head: set_literal  */
         { 
-            (yyval.setValueList) = new vector<AST::SetLit>(1); 
+            (yyval.setValueList) = new std::vector<AST::SetLit>(1); 
             (*(yyval.setValueList))[0] = *(yyvsp[0].setLit); 
             delete (yyvsp[0].setLit); 
         }
@@ -3160,7 +3158,7 @@ yyreduce:
 
   case 130: /* non_array_expr: ID  */
         { 
-            vector<int> as;
+            std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
                 AST::Array *ia = new AST::Array(as.size());
@@ -3300,7 +3298,7 @@ yyreduce:
 
   case 138: /* solve_expr: ID '[' INT_LIT ']'  */
         {
-            vector<int> tmp;
+            std::vector<int> tmp;
             ParserState *pp = static_cast<ParserState*>(parm);
             if (!pp->intvararrays.get((yyvsp[-3].sValue), tmp)) {
                 pp->err << "Error: unknown integer variable array " << (yyvsp[-3].sValue)
@@ -3421,7 +3419,7 @@ yyreduce:
 
   case 157: /* ann_non_array_expr: ID  */
         { 
-            vector<int> as;
+            std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
                 AST::Array *ia = new AST::Array(as.size());

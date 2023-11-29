@@ -5,13 +5,11 @@
 #include <set>
 #include <utility>
 
-using namespace std;
+std::vector<int> child;
+std::vector<int> size_;
 
-vector<int> child;
-vector<int> size_;
-
-vector<vector<int> > preds;
-vector<vector<int> > succs;
+std::vector<std::vector<int> > preds;
+std::vector<std::vector<int> > succs;
 
 void LengauerTarjan::LINK(int v, int w) { ancestor[w] = v; }
 
@@ -38,8 +36,8 @@ void LengauerTarjan::COMPRESS(int v) {
 
 void LengauerTarjan::init() {
 	int n = in.size();
-	preds = vector<vector<int> >(n, vector<int>());
-	succs = vector<vector<int> >(n, vector<int>());
+	preds = std::vector<std::vector<int> >(n, std::vector<int>());
+	succs = std::vector<std::vector<int> >(n, std::vector<int>());
 	for (int i = 0; i < n; i++) {
 		// succs.push_back(vector<int>());
 		// cout <<"Succs of "<<i<<": ";
@@ -60,18 +58,18 @@ void LengauerTarjan::init() {
 		// cout<<endl;
 	}
 
-	parent = vector<int>(n, -1);
-	vertex = vector<int>(n, -1);
-	semi = vector<int>(n, -1);
-	idom = vector<int>(n, -1);
+	parent = std::vector<int>(n, -1);
+	vertex = std::vector<int>(n, -1);
+	semi = std::vector<int>(n, -1);
+	idom = std::vector<int>(n, -1);
 
 	count = -1;
 
-	ancestor = vector<int>(n, -1);
-	label = vector<int>(n, -1);
+	ancestor = std::vector<int>(n, -1);
+	label = std::vector<int>(n, -1);
 
-	child = vector<int>(n, root);
-	size_ = vector<int>(n, 0);
+	child = std::vector<int>(n, root);
+	size_ = std::vector<int>(n, 0);
 }
 
 //*
@@ -83,7 +81,7 @@ void LengauerTarjan::DFS(int v) {
 	// Init vars for step 3 and 4
 	label[v] = v;
 	ancestor[v] = -1;
-	vector<int>::iterator it;
+	std::vector<int>::iterator it;
 	for (it = succs[v].begin(); it != succs[v].end(); it++) {
 		int w = *it;
 		if (semi[w] == -1) {
@@ -124,11 +122,12 @@ void LengauerTarjan::find_doms() {
 	// cout<<endl;
 	// cout <<"count "<<count<<endl;
 
-	vector<vector<int> > buckets = vector<vector<int> >(in.size(), vector<int>());
+	std::vector<std::vector<int> > buckets =
+			std::vector<std::vector<int> >(in.size(), std::vector<int>());
 
 	for (int i = count; i >= 1; i--) {
 		int w = vertex[i];
-		vector<int>::iterator it;
+		std::vector<int>::iterator it;
 		for (it = preds[w].begin(); it != preds[w].end(); it++) {
 			int v = *it;
 			int u = EVAL(v);
@@ -156,7 +155,7 @@ void LengauerTarjan::find_doms() {
 
 }  //*/
 
-vector<int> bucket;
+std::vector<int> bucket;
 void addToBucket(int buckIdx, int element) {
 	if (bucket[buckIdx] == -1) {
 		bucket[buckIdx] = element;
@@ -259,7 +258,7 @@ void ex1() {
 	int n = 15;
 	int e = 16;
 
-	vector<vector<int> > in(n, vector<int>());
+	std::vector<std::vector<int> > in(n, std::vector<int>());
 	in[12].push_back(2);
 	in[12].push_back(1);
 	in[13].push_back(10);
@@ -275,7 +274,7 @@ void ex1() {
 	in[0].push_back(8);
 	in[0].push_back(11);
 
-	vector<vector<int> > ou(n, vector<int>());
+	std::vector<std::vector<int> > ou(n, std::vector<int>());
 	ou[12].push_back(3);
 	ou[12].push_back(0);
 	ou[13].push_back(11);
@@ -292,7 +291,7 @@ void ex1() {
 	ou[8].push_back(13);
 	ou[13].push_back(12);
 
-	vector<vector<int> > endnodes(e, vector<int>());
+	std::vector<std::vector<int> > endnodes(e, std::vector<int>());
 	endnodes[0].push_back(12);
 	endnodes[0].push_back(14);
 	endnodes[1].push_back(14);
@@ -336,11 +335,11 @@ void ex1() {
 	LengauerTarjan lt = LengauerTarjan(12, endnodes, in, ou);
 	lt.run(12);
 
-	vector<bool> vis(in.size(), false);
+	std::vector<bool> vis(in.size(), false);
 	for (int i = 0; i < in.size(); i++) {
-		cout << "(" << i << "," << lt.dominator(i) << ") ";
+		std::cout << "(" << i << "," << lt.dominator(i) << ") ";
 	}
-	cout << endl;
+	std::cout << std::endl;
 }
 
 /*int main(int argc, char* argv[]) {

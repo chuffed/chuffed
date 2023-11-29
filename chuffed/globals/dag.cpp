@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 														 vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en)
 		: DReachabilityPropagator(_r, _vs, _es, _in, _out, _en) {
@@ -28,8 +26,8 @@ DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 		reachability[i][i] = 1;
 	}
 
-	succs = vector<TrailedSuccList>();
-	preds = vector<TrailedPredList>();
+	succs = std::vector<TrailedSuccList>();
+	preds = std::vector<TrailedPredList>();
 	for (int i = 0; i < nbNodes(); i++) {
 		succs.emplace_back(nbNodes());
 		preds.emplace_back(nbNodes());
@@ -260,14 +258,14 @@ bool DAGPropagator::prevent_cycle(int e) {
 }
 
 bool DAGPropagator::propagate() {
-	processed_e = vector<bool>(nbEdges(), false);
-	processed_n = vector<bool>(nbNodes(), false);
+	processed_e = std::vector<bool>(nbEdges(), false);
+	processed_n = std::vector<bool>(nbNodes(), false);
 
 	if (!DReachabilityPropagator::propagate()) {
 		return false;
 	}
 
-	set<int>::iterator it;
+	std::set<int>::iterator it;
 
 	for (it = new_edge.begin(); it != new_edge.end(); ++it) {
 		if (!processed_e[*it]) {
@@ -292,12 +290,12 @@ bool DAGPropagator::checkFinalSatisfied() {
 	if (!DReachabilityPropagator::checkFinalSatisfied()) {
 		return false;
 	}
-	vector<int> v = vector<int>(nbNodes(), 0);
+	std::vector<int> v = std::vector<int>(nbNodes(), 0);
 	assert(check_correctness(get_root_idx(), v));
 	return check_correctness(get_root_idx(), v);
 }
 
-bool DAGPropagator::check_correctness(int r, vector<int>& v) {
+bool DAGPropagator::check_correctness(int r, std::vector<int>& v) {
 	v[r] = -1;
 	// cout <<"Visiting "<<r<<endl;
 	for (int e : ou[r]) {

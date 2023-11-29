@@ -26,8 +26,6 @@
 #include <chuffed/flatzinc/flatzinc.h>
 #include <chuffed/support/vec.h>
 
-using namespace std;
-
 namespace FlatZinc {
 
 FlatZincSpace* s;
@@ -71,9 +69,10 @@ VarBranch ann2ivarsel(AST::Node* ann) {
 		if (s->id == "impact") return VAR_IMPACT;
 #endif
 	}
-	cerr << "% Warning: Unknown or not support variable selection annotation '";
-	ann->print(cerr);
-	cerr << "'! Ignore variable selection annotation and replace it by 'input_order'." << endl;
+	std::cerr << "% Warning: Unknown or not support variable selection annotation '";
+	ann->print(std::cerr);
+	std::cerr << "'! Ignore variable selection annotation and replace it by 'input_order'."
+						<< std::endl;
 	return VAR_INORDER;
 }
 
@@ -158,7 +157,7 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 				for (int& i : sl->s) {
 					d.push(i);
 				}
-				sort((int*)d, (int*)d + d.size());
+				std::sort((int*)d, (int*)d + d.size());
 				v = ::newIntVar(d[0], d.last());
 				intVarString.insert(std::pair<IntVar*, std::string>(v, name));
 				if ((d.last() - d[0] >= d.size() * mylog2(d.size())) ||
@@ -272,7 +271,7 @@ void FlatZincSpace::postConstraint(const ConExpr& ce, AST::Node* ann) {
 		registry().post(ce, ann);
 	} catch (AST::TypeError& e) {
 		throw FlatZinc::Error("Type error", e.what());
-	} catch (exception& e) {
+	} catch (std::exception& e) {
 		throw FlatZinc::Error("LazyGeoff", e.what());
 	}
 }
@@ -393,7 +392,7 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_bool annotation.\n");
 		}
-		int sz = min(vars->a.size(), vals->a.size());
+		int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
 			decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
 		}
@@ -405,7 +404,7 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
 		}
-		int sz = min(vars->a.size(), vals->a.size());
+		int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
 			IntVar* x(iv[vars->a[ii]->getIntVar()]);
 			int k(vals->a[ii]->getInt());
@@ -451,7 +450,7 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
 		// Parse the search annotation
 		parseSolveAnn(ann, engine.branching, nbNonEmptySearchAnnotations);
 	} catch (FlatZinc::Error& e) {
-		cerr << "% " << e.toString() << ". Ignore search annotation!" << endl;
+		std::cerr << "% " << e.toString() << ". Ignore search annotation!" << std::endl;
 		// Removal of successful parsed parts of the search annotation
 		engine.branching = new BranchGroup();
 		// Reset counter
@@ -627,7 +626,7 @@ void FlatZincSpace::setOutput() const {
 	}
 }
 
-void FlatZincSpace::printElem(AST::Node* ai, ostream& out) const {
+void FlatZincSpace::printElem(AST::Node* ai, std::ostream& out) const {
 	int k;
 	if (ai->isInt(k)) {
 		out << k;

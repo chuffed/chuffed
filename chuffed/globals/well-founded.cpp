@@ -10,8 +10,6 @@
 #define ADD_CLAUSES 0
 #define FLIP_NEG 1
 
-using namespace std;
-
 class ConjRule {
 public:
 	int head;
@@ -47,10 +45,10 @@ public:
 	vec<ConjRule*> rules;
 	vec<int> scc_ids;
 
-	multimap<int, int> raw_head_to_body;
+	std::multimap<int, int> raw_head_to_body;
 
-	map<int, int> lit_to_index;
-	map<int, ConjRule*> body_lit_to_rule;
+	std::map<int, int> lit_to_index;
+	std::map<int, ConjRule*> body_lit_to_rule;
 
 	vec<vec<ConjRule*> > head_occ_rules;  // occurences in rule head
 	vec<vec<ConjRule*> > body_occ_rules;  // occurences in rule body
@@ -92,8 +90,8 @@ public:
 	}
 
 	int getId(Lit l) {
-		pair<map<int, int>::iterator, bool> p =
-				lit_to_index.insert(pair<int, int>(toInt(l), lits.size()));
+		std::pair<std::map<int, int>::iterator, bool> p =
+				lit_to_index.insert(std::pair<int, int>(toInt(l), lits.size()));
 		if (p.second) {
 			lits.push(l);
 		}
@@ -111,7 +109,7 @@ public:
 
 	void preprocess() {
 		for (int i = 0; i < raw_heads.size(); i++) {
-			raw_head_to_body.insert(pair<int, int>(toInt((Lit)raw_heads[i]), i));
+			raw_head_to_body.insert(std::pair<int, int>(toInt((Lit)raw_heads[i]), i));
 		}
 
 		for (int i = 0; i < raw_heads.size(); i++) {
