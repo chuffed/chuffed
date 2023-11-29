@@ -7,8 +7,6 @@
 #include <map>
 #include <set>
 
-using namespace std;
-
 class VarGroup;
 
 struct LinearIneq {
@@ -37,8 +35,8 @@ class MIP : public Propagator {
 	};
 
 public:
-	set<IntVar*> var_set;
-	map<IntVar*, int> var_map;
+	std::set<IntVar*> var_set;
+	std::map<IntVar*, int> var_map;
 	vec<IntVar*> vars;
 	vec<LinearIneq> ineqs;
 

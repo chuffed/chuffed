@@ -50,7 +50,7 @@ void LDSB::processDec(Lit p) {
 		NOT_SUPPORTED;
 	}
 
-	vec<pair<int, int> >& syms = lookupTable[var_id];
+	vec<std::pair<int, int> >& syms = lookupTable[var_id];
 
 	for (int i = 0; i < syms.size(); i++) {
 		symmetries[syms[i].first]->processDec(p, syms[i].second);
@@ -77,7 +77,7 @@ bool LDSB::processImpl(Clause* c) {
 			continue;
 		}
 
-		vec<pair<int, int> >& syms = lookupTable[var_id];
+		vec<std::pair<int, int> >& syms = lookupTable[var_id];
 
 		for (int i = 0; i < syms.size(); i++) {
 			if (syms[i].first == sl_origin[k]) {
@@ -150,7 +150,7 @@ public:
 	void init() override {
 		for (int i = 0; i < n; i++) {
 			assert(engine.vars[vars[i]]->getType() == INT_VAR_EL);
-			ldsb.lookupTable[vars[i]].push(pair<int, int>(sym_id, i));
+			ldsb.lookupTable[vars[i]].push(std::pair<int, int>(sym_id, i));
 		}
 	}
 
@@ -276,7 +276,7 @@ public:
 		}
 		for (int i = 0; i < n; i++) {
 			assert(engine.vars[vars[i]]->getType() == INT_VAR_EL);
-			ldsb.lookupTable[vars[i]].push(pair<int, int>(sym_id, i));
+			ldsb.lookupTable[vars[i]].push(std::pair<int, int>(sym_id, i));
 			which_vars[vars[i]] = true;
 		}
 	}
@@ -490,7 +490,7 @@ public:
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				assert(vars[i][j]->getType() == INT_VAR_EL);
-				ldsb.lookupTable[vars[i][j]->var_id].push(pair<int, int>(sym_id, i * m + j));
+				ldsb.lookupTable[vars[i][j]->var_id].push(std::pair<int, int>(sym_id, i * m + j));
 				occ[vars[i][j]->var_id].push(i * m + j);
 			}
 		}
@@ -675,7 +675,7 @@ public:
 		}
 		for (int i = 0; i < vars.size(); i++) {
 			assert(vars[i]->getType() == INT_VAR_EL);
-			ldsb.lookupTable[vars[i]->var_id].push(pair<int, int>(sym_id, i));
+			ldsb.lookupTable[vars[i]->var_id].push(std::pair<int, int>(sym_id, i));
 			which_vars[vars[i]->var_id] = true;
 		}
 	}

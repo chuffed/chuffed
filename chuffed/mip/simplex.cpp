@@ -468,7 +468,7 @@ bool Simplex::findPivotCol2() {
 	}
 
 	// sort based on ratio asc, then pivot size asc
-	sort((int*)pivot_cands, (int*)pivot_cands + pivot_cands.size(), sort_col_ratio);
+	std::sort((int*)pivot_cands, (int*)pivot_cands + pivot_cands.size(), sort_col_ratio);
 
 	long double best_psize = 0;
 

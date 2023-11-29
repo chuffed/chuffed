@@ -34,11 +34,11 @@ int nextnodeid = 0;
 cpprofiler::Connector* profilerConnector;
 #endif
 
-std::map<IntVar*, string> intVarString;
-std::map<BoolView, string> boolVarString;
-string mostRecentLabel;
+std::map<IntVar*, std::string> intVarString;
+std::map<BoolView, std::string> boolVarString;
+std::string mostRecentLabel;
 
-extern std::map<int, string> learntClauseString;
+extern std::map<int, std::string> learntClauseString;
 extern std::ofstream learntStatsStream;
 
 std::ofstream node_stream;
@@ -46,7 +46,7 @@ std::ofstream node_stream;
 #ifdef HAS_PROFILER
 static bool doProfiling() { return so.print_nodes || profilerConnector->connected(); }
 
-static ostream& operator<<(ostream& os, const cpprofiler::NodeUID& uid) {
+static std::ostream& operator<<(std::ostream& os, const cpprofiler::NodeUID& uid) {
 	return os << "{" << uid.nid << ", " << uid.rid << ", " << uid.tid << "}";
 }
 
@@ -114,7 +114,7 @@ std::vector<int> decisionLevelTip;
 enum RewindStyle { REWIND_OMIT_SKIPPED, REWIND_SEND_SKIPPED };
 
 std::string showVector(const std::vector<int>& v) {
-	stringstream ss;
+	std::stringstream ss;
 	for (int i = 0; i < v.size(); i++) {
 		if (i > 0) {
 			ss << " ";
@@ -125,7 +125,7 @@ std::string showVector(const std::vector<int>& v) {
 }
 
 std::string showVec(const vec<int>& v) {
-	stringstream ss;
+	std::stringstream ss;
 	for (int i = 0; i < v.size(); i++) {
 		if (i > 0) {
 			ss << " ";
@@ -242,7 +242,7 @@ inline void Engine::newDecisionLevel() {
 		mip->newDecisionLevel();
 	}
 	assert(dec_info.size() == decisionLevel());
-	peak_depth = max(peak_depth, decisionLevel());
+	peak_depth = std::max(peak_depth, decisionLevel());
 }
 
 inline void Engine::doFixPointStuff() {
@@ -828,7 +828,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 					std::stringstream ss2;
 					/* ss2 << "-> "; */
-					string ls = getLitString(toInt(sat.out_learnt[0]));
+					std::string ls = getLitString(toInt(sat.out_learnt[0]));
 					ss2 << ls;
 					if (ls.size() < 2) {
 						std::cerr << "WARNING: short label for " << toInt(sat.out_learnt[0]) << ": " << ls
@@ -1058,7 +1058,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #endif
 #ifdef HAS_PROFILER
 			if (doProfiling()) {
-				string info;
+				std::string info;
 				if (so.send_domains) {
 					auto* fzs = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
 					if (fzs != nullptr) {

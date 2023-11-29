@@ -120,8 +120,8 @@ inline MDDOpts getMDDOpts(AST::Node* ann) {
 	return mopts;
 }
 
-std::list<string> getCumulativeOptions(AST::Node* ann) {
-	std::list<string> opt;
+std::list<std::string> getCumulativeOptions(AST::Node* ann) {
+	std::list<std::string> opt;
 	if (ann != nullptr) {
 		if (ann->hasCall("tt_filt")) {
 			if (ann->getCall("tt_filt")->args->getBool()) {
@@ -721,7 +721,7 @@ void p_cumulative(const ConExpr& ce, AST::Node* ann) {
 	vec<int> p;
 	arg2intargs(p, ce[2]);
 	int limit = ce[3]->getInt();
-	std::list<string> opt = getCumulativeOptions(ann);
+	std::list<std::string> opt = getCumulativeOptions(ann);
 	cumulative(s, d, p, limit, opt);
 }
 
@@ -732,7 +732,7 @@ void p_cumulative2(const ConExpr& ce, AST::Node* ann) {
 	arg2intvarargs(d, ce[1]);
 	vec<IntVar*> r;
 	arg2intvarargs(r, ce[2]);
-	std::list<string> opt = getCumulativeOptions(ann);
+	std::list<std::string> opt = getCumulativeOptions(ann);
 	cumulative2(s, d, r, getIntVar(ce[3]), opt);
 }
 
@@ -762,7 +762,7 @@ void p_cumulative_cal(const ConExpr& ce, AST::Node* ann) {
 	arg2intargs(taskCal, ce[7]);
 	int rho = ce[8]->getInt();
 	int resCal = ce[9]->getInt();
-	std::list<string> opt = getCumulativeOptions(ann);
+	std::list<std::string> opt = getCumulativeOptions(ann);
 	cumulative_cal(s, d, p, getIntVar(ce[3]), cal, taskCal, rho, resCal, opt);
 }
 
@@ -1726,7 +1726,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* ann) {
 			}
 		}
 	}
-	cout << endl;
+	std::cout << std::endl;
 	vec<int> en_flat;
 	arg2intargs(en_flat, ce[6]);
 	// assert(en_flat.size() == es.size()*vs.size());

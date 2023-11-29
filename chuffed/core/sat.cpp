@@ -17,7 +17,7 @@ SAT sat;
 
 std::map<int, std::string> litString;
 
-std::map<int, string> learntClauseString;
+std::map<int, std::string> learntClauseString;
 std::ofstream learntStatsStream;
 
 cassert(sizeof(Lit) == 4);
@@ -382,7 +382,7 @@ bool SAT::simplify(Clause& c) const {
 	return false;
 }
 
-string showReason(Reason r) {
+std::string showReason(Reason r) {
 	std::stringstream ss;
 	switch (r.d.type) {
 		case 0:

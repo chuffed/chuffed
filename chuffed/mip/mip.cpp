@@ -52,11 +52,11 @@ void MIP::init() {
 	}
 
 	var_set.erase(engine.opt_var);
-	var_map.insert(pair<IntVar*, int>(engine.opt_var, 0));
+	var_map.insert(std::pair<IntVar*, int>(engine.opt_var, 0));
 	vars.push(engine.opt_var);
 
 	for (auto* v : var_set) {
-		var_map.insert(pair<IntVar*, int>(v, vars.size()));
+		var_map.insert(std::pair<IntVar*, int>(v, vars.size()));
 		v->attach(this, vars.size(), EVENT_LU);
 		vars.push(v);
 	}
