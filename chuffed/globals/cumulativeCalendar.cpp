@@ -1543,7 +1543,7 @@ Clause* CumulativeCalProp::get_reason_for_update(vec<Lit>& expl) {
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in) {
 	std::list<std::string> opt;
-	cumulative_cal(s, d, r, limit, cal, taskCal, rho_in, resCal_in);
+	cumulative_cal(s, d, r, limit, cal, taskCal, rho_in, resCal_in, opt);
 }
 
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
