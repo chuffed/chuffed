@@ -945,7 +945,7 @@ bool MDDProp<U>::fullProp() {
 		val_entries[clear_queue[c]].stat_flag = 0;
 		if (val_entries[clear_queue[c]].supp_count == 0) {
 			std::cout << prop_id << "|" << c << "|" << clear_queue[c] << std::endl;
-			std::cout << clear_queue << std::endl;
+			std::cout << clear_queue << '\n';
 		}
 
 		assert(val_entries[clear_queue[c]].supp_count > 0);
@@ -1119,7 +1119,7 @@ bool MDDProp<U>::propagate() {
 #ifndef USE_WATCHES
 		if (val_entries[val].supp_count == 0) {
 			std::cout << prop_id << "|" << c << "|" << val << std::endl;
-			std::cout << clear_queue << std::endl;
+			std::cout << clear_queue << '\n';
 		}
 
 		assert(VAL(val).supp_count != 0);

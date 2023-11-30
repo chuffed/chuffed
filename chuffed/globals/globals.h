@@ -25,7 +25,7 @@ void wf_init();
 
 void all_different(vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl = CL_DEF);
-void all_different_imp(BoolView b, vec<IntVar*>& x, ConLevel cl = CL_DEF);
+void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1 = 0, int o2 = 0, ConLevel cl = CL_DEF);
 
 // circuit.c
@@ -68,15 +68,16 @@ void disjunctive(vec<IntVar*>& x, vec<int>& d);
 // cumulative.c
 
 void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit);
-void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<std::string> opt);
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
+								const std::list<std::string>& opt);
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit);
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
-								 std::list<std::string> opt);
+								 const std::list<std::string>& opt);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal,
-										std::list<std::string> opt);
+										const std::list<std::string>& opt);
 
 // lex.c
 

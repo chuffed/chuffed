@@ -183,7 +183,7 @@ public:
 	// Constructor
 	//
 	CumulativeProp(CUMU_ARR_INTVAR& _start, CUMU_ARR_INTVAR& _dur, CUMU_ARR_INTVAR& _usage,
-								 CUMU_INTVAR _limit, std::list<std::string> opt)
+								 CUMU_INTVAR _limit, const std::list<std::string>& opt)
 			: start(_start),
 				dur(_dur),
 				usage(_usage),
@@ -201,7 +201,7 @@ public:
 				sort_est_asc(this),
 				sort_lct_asc(this) {
 		// Overriding option defaults
-		for (auto& it : opt) {
+		for (const auto& it : opt) {
 			if (it == "tt_filt_on") {
 				tt_filt = true;
 			} else if (it == "tt_filt_off") {
@@ -1319,7 +1319,8 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit) {
 	cumulative(s, d, r, limit, opt);
 }
 
-void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit, std::list<std::string> opt) {
+void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
+								const std::list<std::string>& opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements
@@ -1405,7 +1406,7 @@ std:
 }
 
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
-								 std::list<std::string> opt) {
+								 const std::list<std::string>& opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements

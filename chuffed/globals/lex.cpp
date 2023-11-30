@@ -4,8 +4,8 @@
 #include "chuffed/vars/int-var.h"
 #include "chuffed/vars/int-view.h"
 
-void newBinGE(IntView<> x, IntView<> y, BoolView r);
-void newBinNE(IntView<> x, IntView<> y, BoolView r);
+void newBinGE(IntView<> x, IntView<> y, const BoolView& r);
+void newBinNE(IntView<> x, IntView<> y, const BoolView& r);
 
 // x lex< y
 

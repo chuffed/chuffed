@@ -92,8 +92,7 @@ VarBranch ann2ivarsel(AST::Node* ann) {
 	}
 	std::cerr << "% Warning: Unknown or not support variable selection annotation '";
 	ann->print(std::cerr);
-	std::cerr << "'! Ignore variable selection annotation and replace it by 'input_order'."
-						<< std::endl;
+	std::cerr << "'! Ignore variable selection annotation and replace it by 'input_order'." << '\n';
 	return VAR_INORDER;
 }
 
@@ -131,7 +130,7 @@ ValBranch ann2ivalsel(AST::Node* ann) {
 	}
 	std::cerr << "% Warning, ignored search annotation: ";
 	ann->print(std::cerr);
-	std::cerr << std::endl;
+	std::cerr << '\n';
 	return VAL_DEFAULT;
 }
 
@@ -471,7 +470,7 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
 		// Parse the search annotation
 		parseSolveAnn(ann, engine.branching, nbNonEmptySearchAnnotations);
 	} catch (FlatZinc::Error& e) {
-		std::cerr << "% " << e.toString() << ". Ignore search annotation!" << std::endl;
+		std::cerr << "% " << e.toString() << ". Ignore search annotation!" << '\n';
 		// Removal of successful parsed parts of the search annotation
 		engine.branching = new BranchGroup();
 		// Reset counter

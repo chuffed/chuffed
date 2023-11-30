@@ -273,7 +273,7 @@ inline Node::~Node() {}
 inline void Node::append(Node* newNode) {
 	auto* a = dynamic_cast<Array*>(this);
 	if (a == nullptr) {
-		std::cerr << "type error" << std::endl;
+		std::cerr << "type error" << '\n';
 		std::exit(-1);
 	}
 	a->a.push_back(newNode);

@@ -203,7 +203,7 @@ void KosarajuSCC::topological_sort(int u, std::vector<std::vector<int> >& out,
 }
 
 void KosarajuSCC::_set_levels(int u, bool vis[], std::unordered_map<int, bool>& mscc, int parent,
-															std::string des) {
+															const std::string& des) {
 	// std::cout<<des;
 	// for (int i = 0; i < nb_sccs(); i++)
 	//      std::cout<<levels[i]<<" ";

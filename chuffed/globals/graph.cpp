@@ -68,7 +68,7 @@ GraphPropagator::GraphPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec
 	}
 	if (DEBUG) {
 		for (int i = 0; i < nbEdges(); i++) {
-			std::cout << i << " " << _en[i][0] << " " << _en[i][1] << std::endl;
+			std::cout << i << " " << _en[i][0] << " " << _en[i][1] << '\n';
 		}
 	}
 
@@ -140,7 +140,7 @@ bool GraphPropagator::coherence_outedges(int node, std::vector<edge_id>& remvd_e
 				(*r)[1] = vs[node].getValLit();
 			}
 			if (GRAPHPROP_DEBUG) {
-				std::cout << "COHERENCE (E) " << edge << std::endl;
+				std::cout << "COHERENCE (E) " << edge << '\n';
 			}
 			es[edge].setVal2(false, r);
 			remvd_e.push_back(edge);
@@ -180,7 +180,7 @@ bool GraphPropagator::coherence_innodes(int edge, std::vector<node_id>& added_n)
 				(*r)[1] = es[edge].getValLit();
 			}
 			if (GRAPHPROP_DEBUG) {
-				std::cout << "COHERENCE (N) " << u << std::endl;
+				std::cout << "COHERENCE (N) " << u << '\n';
 			}
 			vs[u].setVal2(true, r);
 			added_n.push_back(u);

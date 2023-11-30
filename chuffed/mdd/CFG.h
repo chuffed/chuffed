@@ -215,7 +215,7 @@ public:
 				}
 				printRule(prods[vv][ri].rule);
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	}
 

@@ -14,7 +14,7 @@ public:
 	WarmStartBrancher(vec<Lit>& _decs, bool _revive = false)
 			: decs(_decs), pos(0), revive(_revive), init_conflicts(INT_MAX) {}
 
-	WarmStartBrancher(vec<IntVar*> xs, vec<int>& vs, bool _revive = false)
+	WarmStartBrancher(const vec<IntVar*>& xs, vec<int>& vs, bool _revive = false)
 			: pos(0), revive(_revive), init_conflicts(INT_MAX) {}
 
 	bool finished() override {

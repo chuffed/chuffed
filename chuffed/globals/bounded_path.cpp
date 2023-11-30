@@ -147,18 +147,18 @@ void BoundedPathPropagator::rootLevelPropagation() {
 	forward_sp->run();
 	if (forward_sp->distTo(dest) > w->getMin()) {
 		if (DEBUG) {
-			std::cout << "Setting Minimum to " << forward_sp->distTo(dest) << std::endl;
+			std::cout << "Setting Minimum to " << forward_sp->distTo(dest) << '\n';
 		}
 		w->setMin(forward_sp->distTo(dest), nullptr);
 	}
 	if (DEBUG) {
-		std::cout << "Forward Dijkstra " << forward_sp->distTo(dest) << std::endl;
+		std::cout << "Forward Dijkstra " << forward_sp->distTo(dest) << '\n';
 	}
 	if (DEBUG) {
-		std::cout << "Min: " << w->getMin() << std::endl;
+		std::cout << "Min: " << w->getMin() << '\n';
 	}
 	if (DEBUG) {
-		std::cout << "Max: " << w->getMax() << std::endl;
+		std::cout << "Max: " << w->getMax() << '\n';
 	}
 	backward_sp->run();
 	initial_dist_from_dest = std::vector<int>(nbNodes(), -1);
@@ -172,17 +172,17 @@ void BoundedPathPropagator::rootLevelPropagation() {
 		initial_mandatory_sp->set_clustering(dkm);
 		bool set_target = false;
 		if (DEBUG) {
-			std::cout << "Running DPLB in constructor" << std::endl;
+			std::cout << "Running DPLB in constructor" << '\n';
 		}
 		int lb = initial_mandatory_sp->run(nullptr, set_target);
 		if (lb > w->getMin()) {
 			if (DEBUG) {
-				std::cout << "Setting Minimum to " << forward_sp->distTo(dest) << std::endl;
+				std::cout << "Setting Minimum to " << forward_sp->distTo(dest) << '\n';
 			}
 			w->setMin(lb, nullptr);
 		}
 		if (DEBUG) {
-			std::cout << "Done " << lb << std::endl;
+			std::cout << "Done " << lb << '\n';
 		}
 	}
 }
@@ -256,7 +256,7 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 			explanation_size(0),
 			in_nodes_tsize(0),
 			in_nodes_size(0) {
-	std::cerr << "Do not use BoundedPathPropagator for time-depending paths" << std::endl;
+	std::cerr << "Do not use BoundedPathPropagator for time-depending paths" << '\n';
 
 	priority = 5;
 
@@ -327,7 +327,7 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 		}
 	}
 
-	std::cout << "Done " << wst.size() << " " << wst[0].size() << std::endl;
+	std::cout << "Done " << wst.size() << " " << wst[0].size() << '\n';
 }
 
 BoundedPathPropagator::~BoundedPathPropagator() {
@@ -372,7 +372,7 @@ void BoundedPathPropagator::wakeup(int i, int c) {
 
 void BoundedPathPropagator::addToExplanation(int e) {
 	if (DEBUG) {
-		std::cout << "Adding to explanation " << e << std::endl;
+		std::cout << "Adding to explanation " << e << '\n';
 	}
 	fail_expl.push(getEdgeVar(e).getValLit());
 	prop_expl.push(getEdgeVar(e).getValLit());
@@ -611,14 +611,14 @@ bool BoundedPathPropagator::propagate() {
 		double st = wallClockTime();
 
 		if (DEBUG) {
-			std::cout << "Running DPLB" << std::endl;
+			std::cout << "Running DPLB" << '\n';
 		}
 
 		int lb = mandatory_sp->run(&ok, set_target);
 		delta = wallClockTime() - st;
 
 		if (DEBUG) {
-			std::cout << "Achieved lb: " << lb << " " << w->getMax() << " " << delta << std::endl;
+			std::cout << "Achieved lb: " << lb << " " << w->getMax() << " " << delta << '\n';
 		}
 
 		/*if(!ok) {//No benefit at all...
@@ -969,7 +969,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
 		int hd_to_d = backward_sp->distTo(hd);
 		if (hd_to_d == -1) {  // Destination can't reach this node
 			if (!falseOrFail(e, r)) {
-				std::cerr << "Error " << __FILE__ << " " << __LINE__ << std::endl;
+				std::cerr << "Error " << __FILE__ << " " << __LINE__ << '\n';
 				return false;
 			}
 			continue;
@@ -977,7 +977,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
 		int s_to_tl = forward_sp->distTo(tl);
 		if (s_to_tl == -1) {  // Source can't reach this node
 			if (!falseOrFail(e, r)) {
-				std::cerr << "Error " << __FILE__ << " " << __LINE__ << std::endl;
+				std::cerr << "Error " << __FILE__ << " " << __LINE__ << '\n';
 				return false;
 			}
 			continue;

@@ -11,7 +11,7 @@
 // The label on each node counts the cost of its duration! (i.e. Duration included)
 //  i.e. the label on each node says when will you be done with it.
 
-Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<int>& _ws)
+Dijkstra::Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int>& _ws)
 		: source(_s),
 			nb_nodes(_in.size()),
 			en(std::move(_en)),
@@ -19,8 +19,8 @@ Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<int>& _w
 			out(std::move(_ou)),
 			ws(_ws),
 			verbose(false) {}
-Dijkstra::Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<std::vector<int> >& _wst,
-									 std::vector<int> d)
+Dijkstra::Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou,
+									 std::vector<std::vector<int> >& _wst, std::vector<int> d)
 		: source(_s),
 			nb_nodes(_in.size()),
 			en(std::move(_en)),
@@ -46,7 +46,7 @@ void Dijkstra::run() {
 	q.push(initial);
 
 	if (verbose) {
-		std::cout << "START" << std::endl;
+		std::cout << "START" << '\n';
 	}
 
 	while (!q.empty() && count < nb_nodes) {
@@ -64,7 +64,7 @@ void Dijkstra::run() {
 
 		if (verbose) {
 			std::cout << "Visiting " << curr << " from " << pred[curr] << "(cost: " << cost[curr] << ")"
-								<< std::endl;
+								<< '\n';
 		}
 
 		for (unsigned int i = 0; i < out[curr].size(); i++) {
@@ -72,8 +72,7 @@ void Dijkstra::run() {
 			assert(en[e][0] == curr);
 			if (ignore_edge(e) || weight(e) < 0) {
 				if (verbose) {
-					std::cout << "Ignoring edge " << e << " from " << en[e][0] << " to " << en[e][1]
-										<< std::endl;
+					std::cout << "Ignoring edge " << e << " from " << en[e][0] << " to " << en[e][1] << '\n';
 				}
 				on_ignore_edge(e);
 				continue;
@@ -93,8 +92,7 @@ void Dijkstra::run() {
 				pred[other] = curr;
 				has_kids[curr] = true;
 				if (verbose) {
-					std::cout << "Marked " << other << " from " << curr << " of cost " << cost[other]
-										<< std::endl;
+					std::cout << "Marked " << other << " from " << curr << " of cost " << cost[other] << '\n';
 				}
 				tuple new_node(other, cost[other]);
 				enqueue(new_node);
@@ -222,7 +220,7 @@ int main(int argc, char* argv[]) {
 //*/
 
 std::vector<int> DijkstraMandatory::DEFAULT_VECTOR;
-DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
+DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou,
 																		 std::vector<int> _ws)
 		: source(_s),
 			dest(_d),
@@ -244,7 +242,7 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t
 
 #endif
 }
-DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
+DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou,
 																		 std::vector<std::vector<int> > _wst, std::vector<int> _ds)
 		: source(_s),
 			dest(_d),
@@ -526,5 +524,5 @@ void Dijkstra::print_pred() const {
 	for (int i : pred) {
 		std::cout << i << " ";
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 }

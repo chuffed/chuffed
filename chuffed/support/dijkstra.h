@@ -47,8 +47,8 @@ private:
 	std::priority_queue<tuple, std::vector<tuple>, Dijkstra::Priority> q;
 
 public:
-	Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<int>& _ws);
-	Dijkstra(int _s, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<std::vector<int>>& _wst,
+	Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int>& _ws);
+	Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<std::vector<int>>& _wst,
 					 std::vector<int> d = std::vector<int>());
 	virtual ~Dijkstra(){};
 	void run();
@@ -73,7 +73,7 @@ public:
 		if (static_cast<unsigned int>(!wst.empty()) != 0U) {
 			return time >= 0 && time < wst[e].size() ? wst[e][time] : -1;
 		}
-		std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
+		std::cerr << "Error " << __FILE__ << __LINE__ << '\n';
 		return -1;
 	}
 	inline virtual int duration(int n) {
@@ -141,7 +141,7 @@ private:
 	public:
 		FilteredKosarajuSCC(DijkstraMandatory* _d, int v, std::vector<std::vector<int>> outgoing,
 												std::vector<std::vector<int>> ingoing, std::vector<std::vector<int>> ends)
-				: KosarajuSCC(v, outgoing, ingoing, ends), d(_d) {}
+				: KosarajuSCC(v, std::move(outgoing), std::move(ingoing), std::move(ends)), d(_d) {}
 		bool ignore_edge(int e) override { return d->ignore_edge_scc(e); }
 		bool ignore_node(int u) override { return d->ignore_node_scc(u); }
 		bool mandatory_node(int u) override { return d->mandatory_node(u); }
@@ -163,8 +163,8 @@ public:
 	typedef std::unordered_map<size_t, tuple>::const_iterator table_iterator;
 	typedef std::vector<map_type> table_type;
 
-	DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou, std::vector<int> _ws);
-	DijkstraMandatory(int _s, int _d, vvi_t _en, vvi_t _in, vvi_t _ou,
+	DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int> _ws);
+	DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou,
 										std::vector<std::vector<int>> _wst, std::vector<int> _ds = std::vector<int>());
 	virtual void init();
 	virtual ~DijkstraMandatory(){};
@@ -181,7 +181,7 @@ public:
 	virtual bool ignore_node(int n) { return false; }
 	virtual bool ignore_edge_scc(int e) { return false; }
 	virtual bool ignore_node_scc(int n) { return false; }
-	virtual void enqueue(tuple node) { q.push(node); }
+	virtual void enqueue(const tuple& node) { q.emplace(node); }
 	virtual bool stop_at_node(int n) { return false; }
 	virtual bool mandatory_node(int n) { return false; }
 	virtual bool mandatory_edge(int e) { return false; }
@@ -194,7 +194,7 @@ public:
 		if (static_cast<unsigned int>(!wst.empty()) != 0U) {
 			return time >= 0 && time < (int)wst[e].size() ? wst[e][time] : -1;
 		}
-		std::cerr << "Error " << __FILE__ << __LINE__ << std::endl;
+		std::cerr << "Error " << __FILE__ << __LINE__ << '\n';
 		return -1;
 	}
 	inline virtual int duration(int n) {

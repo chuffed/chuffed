@@ -728,7 +728,7 @@ void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offs
 	}
 }
 
-void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y,
+void array_var_int_element_bound_imp(const BoolView& b, IntVar* x, vec<IntVar*>& a, IntVar* y,
 																		 int offset) {
 	x->specialiseToEL();
 	vec<IntView<> > w;

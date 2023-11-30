@@ -50,7 +50,7 @@ void SIGINT_handler(int signum) {
 
 const char* irel_str[] = {" = ", " != ", " <= ", " > "};
 
-std::string get_bv_string(BoolView b, bool tryIntDom) {
+std::string get_bv_string(const BoolView& b, bool tryIntDom) {
 	std::string s;
 
 	if (tryIntDom) {
@@ -163,16 +163,16 @@ int main(int argc, char** argv) {
 					std::cout << ", " << get_bv_string(ng[ii], so.assump_int);
 				}
 			}
-			std::cout << "]" << std::endl;
+			std::cout << "]" << '\n';
 		}
 	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << e.what() << '\n';
 		std::exit(EXIT_FAILURE);
 	} catch (const FlatZinc::Error& e) {
-		std::cerr << e.toString() << std::endl;
+		std::cerr << e.toString() << '\n';
 		std::exit(EXIT_FAILURE);
 	} catch (...) {
-		std::cerr << "  UNKNOWN EXCEPTION." << std::endl;
+		std::cerr << "  UNKNOWN EXCEPTION." << '\n';
 		std::exit(EXIT_FAILURE);
 	}
 	return 0;

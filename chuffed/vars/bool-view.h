@@ -81,7 +81,7 @@ public:
 
 	operator Lit() const { return getLit(true); }
 	Lit operator=(bool v) const { return getLit(v); }
-	bool operator==(BoolView o) const { return v == o.v && s == o.s; }
+	bool operator==(const BoolView& o) const { return v == o.v && s == o.s; }
 
 	void setLearnable(bool learnable) const { sat.flags[v].setLearnable(learnable); }
 

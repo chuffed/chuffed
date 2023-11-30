@@ -96,9 +96,9 @@ void int_rel(IntVar* x, IntRelType t, IntVar* y, int c = 0);
 // x rel c
 void int_rel(IntVar* x, IntRelType t, int c);
 // x rel y + c <-> r
-void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c = 0);
+void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, const BoolView& r, int c = 0);
 // x rel y + c <- r
-void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c = 0);
+void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, const BoolView& r, int c = 0);
 // x rel c <-> r
 void int_rel_reif(IntVar* x, IntRelType t, int c, BoolView r);
 // x rel c <- r
@@ -107,13 +107,13 @@ void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r);
 // linear.c
 
 // sum a*x rel c <-> r
-void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r = bv_true);
+void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolView& r = bv_true);
 // sum x rel c <-> r
-void int_linear(vec<IntVar*>& x, IntRelType t, int c, BoolView r = bv_true);
+void int_linear(vec<IntVar*>& x, IntRelType t, int c, const BoolView& r = bv_true);
 // sum a*x rel y <-> r
-void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, IntVar* y, BoolView r = bv_true);
+void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, IntVar* y, const BoolView& r = bv_true);
 // sum x rel y <-> r
-void int_linear(vec<IntVar*>& x, IntRelType t, IntVar* y, BoolView r = bv_true);
+void int_linear(vec<IntVar*>& x, IntRelType t, IntVar* y, const BoolView& r = bv_true);
 // sum a*x = c, domain consistent
 void int_linear_dom(vec<int>& a, vec<IntVar*>& x, int c);
 
@@ -153,7 +153,7 @@ void array_var_bool_element(IntVar* x, vec<BoolView>& a, BoolView y, int offset 
 // y = a[x-offset]
 void array_var_int_element_bound(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
 void array_var_int_element_dom(IntVar* x, vec<IntVar*>& a, IntVar* y, int offset = 0);
-void array_var_int_element_bound_imp(BoolView b, IntVar* x, vec<IntVar*>& a, IntVar* y,
+void array_var_int_element_bound_imp(const BoolView& b, IntVar* x, vec<IntVar*>& a, IntVar* y,
 																		 int offset = 0);
 
 // domain.c

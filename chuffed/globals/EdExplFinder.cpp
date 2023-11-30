@@ -79,7 +79,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		if (l > 0) {
 			// we insert x_i <= l-1, as we have to actually negate the inequality
 #ifndef NDEBUG
-			std::cout << "x_" << i << " >= " << l << std::endl;
+			std::cout << "x_" << i << " >= " << l << '\n';
 #endif
 			litVector.push_back(seq1[i].getLit(l - 1, LR_LE));
 		}
@@ -88,7 +88,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		if (u < max_char && l <= u) {
 			// we insert x_i >= u+1, as we have to actually negate the inequality
 #ifndef NDEBUG
-			std::cout << "x_" << i << " <= " << u << std::endl;
+			std::cout << "x_" << i << " <= " << u << '\n';
 #endif
 			litVector.push_back(seq1[i].getLit(u + 1, LR_GE));
 		}
@@ -97,7 +97,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		for (int c1 = l; c1 <= u; c1++) {
 			if ((*seq1ExcludedCharacters)[excludedCharCoord(i, c1)]) {
 #ifndef NDEBUG
-				std::cout << "x_" << i << " != " << c1 << std::endl;
+				std::cout << "x_" << i << " != " << c1 << '\n';
 #endif
 				// we insert x_i = c1, as we have to actually negate the inequality
 				litVector.push_back(seq1[i].getLit(c1, LR_EQ));
@@ -124,7 +124,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		// create y_i >= l
 		if (l > 0) {
 #ifndef NDEBUG
-			std::cout << "y_" << j << " >= " << l << std::endl;
+			std::cout << "y_" << j << " >= " << l << '\n';
 #endif
 			// we insert y_i <= l-1, as we have to actually negate the inequality
 			litVector.push_back(seq2[j].getLit(l - 1, LR_LE));
@@ -132,7 +132,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		// create y_i <= u
 		if (u < max_char && l <= u) {
 #ifndef NDEBUG
-			std::cout << "y_" << j << " <= " << u << std::endl;
+			std::cout << "y_" << j << " <= " << u << '\n';
 #endif
 			// we insert y_i >= u+1, as we have to actually negate the inequality
 			litVector.push_back(seq2[j].getLit(u + 1, LR_GE));
@@ -142,7 +142,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		for (int c1 = l; c1 <= u; c1++) {
 			if ((*seq2ExcludedCharacters)[excludedCharCoord(j, c1)]) {
 #ifndef NDEBUG
-				std::cout << "y_" << j << " != " << c1 << std::endl;
+				std::cout << "y_" << j << " != " << c1 << '\n';
 #endif
 				// we insert y_i = c1, as we have to actually negate the inequality
 				litVector.push_back(seq2[j].getLit(c1, LR_EQ));
@@ -318,20 +318,20 @@ void EdExplFinder::clean_data_structures() {
 }
 
 void EdExplFinder::debug_print(std::vector<int>* shortestPathMatrix) const {
-	std::cout << "***************************************************************" << std::endl;
+	std::cout << "***************************************************************" << '\n';
 
-	std::cout << "shortest path matrix:" << std::endl;
+	std::cout << "shortest path matrix:" << '\n';
 
 	std::cout << "   ";
 	for (int i = 0; i < seqSize + 1; i++) {
 		printf("%2d ", i);
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 
 	for (int i = 0; i < seqSize + 2; i++) {
 		std::cout << "---";
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 
 	for (int i = 0; i < seqSize + 1; i++) {
 		for (int j = -1; j < seqSize + 1; j++) {
@@ -341,8 +341,8 @@ void EdExplFinder::debug_print(std::vector<int>* shortestPathMatrix) const {
 				printf("%2d ", (*shortestPathMatrix)[matrixCoord(i, j)]);
 			}
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 	}
 
-	std::cout << "***************************************************************" << std::endl;
+	std::cout << "***************************************************************" << '\n';
 }

@@ -282,10 +282,10 @@ bool DTreePropagator::checkFinalSatisfied() {
 							std::cout << i << " ";
 						}
 					}
-					std::cout << std::endl;
+					std::cout << '\n';
 				}
 				assert(false);
-				std::cerr << "DTreePropagator not satisfied " << __FILE__ << ":" << __LINE__ << std::endl;
+				std::cerr << "DTreePropagator not satisfied " << __FILE__ << ":" << __LINE__ << '\n';
 				return false;
 			}
 		}
@@ -354,7 +354,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 			}
 			std::cout << ") ";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 	}
 }
 
@@ -422,7 +422,7 @@ bool DTreeParenthoodPropagator::propagateRemEdge(int e) {
 		parents[getHead(e)]->remVal(getTail(e), r);
 		if (DEBUG) {
 			std::cout << "This guy " << getHead(e) << " cannot have " << getTail(e)
-								<< " as a parent, because I removed edge" << e << std::endl;
+								<< " as a parent, because I removed edge" << e << '\n';
 		}
 		assert(parents[getHead(e)]->size() > 0);
 		dom_size[getHead(e)] = parents[getHead(e)]->size();
@@ -564,7 +564,7 @@ bool DTreeParenthoodPropagator::propagate() {
 	for (it = parenthood_fixed.begin(); it != parenthood_fixed.end(); ++it) {
 		if (!propagateNewParent(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -581,7 +581,7 @@ bool DTreeParenthoodPropagator::propagate() {
 	for (it = parenthood_abandon.begin(); it != parenthood_abandon.end(); ++it) {
 		if (!propagateRemParent(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -596,7 +596,7 @@ bool DTreeParenthoodPropagator::propagate() {
 
 	if (!DTreePropagator::propagate()) {
 		if (DEBUG) {
-			std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+			std::cout << "False " << __FILE__ << __LINE__ << '\n';
 		}
 		return false;
 	}
@@ -613,7 +613,7 @@ bool DTreeParenthoodPropagator::checkFinalSatisfied() {
 		assert(parents[i]->isFixed());
 		if (!parents[i]->isFixed()) {
 			if (DEBUG) {
-				std::cout << parents[0]->size() << std::endl;
+				std::cout << parents[0]->size() << '\n';
 				for (int i = 0; i < nbNodes(); i++) {
 					std::cout << " (";
 					IntVar::const_iterator it = parents[i]->begin();

@@ -10,19 +10,19 @@ class DAGPropagator : public DReachabilityPropagator {
 		TrailedSuccList(int n) : TrailedConstantAccessList(n) {}
 		int key(std::pair<int, int> p) override { return p.first; }
 		void print() {
-			std::cout << "Size: " << size << std::endl;
+			std::cout << "Size: " << size << '\n';
 			;
 			std::cout << "Sparse: ";
 			for (int i : sparse) {
 				std::cout << i << " ";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 
 			std::cout << "Dense: ";
 			for (auto& i : dense) {
 				std::cout << "(" << i.first << "," << i.second << ") ";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	};
 	class TrailedPredList final : public TrailedConstantAccessList<int> {
@@ -30,19 +30,19 @@ class DAGPropagator : public DReachabilityPropagator {
 		TrailedPredList(int n) : TrailedConstantAccessList(n) {}
 		int key(int p) override { return p; }
 		void print() {
-			std::cout << "Size: " << size << std::endl;
+			std::cout << "Size: " << size << '\n';
 			;
 			std::cout << "Sparse: ";
 			for (int i : sparse) {
 				std::cout << i << " ";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 
 			std::cout << "Dense: ";
 			for (int i : dense) {
 				std::cout << i << " ";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	};
 

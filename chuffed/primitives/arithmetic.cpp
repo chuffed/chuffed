@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <utility>
 
 //-----
 // Absolute propagator
@@ -781,5 +782,5 @@ void bool2int(BoolView x, IntVar* y) {
 	int_rel(y, IRT_GE, 0);
 	int_rel(y, IRT_LE, 1);
 	y->specialiseToEL();
-	bool_rel(x, BRT_EQ, BoolView(y->getLit(1, LR_GE)));
+	bool_rel(std::move(x), BRT_EQ, BoolView(y->getLit(1, LR_GE)));
 }

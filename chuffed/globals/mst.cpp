@@ -356,6 +356,7 @@ class DCMSTSearch : public BranchGroup {
 
 			for (int i = 0; i < mst_p->nbNodes(); i++) {
 				std::vector<std::pair<int, int> > cost;
+				cost.reserve(mst_p->nbNodes());
 				for (int j = 0; j < mst_p->nbNodes(); j++) {
 					cost.emplace_back(j, dist[i][j]);
 				}
@@ -381,6 +382,7 @@ class DCMSTSearch : public BranchGroup {
 				int v = std::min(tmp[i].second, tmp[j].second);
 				sums.emplace_back(e, v);
 				std::vector<std::pair<int, int> > cost;
+				cost.reserve(mst_p->nbNodes());
 				for (int k = 0; k < mst_p->nbNodes(); k++) {
 					cost.emplace_back(k, std::min(dist[i][k], dist[j][k]));
 				}

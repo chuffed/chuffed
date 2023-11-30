@@ -109,7 +109,7 @@ public:
 		return p.first->second;
 	}
 
-	void addRule(BoolView hl, vec<BoolView>& posb, vec<BoolView>& negb) {
+	void addRule(const BoolView& hl, vec<BoolView>& posb, vec<BoolView>& negb) {
 		raw_heads.push(hl);
 		raw_posb.push();
 		posb.copyTo(raw_posb.last());
@@ -682,7 +682,7 @@ public:
 
 vec<WellFounded> wf_props;
 
-void add_inductive_rule(BoolView hl, vec<BoolView>& posb, vec<BoolView>& negb, int wf_id) {
+void add_inductive_rule(const BoolView& hl, vec<BoolView>& posb, vec<BoolView>& negb, int wf_id) {
 	wf_props.growTo(wf_id);
 	wf_props[wf_id - 1].addRule(hl, posb, negb);
 }

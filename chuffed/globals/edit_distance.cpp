@@ -88,17 +88,17 @@ public:
 		for (int i = 0; i < max_char; i++) {
 			std::cout << insertion_cost[i] << " ";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 		std::cout << "deletion_cost: ";
 		for (int i = 0; i < max_char; i++) {
 			std::cout << deletion_cost[i] << " ";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 		std::cout << "substitution_cost: ";
 		for (int i = 0; i < max_char * max_char; i++) {
 			std::cout << substitution_cost[i] << " ";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 #endif
 
 		// we set this propagator to low priority
@@ -146,13 +146,13 @@ public:
 		//
 
 #ifndef NDEBUG
-		std::cout << "lastBound = " << lastBound << std::endl;
-		std::cout << "cellChanges = " << cellChanges << std::endl;
+		std::cout << "lastBound = " << lastBound << '\n';
+		std::cout << "cellChanges = " << cellChanges << '\n';
 		std::cout << "cellHasChanged = [";
 		for (int i = 0; i < seqSize * 2; i++) {
 			std::cout << cellHasChanged[i] << " ";
 		}
-		std::cout << "]" << std::endl;
+		std::cout << "]" << '\n';
 #endif
 
 		int ub = std::min(2 * seqSize * max_id_cost, lastBound + cellChanges * 2 * max_id_cost);
@@ -178,7 +178,7 @@ public:
 
 		if (ed.getMin() < editDistanceLB) {
 #ifndef NDEBUG
-			std::cout << "ED " << editDistanceLB << std::endl;
+			std::cout << "ED " << editDistanceLB << '\n';
 #endif
 
 			if (explLevel == E_NAIVE) {
@@ -340,7 +340,7 @@ private:
 		int d = upperBound / min_id_cost + std::max(possible_0_inserts, possible_0_deletes);
 
 #ifndef NDEBUG
-		std::cout << "d = " << d << std::endl;
+		std::cout << "d = " << d << '\n';
 #endif
 
 		for (int i = 0; i < seqSize + 1; i++) {
@@ -383,8 +383,8 @@ private:
 	}
 
 	void printCurrentDpMatrix() {
-		std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		std::cout << " Sequence1: " << std::endl;
+		std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << '\n';
+		std::cout << " Sequence1: " << '\n';
 		for (int i = 0; i < seqSize; i++) {
 			std::cout << "{";
 			for (int it : seq1[i]) {
@@ -395,9 +395,9 @@ private:
 			}
 			std::cout << "};";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 
-		std::cout << " Sequence2: " << std::endl;
+		std::cout << " Sequence2: " << '\n';
 		for (int i = 0; i < seqSize; i++) {
 			std::cout << "{";
 			for (int it : seq2[i]) {
@@ -408,21 +408,21 @@ private:
 			}
 			std::cout << "};";
 		}
-		std::cout << std::endl;
-		std::cout << std::endl;
+		std::cout << '\n';
+		std::cout << '\n';
 
-		std::cout << " Current dp matrix: " << std::endl;
+		std::cout << " Current dp matrix: " << '\n';
 
 		std::cout << "   ";
 		for (int i = 0; i < seqSize + 1; i++) {
 			printf("%2d ", i);
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 
 		for (int i = 0; i < seqSize + 2; i++) {
 			std::cout << "---";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 
 		for (int i = 0; i < seqSize + 1; i++) {
 			for (int j = -1; j < seqSize + 1; j++) {
@@ -432,7 +432,7 @@ private:
 					printf("%2d ", dpMatrix[matrixCoord(i, j)]);
 				}
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	}
 };

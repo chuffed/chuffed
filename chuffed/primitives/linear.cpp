@@ -389,7 +389,7 @@ void int_linear_reif(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView
 
 // sum a*x rel c <-> r
 
-void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
+void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolView& r) {
 	assert(a.size() == x.size());
 
 	bool scale = false;
@@ -468,12 +468,12 @@ void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
 	}
 }
 
-void int_linear(vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
+void int_linear(vec<IntVar*>& x, IntRelType t, int c, const BoolView& r) {
 	vec<int> a(x.size(), 1);
 	int_linear(a, x, t, c, r);
 }
 
-void int_linear(vec<int>& _a, vec<IntVar*>& _x, IntRelType t, IntVar* y, BoolView r) {
+void int_linear(vec<int>& _a, vec<IntVar*>& _x, IntRelType t, IntVar* y, const BoolView& r) {
 	vec<int> a;
 	for (int i = 0; i < _a.size(); i++) {
 		a.push(_a[i]);
@@ -487,7 +487,7 @@ void int_linear(vec<int>& _a, vec<IntVar*>& _x, IntRelType t, IntVar* y, BoolVie
 	int_linear(a, x, t, 0, r);
 }
 
-void int_linear(vec<IntVar*>& x, IntRelType t, IntVar* y, BoolView r) {
+void int_linear(vec<IntVar*>& x, IntRelType t, IntVar* y, const BoolView& r) {
 	vec<int> a(x.size(), 1);
 	int_linear(a, x, t, y, r);
 }

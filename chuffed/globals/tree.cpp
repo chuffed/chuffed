@@ -221,7 +221,7 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 					for (int reason : reasons) {
 						std::cout << reason << " ";
 					}
-					std::cout << std::endl;
+					std::cout << '\n';
 				}
 				r = Reason_new(ps);
 			}
@@ -232,7 +232,7 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 			} else {
 				assert(!getEdgeVar(bridge).isFalse());
 				if (TREEPROP_DEBUG) {
-					std::cout << "BRIDGE " << bridge << std::endl;
+					std::cout << "BRIDGE " << bridge << '\n';
 				}
 				// cout << "Bridge (E) "<<bridge<<endl;
 				getEdgeVar(bridge).setVal2(true, r);
@@ -310,7 +310,7 @@ void TreePropagator::precycle_detect(int unk_edge) {
 		}
 
 		if (TREEPROP_DEBUG) {
-			std::cout << "PRECYCLE " << unk_edge << std::endl;
+			std::cout << "PRECYCLE " << unk_edge << '\n';
 		}
 		// cout << "Precycle (E) "<<unk_edge<<endl;
 		getEdgeVar(unk_edge).setVal2(false, r);
@@ -537,9 +537,9 @@ TreePropagator::~TreePropagator() { delete[] isTerminal; }
 
 void TreePropagator::wakeup(int i, int c) {
 	if (TREEPROP_DEBUG) {
-		std::cout << "Wakeup" << std::endl;
-		std::cout << __FILE__ << " " << __LINE__ << " i " << i << std::endl;
-		std::cout << "event fix" << std::endl;
+		std::cout << "Wakeup" << '\n';
+		std::cout << __FILE__ << " " << __LINE__ << " i " << i << '\n';
+		std::cout << "event fix" << '\n';
 	}
 	// Check it's an event on edges
 	if (i >= nbNodes() && i < nbNodes() + nbEdges()) {
@@ -550,7 +550,7 @@ void TreePropagator::wakeup(int i, int c) {
 		}
 		if (TREEPROP_DEBUG) {
 			std::cout << __FILE__ << " " << __LINE__ << " edge " << j << " esvalue "
-								<< getEdgeVar(j).getVal() << std::endl;
+								<< getEdgeVar(j).getVal() << '\n';
 		}
 		newFixedE.insert(j);
 	} else if (i >= 0 && i < nbNodes()) {
@@ -559,8 +559,7 @@ void TreePropagator::wakeup(int i, int c) {
 			return;
 		}
 		if (TREEPROP_DEBUG) {
-			std::cout << __FILE__ << " " << __LINE__ << " vsvalue " << getNodeVar(i).getVal()
-								<< std::endl;
+			std::cout << __FILE__ << " " << __LINE__ << " vsvalue " << getNodeVar(i).getVal() << '\n';
 		}
 		newFixedN.insert(i);
 	}
@@ -869,7 +868,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
 
 void TreePropagator::clearPropState() {
 	if (TREEPROP_DEBUG) {
-		std::cout << " clear prop state" << std::endl;
+		std::cout << " clear prop state" << '\n';
 	}
 
 	GraphPropagator::clearPropState();
@@ -879,7 +878,7 @@ void TreePropagator::clearPropState() {
 	newNodeCompleteCheckup_Count = 0;
 
 	if (TREEPROP_DEBUG) {
-		std::cout << " clear prop state end" << std::endl;
+		std::cout << " clear prop state end" << '\n';
 	}
 }
 
@@ -1048,7 +1047,7 @@ bool TreePropagator::checkFinalSatisfied() {
 				par[o] = curr;
 				s.push(o);
 			} else {
-				std::cerr << "TreePropagator not satisfied " << __FILE__ << ":" << __LINE__ << std::endl;
+				std::cerr << "TreePropagator not satisfied " << __FILE__ << ":" << __LINE__ << '\n';
 				if (DEBUG) {
 					std::cout << "Edges in: ";
 					for (int i = 0; i < nbEdges(); i++) {
@@ -1056,7 +1055,7 @@ bool TreePropagator::checkFinalSatisfied() {
 							std::cout << i << " ";
 						}
 					}
-					std::cout << std::endl;
+					std::cout << '\n';
 				}
 				assert(false);
 				return false;
@@ -1270,7 +1269,7 @@ public:
 			std::cout << "Tree " << min_t << " taking "
 								<< TreePropagator::tree_propagators[0]->getEndnode(min_e, 0) << " "
 								<< TreePropagator::tree_propagators[0]->getEndnode(min_e, 1) << " " << min_d
-								<< std::endl;
+								<< '\n';
 		}
 		// cout<<min_t<<" "<<arg_min<<endl;
 

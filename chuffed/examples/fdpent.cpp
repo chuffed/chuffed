@@ -124,7 +124,7 @@ public:
 		return curr->data;
 	}
 
-	bool is_empty() { return root == nullptr; }
+	bool is_empty() const { return root == nullptr; }
 
 	~hlist() {
 		//      std::cout << "DES" << this << std::endl;
@@ -411,7 +411,7 @@ hlist<int> pent_seq(int width, hlist<hlist<int> > pattern) {
 				 (replicate(width - head(pattern).length(), 0) + pent_seq(width, tail(pattern)));
 }
 
-static hlist<intpair> pentDFApr(hlist<int> pattern, int node) {
+static hlist<intpair> pentDFApr(const hlist<int>& pattern, int node) {
 	// Assumes leading 0s and garbage state has been handled.
 	assert(node > 1);
 
@@ -423,7 +423,7 @@ static hlist<intpair> pentDFApr(hlist<int> pattern, int node) {
 							pentDFApr(tail(pattern), node + 1));
 }
 
-static hlist<intpair> pentDFA(hlist<int> pattern, int node = 0) {
+static hlist<intpair> pentDFA(const hlist<int>& pattern, int node = 0) {
 	assert(!pattern.is_empty());
 
 	// Handle garbage state.

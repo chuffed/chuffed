@@ -76,4 +76,4 @@ public:
 	}
 };
 
-void mark_complete(BoolView x, bool* v) { new Complete(x, v); }
+void mark_complete(BoolView x, bool* v) { new Complete(std::move(x), v); }

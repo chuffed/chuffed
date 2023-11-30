@@ -130,12 +130,12 @@ Options::Options()
 }
 
 template <class T>
-inline bool assignStr(T* /*unused*/, const std::string /*unused*/) {
+inline bool assignStr(T& /*unused*/, const std::string& /*unused*/) {
 	return false;
 }
 template <>
-inline bool assignStr(std::string* pS, const std::string s) {
-	*pS = s;
+inline bool assignStr(std::string& pS, const std::string& s) {
+	pS = s;
 	return true;
 }
 
@@ -567,7 +567,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 		} else if (cop.get("-t --time-out", &intBuffer)) {
 			// TODO: Remove warning when appropriate
 			std::cerr << "WARNING: the --time-out flag has recently been changed."
-								<< "The time-out is now provided in milliseconds instead of seconds" << std::endl;
+								<< "The time-out is now provided in milliseconds instead of seconds" << '\n';
 			so.time_out = duration(intBuffer);
 		} else if (cop.get("-r --rnd-seed", &intBuffer)) {
 			so.rnd_seed = intBuffer;
@@ -602,7 +602,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 			// TODO: Remove warning when appropriate
 			std::cerr << "WARNING: the --restart-base flag has recently been changed."
 								<< "The old behaviour of \"restart base\" is now implemented by --restart-scale."
-								<< std::endl;
+								<< '\n';
 			so.restart_base = stod(stringBuffer);
 			if (so.restart_base < 1.0) {
 				CHUFFED_ERROR("Illegal restart base. Restart count will converge to zero.");
@@ -772,12 +772,12 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 			std::cerr << "WARNING: SBPS value selection must be used with an activity-based search to "
 									 "optimize its "
 									 "efficiency."
-								<< std::endl;
+								<< '\n';
 		}
 		if (so.restart_type == NONE || so.restart_scale == 0) {
 			std::cerr << "WARNING: SBPS value selection must be used with restarts to optimize its "
 									 "efficiency."
-								<< std::endl;
+								<< '\n';
 		}
 	}
 }

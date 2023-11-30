@@ -12,6 +12,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <utility>
 #include <vector>
 
 class ShortestPathSearch;
@@ -25,7 +26,7 @@ class BoundedPathPropagator : public GraphPropagator {
 	public:
 		FilteredKosarajuSCC(BoundedPathPropagator* _pp, int v, std::vector<std::vector<int> > outgoing,
 												std::vector<std::vector<int> > ingoing, std::vector<std::vector<int> > ends)
-				: KosarajuSCC(v, outgoing, ingoing, ends), pp(_pp) {}
+				: KosarajuSCC(v, std::move(outgoing), std::move(ingoing), std::move(ends)), pp(_pp) {}
 		bool ignore_edge(int e) override {
 			if (pp->getEdgeVar(e).isFixed() && pp->getEdgeVar(e).isFalse()) {
 				return true;
@@ -49,13 +50,13 @@ class BoundedPathPropagator : public GraphPropagator {
 		BoundedPathPropagator* p;
 
 	public:
-		FilteredDijkstra(BoundedPathPropagator* _btp, int _s, std::vector<std::vector<int> > _en,
-										 std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou,
-										 std::vector<int>& _ws)
+		FilteredDijkstra(BoundedPathPropagator* _btp, int _s, const std::vector<std::vector<int> >& _en,
+										 const std::vector<std::vector<int> >& _in,
+										 const std::vector<std::vector<int> >& _ou, std::vector<int>& _ws)
 				: Dijkstra(_s, _en, _in, _ou, _ws), p(_btp) {}
-		FilteredDijkstra(BoundedPathPropagator* _btp, int _s, std::vector<std::vector<int> > _en,
-										 std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou,
-										 std::vector<std::vector<int> >& _ws)
+		FilteredDijkstra(BoundedPathPropagator* _btp, int _s, const std::vector<std::vector<int> >& _en,
+										 const std::vector<std::vector<int> >& _in,
+										 const std::vector<std::vector<int> >& _ou, std::vector<std::vector<int> >& _ws)
 				: Dijkstra(_s, _en, _in, _ou, _ws), p(_btp) {}
 		bool ignore_edge(int e) override {
 			if (p->getEdgeVar(e).isFixed() && p->getEdgeVar(e).isFalse()) {
@@ -89,12 +90,15 @@ class BoundedPathPropagator : public GraphPropagator {
 		int explaining;
 
 	public:
-		ExplainerDijkstra(BoundedPathPropagator* _btp, int _s, std::vector<std::vector<int> > _en,
-											std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou,
-											std::vector<int>& _ws)
+		ExplainerDijkstra(BoundedPathPropagator* _btp, int _s,
+											const std::vector<std::vector<int> >& _en,
+											const std::vector<std::vector<int> >& _in,
+											const std::vector<std::vector<int> >& _ou, std::vector<int>& _ws)
 				: FilteredDijkstra(_btp, _s, _en, _in, _ou, _ws), back(nullptr), explaining(-1) {}
-		ExplainerDijkstra(BoundedPathPropagator* _btp, int _s, std::vector<std::vector<int> > _en,
-											std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou,
+		ExplainerDijkstra(BoundedPathPropagator* _btp, int _s,
+											const std::vector<std::vector<int> >& _en,
+											const std::vector<std::vector<int> >& _in,
+											const std::vector<std::vector<int> >& _ou,
 											std::vector<std::vector<int> >& _ws)
 				: FilteredDijkstra(_btp, _s, _en, _in, _ou, _ws), back(nullptr), explaining(-1) {}
 		bool debug;
@@ -107,7 +111,7 @@ class BoundedPathPropagator : public GraphPropagator {
 		}
 		void reset(int limit, FilteredDijkstra* _back, std::vector<Lit> _lits, int ex = -1) {
 			explanation.clear();
-			lits = _lits;
+			lits = std::move(_lits);
 			lim = limit;
 			back = _back;
 			explaining = ex;
@@ -121,7 +125,7 @@ class BoundedPathPropagator : public GraphPropagator {
 		bool ignore_edge(int e) override {
 			if (p->getEdgeVar(e).isFixed() && p->getEdgeVar(e).isFalse()) {
 				if (verbose) {
-					std::cout << ">>Looking at: " << p->getTail(e) << " to " << p->getHead(e) << std::endl;
+					std::cout << ">>Looking at: " << p->getTail(e) << " to " << p->getHead(e) << '\n';
 				}
 
 				// Useless edges to be in the explanation:
@@ -172,14 +176,14 @@ class BoundedPathPropagator : public GraphPropagator {
 
 	public:
 		FilteredDijkstraMandatory(BoundedPathPropagator* _btp, int _s, int _d,
-															std::vector<std::vector<int> > _en,
-															std::vector<std::vector<int> > _in,
-															std::vector<std::vector<int> > _ou, std::vector<int>& _ws)
+															const std::vector<std::vector<int> >& _en,
+															const std::vector<std::vector<int> >& _in,
+															const std::vector<std::vector<int> >& _ou, std::vector<int>& _ws)
 				: DijkstraMandatory(_s, _d, _en, _in, _ou, _ws), p(_btp) {}
 		FilteredDijkstraMandatory(BoundedPathPropagator* _btp, int _s, int _d,
-															std::vector<std::vector<int> > _en,
-															std::vector<std::vector<int> > _in,
-															std::vector<std::vector<int> > _ou,
+															const std::vector<std::vector<int> >& _en,
+															const std::vector<std::vector<int> >& _in,
+															const std::vector<std::vector<int> >& _ou,
 															std::vector<std::vector<int> >& _ws)
 				: DijkstraMandatory(_s, _d, _en, _in, _ou, _ws), p(_btp) {}
 
@@ -238,14 +242,14 @@ class BoundedPathPropagator : public GraphPropagator {
 
 	public:
 		ExplainerDijkstraMandatory(BoundedPathPropagator* _btp, int _s, int _d,
-															 std::vector<std::vector<int> > _en,
-															 std::vector<std::vector<int> > _in,
-															 std::vector<std::vector<int> > _ou, std::vector<int>& _ws)
+															 const std::vector<std::vector<int> >& _en,
+															 const std::vector<std::vector<int> >& _in,
+															 const std::vector<std::vector<int> >& _ou, std::vector<int>& _ws)
 				: FilteredDijkstraMandatory(_btp, _s, _d, _en, _in, _ou, _ws), back(nullptr) {}
 		ExplainerDijkstraMandatory(BoundedPathPropagator* _btp, int _s, int _d,
-															 std::vector<std::vector<int> > _en,
-															 std::vector<std::vector<int> > _in,
-															 std::vector<std::vector<int> > _ou,
+															 const std::vector<std::vector<int> >& _en,
+															 const std::vector<std::vector<int> >& _in,
+															 const std::vector<std::vector<int> >& _ou,
 															 std::vector<std::vector<int> >& _ws)
 				: FilteredDijkstraMandatory(_btp, _s, _d, _en, _in, _ou, _ws), back(nullptr) {}
 
@@ -421,7 +425,7 @@ protected:
 
 	virtual bool propagate_dijkstra();
 	bool propagate_scc_order();
-	bool _check_expl(std::vector<int> forbidden, int limit, int at, bool reverse = false) {
+	bool _check_expl(const std::vector<int>& forbidden, int limit, int at, bool reverse = false) {
 		// std::cout << "Forbidden:"<<std::endl;
 		std::vector<bool> is_forbidden = std::vector<bool>(nbEdges(), false);
 		for (int i : forbidden) {
@@ -518,7 +522,7 @@ protected:
 		// std::cout<<std::endl;
 		bool ok = _check_expl(forbidden, limit, at, reverse);
 		if (!ok) {
-			std::cout << "Not correct" << std::endl;
+			std::cout << "Not correct" << '\n';
 			return false;
 		}
 		// std::cout<< "Checking minimal:"<<std::endl;
@@ -533,8 +537,8 @@ protected:
 				}
 				// assert(!_check_expl(tmp,limit,at,reverse));
 				if (_check_expl(tmp, limit, at, reverse)) {
-					std::cout << getTail(forbidden[i]) << " " << getHead(forbidden[i]) << std::endl;
-					std::cout << forbidden[i] << " " << ws[forbidden[i]] << std::endl;
+					std::cout << getTail(forbidden[i]) << " " << getHead(forbidden[i]) << '\n';
+					std::cout << forbidden[i] << " " << ws[forbidden[i]] << '\n';
 					return false;
 				}
 			}
@@ -543,7 +547,7 @@ protected:
 		return true;
 	}
 
-	bool _check_expl_mand(std::vector<int> forbidden, int limit) {
+	bool _check_expl_mand(const std::vector<int>& forbidden, int limit) {
 		std::vector<std::unordered_map<size_t, DijkstraMandatory::tuple> > table;
 
 		std::vector<bool> is_forbidden = std::vector<bool>(nbEdges(), false);
@@ -635,29 +639,29 @@ protected:
 			if (!(minToDest > limit)) {
 				for (int i = 0; i < nbNodes(); i++) {
 					if (getNodeVar(i).isFixed() && getNodeVar(i).isTrue()) {
-						std::cout << i << " [color=red];" << std::endl;
+						std::cout << i << " [color=red];" << '\n';
 					}
 				}
 				int ct = 0;
 				for (int i = 0; i < nbEdges(); i++) {
 					if (!getEdgeVar(i).isFixed()) {
 						std::cout << " " << getTail(i) << "->" << getHead(i) << "[label=" << ws[i] << "];"
-											<< std::endl;
+											<< '\n';
 						ct++;
 					}
 					if (getEdgeVar(i).isTrue()) {
 						std::cout << " " << getTail(i) << "->" << getHead(i) << "[label=" << ws[i]
-											<< ",color=red];" << std::endl;
+											<< ",color=red];" << '\n';
 						ct++;
 					}
 				}
-				std::cout << "Checked explanation::" << std::endl;
-				std::cout << ct << std::endl;
+				std::cout << "Checked explanation::" << '\n';
+				std::cout << ct << '\n';
 				for (bool b : target) {
 					std::cout << b;
 				}
-				std::cout << std::endl;
-				std::cout << minToDest << " " << limit << std::endl;
+				std::cout << '\n';
+				std::cout << minToDest << " " << limit << '\n';
 				std::unordered_map<size_t, DijkstraMandatory::tuple>::const_iterator it =
 						table[dest].begin();
 				for (; it != table[dest].end(); ++it) {
@@ -669,9 +673,9 @@ protected:
 					for (bool b : (it->second).mand) {
 						std::cout << b;
 					}
-					std::cout << " " << (it->second).cost << std::endl;
+					std::cout << " " << (it->second).cost << '\n';
 				}
-				std::cout << "::" << std::endl;
+				std::cout << "::" << '\n';
 			}
 			//*/
 

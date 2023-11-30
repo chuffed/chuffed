@@ -171,7 +171,7 @@ public:
 	// Constructor
 	CumulativeCalProp(CUMU_ARR_INTVAR& _start, CUMU_ARR_INTVAR& _dur, CUMU_ARR_INTVAR& _usage,
 										CUMU_INTVAR _limit, CUMU_MATRIX_INT& _cal, CUMU_ARR_INT& _taskCal,
-										CUMU_INT _rho, CUMU_INT _resCalendar, std::list<std::string> opt)
+										CUMU_INT _rho, CUMU_INT _resCalendar, const std::list<std::string>& opt)
 			: start(_start),
 				dur(_dur),
 				usage(_usage),
@@ -205,7 +205,7 @@ public:
 		rassert(!tteef_filt || ttef_filt);
 
 		// Overriding option defaults
-		for (auto& it : opt) {
+		for (const auto& it : opt) {
 			if (it == "tt_filt_on") {
 				tt_filt = true;
 			} else if (it == "tt_filt_off") {
@@ -1562,7 +1562,7 @@ void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* l
 
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 										vec<vec<int> >& cal, vec<int>& taskCal, int rho_in, int resCal_in,
-										std::list<std::string> opt) {
+										const std::list<std::string>& opt) {
 	rassert(s.size() == d.size() && s.size() == r.size());
 	// ASSUMPTION
 	// - s, d, and r contain the same number of elements

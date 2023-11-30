@@ -601,7 +601,7 @@ void MDDTable::print_node(MDDNodeInt r) {
 	for (unsigned int jj = 0; jj < nodes[r]->sz; jj++) {
 		std::cout << " (" << nodes[r]->edges[jj].val << "," << nodes[r]->edges[jj].dest << ")";
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 }
 
 void MDDTable::print_mdd(MDDNodeInt r) {

@@ -338,7 +338,7 @@ void ex1() {
 	for (int i = 0; i < in.size(); i++) {
 		std::cout << "(" << i << "," << lt.dominator(i) << ") ";
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 }
 
 /*int main(int argc, char* argv[]) {

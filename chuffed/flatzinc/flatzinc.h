@@ -410,10 +410,10 @@ public:
 					} else if (b.isFalse()) {
 						printElem(aia->a[2], out);
 					} else {
-						std::cerr << "% Error: Condition not fixed." << std::endl;
+						std::cerr << "% Error: Condition not fixed." << '\n';
 					}
 				} else {
-					std::cerr << "% Error: Condition not Boolean." << std::endl;
+					std::cerr << "% Error: Condition not Boolean." << '\n';
 				}
 			} else {
 				printElem(ai, out);
@@ -593,7 +593,7 @@ public:
 		return num;
 	}
 
-	void output(std::string x, AST::Node* n) { _output.emplace_back(x, n); }
+	void output(const std::string& x, AST::Node* n) { _output.emplace_back(x, n); }
 
 	AST::Array* getOutput() {
 		std::sort(_output.begin(), _output.end());

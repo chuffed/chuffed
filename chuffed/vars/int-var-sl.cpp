@@ -78,10 +78,14 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 	std::string label = intVarString[el];
 	for (int i = 0; i < values.size(); i++) {
 		std::string val = std::to_string(values[i]);
-		litString[toInt(el->getLit(i, LR_NE))] = label + "!=" + val;
-		litString[toInt(el->getLit(i, LR_EQ))] = label + "==" + val;
-		litString[toInt(el->getLit(i, LR_GE))] = label + ">=" + val;
-		litString[toInt(el->getLit(i, LR_LE))] = label + "<=" + val;
+		litString[toInt(el->getLit(i, LR_NE))] = label + "!=";
+		litString[toInt(el->getLit(i, LR_NE))] += val;
+		litString[toInt(el->getLit(i, LR_EQ))] = label + "==";
+		litString[toInt(el->getLit(i, LR_EQ))] += val;
+		litString[toInt(el->getLit(i, LR_GE))] = label + ">=";
+		litString[toInt(el->getLit(i, LR_GE))] += val;
+		litString[toInt(el->getLit(i, LR_LE))] = label + "<=";
+		litString[toInt(el->getLit(i, LR_LE))] += val;
 	}
 
 	// rechannel channel info

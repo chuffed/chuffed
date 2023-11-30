@@ -34,7 +34,7 @@ public:
 		for (int i = 0; i < size; i++) {
 			std::cout << id[i] << " ";
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 		std::cout << "           ";
 		for (int i = 0; i < size; i++) {
 			if (id[i] == i) {
@@ -49,7 +49,7 @@ public:
 				x /= 10;
 			}
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
 	}
 };
 

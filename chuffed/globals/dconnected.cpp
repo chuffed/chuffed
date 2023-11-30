@@ -15,13 +15,16 @@
 #include <cstring>
 #include <iostream>
 #include <set>
+#include <utility>
 #include <vector>
 
 #define DEBUG 0
 
 FilteredLT::FilteredLT(GraphPropagator* _p, int _r, std::vector<std::vector<int> > _en,
 											 std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou)
-		: LengauerTarjan(_r, _en, _in, _ou), p(_p), visited_innodes(0) {}
+		: LengauerTarjan(_r, std::move(_en), std::move(_in), std::move(_ou)),
+			p(_p),
+			visited_innodes(0) {}
 
 int FilteredLT::get_visited_innodes() const {
 	// visited_innodes = 0;
@@ -42,7 +45,7 @@ void FilteredLT::DFS(int r) {
 	if (DEBUG) {
 		std::cout << "DFS Visiting " << r << " " << p->getNodeVar(r).isFixed()
 							<< ((p->getNodeVar(r).isFixed()) ? static_cast<int>(p->getNodeVar(r).isTrue()) : -1)
-							<< std::endl;
+							<< '\n';
 	}
 	if (p->getNodeVar(r).isFixed() && p->getNodeVar(r).isTrue()) {
 		visited_innodes++;
@@ -72,7 +75,7 @@ bool DReachabilityPropagator::correctDominator(int r, std::vector<bool>& v, int 
 	if (DEBUG) {
 		std::cout << "Visiting " << r << " " << avoid << " who is "
 							<< (getNodeVar(r).isFixed() ? (getNodeVar(r).isTrue() ? "in" : "out") : "unfixed")
-							<< std::endl;
+							<< '\n';
 	}
 	for (int e : ou[r]) {
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
@@ -95,7 +98,7 @@ bool DReachabilityPropagator::correctDominator(int r, std::vector<bool>& v, int 
 
 void DReachabilityPropagator::add_innode(int i) {
 	if (DEBUG) {
-		std::cout << "Adding innode " << i << std::endl;
+		std::cout << "Adding innode " << i << '\n';
 	}
 	assert(getNodeVar(i).isFixed());
 	assert(getNodeVar(i).isTrue());
@@ -124,7 +127,7 @@ int DReachabilityPropagator::get_root_idx() const { return root; }
 
 bool DReachabilityPropagator::remove_deg1(int u) {
 	if (DEBUG) {
-		std::cout << "Remove deg1 from " << u << std::endl;
+		std::cout << "Remove deg1 from " << u << '\n';
 	}
 	if (getNodeVar(u).isFixed() && getNodeVar(u).isFalse()) {
 		return true;
@@ -161,7 +164,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 			last_state_e[last_seen] = VT_IN;
 			new_edge.insert(last_seen);
 			if (DEBUG) {
-				std::cout << "Edge in " << last_seen << std::endl;
+				std::cout << "Edge in " << last_seen << '\n';
 			}
 			// Propagate New Edge already does this.
 			// We enforce the other extremity if not there yet:
@@ -178,7 +181,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 				add_innode(getHead(last_seen));
 				new_node.insert(getHead(last_seen));
 				if (DEBUG) {
-					std::cout << "Node in " << getHead(last_seen) << std::endl;
+					std::cout << "Node in " << getHead(last_seen) << '\n';
 				}
 			} else if (getNodeVar(getHead(last_seen)).isFalse()) {
 				if (so.lazy) {
@@ -190,7 +193,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 					sat.confl = expl;
 				}
 				if (DEBUG) {
-					std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+					std::cout << "False " << __FILE__ << __LINE__ << '\n';
 				}
 				return false;
 			}  //*/
@@ -231,7 +234,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 				sat.confl = expl;
 			}
 			if (DEBUG) {
-				std::cout << "False " << u << " " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << u << " " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -249,7 +252,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 			last_state_n[u] = VT_OUT;
 			rem_node.insert(u);
 			if (DEBUG) {
-				std::cout << "Node out " << u << std::endl;
+				std::cout << "Node out " << u << '\n';
 			}
 			//*
 			if (so.lazy) {
@@ -262,7 +265,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 				int oe = ou[u][i];
 				if (!remove_deg1(getHead(oe))) {
 					if (DEBUG) {
-						std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+						std::cout << "False " << __FILE__ << __LINE__ << '\n';
 					}
 					return false;
 				}
@@ -273,7 +276,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 					last_state_e[oe] = VT_OUT;
 					rem_edge.insert(oe);
 					if (DEBUG) {
-						std::cout << "Edge out " << oe << std::endl;
+						std::cout << "Edge out " << oe << '\n';
 					}
 
 				} else if (getEdgeVar(oe).isTrue()) {
@@ -286,7 +289,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 						sat.confl = expl;
 					}
 					if (DEBUG) {
-						std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+						std::cout << "False " << __FILE__ << __LINE__ << '\n';
 					}
 					return false;
 				}  //*/
@@ -323,7 +326,7 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 			}
 		}
 		if (DEBUG) {
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	}
 
@@ -339,7 +342,7 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 			}
 		}
 		if (DEBUG) {
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 	}
 
@@ -411,29 +414,29 @@ void DReachabilityPropagator::wakeup(int i, int c) {
 
 	bool ignore = true;
 	if (DEBUG) {
-		std::cout << "Wake up " << i << std::endl;
+		std::cout << "Wake up " << i << '\n';
 	}
 	if (i >= 0 && i < nbNodes()) {
 		assert(getNodeVar(i).isFixed());
 		if (getNodeVar(i).isTrue() && last_state_n[i] != VT_IN) {
 			if (DEBUG) {
-				std::cout << "WakeUp Add node " << i << std::endl;
+				std::cout << "WakeUp Add node " << i << '\n';
 			}
 			if (DEBUG) {
-				std::cout << "Adding in " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "Adding in " << __FILE__ << __LINE__ << '\n';
 			}
 			add_innode(i);
 			new_node.insert(i);
 			ignore = false;
 		} else if (getNodeVar(i).isFalse() && last_state_n[i] != VT_OUT) {
 			if (DEBUG) {
-				std::cout << "WakeUp Rem node " << i << std::endl;
+				std::cout << "WakeUp Rem node " << i << '\n';
 			}
 			rem_node.insert(i);
 			ignore = false;
 		} else {
 			if (DEBUG) {
-				std::cout << "Ignoring node " << i << std::endl;
+				std::cout << "Ignoring node " << i << '\n';
 			}
 		}
 	}
@@ -443,19 +446,19 @@ void DReachabilityPropagator::wakeup(int i, int c) {
 		assert(getEdgeVar(i).isFixed());
 		if (getEdgeVar(i).isTrue() && last_state_e[i] != VT_IN) {
 			if (DEBUG) {
-				std::cout << "WakeUp Add edge" << i << std::endl;
+				std::cout << "WakeUp Add edge" << i << '\n';
 			}
 			new_edge.insert(i);
 			ignore = false;
 		} else if (getEdgeVar(i).isFalse() && last_state_e[i] != VT_OUT) {
 			if (DEBUG) {
-				std::cout << "WakeUp Rem edge " << i << std::endl;
+				std::cout << "WakeUp Rem edge " << i << '\n';
 			}
 			rem_edge.insert(i);
 			ignore = false;
 		} else {
 			if (DEBUG) {
-				std::cout << "Ignoring edge " << i << std::endl;
+				std::cout << "Ignoring edge " << i << '\n';
 			}
 		}
 	}
@@ -470,7 +473,7 @@ bool DReachabilityPropagator::propagate() {
 	update_innodes();  // In case I have not awaken
 										 // through DReachabilityPropagator::wakeup method
 	if (DEBUG) {
-		std::cout << "PROPAGATE" << std::endl;
+		std::cout << "PROPAGATE" << '\n';
 	}
 
 	std::set<int>::iterator it;
@@ -478,7 +481,7 @@ bool DReachabilityPropagator::propagate() {
 	for (it = new_edge.begin(); it != new_edge.end(); ++it) {
 		if (!propagateNewEdge(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -488,7 +491,7 @@ bool DReachabilityPropagator::propagate() {
 	for (it = rem_node.begin(); it != rem_node.end(); ++it) {
 		if (!propagateRemNode(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -500,7 +503,7 @@ bool DReachabilityPropagator::propagate() {
 	for (it = new_node.begin(); it != new_node.end(); ++it) {
 		if (!propagateNewNode(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -510,7 +513,7 @@ bool DReachabilityPropagator::propagate() {
 	for (it = rem_edge.begin(); it != rem_edge.end(); ++it) {
 		if (!propagateRemEdge(*it)) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
@@ -519,18 +522,18 @@ bool DReachabilityPropagator::propagate() {
 
 	if (!new_node.empty() || !rem_edge.empty()) {
 		if (DEBUG) {
-			std::cout << "Checking new nodes and removed edges" << std::endl;
+			std::cout << "Checking new nodes and removed edges" << '\n';
 		}
 		if (!_propagateReachability()) {
 			if (DEBUG) {
-				std::cout << "False " << __FILE__ << __LINE__ << std::endl;
+				std::cout << "False " << __FILE__ << __LINE__ << '\n';
 			}
 			return false;
 		}
 	}
 
 	if (DEBUG) {
-		std::cout << "True" << __FILE__ << __LINE__ << std::endl;
+		std::cout << "True" << __FILE__ << __LINE__ << '\n';
 	}
 
 	return true;
@@ -550,7 +553,7 @@ bool DReachabilityPropagator::propagateRemEdge(int e) {
 	int hd = getHead(e);
 	int tl = getTail(e);
 	if (DEBUG) {
-		std::cout << "Removing Edge " << e << std::endl;
+		std::cout << "Removing Edge " << e << '\n';
 	}
 	if (tl == get_root_idx()) {
 		if (!remove_deg1(tl)) {
@@ -570,7 +573,7 @@ bool DReachabilityPropagator::propagateNewEdge(int edge) {
 	}
 	for (int& added_node : added_nodes) {
 		if (DEBUG) {
-			std::cout << "Adding in " << __FILE__ << __LINE__ << std::endl;
+			std::cout << "Adding in " << __FILE__ << __LINE__ << '\n';
 		}
 		last_state_n[added_node] = VT_IN;
 		add_innode(added_node);
@@ -608,7 +611,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 	int reached = lt->get_visited_innodes();
 	if (DEBUG) {
 		std::cout << "Reached " << reached << " in_nodes_tsize " << in_nodes_tsize
-							<< " in_nodes.size() " << in_nodes_list.size() << std::endl;
+							<< " in_nodes.size() " << in_nodes_list.size() << '\n';
 	}
 
 	if (reached < in_nodes_tsize) {
@@ -629,7 +632,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 			std::vector<bool> falsev(nbNodes(), false);
 			reverseDFStoBorder(some_node, v, falsev, psfail);
 			if (DEBUG) {
-				std::cout << "Expl size: " << psfail.size() << std::endl;
+				std::cout << "Expl size: " << psfail.size() << '\n';
 			}
 			Clause* expl = Clause_new(psfail);
 			expl->temp_expl = 1;
@@ -670,7 +673,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 		assert(getNodeVar(u).isFixed());
 		assert(getNodeVar(u).isTrue());
 		if (DEBUG) {
-			std::cout << "Looking at innode? u: " << u << " " << getNodeVar(u).isFixed() << std::endl;
+			std::cout << "Looking at innode? u: " << u << " " << getNodeVar(u).isFixed() << '\n';
 		}
 		int dom_u = lt->dominator(u);
 
@@ -683,24 +686,24 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 
 		std::vector<bool> visited = std::vector<bool>(nbNodes(), false);
 		if (DEBUG) {
-			std::cout << "STARTING DFS (avoid " << dom_u << ")" << std::endl;
+			std::cout << "STARTING DFS (avoid " << dom_u << ")" << '\n';
 			std::cout << "Nodes: ";
 			for (int i = 0; i < nbNodes(); i++) {
 				std::cout << i << "("
 									<< (getNodeVar(i).isFixed() ? (getNodeVar(i).isTrue() ? "I" : "O") : "U") << "),";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 			std::cout << "Edges: ";
 			for (int i = 0; i < nbEdges(); i++) {
 				std::cout << i << "[" << getTail(i) << "," << getHead(i) << "]"
 									<< "(" << (getEdgeVar(i).isFixed() ? (getEdgeVar(i).isTrue() ? "I" : "O") : "U")
 									<< "),";
 			}
-			std::cout << std::endl;
+			std::cout << '\n';
 		}
 		assert(correctDominator(get_root_idx(), visited, dom_u));
 		if (visited[u]) {
-			std::cout << dom_u << " " << u << " " << get_root_idx() << std::endl;
+			std::cout << dom_u << " " << u << " " << get_root_idx() << '\n';
 		}
 		assert(!visited[u]);
 
@@ -715,7 +718,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 
 			if (DEBUG) {
 				std::cout << "Adding innode " << __FILE__ << __LINE__ << "(" << dom_u << " dominates " << u
-									<< ")" << std::endl;
+									<< ")" << '\n';
 			}
 			getNodeVar(dom_u).setVal(true, r);
 			if (local) {
@@ -759,7 +762,7 @@ bool DReachabilityPropagator::_propagateReachability(bool local) {
 					}
 					if (DEBUG) {
 						std::cout << "Adding inedge " << last_incident << " " << __FILE__ << __LINE__ << "("
-											<< dom_u << " dominates " << u << ")" << std::endl;
+											<< dom_u << " dominates " << u << ")" << '\n';
 					}
 					new_edge.insert(last_incident);
 					last_state_e[last_incident] = VT_IN;
@@ -776,7 +779,7 @@ bool DReachabilityPropagator::propagateReachability() { return _propagateReachab
 
 void DReachabilityPropagator::reverseDFS(int u, std::vector<bool>& v, int skip_n) {
 	if (DEBUG) {
-		std::cout << "Reverse DFS from " << u << std::endl;
+		std::cout << "Reverse DFS from " << u << '\n';
 	}
 	v[u] = true;
 	for (int ie : in[u]) {
@@ -795,7 +798,7 @@ void DReachabilityPropagator::reverseDFStoBorder(int u, std::vector<bool>& v,
 																								 std::vector<bool>& my_side, vec<Lit>& expl,
 																								 int skip_n) {
 	if (DEBUG) {
-		std::cout << "Reverse DFS to border from " << u << std::endl;
+		std::cout << "Reverse DFS to border from " << u << '\n';
 	}
 	v[u] = true;
 	for (int ie : in[u]) {
@@ -803,7 +806,7 @@ void DReachabilityPropagator::reverseDFStoBorder(int u, std::vector<bool>& v,
 				!my_side[getTail(ie)]) {
 			expl.push(getEdgeVar(ie).getValLit());
 			if (DEBUG) {
-				std::cout << "Added to explanation for dom/bridge edge:" << ie << std::endl;
+				std::cout << "Added to explanation for dom/bridge edge:" << ie << '\n';
 			}
 		} else {
 			int o = getTail(ie);
@@ -818,7 +821,7 @@ void DReachabilityPropagator::reverseDFStoBorder(int u, std::vector<bool>& v,
 void DReachabilityPropagator::explain_dominator(int u, int dom, Clause** r) {
 	if (DEBUG) {
 		std::cout << "Explain dominators " << getNodeVar(get_root_idx()).isFixed()
-							<< getNodeVar(u).isFixed() << std::endl;
+							<< getNodeVar(u).isFixed() << '\n';
 	}
 	vec<Lit> ps;
 	ps.push();
@@ -831,7 +834,7 @@ void DReachabilityPropagator::explain_dominator(int u, int dom, Clause** r) {
 	std::vector<bool> v(nbNodes(), false);
 	reverseDFStoBorder(u, v, red, ps, dom);
 	if (DEBUG) {
-		std::cout << "Size expl for dominator " << ps.size() << std::endl;
+		std::cout << "Size expl for dominator " << ps.size() << '\n';
 	}
 	*r = Reason_new(ps);
 }
@@ -839,7 +842,7 @@ void DReachabilityPropagator::explain_dominator(int u, int dom, Clause** r) {
 void DReachabilityPropagator::explain_dominator(int u, int dom, vec<Lit>& ps) {
 	if (DEBUG) {
 		std::cout << "Explain dominators " << getNodeVar(get_root_idx()).isFixed()
-							<< getNodeVar(u).isFixed() << std::endl;
+							<< getNodeVar(u).isFixed() << '\n';
 	}
 	ps.push();
 	ps.push(getNodeVar(get_root_idx()).getValLit());
@@ -851,7 +854,7 @@ void DReachabilityPropagator::explain_dominator(int u, int dom, vec<Lit>& ps) {
 	std::vector<bool> v(nbNodes(), false);
 	reverseDFStoBorder(u, v, red, ps, dom);
 	if (DEBUG) {
-		std::cout << "Size expl for dominator " << ps.size() << std::endl;
+		std::cout << "Size expl for dominator " << ps.size() << '\n';
 	}
 }
 
@@ -863,7 +866,7 @@ bool DReachabilityPropagator::checkFinalSatisfied() {
 			assert(v[i]);
 			if (!v[i]) {
 				std::cerr << "DreachabilityPropagator not satisfied (cannot reach node " << i << ") "
-									<< __FILE__ << ":" << __LINE__ << std::endl;
+									<< __FILE__ << ":" << __LINE__ << '\n';
 				return false;
 			}
 		}
@@ -895,7 +898,8 @@ void dconnected(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> 
 DReachabilityPropagator* dreachable(int r, vec<BoolView>& _vs, vec<BoolView>& _es,
 																		vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out,
 																		vec<vec<int> >& _en, BoolView b) {
-	DReachabilityPropagator* dr = new DReachabilityPropagatorReif(r, _vs, _es, _in, _out, _en, b);
+	DReachabilityPropagator* dr =
+			new DReachabilityPropagatorReif(r, _vs, _es, _in, _out, _en, std::move(b));
 	// if (so.check_prop)
 	//     engine.propagators.push(dr);
 	return dr;

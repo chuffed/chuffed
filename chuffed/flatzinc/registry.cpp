@@ -552,7 +552,7 @@ void p_set_in_reif(const ConExpr& ce, AST::Node* /*unused*/) {
 	IntVar* v = getIntVar(ce[0]);
 	BoolView r = getBoolVar(ce[2]);
 	// TODO: Seems a bit wastefull to create new boolvars here
-	auto add_reif_lbl = [](BoolView v, std::string&& label) {
+	auto add_reif_lbl = [](const BoolView& v, std::string&& label) {
 		std::string lbl = "(" + label + ")";
 		boolVarString.emplace(v, label);
 		litString.emplace(toInt(v.getLit(true)), lbl + "=true");
@@ -1739,7 +1739,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* ann) {
 			}
 		}
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 	vec<int> en_flat;
 	arg2intargs(en_flat, ce[6]);
 	// assert(en_flat.size() == es.size()*vs.size());

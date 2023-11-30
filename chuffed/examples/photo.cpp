@@ -76,7 +76,7 @@ public:
 		for (int i = 0; i < n_names; i++) {
 			os << x[i]->getVal() << ", ";
 		}
-		os << std::endl;
+		os << '\n';
 		os << "SAT = " << sat->getVal() << "\n";
 	}
 };

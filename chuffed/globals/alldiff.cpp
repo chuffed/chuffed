@@ -940,7 +940,7 @@ public:
 	}
 };
 
-void all_different_imp(BoolView b, vec<IntVar*>& x, ConLevel cl) {
+void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl) {
 	int min = INT_MAX;
 	int max = INT_MIN;
 	for (int i = 0; i < x.size(); i++) {

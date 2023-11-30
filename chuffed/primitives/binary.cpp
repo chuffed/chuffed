@@ -182,7 +182,7 @@ public:
 
 // NOLINTEND
 
-void newBinGE(IntView<> x, IntView<> y, BoolView r = bv_true) {
+void newBinGE(IntView<> x, IntView<> y, const BoolView& r = bv_true) {
 	int u = x.getType();
 	int v = y.getType();
 	Propagator* p = nullptr;
@@ -197,7 +197,7 @@ void newBinGE(IntView<> x, IntView<> y, BoolView r = bv_true) {
 	assert(p);
 }
 
-void newBinNE(IntView<> x, IntView<> y, BoolView r = bv_true) {
+void newBinNE(IntView<> x, IntView<> y, const BoolView& r = bv_true) {
 	int u = x.getType();
 	int v = y.getType();
 	Propagator* p = nullptr;
@@ -368,7 +368,7 @@ void int_rel(IntVar* x, IntRelType t, int c) {
 
 // x rel y + c <-> r
 
-void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
+void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, const BoolView& r, int c) {
 	switch (t) {
 		case IRT_EQ:
 			newBinGE(IntView<>(x), IntView<>(y, 1, c), r);
@@ -403,9 +403,11 @@ void int_rel_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
 
 // x rel y + c <- r
 
-void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r) { ihrcs.push(IRR(x, t, c, r)); }
+void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r) {
+	ihrcs.push(IRR(x, t, c, std::move(r)));
+}
 
-void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
+void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, const BoolView& r, int c) {
 	switch (t) {
 		case IRT_EQ:
 			newBinGE(IntView<>(x), IntView<>(y, 1, c), r);
@@ -434,7 +436,9 @@ void int_rel_half_reif(IntVar* x, IntRelType t, IntVar* y, BoolView r, int c) {
 //-----
 // x rel c <-> r
 
-void int_rel_reif(IntVar* x, IntRelType t, int c, BoolView r) { ircs.push(IRR(x, t, c, r)); }
+void int_rel_reif(IntVar* x, IntRelType t, int c, BoolView r) {
+	ircs.push(IRR(x, t, c, std::move(r)));
+}
 
 void int_rel_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 	if (r.isTrue() && t == IRT_NE && x->getType() == INT_VAR_EL) {

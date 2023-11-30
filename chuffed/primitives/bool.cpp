@@ -5,9 +5,11 @@
 #include "chuffed/support/vec.h"
 #include "chuffed/vars/bool-view.h"
 
+#include <utility>
+
 void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
 	//	NOT_SUPPORTED;
-	BoolView v[3] = {x, y, z};
+	BoolView v[3] = {std::move(x), std::move(y), std::move(z)};
 	int u = 0;
 
 	for (int l = 1; l <= 3; l++) {
@@ -110,7 +112,7 @@ void array_bool_or(vec<BoolView>& x, vec<BoolView>& y, BoolView z) {
 
 void array_bool_or(vec<BoolView>& x, BoolView z) {
 	vec<BoolView> y;
-	array_bool_or(x, y, z);
+	array_bool_or(x, y, std::move(z));
 }
 
 // /\ x_i /\ !y_i <-> z
@@ -118,5 +120,5 @@ void array_bool_and(vec<BoolView>& x, vec<BoolView>& y, BoolView z) { array_bool
 
 void array_bool_and(vec<BoolView>& x, BoolView z) {
 	vec<BoolView> y;
-	array_bool_and(x, y, z);
+	array_bool_and(x, y, std::move(z));
 }

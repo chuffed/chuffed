@@ -114,6 +114,7 @@ MDDNodeInt mdd_table(MDDTable& mddtab, int arity, vec<int>& doms, vec<vec<int> >
 
 	if (!is_pos) {
 		std::vector<unsigned int> vdoms;
+		vdoms.reserve(doms.size());
 		for (int i = 0; i < doms.size(); i++) {
 			vdoms.push_back(doms[i]);
 		}
