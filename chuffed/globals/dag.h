@@ -5,7 +5,7 @@
 #include <chuffed/support/trailed_cst_list.h>
 
 class DAGPropagator : public DReachabilityPropagator {
-	class TrailedSuccList : public TrailedConstantAccessList<std::pair<int, int> > {
+	class TrailedSuccList final : public TrailedConstantAccessList<std::pair<int, int> > {
 	public:
 		TrailedSuccList(int n) : TrailedConstantAccessList(n) {}
 		int key(std::pair<int, int> p) override { return p.first; }
@@ -25,7 +25,7 @@ class DAGPropagator : public DReachabilityPropagator {
 			std::cout << std::endl;
 		}
 	};
-	class TrailedPredList : public TrailedConstantAccessList<int> {
+	class TrailedPredList final : public TrailedConstantAccessList<int> {
 	public:
 		TrailedPredList(int n) : TrailedConstantAccessList(n) {}
 		int key(int p) override { return p; }
