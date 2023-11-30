@@ -29,7 +29,7 @@ public:
 		y.attach(this, x.size(), EVENT_U);
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int i, int /*c*/) override {
 		if (i < x.size()) {
 			ones++;
 		}
@@ -37,7 +37,7 @@ public:
 	}
 
 	bool propagate() override {
-		int y_max = y.getMax();
+		const int y_max = y.getMax();
 
 		if (ones > y_max) {
 			ones = y_max + 1;
@@ -56,7 +56,7 @@ public:
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) override {
+	Clause* explain(Lit /*p*/, int inf_id) override {
 		ps.clear();
 		ps.growTo(ones + 1);
 		for (int i = 0, j = 1; j <= ones; i++) {

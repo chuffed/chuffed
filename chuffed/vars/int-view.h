@@ -133,7 +133,7 @@ public:
 			}
 			return *this;
 		}
-		iterator operator++(int dummy) {
+		iterator operator++(int /*dummy*/) {
 			iterator temp = *this;
 			++*this;
 			return temp;
@@ -146,7 +146,7 @@ public:
 			}
 			return *this;
 		}
-		iterator operator--(int dummy) {
+		iterator operator--(int /*dummy*/) {
 			iterator temp = *this;
 			--*this;
 			return temp;
@@ -178,7 +178,7 @@ public:
 			--forward;
 			return *this;
 		}
-		reverse_iterator operator++(int dummy) {
+		reverse_iterator operator++(int /*dummy*/) {
 			reverse_iterator temp = *this;
 			++*this;
 			return temp;
@@ -187,7 +187,7 @@ public:
 			++forward;
 			return *this;
 		}
-		reverse_iterator operator--(int dummy) {
+		reverse_iterator operator--(int /*dummy*/) {
 			reverse_iterator temp = *this;
 			--*this;
 			return temp;
@@ -248,7 +248,7 @@ public:
 			v -= b;
 		}
 		if ((type & 2) != 0) {
-			int k = v % a;
+			const int k = v % a;
 			v = v / a;
 			if (k != 0) {
 				if (t == 0) {

@@ -42,7 +42,7 @@ void Dijkstra::run() {
 
 	pred[source] = source;
 	cost[source] = duration(source);
-	tuple initial(source, cost[source]);
+	const tuple initial(source, cost[source]);
 	q.push(initial);
 
 	if (verbose) {
@@ -50,9 +50,9 @@ void Dijkstra::run() {
 	}
 
 	while (!q.empty() && count < nb_nodes) {
-		tuple top = q.top();
+		const tuple top = q.top();
 		q.pop();
-		int curr = top.node;
+		const int curr = top.node;
 
 		if (vis[curr]) {
 			continue;
@@ -68,7 +68,7 @@ void Dijkstra::run() {
 		}
 
 		for (unsigned int i = 0; i < out[curr].size(); i++) {
-			int e = out[curr][i];
+			const int e = out[curr][i];
 			assert(en[e][0] == curr);
 			if (ignore_edge(e) || weight(e) < 0) {
 				if (verbose) {
@@ -77,7 +77,7 @@ void Dijkstra::run() {
 				on_ignore_edge(e);
 				continue;
 			}
-			int other = en[e][1];  // Head of e
+			const int other = en[e][1];  // Head of e
 
 			if (ignore_node(other)) {
 				continue;
@@ -94,7 +94,7 @@ void Dijkstra::run() {
 				if (verbose) {
 					std::cout << "Marked " << other << " from " << curr << " of cost " << cost[other] << '\n';
 				}
-				tuple new_node(other, cost[other]);
+				const tuple new_node(other, cost[other]);
 				enqueue(new_node);
 			}
 		}
@@ -284,7 +284,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	int dest = source;
 #endif
 
-	int nb_sccs = 1;
+	const int nb_sccs = 1;
 	(void)nb_sccs;  // Avoid -Wunused
 
 #if defined(INCREMENTAL_SCC_REASONING) && defined(BASIC_EXPL)
@@ -302,7 +302,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	if (!use_set_target) {  // Create the target bitset here
 
 		target = std::vector<bool>(target.size(), false);
-		std::vector<int>& mands = mandatory_nodes();
+		const std::vector<int>& mands = mandatory_nodes();
 
 #ifdef CLUSTERING
 		// Cluster mands if only one SCC
@@ -349,7 +349,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 #endif
 		{
 			// Normal case, less mandatories than clusters
-			for (int mand : mands) {
+			for (const int mand : mands) {
 				target[mand] = true;
 			}
 		}
@@ -371,7 +371,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	pathS[source] = true;
 	std::vector<bool> mandS(nb_nodes, false);
 	mandS[source] = true;
-	tuple initial(source, duration(source), pathS, mandS);
+	const tuple initial(source, duration(source), pathS, mandS);
 	table[source][hash_fn(mandS)] = initial;
 	// tries[source].add(mandS,duration(source));
 
@@ -382,7 +382,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 	while (!q.empty()) {
 		top = q.top();
 		q.pop();
-		int curr = top.node;
+		const int curr = top.node;
 		table_iterator it;
 		if (table[curr][hash_fn(top.mand)].cost < top.cost) {
 			continue;
@@ -396,9 +396,9 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 		// if(stop_at_node(curr))
 		//     continue;
 		for (unsigned int i = 0; i < out[curr].size(); i++) {
-			int e = out[curr][i];
+			const int e = out[curr][i];
 			assert(en[e][0] == curr);
-			int other = en[e][1];  // Head of e
+			const int other = en[e][1];  // Head of e
 
 #ifdef DIJKSTRAMANDATORY_ALLOW_CYCLE
 			if (e != en.size() - 1) {
@@ -434,7 +434,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 #endif
 
 			bool _enqueue = true;
-			bool was_mand_other = top.mand[other];
+			const bool was_mand_other = top.mand[other];
 			if (target[other]) {
 				top.mand[other] = true;
 			}
@@ -521,7 +521,7 @@ int DijkstraMandatory::run(bool* ok, bool use_set_target) {
 }
 
 void Dijkstra::print_pred() const {
-	for (int i : pred) {
+	for (const int i : pred) {
 		std::cout << i << " ";
 	}
 	std::cout << '\n';

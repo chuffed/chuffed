@@ -113,7 +113,7 @@ public:
 
 class ConnectedPropagator : public TreePropagator {
 protected:
-	bool cycle_detect(int edge) override { return true; }
+	bool cycle_detect(int /*edge*/) override { return true; }
 	void precycle_detect(int unk_edge) override {}
 
 	void unite(int u, int v) override {

@@ -92,7 +92,7 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 	}
 	kv->specialiseToEL();
 
-	int k = kv->getMax();
+	const int k = kv->getMax();
 
 	vec<Lit> terminals;
 	for (int ii = 0; ii <= k; ii++) {
@@ -143,7 +143,7 @@ static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	vec<Lit> vs;
 
 	// Should add stuff for nodes that are locked T.
-	Lit r = bool_linear_leq(elts, vs, terminals, xs, k, 0, 0);
+	const Lit r = bool_linear_leq(elts, vs, terminals, xs, k, 0, 0);
 	assert(r != lit_True);
 	sat.enqueue(r);
 }
@@ -169,8 +169,8 @@ static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals,
 
 	Lit ret;
 
-	Lit low = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc);
-	Lit high = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc + 1);
+	const Lit low = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc);
+	const Lit high = bool_linear_leq(elts, vs, terminals, xs, k, vv + 1, cc + 1);
 
 	if (low == lit_False) {
 		assert(high == lit_False);
@@ -229,7 +229,7 @@ static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	vec<Lit> vs;
 
 	// Should add stuff for nodes that are locked T.
-	Lit r = bool_linear_leq_std(elts, vs, terminals, xs, k, 0, 0);
+	const Lit r = bool_linear_leq_std(elts, vs, terminals, xs, k, 0, 0);
 	assert(r != lit_True);
 	sat.enqueue(r);
 }
@@ -253,8 +253,8 @@ static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termin
 
 	Lit ret;
 
-	Lit low = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc);
-	Lit high = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc + 1);
+	const Lit low = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc);
+	const Lit high = bool_linear_leq_std(elts, vs, terminals, xs, k, vv + 1, cc + 1);
 
 	if (low == lit_False) {
 		assert(high == lit_False);

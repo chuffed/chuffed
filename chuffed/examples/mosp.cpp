@@ -121,8 +121,8 @@ public:
 	void generateInstance() {
 		srand(so.rnd_seed);
 
-		int cust_per_prod = rand() % 4 + 2;
-		double density = (double)cust_per_prod / n;
+		const int cust_per_prod = rand() % 4 + 2;
+		const double density = (double)cust_per_prod / n;
 
 		a = (bool**)malloc(n * sizeof(bool*));
 		for (int i = 0; i < n; i++) {
@@ -155,7 +155,7 @@ public:
 
 			for (int j = 0; j < m; j++) {
 				while (b[j] < 2) {
-					int r = rand() % n;
+					const int r = rand() % n;
 					if (static_cast<int>(a[r][j]) == 1) {
 						continue;
 					}
@@ -200,7 +200,7 @@ public:
 			while (qhead < num_connected) {
 				assert(qhead < n);
 				assert(num_connected <= n);
-				int c = connected[qhead++];
+				const int c = connected[qhead++];
 				assert(c >= 0);
 				assert(c < n);
 				for (int j = 0; j < n; j++) {
@@ -219,7 +219,7 @@ public:
 
 	void print(std::ostream& os) override {
 		for (int i = 0; i < n; i++) {
-			int m = e[i]->getVal();
+			const int m = e[i]->getVal();
 			os << "e_" << i << " = " << m << ", ";
 		}
 		os << "\n";

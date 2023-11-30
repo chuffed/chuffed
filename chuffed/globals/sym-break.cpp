@@ -29,7 +29,7 @@ public:
 
 	bool propagate() override {
 		if (y.getMax() < k) {
-			int64_t m = y.getMax() - 1;
+			const int64_t m = y.getMax() - 1;
 			setDom(x, setMax, m, y.getMaxLit());
 		}
 

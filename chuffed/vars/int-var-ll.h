@@ -44,8 +44,8 @@ public:
 		assert(isFixed());
 		return ~valLit;
 	}
-	Lit getFMinLit(int64_t v) override { return getMinLit(); }
-	Lit getFMaxLit(int64_t v) override { return getMaxLit(); }
+	Lit getFMinLit(int64_t /*v*/) override { return getMinLit(); }
+	Lit getFMaxLit(int64_t /*v*/) override { return getMaxLit(); }
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;
 	bool setMax(int64_t v, Reason r = nullptr, bool channel = true) override;

@@ -120,8 +120,8 @@ public:
 		}
 	}
 
-	Clause* explain(Lit p, int inf_id) override {
-		tag_t t(conv<tag_t, int>(inf_id));
+	Clause* explain(Lit /*p*/, int inf_id) override {
+		const tag_t t(conv<tag_t, int>(inf_id));
 		return t.flag ? ex_t(t.ti) : ex_s(t.si, t.ti);
 	}
 
@@ -130,7 +130,7 @@ public:
 			return true;
 		}
 
-		int sz = xs.size();
+		const int sz = xs.size();
 		int si = first_s;
 		// Update the first occurrence
 		for (; si < first_t; ++si) {
@@ -185,11 +185,11 @@ public:
 		return true;
 	}
 
-	void wakeup(int ii, int c) override {
+	void wakeup(int ii, int /*c*/) override {
 		if (satisfied != 0) {
 			return;
 		}
-		int vi = ii >> 1;
+		const int vi = ii >> 1;
 		if ((ii & 1) != 0) {
 			if (vi < first_t && xs[vi]->getVal() == t) {
 				first_t = vi;
@@ -257,8 +257,8 @@ class seq_precede_chain : public Propagator {
 	static int lb_tag(int x, int k) { return conv<int, tag_t>(tag_t(false, x, k)); }
 	static int ub_tag(int x, int k) { return conv<int, tag_t>(tag_t(true, x, k)); }
 
-	Clause* explain(Lit p, int inf_id) override {
-		tag_t t(conv<tag_t, int>(inf_id));
+	Clause* explain(Lit /*p*/, int inf_id) override {
+		const tag_t t(conv<tag_t, int>(inf_id));
 		if (t.flag) {
 			// Upper bound
 			return ex_ub(t.x, t.k);
@@ -280,7 +280,7 @@ public:
 	}
 
 	seq_precede_chain(vec<IntVar*>& _xs) : xs(_xs), vmax(0), limit(xs.size(), xs.size()) {
-		int sz = xs.size();
+		const int sz = xs.size();
 		priority = 3;
 		int M = 0;
 		int low_f = 0;
@@ -291,7 +291,7 @@ public:
 			}
 			if (xs[ii]->getMin() > low_f) {
 				// Iniitalize limits.
-				int m = xs[ii]->getMin();
+				const int m = xs[ii]->getMin();
 				for (; m > low_f; ++low_f) {
 					limit.push(ii);
 				}
@@ -307,7 +307,7 @@ public:
 
 	bool propagate() override {
 		// Forward pass; tighten upper bounds.
-		int sz = xs.size();
+		const int sz = xs.size();
 		int ii = 0;
 		int fval = 1;
 		for (; ii < sz; ++ii) {
@@ -419,8 +419,8 @@ class seq_precede_inc : public Propagator {
 	static int lb_tag(int x, int k) { return conv<int, tag_t>(tag_t(false, x, k)); }
 	static int ub_tag(int x, int k) { return conv<int, tag_t>(tag_t(true, x, k)); }
 
-	Clause* explain(Lit p, int inf_id) override {
-		tag_t t(conv<tag_t, int>(inf_id));
+	Clause* explain(Lit /*p*/, int inf_id) override {
+		const tag_t t(conv<tag_t, int>(inf_id));
 		if (t.flag) {
 			// Upper bound
 			return ex_ub(t.x, t.k);
@@ -432,13 +432,13 @@ public:
 	inline bool is_first(int ii) { return first[first_val[ii]] == ii; }
 	inline bool is_limit(int ii) { return limit[limit_val[ii]] == ii; }
 
-	void wakeup(int ii, int c) override {
+	void wakeup(int ii, int /*c*/) override {
 		// How do we know when to wake up?
 		if (is_first(ii) && xs[ii]->getMax() < first_val[ii]) {
 			first_change.push(first_val[ii]);
 			pushInQueue();
 		}
-		int m = xs[ii]->getMin();
+		const int m = xs[ii]->getMin();
 		// Can probably actually relax this to m > 1.
 		if (m > 0 && ii < limit[m]) {
 			if (max_def < m) {
@@ -554,7 +554,7 @@ public:
 				limit_val(xs.size(), xs.size()),
 				max_val(xs.size()),
 				max_def(0) {
-		int sz = xs.size();
+		const int sz = xs.size();
 		priority = 3;
 
 		// Set unused zero value out of range
@@ -584,7 +584,7 @@ public:
 		int m = 0;
 		int k = 0;
 		for (int ii = sz - 1; ii >= 0; --ii) {
-			int mx = xs[ii]->getMin();
+			const int mx = xs[ii]->getMin();
 			if (mx > k) {
 				k = mx;
 				if (mx > m) {

@@ -150,7 +150,7 @@ std::string showVec(const vec<int>& v) {
 
 // Rewind nodepath and altpath after a backjump.
 void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle rewindStyle,
-								 long timestamp) {
+								 long /*timestamp*/) {
 	int currentDecisionLevel;
 	switch (rewindStyle) {
 		case REWIND_OMIT_SKIPPED:
@@ -177,9 +177,9 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 			// Now walk back through the decision levels, sending a
 			// "skipped" node for each child that was never visited.
 			while (nodepath.size() > decisionLevelTip[newDecisionLevel]) {
-				int nodeid = nextnodeid;
+				const int nodeid = nextnodeid;
 				nextnodeid++;
-				int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
+				const int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
 				int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
 
 				// myalt is the alternative that led to the failure; the
@@ -356,7 +356,7 @@ inline bool Engine::constrain() {
 	//  printf("%% opt_var min = %d, opt_var max = %d\n", opt_var->getMin(), opt_var->getMax());
 
 	if (so.lazy) {
-		Lit p =
+		const Lit p =
 				opt_type != 0 ? opt_var->getLit(best_sol + 1, LR_GE) : opt_var->getLit(best_sol - 1, LR_LE);
 		// GKG: Preserves existing assumptions, but assumes we've reserved
 		// space at the end for the objective bound.
@@ -379,7 +379,7 @@ inline bool Engine::constrain() {
 	}
 
 	if (fzn != nullptr) {
-		bool done = fzn->onRestart(this);
+		const bool done = fzn->onRestart(this);
 		if (done) {
 			return false;
 		}
@@ -432,7 +432,7 @@ WakeUp:
 			Propagator* p = p_queue[i].last();
 			p_queue[i].pop();
 			propagations++;
-			bool ok = p->propagate();
+			const bool ok = p->propagate();
 			p->clearPropState();
 			if (!ok) {
 				return false;
@@ -602,10 +602,10 @@ void Engine::set_assumptions(vec<BoolView>& xs) {
 
 void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
 	vec<Lit> out_nogood;
-	int assump_sz = sat.decisionLevel();
+	const int assump_sz = sat.decisionLevel();
 	assert(assump_sz < engine.assumptions.size());
 
-	Lit q(toLit(engine.assumptions[assump_sz]));
+	const Lit q(toLit(engine.assumptions[assump_sz]));
 	assert(sat.value(q) == l_False);
 
 	// Mark the available assumptions
@@ -630,7 +630,7 @@ void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
 
 #ifdef HAS_VAR_IMPACT
 vec<int>& Engine::getVarSizes(vec<int>& outVarSizes) const {
-	int const n = vars.size();
+	const int n = vars.size();
 	outVarSizes.growTo(n);  // hopefully optimised by compiler
 	for (int i = 0; i < n; ++i) {
 		outVarSizes[i] = vars[i]->size();
@@ -647,23 +647,23 @@ RESULT Engine::search(const std::string& problemLabel) {
 	if (so.print_variable_list) {
 		std::ofstream s;
 		s.open("variable-list");
-		for (auto const& p : intVarString) {
+		for (const auto& p : intVarString) {
 			s << p.second << "\n";
 		}
-		for (auto const& p : boolVarString) {
+		for (const auto& p : boolVarString) {
 			s << p.second << "\n";
 		}
 	}
 
 	std::stringstream ss;
-	for (auto const& p : intVarString) {
+	for (const auto& p : intVarString) {
 		ss << p.second << " ";
 	}
 	ss << ";";
-	for (auto const& p : boolVarString) {
+	for (const auto& p : boolVarString) {
 		ss << p.second << " ";
 	}
-	std::string variableListString = ss.str();
+	const std::string variableListString = ss.str();
 
 	restart_count = 0;
 #ifdef HAS_PROFILER
@@ -674,18 +674,18 @@ RESULT Engine::search(const std::string& problemLabel) {
 #endif
 	auto* fzn = dynamic_cast<FlatZinc::FlatZincSpace*>(problem);
 	if ((fzn != nullptr) && fzn->restart_status >= 0) {
-		Lit p = fzn->iv[fzn->restart_status]->getLit(1, LR_EQ);  // START
+		const Lit p = fzn->iv[fzn->restart_status]->getLit(1, LR_EQ);  // START
 		assumptions.push(toInt(p));
 	}
 
 	decisionLevelTip.push_back(1);
 
 	while (true) {
-		int nodeid = nextnodeid;
+		const int nodeid = nextnodeid;
 		nextnodeid++;
-		int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
+		const int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
 		nodepath.push_back(nodeid);
-		int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
+		const int myalt = (altpath.empty()) ? (-1) : (altpath[altpath.size() - 1]);
 #if DEBUG_VERBOSE
 		std::cerr << "propagate (";
 		for (int i : nodepath) {
@@ -707,10 +707,10 @@ RESULT Engine::search(const std::string& problemLabel) {
 							<< "\n";
 #endif
 
-		int previousDecisionLevel = decisionLevel();
+		const int previousDecisionLevel = decisionLevel();
 
-		bool propResult = propagate();
-		long timeus = 0;
+		const bool propResult = propagate();
+		const long timeus = 0;
 		//        long timeus = dur.total_microseconds();
 		if (!propResult) {
 #if DEBUG_VERBOSE
@@ -770,25 +770,25 @@ RESULT Engine::search(const std::string& problemLabel) {
 					// that the profiler can make use of them.
 					std::set<int> levels;
 					for (int i = 0; i < sat.out_learnt_level.size(); i++) {
-						int rawLevel = sat.out_learnt_level[i];
+						const int rawLevel = sat.out_learnt_level[i];
 						// We increment the "raw level" by one,
 						// because internally (on the trail) the first
 						// decision level -- that is, after a single
 						// search decision has been made -- is called
 						// zero.  We would rather that it be called
 						// one, to equal the number of decisions made.
-						int adjustedLevel = rawLevel + 1;
+						const int adjustedLevel = rawLevel + 1;
 						contribString << ((i == 0) ? "" : ",") << adjustedLevel;
 						levels.insert(adjustedLevel);
 					}
 					contribString << "]}";
 
 					// Calculate block level distance.
-					int bld = levels.size();
+					const int bld = levels.size();
 
 					// Does this nogood involve literals that are
 					// derived from assumption literals?
-					int numAssumptions = assumptions.size();
+					const int numAssumptions = assumptions.size();
 					bool usesAssumptions = false;
 					for (int i = 0; i < sat.out_learnt_level.size(); i++) {
 						if (sat.out_learnt_level[i] < numAssumptions) {
@@ -800,7 +800,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 						std::cerr << "uses assumptions: " << usesAssumptions << "\n";
 					}
 
-					int backjumpDistance = previousDecisionLevel - decisionLevel();
+					const int backjumpDistance = previousDecisionLevel - decisionLevel();
 
 					if (doProfiling()) {
 						sendNode(profilerConnector
@@ -830,7 +830,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 					std::stringstream ss2;
 					/* ss2 << "-> "; */
-					std::string ls = getLitString(toInt(sat.out_learnt[0]));
+					const std::string ls = getLitString(toInt(sat.out_learnt[0]));
 					ss2 << ls;
 					if (ls.size() < 2) {
 						std::cerr << "WARNING: short label for " << toInt(sat.out_learnt[0]) << ": " << ls
@@ -882,7 +882,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 				}
 #endif
 				if (fzn != nullptr) {
-					bool done = fzn->onRestart(this);
+					const bool done = fzn->onRestart(this);
 					if (done) {
 						return RES_GUN;
 					}
@@ -909,7 +909,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 				}
 #endif
 				if (fzn != nullptr) {
-					bool done = fzn->onRestart(this);
+					const bool done = fzn->onRestart(this);
 					if (done) {
 						return RES_GUN;
 					}
@@ -934,7 +934,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 
 			// Propagate assumptions
 			while (decisionLevel() < assumptions.size()) {
-				int p = assumptions[decisionLevel()];
+				const int p = assumptions[decisionLevel()];
 				if (sat.value(toLit(p)) == l_True) {
 					// Dummy decision level:
 					assert(sat.trail.last().size() == sat.qhead.last());
@@ -947,7 +947,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 							restart_count++;
 							nodepath.resize(0);
 							altpath.resize(0);
-							bool done = fzn->onRestart(this);
+							const bool done = fzn->onRestart(this);
 							if (done) {
 								return RES_GUN;
 							}
@@ -1139,7 +1139,7 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 			Clause& c = *(sat.learnts[i]);
 			//        std::cerr << "clausescore," << c.clauseID() << ","
 			//        << c.rawActivity() << "\n";
-			int id = c.clauseID();
+			const int id = c.clauseID();
 			learntStatsStream << learntClauseString[id];
 			learntStatsStream << ",";
 			learntStatsStream << c.rawActivity();

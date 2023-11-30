@@ -37,7 +37,7 @@ class Heap {
 	static inline int parent(int i) { return (i - 1) >> 1; }
 
 	inline void percolateUp(int i) {
-		int x = heap[i];
+		const int x = heap[i];
 		while (i != 0 && lt(x, heap[parent(i)])) {
 			heap[i] = heap[parent(i)];
 			indices[heap[i]] = i;
@@ -48,9 +48,10 @@ class Heap {
 	}
 
 	inline void percolateDown(int i) {
-		int x = heap[i];
+		const int x = heap[i];
 		while (left(i) < heap.size()) {
-			int child = right(i) < heap.size() && lt(heap[right(i)], heap[left(i)]) ? right(i) : left(i);
+			const int child =
+					right(i) < heap.size() && lt(heap[right(i)], heap[left(i)]) ? right(i) : left(i);
 			if (!lt(heap[child], x)) {
 				break;
 			}
@@ -99,7 +100,7 @@ public:
 	}
 
 	int removeMin() {
-		int x = heap[0];
+		const int x = heap[0];
 		heap[0] = heap.last();
 		indices[heap[0]] = 0;
 		indices[x] = -1;

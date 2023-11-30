@@ -24,9 +24,9 @@ class GridColouring : public Problem {
 public:
 	// Constants
 
-	int const n;  // number of rows
-	int const m;  // number of columns
-	int const c;  // number of colours
+	const int n;  // number of rows
+	const int m;  // number of columns
+	const int c;  // number of colours
 
 	// Core variables
 
@@ -124,9 +124,9 @@ int main(int argc, char** argv) {
 
 	assert(argc == 4);
 
-	int n = atoi(argv[1]);
-	int m = atoi(argv[2]);
-	int c = atoi(argv[3]);
+	const int n = atoi(argv[1]);
+	const int m = atoi(argv[2]);
+	const int c = atoi(argv[3]);
 
 	engine.solve(new GridColouring(n, m, c));
 
@@ -189,8 +189,8 @@ public:
 		min_matches = (int*)malloc((p.m + 1) * sizeof(int));
 		printf("min_matches:\n");
 		for (int i = 0; i <= p.m; i++) {
-			int b = i / p.c;
-			int e = i % p.c;
+			const int b = i / p.c;
+			const int e = i % p.c;
 			min_matches[i] = p.c * b * (b - 1) / 2 + e * b;
 			printf("%d, ", min_matches[i]);
 		}
@@ -200,9 +200,9 @@ public:
 			limits[j] = (int*)malloc((p.m + 1) * sizeof(int));
 			printf("limits[%d]: ", j);
 			for (int i = 0; i <= p.m; i++) {
-				int hard_limit = i * (i - 1) / 2 * p.c - (p.n - j) * min_matches[i];
-				int soft_limit = (int)ceil((double)i * static_cast<int>(p.m / p.c) / 2 +
-																	 (double)j * i * (i - 1) / 2 / p.c);
+				const int hard_limit = i * (i - 1) / 2 * p.c - (p.n - j) * min_matches[i];
+				const int soft_limit = (int)ceil((double)i * static_cast<int>(p.m / p.c) / 2 +
+																				 (double)j * i * (i - 1) / 2 / p.c);
 				//				int soft_limit = (int) ceil((double)i*(p.m/p.c)/2 +
 				//((double)i*(i-1)/2*p.c-(double)i*(p.m/p.c)/2)*j/p.n);
 				limits[j][i] = hard_limit;
@@ -215,15 +215,15 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int i, int /*c*/) override {
 		new_fixed.push(i);
 		pushInQueue();
 	}
 
 	bool propagate() override {
 		for (int i = 0; i < new_fixed.size(); i++) {
-			int r = new_fixed[i] / p.m;
-			int c = new_fixed[i] % p.m;
+			const int r = new_fixed[i] / p.m;
+			const int c = new_fixed[i] % p.m;
 			if (TEST && r != row) {
 				row = r;
 				printf("Processing %dth row\n", (int)row);
@@ -261,13 +261,13 @@ public:
 					s = c;
 					b = j;
 				}
-				int size1 = (1 << s);
-				int size2 = (1 << (b - s - 1));
-				int size3 = (1 << (p.m - b - 1));
+				const int size1 = (1 << s);
+				const int size2 = (1 << (b - s - 1));
+				const int size3 = (1 << (p.m - b - 1));
 				for (int v3 = 0; v3 < size3; v3++) {
 					for (int v2 = 0; v2 < size2; v2++) {
 						for (int v1 = 0; v1 < size1; v1++) {
-							int z = v1 + (1 << s) + (v2 << (s + 1)) + (1 << b) + (v3 << (b + 1));
+							const int z = v1 + (1 << s) + (v2 << (s + 1)) + (1 << b) + (v3 << (b + 1));
 							counts[z] = counts[z] + 1;
 							if (counts[z] > limits[row + 1][set_sizes[z]]) {
 								printf("z = %d %x, counts[z] = %d\n", z, z, (int)counts[z]);

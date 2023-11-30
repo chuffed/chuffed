@@ -17,7 +17,7 @@
 
 class NNQueens : public Problem {
 public:
-	int const n;
+	const int n;
 	vec<vec<IntVar*> > x;  // squares labels
 
 	NNQueens(int _n) : n(_n) {

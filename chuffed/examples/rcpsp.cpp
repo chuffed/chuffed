@@ -37,7 +37,7 @@ public:
 	RCPSP(char* filename) {
 		readData(filename);
 
-		int horizon = 250;
+		const int horizon = 250;
 
 		// Create vars
 
@@ -79,7 +79,7 @@ public:
 
 		for (int i = 0; i < n_tasks; i++) {
 			for (int j = 0; j < succ[i].size(); j++) {
-				int k = succ[i][j];
+				const int k = succ[i][j];
 				if (k == n_tasks) {
 					continue;
 				}
@@ -139,7 +139,7 @@ public:
 				rr[j][i] = atoi(s);
 			}
 			s = strtok(nullptr, " \t\n");
-			int num_succ = atoi(s);
+			const int num_succ = atoi(s);
 			for (int j = 0; j < num_succ; j++) {
 				s = strtok(nullptr, " \t\n");
 				succ[i].push(atoi(s) - 2);

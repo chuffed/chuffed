@@ -99,7 +99,7 @@ public:
 
 	void print(std::ostream& os) override {
 		for (int i = 0; i < nvars; i++) {
-			int v = x[i]->getVal();
+			const int v = x[i]->getVal();
 			os << i << ": " << v << "\n";
 		}
 	}

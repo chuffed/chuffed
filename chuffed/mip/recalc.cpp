@@ -53,7 +53,7 @@ void Simplex::LTmultiply(long double* a) {
 
 void Simplex::Umultiply(long double* a) {
 	for (int k = m - 1; k >= U_diag_units; k--) {
-		int i = U_perm[k];
+		const int i = U_perm[k];
 		checkZero13(a[i]);
 		if (a[i] == 0) {
 			continue;
@@ -67,7 +67,7 @@ void Simplex::Umultiply(long double* a) {
 
 void Simplex::UTmultiply(long double* a) {
 	for (int k = 0; k < m; k++) {
-		int i = U_perm[k];
+		const int i = U_perm[k];
 		checkZero13(a[i]);
 		if (a[i] == 0) {
 			continue;
@@ -167,7 +167,7 @@ void Simplex::updateBasis() {
 		updateNorms();
 	}
 
-	int r = pivot_row;  // column which is being replaced
+	const int r = pivot_row;  // column which is being replaced
 
 	//	fprintf(stderr, "r = %d\n", r);
 
@@ -190,12 +190,12 @@ void Simplex::updateBasis() {
 
 	// clear rth row
 	for (int k = inv_r + 1; k < m; k++) {
-		int i = U_perm[k];
+		const int i = U_perm[k];
 		checkZero13(tm[i]);
 		if (tm[i] == 0) {
 			continue;
 		}
-		long double a = -tm[i] / U_diag[i];
+		const long double a = -tm[i] / U_diag[i];
 		f.vals.push(IndexVal(i, a));
 		for (int j = 0; j < U_rows[i].size(); j++) {
 			tm[U_rows[i][j].index()] += a * U_rows[i][j].val();
@@ -303,7 +303,7 @@ void Simplex::updateBasis() {
 }
 
 void Simplex::updateNorms() const {
-	long double Z_norm2 = BZ[pivot_row];
+	const long double Z_norm2 = BZ[pivot_row];
 
 	assert(Y[pivot_row] != 0);
 	for (int i = 0; i < m; i++) {
@@ -314,7 +314,7 @@ void Simplex::updateNorms() const {
 			if (Y[i] == 0) {
 				continue;
 			}
-			long double y_ratio = Y[i] / Y[pivot_row];
+			const long double y_ratio = Y[i] / Y[pivot_row];
 			norm2[i] += -2 * y_ratio * BZ[i] + y_ratio * y_ratio * Z_norm2;
 		}
 		//		fprintf(stderr, "%d:%.3Lf ", i, norm2[i]);
@@ -352,10 +352,10 @@ void Simplex::refactorB() {
 	int cs = 0;
 	vec<int> non_col_sing;
 	for (int i = 0; i < m; i++) {
-		int c = rtoc[i];
+		const int c = rtoc[i];
 		if (AV_nz[c] == 1) {
 			col_perm[i] = cs;
-			int k = AV[c][0].index();
+			const int k = AV[c][0].index();
 			row_perm[k] = cs;
 			row_perm2[cs] = cs;
 			U_diag[cs] = AV[c][0].val();
@@ -388,7 +388,7 @@ void Simplex::refactorB() {
 	}
 
 	// Initialise R1, R2 (for storing U and L)
-	int p = m - cs;
+	const int p = m - cs;
 	for (int i = 1; i < p; i++) {
 		R1[i] = R1[0] + static_cast<ptrdiff_t>(i * p);
 		R2[i] = R2[0] + static_cast<ptrdiff_t>(i * p);
@@ -398,9 +398,9 @@ void Simplex::refactorB() {
 
 	int rows_used = cs;
 	for (int i = cs; i < m; i++) {
-		int c = col_perm2[i];
+		const int c = col_perm2[i];
 		for (int j = 0; j < AV_nz[c]; j++) {
-			int k = AV[c][j].index();
+			const int k = AV[c][j].index();
 			int& r = row_perm[k];
 			if (r == -1) {
 				r = rows_used++;
@@ -457,7 +457,7 @@ void Simplex::refactorB() {
 			if (R1[j][i] == 0 || row_perm2[j + cs] >= 0) {
 				continue;
 			}
-			long double a = -R1[j][i] / R1[nr][i];
+			const long double a = -R1[j][i] / R1[nr][i];
 			for (int k = 0; k < U_rows[i + cs].size(); k++) {
 				R1[j][U_rows[i + cs][k].index() - cs] += a * U_rows[i + cs][k].val();
 			}

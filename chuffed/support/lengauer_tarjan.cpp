@@ -34,18 +34,18 @@ void LengauerTarjan::COMPRESS(int v) {
 }
 
 void LengauerTarjan::init() {
-	int n = in.size();
+	const int n = in.size();
 	preds = std::vector<std::vector<int> >(n, std::vector<int>());
 	succs = std::vector<std::vector<int> >(n, std::vector<int>());
 	for (int i = 0; i < n; i++) {
 		// succs.push_back(vector<int>());
 		// cout <<"Succs of "<<i<<": ";
 		for (int j = 0; j < ou[i].size(); j++) {
-			int e = ou[i][j];
+			const int e = ou[i][j];
 			if (ignore_edge(e)) {
 				continue;
 			}
-			int o = en[e][1];
+			const int o = en[e][1];
 			if (ignore_node(o)) {
 				continue;
 			}
@@ -82,7 +82,7 @@ void LengauerTarjan::DFS(int v) {
 	ancestor[v] = -1;
 	std::vector<int>::iterator it;
 	for (it = succs[v].begin(); it != succs[v].end(); it++) {
-		int w = *it;
+		const int w = *it;
 		if (semi[w] == -1) {
 			parent[w] = v;
 			DFS(w);
@@ -125,11 +125,11 @@ void LengauerTarjan::find_doms() {
 			std::vector<std::vector<int> >(in.size(), std::vector<int>());
 
 	for (int i = count; i >= 1; i--) {
-		int w = vertex[i];
+		const int w = vertex[i];
 		std::vector<int>::iterator it;
 		for (it = preds[w].begin(); it != preds[w].end(); it++) {
-			int v = *it;
-			int u = EVAL(v);
+			const int v = *it;
+			const int u = EVAL(v);
 			if (semi[u] < semi[w]) {
 				semi[w] = semi[u];
 			}
@@ -137,15 +137,15 @@ void LengauerTarjan::find_doms() {
 		buckets[vertex[semi[w]]].push_back(w);
 		LINK(parent[w], w);
 		for (it = buckets[parent[w]].begin(); it != buckets[parent[w]].end(); it++) {
-			int v = *it;
-			int u = EVAL(v);
+			const int v = *it;
+			const int u = EVAL(v);
 			idom[v] = (semi[u] < semi[v]) ? u : parent[w];
 		}
 		buckets[parent[w]].clear();
 	}
 
 	for (int i = 1; i <= count; i++) {
-		int w = vertex[i];
+		const int w = vertex[i];
 		if (idom[w] != vertex[semi[w]]) {
 			idom[w] = idom[idom[w]];
 		}
@@ -159,7 +159,7 @@ void addToBucket(int buckIdx, int element) {
 	if (bucket[buckIdx] == -1) {
 		bucket[buckIdx] = element;
 	} else {
-		int old = bucket[buckIdx];
+		const int old = bucket[buckIdx];
 		bucket[buckIdx] = element;
 		bucket[element] = old;
 	}
@@ -221,7 +221,7 @@ LengauerTarjan::LengauerTarjan(int r, vvi_t _en, vvi_t _in, vvi_t _ou)
 
 LengauerTarjan::~LengauerTarjan() = default;
 
-void LengauerTarjan::run(int root) {
+void LengauerTarjan::run(int /*root*/) {
 	init();
 	DFS();
 
@@ -243,19 +243,19 @@ bool LengauerTarjan::visited_dfs(int u) { return semi[u] != -1; }
 
 int LengauerTarjan::dominator(int u) { return idom[u]; }
 
-bool LengauerTarjan::ignore_node(int u) {
+bool LengauerTarjan::ignore_node(int /*u*/) {
 	// return u==13;
 	return false;
 }
 
-bool LengauerTarjan::ignore_edge(int e) {
+bool LengauerTarjan::ignore_edge(int /*e*/) {
 	// return e==3 || e==2 || e==4 || e==5;
 	return false;
 }
 
 void ex1() {
-	int n = 15;
-	int e = 16;
+	const int n = 15;
+	const int e = 16;
 
 	std::vector<std::vector<int> > in(n, std::vector<int>());
 	in[12].push_back(2);
@@ -334,7 +334,7 @@ void ex1() {
 	LengauerTarjan lt = LengauerTarjan(12, endnodes, in, ou);
 	lt.run(12);
 
-	std::vector<bool> vis(in.size(), false);
+	const std::vector<bool> vis(in.size(), false);
 	for (int i = 0; i < in.size(); i++) {
 		std::cout << "(" << i << "," << lt.dominator(i) << ") ";
 	}

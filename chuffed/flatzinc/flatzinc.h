@@ -386,7 +386,7 @@ public:
 		for (auto* ai : output->a) {
 			if (ai->isArray()) {
 				AST::Array* aia = ai->getArray();
-				int size = aia->a.size();
+				const int size = aia->a.size();
 				out << "[";
 				for (int j = 0; j < size; j++) {
 					printElem(aia->a[j], out);
@@ -404,7 +404,7 @@ public:
 						printElem(aia->a[2], out);
 					}
 				} else if (aia->a[0]->isBoolVar()) {
-					BoolView b = bv[aia->a[0]->getBoolVar()];
+					const BoolView b = bv[aia->a[0]->getBoolVar()];
 					if (b.isTrue()) {
 						printElem(aia->a[1], out);
 					} else if (b.isFalse()) {
@@ -433,7 +433,7 @@ public:
 			}
 
 			IntVar* var = iv[i];
-			std::string varName = intVarString[var];
+			const std::string varName = intVarString[var];
 
 			if (varName.empty() || varName.find(so.filter_domains) == std::string::npos) {
 				continue;
@@ -468,7 +468,7 @@ public:
 				continue;
 			}
 
-			BoolView bview = bv[i];
+			const BoolView bview = bv[i];
 			std::string bvstring = boolVarString[bview];
 
 			if (bvstring.find(so.filter_domains) == std::string::npos) {
@@ -495,7 +495,7 @@ public:
 			out << boolVarString[bview] << ":";
 			/* out << litString[toInt(bview.getLit(true))] << ":"; */
 			/* out << litString[toInt(bview.getLit(false))] << ":"; */
-			bool first = true;
+			const bool first = true;
 			if (!bview.isFixed()) {
 				out << "'undef'";
 			} else if (bview.isTrue()) {
@@ -587,7 +587,7 @@ public:
 		if (pos >= length) {
 			return 0;
 		}
-		int num = std::min(length - pos, lexBufSize);
+		const int num = std::min(length - pos, lexBufSize);
 		memcpy(lexBuf, buf + pos, num);
 		pos += num;
 		return num;

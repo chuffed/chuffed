@@ -31,8 +31,8 @@ public:
 	vec<IntVar*> y;  // Card of pos
 
 	BlackHole() {
-		assert(suits * ranks == cards);
-		assert(piles * layers == cards - 1);
+		static_assert(suits * ranks == cards, "");
+		static_assert(piles * layers == cards - 1, "");
 
 		// Generate instance
 
@@ -120,7 +120,7 @@ public:
 							continue;
 						}
 						if (ctol[o1] < ctol[o2]) {
-							int t = o1;
+							const int t = o1;
 							o1 = o2;
 							o2 = t;
 						}
@@ -171,10 +171,10 @@ public:
 	}
 
 	void print(std::ostream& os) override {
-		char s[5] = "SCHD";
+		const char s[5] = "SCHD";
 		for (int i = 0; i < layers; i++) {
 			for (auto& j : layout) {
-				int v = j[i];
+				const int v = j[i];
 				os << " " << std::setw(2) << std::setfill('0') << (v % ranks + 1) << s[v / ranks];
 			}
 			os << "\n";
@@ -182,7 +182,7 @@ public:
 		os << "\n";
 
 		for (int i = 0; i < cards; i++) {
-			int v = y[i]->getVal();
+			const int v = y[i]->getVal();
 			os << std::setw(2) << std::setfill('0') << (v % ranks + 1) << s[v / ranks] << " ";
 			if (i % ranks == ranks - 1) {
 				os << "\n";

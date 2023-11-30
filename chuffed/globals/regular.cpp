@@ -6,7 +6,8 @@
 
 #include <cassert>
 
-void regular_check(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f) {
+#ifndef NDEBUG
+bool regular_check(vec<IntVar*>& /*x*/, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f) {
 	assert(q >= 1);
 	assert(s >= 1);
 	assert(d.size() == q);
@@ -20,10 +21,12 @@ void regular_check(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec
 	for (int i = 0; i < f.size(); i++) {
 		assert(f[i] >= 1 && f[i] <= q);
 	}
+	return true;
 }
+#endif
 
 void regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f) {
-	regular_check(x, q, s, d, q0, f);
+	assert(regular_check(x, q, s, d, q0, f));
 	//	bool accept[q+1];
 	bool* accept = new bool[q + 1];
 	for (int i = 0; i <= q; i++) {

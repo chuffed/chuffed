@@ -114,12 +114,12 @@ public:
 	}
 
 	int imin(int x, int y) {
-		int mask = ((x - y) >> 31);
+		const int mask = ((x - y) >> 31);
 		return (x & mask) + (y & (~mask));
 	}
 
 	int imax(int x, int y) {
-		int mask = ((y - x) >> 31);
+		const int mask = ((y - x) >> 31);
 		return (x & mask) + (y & (~mask));
 	}
 

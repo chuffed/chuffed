@@ -97,16 +97,16 @@ public:
 
 		clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 
-		for (int n : to_cluster) {
+		for (const int n : to_cluster) {
 			int min = -1;
 			int arg_min = -1;
 			for (unsigned int j = 0; j < this->clusters_count; j++) {
-				int cent = centroids[j];
+				const int cent = centroids[j];
 				int inf = 0;
 				int inf2 = 0;
 				int d = 0;
-				int d1 = fw->getDist(n, cent, &inf);
-				int d2 = fw->getDist(cent, n, &inf2);
+				const int d1 = fw->getDist(n, cent, &inf);
+				const int d2 = fw->getDist(cent, n, &inf2);
 				if ((inf != 0) && (inf2 == 0)) {
 					d = d2;
 				} else if ((inf == 0) && (inf2 != 0)) {
@@ -147,8 +147,8 @@ public:
 					for (it2 = clusters[cl].begin(); it2 != clusters[cl].end(); ++it2) {
 						int inf = 0;
 						int inf2 = 0;
-						int d1 = fw->getDist(*it, *it2, &inf);
-						int d2 = fw->getDist(*it2, *it, &inf2);
+						const int d1 = fw->getDist(*it, *it2, &inf);
+						const int d2 = fw->getDist(*it2, *it, &inf2);
 						int d = 0;
 						assert(!(inf && inf2));
 						if ((inf != 0) && (inf2 == 0)) {
@@ -178,16 +178,16 @@ public:
 
 			clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 
-			for (int n : to_cluster) {
+			for (const int n : to_cluster) {
 				int min = -1;
 				int arg_min = -1;
 				for (unsigned int j = 0; j < this->clusters_count; j++) {
-					int cent = centroids[j];
+					const int cent = centroids[j];
 					int inf = 0;
 					int inf2 = 0;
 					int d = 0;
-					int d1 = fw->getDist(n, cent, &inf);
-					int d2 = fw->getDist(cent, n, &inf2);
+					const int d1 = fw->getDist(n, cent, &inf);
+					const int d2 = fw->getDist(cent, n, &inf2);
 					if ((inf != 0) && (inf2 == 0)) {
 						d = d2;
 					} else if ((inf == 0) && (inf2 != 0)) {

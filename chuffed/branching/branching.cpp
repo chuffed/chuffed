@@ -69,7 +69,7 @@ DecInfo* BranchGroup::branch() {
 			return nullptr;
 		}
 		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
-		int best_i = moves[rnd_move(engine.rnd)];
+		const int best_i = moves[rnd_move(engine.rnd)];
 		if (!terminal) {
 			cur = best_i;
 		}
@@ -83,7 +83,7 @@ DecInfo* BranchGroup::branch() {
 		if (x[i]->finished()) {
 			continue;
 		}
-		double s = x[i]->getScore(var_branch);
+		const double s = x[i]->getScore(var_branch);
 		if (s >= best) {
 			if (s > best) {
 				best = s;
@@ -200,7 +200,7 @@ DecInfo* PriorityBranchGroup::branch() {
 			return nullptr;
 		}
 		std::uniform_int_distribution<int> rnd_move(0, moves.size() - 1);
-		int best_i = moves[rnd_move(engine.rnd)];
+		const int best_i = moves[rnd_move(engine.rnd)];
 		if (!terminal) {
 			cur = best_i;
 		}
@@ -214,7 +214,7 @@ DecInfo* PriorityBranchGroup::branch() {
 		if (annotations[i]->finished()) {
 			continue;
 		}
-		double s = x[i]->getScore(var_branch);
+		const double s = x[i]->getScore(var_branch);
 		if (s >= best) {
 			if (s > best) {
 				best = s;

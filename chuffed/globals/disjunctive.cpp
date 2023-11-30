@@ -73,7 +73,7 @@ public:
 			int b = INT_MIN;
 			int e = INT_MIN;
 			for (int ests_i = 0; ests_i < x.size(); ests_i++) {
-				int j = ests[ests_i];
+				const int j = ests[ests_i];
 				if (!pred[j][i].isTrue()) {
 					continue;
 				}
@@ -96,7 +96,7 @@ public:
 	}
 
 	Clause* explain(Lit p, int inf_id) override {
-		Pinfo& pi = p_info[inf_id];
+		const Pinfo& pi = p_info[inf_id];
 		/*
 				fprintf(stderr, "var = %d, est = %d\n", pi.var, pi.est);
 
@@ -123,7 +123,7 @@ public:
 		// can lift!
 		int lb = pi.est;
 		for (int i = 0; i < x.size(); i++) {
-			BoolView& p = pred[i][pi.var];
+			const BoolView& p = pred[i][pi.var];
 			if (p.isTrue() && old_est[i] >= pi.est) {
 				ps.push(p.getValLit());
 				ps.push(x[i]->getMinLit());
@@ -333,7 +333,7 @@ public:
 
 			// process newly available tasks
 			for (; ests_i < x.size(); ests_i++) {
-				int task = ests[ests_i];
+				const int task = ests[ests_i];
 				if (x[task]->getMin() > cur_time) {
 					break;
 				}
@@ -364,12 +364,12 @@ public:
 				}
 
 				// precedences can be inferred
-				Reason r = createReason(ps_i, task, let(lets[lets_i]));
+				const Reason r = createReason(ps_i, task, let(lets[lets_i]));
 				for (int i = lets_i; i < lets_comp; i++) {
 					if (residual[lets[i]] == 0) {
 						continue;
 					}
-					BoolView& v = pred[lets[i]][task];
+					const BoolView& v = pred[lets[i]][task];
 					if (v.setValNotR(true)) {
 						if (!v.setVal(true, r)) {
 							return false;
@@ -512,7 +512,7 @@ public:
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) override {
+	Clause* explain(Lit /*p*/, int inf_id) override {
 		Pinfo& pi = p_info[inf_id];
 
 		if (pi.expl != nullptr) {

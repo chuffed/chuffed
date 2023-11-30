@@ -18,15 +18,15 @@
 
 class GracefulGraph : public Problem {
 public:
-	int const m;      // size of cliques
-	int const n;      // number of cliques
+	const int m;      // size of cliques
+	const int n;      // number of cliques
 	vec<IntVar*> x;   // vertex labels
 	vec<IntVar*> d;   // raw difference of vertex labels
 	vec<IntVar*> ad;  // absolute differences of vertex labels
 
 	GracefulGraph(int _m, int _n) : m(_m), n(_n) {
-		int nodes = m * n;
-		int nedges = m * (m - 1) / 2 * n + (n - 1) * m;
+		const int nodes = m * n;
+		const int nedges = m * (m - 1) / 2 * n + (n - 1) * m;
 
 		vec<int> origins;
 		vec<int> destinations;

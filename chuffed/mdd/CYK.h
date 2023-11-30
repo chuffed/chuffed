@@ -11,7 +11,7 @@ struct cyk_sig {
 	int end;
 };
 
-cyk_sig mk_sig(CFG::Sym s, int start, int end) {
+inline cyk_sig mk_sig(CFG::Sym s, int start, int end) {
 	cyk_sig sig = {s, start, end};
 	return sig;
 }
@@ -46,7 +46,7 @@ public:
 	}
 
 	F part(CFG::Sym s, int start, int end) {
-		cyk_sig sig = mk_sig(s, start, end);
+		const cyk_sig sig = mk_sig(s, start, end);
 
 		auto cval = cache.find(sig);
 
@@ -62,21 +62,21 @@ public:
 		}
 
 		F ret(fff);
-		int vid(symID(s));
+		const int vid(symID(s));
 		for (auto pinf : g.prods[vid]) {
 			if ((pinf.cond == nullptr) || pinf.cond->check(start, end)) {
 				ret = ret | prod(pinf.rule, start, end);
 			}
 		}
 
-		int rindex = fs.size();
+		const int rindex = fs.size();
 		fs.push_back(ret);
 		cache[sig] = rindex;
 		return ret;
 	}
 
 	F prod(int r_id, int start, int end) {
-		std::vector<F> partial;
+		const std::vector<F> partial;
 
 		if (g.rules[r_id].size() == 1) {
 			if ((g.rules[r_id][0].cond == nullptr) || g.rules[r_id][0].cond->check(start, end)) {

@@ -43,7 +43,7 @@ public:
 	}
 
 	void add(T val) {
-		int k = key(val);
+		const int k = key(val);
 		assert(k >= 0 && k < max_size);
 		assert(size < max_size);
 		if (!get(k)) {
@@ -70,11 +70,11 @@ public:
 			i--;
 			return *this;
 		}
-		Iterator& operator++(int dummy) {
+		Iterator& operator++(int /*dummy*/) {
 			++i;
 			return *this;
 		}
-		Iterator& operator--(int dummy) {
+		Iterator& operator--(int /*dummy*/) {
 			--i;
 			return *this;
 		}

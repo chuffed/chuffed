@@ -85,13 +85,13 @@ void MIP::init() {
 	simplex.init();
 }
 
-void MIP::wakeup(int i, int c) {
+void MIP::wakeup(int i, int /*c*/) {
 	new_bc.push(i);
 	pushInQueue();
 }
 
 bool MIP::propagate() {
-	time_point start = chuffed_clock::now();
+	const time_point start = chuffed_clock::now();
 	//	printObjective();
 
 	updateBounds();
@@ -142,7 +142,7 @@ void MIP::btToLevel(int level) {
 		return;
 	}
 	for (int i = bctrail.size(); i-- > bctrail_lim[level];) {
-		BoundChange& bc = bctrail[i];
+		const BoundChange& bc = bctrail[i];
 		if (bc.w == simplex.shift[bc.v]) {
 			simplex.boundChange(bc.v, -bc.d);
 		}
@@ -189,7 +189,7 @@ bool MIP::propagateAllBounds() {
 	//	printf("level = %d\n", decisionLevel());
 	//	printf("\n");
 
-	bool rc = false;
+	const bool rc = false;
 
 	ps.clear();
 
@@ -211,7 +211,7 @@ bool MIP::propagateAllBounds() {
 
 	//	fprintf(stderr, "objVarBound() = %.3Lf, optimum = %.3Lf\n", objVarBound(), simplex.optimum());
 
-	long double slack = objVarBound() - simplex.optimum();  // can this be sharpend?
+	const long double slack = objVarBound() - simplex.optimum();  // can this be sharpend?
 
 	if (slack < 0) {
 		//		printf("F");
@@ -257,8 +257,8 @@ bool MIP::propagateBound(int i, long double s) {
 	if (s > 4e9) {
 		return true;
 	}
-	IntView<T> v(vars[i]);
-	int64_t max = v.getMin() + (int64_t)floor(s);
+	const IntView<T> v(vars[i]);
+	const int64_t max = v.getMin() + (int64_t)floor(s);
 	//	fprintf(stderr, "%.3Lf %lld %lld %lld\n", s, v.getMin(), v.getMax(), max);
 	if (v.setMaxNotR(max)) {
 		Clause* m_r = nullptr;
@@ -280,7 +280,7 @@ long double MIP::objVarBound() {
 }
 
 long double MIP::getRC(IntVar* v) {
-	int r = var_map.find(v)->second;
+	const int r = var_map.find(v)->second;
 	if (!(0 <= r && r < vars.size())) {
 		printf("%d %d\n", r, vars.size());
 	}
@@ -307,10 +307,10 @@ long double MIP::getRC(IntVar* v) {
 void MIP::updateBounds() {
 	// Update all bounds changes
 	for (int i = 0; i < new_bc.size(); i++) {
-		int v = new_bc[i];
+		const int v = new_bc[i];
 		assert(0 < v && v < vars.size());
-		int min = vars[v]->getMin();
-		int max = vars[v]->getMax();
+		const int min = vars[v]->getMin();
+		const int max = vars[v]->getMax();
 		if (min != simplex.lb[v]) {
 			assert(min > simplex.lb[v]);
 			//			fprintf(stderr, "var %d lb changed to %d\n", v, min);
@@ -350,7 +350,7 @@ int MIP::doSimplex() const {
 	//	printf("start simplex\n");
 	int r = SIMPLEX_IN_PROGRESS;
 	int steps = 0;
-	int limit = getLimit();
+	const int limit = getLimit();
 	for (; steps < limit; steps++) {
 		r = simplex.simplex();
 		if (r != SIMPLEX_IN_PROGRESS) {

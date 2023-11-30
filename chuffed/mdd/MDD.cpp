@@ -94,7 +94,7 @@ MDDNodeInt MDDTable::insert(unsigned int var, unsigned int low, unsigned int sta
 
 	if (jj == 0 && !expand) {
 		// Constant node.
-		unsigned int ret = stack[start].dest;
+		const unsigned int ret = stack[start].dest;
 		stack.resize(start);
 		return ret;
 	}
@@ -126,7 +126,7 @@ template <class T>
 MDDNodeInt MDDTable::tuple(vec<T>& tpl) {
 	MDDNodeInt res = MDDTRUE;
 
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 	for (int i = tpl.size() - 1; i >= 0; i--) {
 		stack.push_back(mkedge(tpl[i], res));
 		stack.push_back(mkedge(tpl[i] + 1, MDDFALSE));
@@ -141,22 +141,22 @@ template MDDNodeInt MDDTable::tuple(vec<int>& tpl);
 MDDNodeInt MDDTable::mdd_vareq(int var, int val) {
 	assert(var < nvars);
 
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 
 	stack.push_back(mkedge(val, MDDTRUE));
 	stack.push_back(mkedge(val + 1, MDDFALSE));
 
-	MDDNodeInt res = insert(var, MDDFALSE, start);
+	const MDDNodeInt res = insert(var, MDDFALSE, start);
 	assert(stack.size() == start);
 
 	return res;
 }
 
 MDDNodeInt MDDTable::mdd_varlt(int var, int val) {
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 
 	stack.push_back(mkedge(val, MDDFALSE));
-	MDDNodeInt res = insert(var, MDDTRUE, start);
+	const MDDNodeInt res = insert(var, MDDTRUE, start);
 
 	assert(stack.size() == start);
 
@@ -164,10 +164,10 @@ MDDNodeInt MDDTable::mdd_varlt(int var, int val) {
 }
 
 MDDNodeInt MDDTable::mdd_vargt(int var, int val) {
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 	stack.push_back(mkedge(val + 1, MDDTRUE));
 
-	MDDNodeInt res = insert(var, MDDFALSE, start);
+	const MDDNodeInt res = insert(var, MDDFALSE, start);
 	assert(stack.size() == start);
 
 	return res;
@@ -187,7 +187,7 @@ MDDNodeInt MDDTable::mdd_case(int var, std::vector<edgepair>& cases) {
 }
 
 // FIXME: Completely bogus.
-MDDNodeInt MDDTable::bound(MDDNodeInt root, vec<intpair>& range) {
+MDDNodeInt MDDTable::bound(MDDNodeInt root, vec<intpair>& /*range*/) {
 	return root;
 	/*
 	 if( root == MDDFALSE || root == MDDTRUE )
@@ -244,10 +244,10 @@ MDDNodeInt MDDTable::expand(int var, MDDNodeInt r) {
 		return res;
 	}
 
-	int cvar = (r == MDDTRUE) ? nvars : nodes[r]->var;
+	const int cvar = (r == MDDTRUE) ? nvars : nodes[r]->var;
 	assert(cvar >= var && var <= nvars);
 
-	int start = stack.size();
+	const int start = stack.size();
 	int low;
 
 	if (cvar == var) {
@@ -288,7 +288,7 @@ MDDNodeInt MDDTable::mdd_and(MDDNodeInt a, MDDNodeInt b) {
 		return res;
 	}
 
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 	unsigned int var;
 	unsigned int low;
 	if (nodes[a]->var < nodes[b]->var) {
@@ -376,7 +376,7 @@ MDDNodeInt MDDTable::mdd_or(MDDNodeInt a, MDDNodeInt b) {
 		return res;
 	}
 
-	unsigned int start = stack.size();
+	const unsigned int start = stack.size();
 	unsigned int var;
 	unsigned int low;
 	if (nodes[a]->var < nodes[b]->var) {
@@ -452,7 +452,7 @@ MDDNodeInt MDDTable::mdd_exist(MDDNodeInt root, unsigned int var) {
 		return root;
 	}
 
-	unsigned int r_var = nodes[root]->var;
+	const unsigned int r_var = nodes[root]->var;
 	if (r_var > var) {
 		return root;
 	}
@@ -472,8 +472,8 @@ MDDNodeInt MDDTable::mdd_exist(MDDNodeInt root, unsigned int var) {
 	}
 
 	// r_var < var
-	unsigned int start = stack.size();
-	unsigned int low = mdd_exist(nodes[root]->low, var);
+	const unsigned int start = stack.size();
+	const unsigned int low = mdd_exist(nodes[root]->low, var);
 	for (unsigned int ii = 0; ii < nodes[root]->sz; ii++) {
 		stack.push_back(
 				mkedge(nodes[root]->edges[ii].val, mdd_exist(nodes[root]->edges[ii].dest, var)));
@@ -491,15 +491,15 @@ MDDNodeInt MDDTable::mdd_not(MDDNodeInt root) {
 		return MDDTRUE;  // Will need to handle long edges.
 	}
 
-	unsigned int var = nodes[root]->var;
-	unsigned int start = stack.size();
+	const unsigned int var = nodes[root]->var;
+	const unsigned int start = stack.size();
 
-	unsigned int low = mdd_not(nodes[root]->low);
+	const unsigned int low = mdd_not(nodes[root]->low);
 
 	for (unsigned int ii = 0; ii < nodes[root]->sz; ii++) {
 		stack.push_back(mkedge(nodes[root]->edges[ii].val, mdd_not(nodes[root]->edges[ii].dest)));
 	}
-	MDDNodeInt res = insert(var, low, start);
+	const MDDNodeInt res = insert(var, low, start);
 	return res;
 }
 
@@ -536,8 +536,8 @@ bool MDDTable::mdd_leq(MDDNodeInt a, MDDNodeInt b) {
 			res = 0U;
 			goto _mdd_leq_done;
 		}
-		int aval = nodes[a]->edges[ii].val;
-		int bval = nodes[b]->edges[jj].val;
+		const int aval = nodes[a]->edges[ii].val;
+		const int bval = nodes[b]->edges[jj].val;
 
 		if (aval <= bval) {
 			aprev = nodes[a]->edges[ii].dest;
@@ -613,7 +613,7 @@ void MDDTable::print_mdd(MDDNodeInt r) {
 	unsigned int head = 0;
 
 	while (head < queued.size()) {
-		MDDNodeInt n = queued[head];
+		const MDDNodeInt n = queued[head];
 
 		print_node(n);
 		for (unsigned int jj = 0; jj < nodes[n]->sz; jj++) {
@@ -624,14 +624,14 @@ void MDDTable::print_mdd(MDDNodeInt r) {
 		}
 		head++;
 	}
-	for (unsigned int i : queued) {
+	for (const unsigned int i : queued) {
 		status[i] = 0;
 	}
 	status[0] = 0;
 	status[1] = 0;
 }
 
-void MDDTable::print_mdd_tikz(MDDNodeInt r) {
+void MDDTable::print_mdd_tikz(MDDNodeInt /*r*/) {
 	assert(0);
 	// std::cout << "\\documentclass{article}\n";
 

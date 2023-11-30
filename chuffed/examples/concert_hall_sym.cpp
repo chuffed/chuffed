@@ -61,7 +61,7 @@ public:
 								y.push(q);
 								bool_clause(y);
 				*/
-				BoolView q = newBoolVar();
+				const BoolView q = newBoolVar();
 				qs.push(q);
 				int_rel_reif(x[i], IRT_NE, x[j], q);
 				bool_rel(~t[i], BRT_OR, q);

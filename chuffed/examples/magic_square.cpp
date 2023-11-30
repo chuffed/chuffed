@@ -13,8 +13,8 @@
 
 class MagicSquare : public Problem {
 public:
-	int const n;
-	int const sum;
+	const int n;
+	const int sum;
 	vec<vec<IntVar*> > x;  // squares labels
 
 	MagicSquare(int _n) : n(_n), sum(n * (n * n + 1) / 2) {

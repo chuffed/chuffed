@@ -166,7 +166,7 @@ public:
 
 template <class V>
 static Clause* Clause_new(const V& ps, bool learnt = false) {
-	int mem_size = sizeof(Clause) + ps.size() * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
+	const int mem_size = sizeof(Clause) + ps.size() * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
 	void* mem = malloc(mem_size);
 	auto* newClause = new (mem) Clause(ps, learnt);
 	return newClause;

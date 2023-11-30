@@ -43,8 +43,8 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 	int cost = 0;
 	UF<int> uf(n);
 	while (i < sorted.size() && in < n - 1) {
-		int e = sorted[i].first;
-		int w = sorted[i].second;
+		const int e = sorted[i].first;
+		const int w = sorted[i].second;
 		if (!uf.connected(ends[e][0], ends[e][1])) {
 			uf.unite(ends[e][0], ends[e][1]);
 			in++;
@@ -59,8 +59,8 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 	int cost2 = 0;
 	UF<int> uf2(n);
 	while (i2 >= 0 && in2 < n - 1) {
-		int e = sorted[i2].first;
-		int w = sorted[i2].second;
+		const int e = sorted[i2].first;
+		const int w = sorted[i2].second;
 		if (!uf2.connected(ends[e][0], ends[e][1])) {
 			uf2.unite(ends[e][0], ends[e][1]);
 			in2++;
@@ -109,7 +109,7 @@ public:
 		//     for (int j = 0; j < _en[i].size(); j++)
 		//         endnodes[i].push(_en[i][j]);
 
-		std::pair<int, int> kkl = Kruskal_weight(ws, nbNodes(), endnodes);
+		const std::pair<int, int> kkl = Kruskal_weight(ws, nbNodes(), endnodes);
 		if (kkl.first > w->getMin()) {
 			w->setMin(kkl.first);
 		}
@@ -144,7 +144,7 @@ public:
 			int in = 0;
 			for (int i = 0; i < nbEdges(); i++) {
 				if (getEdgeVar(i).isTrue()) {
-					bool ok = ruf.unite(endnodes[i][0], endnodes[i][1]);
+					const bool ok = ruf.unite(endnodes[i][0], endnodes[i][1]);
 					assert(ok);
 					uf.unite(endnodes[i][0], endnodes[i][1]);
 					in++;
@@ -154,16 +154,16 @@ public:
 
 			unsigned int i = 0;
 			while (i < sorted.size()) {
-				int e = sorted[i].first;
+				const int e = sorted[i].first;
 				if (getEdgeVar(e).isTrue()) {
 					i++;
 					continue;
 				}
 				// cout <<"Looking at "<<e<<endl;
-				int w = sorted[i].second;
-				int u = endnodes[e][0];
-				int v = endnodes[e][1];
-				bool connected = uf.connected(u, v);
+				const int w = sorted[i].second;
+				const int u = endnodes[e][0];
+				const int v = endnodes[e][1];
+				const bool connected = uf.connected(u, v);
 
 				// I wanted to connected them, but I can't bc I'm out
 				if (getEdgeVar(e).isFalse() && !connected) {
@@ -183,7 +183,7 @@ public:
 					// forbidden and there in no other way of connecting its endnodes
 
 					for (int k = 0; k < path.size() - 1; k++) {
-						int e_path = findEdge(path[k], path[k + 1]);
+						const int e_path = findEdge(path[k], path[k + 1]);
 						arg_maxw = ws[e_path] > ws[arg_maxw] ? e_path : arg_maxw;
 						heavier |= ws[e_path] > w;
 						assert(e_path != e);
@@ -199,7 +199,7 @@ public:
 				}
 				// I can connect them!
 				if (in < nbNodes() - 1 && !getEdgeVar(e).isFixed() && !connected) {
-					bool ok = ruf.unite(u, v);
+					const bool ok = ruf.unite(u, v);
 					assert(ok);
 					uf.unite(u, v);
 					in++;
@@ -268,7 +268,7 @@ public:
 		// bool prevention_case = c <= w->getMax();
 
 		int cost = c;
-		for (int e : in_edges_cpy) {
+		for (const int e : in_edges_cpy) {
 			if (substitute[e] == -1 || ws[e] <= ws[substitute[e]]) {
 				continue;
 			}
@@ -375,11 +375,11 @@ class DCMSTSearch : public BranchGroup {
 				tmp.emplace_back(i, s);
 			}
 			for (int e = 0; e < mst_p->nbEdges(); e++) {
-				int i = mst_p->getEndnode(e, 0);
-				int j = mst_p->getEndnode(e, 1);
+				const int i = mst_p->getEndnode(e, 0);
+				const int j = mst_p->getEndnode(e, 1);
 				// Is v the MIN or the SUM?? Its not clear from the paper that
 				// describes the searchs trategy....
-				int v = std::min(tmp[i].second, tmp[j].second);
+				const int v = std::min(tmp[i].second, tmp[j].second);
 				sums.emplace_back(e, v);
 				std::vector<std::pair<int, int> > cost;
 				cost.reserve(mst_p->nbNodes());
@@ -435,8 +435,8 @@ public:
 		// cout <<"dec level "<< engine.decisionLevel()<<endl;
 		// cout <<"sz vs sz_t "<<sz<<" "<<(int)sz_t<<endl;
 		// cout <<"last dec level" <<last_dec_level<<endl;
-		if (last_dec_level >= engine.decisionLevel()) {             // sz > sz_t) {
-			int remove = -(engine.decisionLevel() - last_dec_level);  // sz - sz_t - 1;
+		if (last_dec_level >= engine.decisionLevel()) {                   // sz > sz_t) {
+			const int remove = -(engine.decisionLevel() - last_dec_level);  // sz - sz_t - 1;
 			// cout <<"Removing "<<remove<<endl;
 			for (int i = 0; i < remove; i++) {
 				decisions.pop_back();
@@ -472,7 +472,7 @@ public:
 			*di = nullptr;
 			return true;
 		}
-		int v = to_look[t.idx].first;
+		const int v = to_look[t.idx].first;
 		// cout <<"v "<<v<<endl;
 		if (t.act == 0) {
 			// cout <<"MIN"<< ((IntVar*)x[v+1])->getMin();
@@ -533,7 +533,7 @@ public:
 				decisions.clear();
 				// Will go to decisions.empty()
 			} else {
-				struct Action failed = decisions.back();
+				struct Action const failed = decisions.back();
 				// if (failed.act != 0)
 				//     cout <<"failed.act "<<failed.act<<endl;
 				assert(failed.act == 0 || so.lazy);

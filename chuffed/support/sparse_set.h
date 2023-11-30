@@ -39,7 +39,7 @@ public:
 		if ((U & 1) != 0) {
 			return (sparse[value] < members);
 		}
-		unsigned int a = sparse[value];
+		const unsigned int a = sparse[value];
 
 		if (a < members && dense[a] == value) {
 			return true;
@@ -51,8 +51,8 @@ public:
 
 	virtual bool insert(unsigned int value) {
 		if ((U & 1) != 0) {
-			unsigned int old_dense = sparse[value];
-			unsigned int lost_val = dense[members];
+			const unsigned int old_dense = sparse[value];
+			const unsigned int lost_val = dense[members];
 
 			sparse[value] = members;
 			dense[members] = value;

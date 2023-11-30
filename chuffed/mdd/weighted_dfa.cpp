@@ -32,7 +32,7 @@ struct edge_leq {
 EVLayerGraph::EVLayerGraph() : opcache(OpCache(OPCACHE_SZ)) {
 	// Initialize \ttt
 	nodes.push_back(nullptr);  // true node
-	TravInfo tinfo = {0, -1, 1};
+	const TravInfo tinfo = {0, -1, 1};
 	status.push_back(tinfo);
 
 	intermed = allocNode(intermed_maxsz);
@@ -100,10 +100,10 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 
 	std::memcpy(node, intermed, sizeof(NodeInfo) + (((int)intermed->sz) - 1) * (sizeof(EInfo)));
 
-	int nID = nodes.size();
+	const int nID = nodes.size();
 	cache[node] = nID;
 	nodes.push_back(node);
-	TravInfo tinfo = {0, 0, 0};
+	const TravInfo tinfo = {0, 0, 0};
 	status.push_back(tinfo);
 
 	return nID;
@@ -125,11 +125,11 @@ int EVLayerGraph::traverse(NodeID idx) {
 	prev = idx;
 
 	while (qhead < queue.size()) {
-		int nodeIdx = queue[qhead];
+		const int nodeIdx = queue[qhead];
 
 		NodeRef node(nodes[nodeIdx]);
 		for (unsigned int ei = 0; ei < node->sz; ei++) {
-			int dest = node->edges[ei].dest;
+			const int dest = node->edges[ei].dest;
 			if (status[dest].flag == 0) {
 				status[dest].flag = 1;
 				queue.push(dest);
@@ -156,20 +156,20 @@ EVLayerGraph::NodeRef EVLayerGraph::allocNode(int sz) {
 
 inline void EVLayerGraph::deallocNode(EVLayerGraph::NodeRef node) { free(node); }
 
-inline void create_edges(EVLayerGraph& graph, vec<EVLayerGraph::EInfo>& edges,
+inline void create_edges(EVLayerGraph& /*graph*/, vec<EVLayerGraph::EInfo>& edges,
 												 const vec<EVLayerGraph::NodeID>& previous_layer, const WDFATrans* T,
-												 int dom, int nstates, int soff) {
+												 int dom, int /*nstates*/, int soff) {
 	edges.clear();
 	for (int xi = 0; xi < dom; xi++) {
-		int tidx = soff + xi;
+		const int tidx = soff + xi;
 		const WDFATrans& trans(T[tidx]);
 		int destination = trans.dest;
 		if (destination > 0)  // a valid transition
 		{
 			destination--;
-			EVLayerGraph::NodeID dest = previous_layer[destination];
+			const EVLayerGraph::NodeID dest = previous_layer[destination];
 			if (dest != EVLayerGraph::EVFalse) {
-				EVLayerGraph::EInfo edge = {xi + 1, trans.weight, previous_layer[destination]};
+				const EVLayerGraph::EInfo edge = {xi + 1, trans.weight, previous_layer[destination]};
 				edges.push(edge);
 			}
 		}
@@ -200,21 +200,21 @@ EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom,
 		layers[curr].clear();
 
 		for (int si = 0; si < nstates; si++) {
-			int soff = si * dom;
+			const int soff = si * dom;
 			create_edges(graph, edges, layers[prev], T, dom, nstates, soff);
 			layers[curr].push(graph.insert(vv, edges));
 		}
 	}
 
-	int soff = (q0 - 1) * dom;
+	const int soff = (q0 - 1) * dom;
 	prev = 1 - prev;
 	create_edges(graph, edges, layers[prev], T, dom, nstates, soff);
-	int root = graph.insert(0, edges);
+	const int root = graph.insert(0, edges);
 	return root;
 }
 
 EVEdge EVNode::operator[](int eidx) const {
-	EVLayerGraph::EInfo edge(g->nodes[idx]->edges[eidx]);
+	const EVLayerGraph::EInfo edge(g->nodes[idx]->edges[eidx]);
 	return {edge.val, edge.weight, EVNode(g, edge.dest)};
 }
 

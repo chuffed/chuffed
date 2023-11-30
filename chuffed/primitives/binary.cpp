@@ -19,8 +19,8 @@
 
 template <int U, int V, int R = 0>
 class BinGE : public Propagator {
-	IntView<U> const x;
-	IntView<V> const y;
+	const IntView<U> x;
+	const IntView<V> y;
 	BoolView r;
 
 public:
@@ -32,7 +32,7 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int /*i*/, int /*c*/) override {
 		if ((R == 0) || !r.isFalse()) {
 			pushInQueue();
 		}
@@ -43,8 +43,8 @@ public:
 			return true;
 		}
 
-		int64_t x_max = x.getMax();
-		int64_t y_min = y.getMin();
+		const int64_t x_max = x.getMax();
+		const int64_t y_min = y.getMin();
 
 		// Can finesse!!
 		if ((R != 0) && x_max < y_min) {
@@ -109,7 +109,7 @@ public:
 		//		printf("BinNE: %d %d %d\n", U, V, R);
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int /*i*/, int /*c*/) override {
 		if ((R == 0) || !r.isFalse()) {
 			pushInQueue();
 		}
@@ -183,8 +183,8 @@ public:
 // NOLINTEND
 
 void newBinGE(IntView<> x, IntView<> y, const BoolView& r = bv_true) {
-	int u = x.getType();
-	int v = y.getType();
+	const int u = x.getType();
+	const int v = y.getType();
 	Propagator* p = nullptr;
 
 	BinProp(BinGE, 0, 0);
@@ -198,8 +198,8 @@ void newBinGE(IntView<> x, IntView<> y, const BoolView& r = bv_true) {
 }
 
 void newBinNE(IntView<> x, IntView<> y, const BoolView& r = bv_true) {
-	int u = x.getType();
-	int v = y.getType();
+	const int u = x.getType();
+	const int v = y.getType();
 	Propagator* p = nullptr;
 
 	BinProp(BinNE, 0, 0);
@@ -451,8 +451,8 @@ void int_rel_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 		int_rel_reif(x, t, v, r);
 		return;
 	}
-	BoolView b1(x->getLit(c, LR_GE));
-	BoolView b2(x->getLit(c, LR_LE));
+	const BoolView b1(x->getLit(c, LR_GE));
+	const BoolView b2(x->getLit(c, LR_LE));
 	switch (t) {
 		case IRT_EQ:
 			bool_rel(b1, BRT_AND, b2, r);

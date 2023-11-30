@@ -18,7 +18,7 @@ public:
 
 template <typename T>
 class UF : public UnionFind {
-	int const size;
+	const int size;
 
 public:
 	T* id;
@@ -75,8 +75,8 @@ public:
 		return id[p];
 	}
 	bool unite(int x, int y) override {
-		int i = find(x);
-		int j = find(y);
+		const int i = find(x);
+		const int j = find(y);
 		if (i == j) {
 			return false;
 		}
@@ -99,7 +99,7 @@ public:
 template <typename T>
 class RerootedUnionFind : public UnionFind {
 private:
-	int const size;
+	const int size;
 	T* parents;
 	T nbCC;
 
@@ -157,8 +157,8 @@ int UF<T>::find(int p) {
 }
 template <typename T>
 bool UF<T>::unite(int x, int y) {
-	int i = find(x);
-	int j = find(y);
+	const int i = find(x);
+	const int j = find(y);
 	if (i == j) {
 		return false;
 	}
@@ -184,8 +184,8 @@ UFRootInfo<T>::~UFRootInfo() {
 
 template <typename T>
 bool UFRootInfo<T>::unite(int x, int y) {
-	int i = this->find(x);
-	int j = this->find(y);
+	const int i = this->find(x);
+	const int j = this->find(y);
 	if (i == j) {
 		return false;
 	}
@@ -221,7 +221,7 @@ void RerootedUnionFind<T>::makeRoot(int u) {
 	int parent = parents[i];
 	int last = i;
 	while (parent != i) {
-		int tmp = parent;
+		const int tmp = parent;
 		parent = parents[parent];
 		parents[i] = last;
 		last = i;
@@ -304,7 +304,7 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
 		return path;
 	}
 	int i = v;  //(uinfo.lengthUntilRoot > vinfo.lengthUntilRoot) ? u : v;
-	int limit = (i == u) ? v : u;
+	const int limit = (i == u) ? v : u;
 
 	std::vector<int> seen(size, -1);
 	while (i != limit && i != parents[i]) {  // We stop at the root

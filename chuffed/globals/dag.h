@@ -13,7 +13,7 @@ class DAGPropagator : public DReachabilityPropagator {
 			std::cout << "Size: " << size << '\n';
 			;
 			std::cout << "Sparse: ";
-			for (int i : sparse) {
+			for (const int i : sparse) {
 				std::cout << i << " ";
 			}
 			std::cout << '\n';
@@ -33,13 +33,13 @@ class DAGPropagator : public DReachabilityPropagator {
 			std::cout << "Size: " << size << '\n';
 			;
 			std::cout << "Sparse: ";
-			for (int i : sparse) {
+			for (const int i : sparse) {
 				std::cout << i << " ";
 			}
 			std::cout << '\n';
 
 			std::cout << "Dense: ";
-			for (int i : dense) {
+			for (const int i : dense) {
 				std::cout << i << " ";
 			}
 			std::cout << '\n';

@@ -59,7 +59,7 @@ void LDSB::init() {
 }
 
 void LDSB::processDec(Lit p) {
-	int var_id = sat.c_info[var(p)].cons_id;
+	const int var_id = sat.c_info[var(p)].cons_id;
 	if (var_id == -1) {
 		NOT_SUPPORTED;
 	}
@@ -72,7 +72,7 @@ void LDSB::processDec(Lit p) {
 }
 
 bool LDSB::processImpl(Clause* c) {
-	time_point start = chuffed_clock::now();
+	const time_point start = chuffed_clock::now();
 
 	sym_learnts.clear();
 	sl_origin.clear();
@@ -81,9 +81,9 @@ bool LDSB::processImpl(Clause* c) {
 
 	for (int k = 0; k < sym_learnts.size(); k++) {
 		//	for (int k = 0; k < 1; k++) {
-		Lit p = (*sym_learnts[k])[0];
+		const Lit p = (*sym_learnts[k])[0];
 
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
 			if (LDSB_DEBUG) {
 				printf("Implication ignored\n");
@@ -168,7 +168,7 @@ public:
 		}
 	}
 
-	void processDec(Lit p, int pos) override {
+	void processDec(Lit /*p*/, int pos) override {
 		assert(active[pos]);
 		active[pos] = 0;
 		if (LDSB_DEBUG) {
@@ -181,7 +181,7 @@ public:
 			return true;
 		}
 
-		Lit p = (*r)[0];
+		const Lit p = (*r)[0];
 
 		for (int i = 0; i < n; i++) {
 			if (!so.ldsbta && (active[i] == 0)) {
@@ -190,8 +190,8 @@ public:
 			if (i == pos) {
 				continue;
 			}
-			Lit q = getSymLit(p, vars[pos], vars[i]);
-			lbool b = sat.value(q);
+			const Lit q = getSymLit(p, vars[pos], vars[i]);
+			const lbool b = sat.value(q);
 			if (b == l_True) {
 				continue;
 			}
@@ -231,18 +231,18 @@ public:
 	}
 
 	Lit getSymLit(Lit p, int a, int b) override {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		Lit q = p;
 		// Not very safe!!!!
 		if (var_id == a) {
-			int base_a = ((IntVarEL*)engine.vars[a])->getBaseVLit();
-			int base_b = ((IntVarEL*)engine.vars[b])->getBaseVLit();
+			const int base_a = ((IntVarEL*)engine.vars[a])->getBaseVLit();
+			const int base_b = ((IntVarEL*)engine.vars[b])->getBaseVLit();
 			q = toLit(toInt(p) - base_a + base_b);
 			//			assert(sat.c_info[var(q)].cons_id == b);
 		}
 		if (var_id == b) {
-			int base_a = ((IntVarEL*)engine.vars[a])->getBaseVLit();
-			int base_b = ((IntVarEL*)engine.vars[b])->getBaseVLit();
+			const int base_a = ((IntVarEL*)engine.vars[a])->getBaseVLit();
+			const int base_b = ((IntVarEL*)engine.vars[b])->getBaseVLit();
 			q = toLit(toInt(p) - base_b + base_a);
 			//			assert(sat.c_info[var(q)].cons_id == a);
 		}
@@ -295,8 +295,8 @@ public:
 		}
 	}
 
-	void processDec(Lit p, int pos) override {
-		int v = getLitVal(p);
+	void processDec(Lit p, int /*pos*/) override {
+		const int v = getLitVal(p);
 		if (v == not_a_val) {
 			NOT_SUPPORTED;
 		}
@@ -310,10 +310,10 @@ public:
 		}
 	}
 
-	bool processImpl(Clause* r, int pos) override {
-		Lit p = (*r)[0];
+	bool processImpl(Clause* r, int /*pos*/) override {
+		const Lit p = (*r)[0];
 
-		int v = getLitVal(p);
+		const int v = getLitVal(p);
 		assert(v != not_a_val);
 		if (v < min || v > max) {
 			if (LDSB_DEBUG) {
@@ -336,8 +336,8 @@ public:
 				continue;
 			}
 			//		printf("try %d\n", i);
-			Lit q = getSymLit(p, v, i);
-			lbool b = sat.value(q);
+			const Lit q = getSymLit(p, v, i);
+			const lbool b = sat.value(q);
 			if (b == l_True) {
 				continue;
 			}
@@ -385,14 +385,14 @@ public:
 		Clause& c = *r;
 
 		for (int i = 1; i < c.size(); i++) {
-			int var_id = sat.c_info[var(c[i])].cons_id;
+			const int var_id = sat.c_info[var(c[i])].cons_id;
 			// Not in sym, ignore
 			if (var_id == -1 || !which_vars[var_id]) {
 				ps.push(c[i]);
 				continue;
 			}
 			// In sym, check value
-			int v = getLitVal(c[i]);
+			const int v = getLitVal(c[i]);
 			// Value is ok, ignore
 			if (v != not_a_val) {
 				ps.push(c[i]);
@@ -431,11 +431,11 @@ public:
 	}
 
 	Lit getSymLit(Lit p, int a, int b) override {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (!which_vars[var_id]) {
 			return p;
 		}
-		int v = getLitVal(p);
+		const int v = getLitVal(p);
 		if (v == not_a_val) {
 			NOT_SUPPORTED;
 		}
@@ -454,7 +454,7 @@ public:
 	}
 
 	static int getLitVal(Lit p) {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
 			return not_a_val;
 		}
@@ -510,7 +510,7 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int i, int /*c*/) override {
 		assert(values[i / m][i % m] == unfixed);
 		values[i / m][i % m] = vars[i / m][i % m]->getVal();
 	}
@@ -519,10 +519,10 @@ public:
 
 	void processDec(Lit p, int pos) override {}
 
-	bool processImpl(Clause* r, int pos) override {
-		Lit p = (*r)[0];
+	bool processImpl(Clause* r, int /*pos*/) override {
+		const Lit p = (*r)[0];
 
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
 			return true;
 		}
@@ -530,13 +530,13 @@ public:
 		//	printf("processing var %d implication\n", sat.c_info[var(p)].cons_id);
 
 		for (int i = 0; i < occ[var_id].size(); i++) {
-			int r1 = occ[var_id][i] / m;
+			const int r1 = occ[var_id][i] / m;
 			for (int r2 = 0; r2 < n; r2++) {
 				if (r1 == r2) {
 					continue;
 				}
-				Lit q = getSymLit(p, r1, r2);
-				lbool b = sat.value(q);
+				const Lit q = getSymLit(p, r1, r2);
+				const lbool b = sat.value(q);
 				if (b == l_True) {
 					continue;
 				}
@@ -603,7 +603,7 @@ public:
 	}
 
 	Lit getSymLit(Lit p, int r1, int r2) override {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
 			return p;
 		}
@@ -613,17 +613,17 @@ public:
 
 		for (int i = 0; i < occ[var_id].size(); i++) {
 			//		printf("%d %d %d %d\n", var_id, occ.size(), i, occ[var_id].size());
-			int r = occ[var_id][i] / m;
-			int c = occ[var_id][i] % m;
+			const int r = occ[var_id][i] / m;
+			const int c = occ[var_id][i] % m;
 			// Not very safe!!!!
 			if (r == r1) {
-				int base_r1 = ((IntVarEL*)vars[r1][c])->getBaseVLit();
-				int base_r2 = ((IntVarEL*)vars[r2][c])->getBaseVLit();
+				const int base_r1 = ((IntVarEL*)vars[r1][c])->getBaseVLit();
+				const int base_r2 = ((IntVarEL*)vars[r2][c])->getBaseVLit();
 				return toLit(toInt(p) - base_r1 + base_r2);
 			}
 			if (r == r2) {
-				int base_r1 = ((IntVarEL*)vars[r1][c])->getBaseVLit();
-				int base_r2 = ((IntVarEL*)vars[r2][c])->getBaseVLit();
+				const int base_r1 = ((IntVarEL*)vars[r1][c])->getBaseVLit();
+				const int base_r2 = ((IntVarEL*)vars[r2][c])->getBaseVLit();
 				return toLit(toInt(p) - base_r2 + base_r1);
 			}
 		}
@@ -694,8 +694,8 @@ public:
 		}
 	}
 
-	void processDec(Lit p, int pos) override {
-		int v = getLitVal(p);
+	void processDec(Lit p, int /*pos*/) override {
+		const int v = getLitVal(p);
 		if (v == not_a_val) {
 			NOT_SUPPORTED;
 		}
@@ -704,17 +704,17 @@ public:
 			return;
 		}
 		for (int i = 0; i < occ[v - min].size(); i++) {
-			int p = occ[v - min][i];
+			const int p = occ[v - min][i];
 			if (active[p / m] != 0) {
 				active[p / m] = 0;
 			}
 		}
 	}
 
-	bool processImpl(Clause* r, int pos) override {
-		Lit p = (*r)[0];
+	bool processImpl(Clause* r, int /*pos*/) override {
+		const Lit p = (*r)[0];
 
-		int v = getLitVal(p);
+		const int v = getLitVal(p);
 		if (v == not_a_val) {
 			return true;
 		}
@@ -725,7 +725,7 @@ public:
 		Clause* rc = cleanClause(r);
 
 		for (int k = 0; k < occ[v - min].size(); k++) {
-			int r1 = occ[v - min][k] / m;
+			const int r1 = occ[v - min][k] / m;
 			if (!so.ldsbta && (active[r1] == 0)) {
 				continue;
 			}
@@ -737,8 +737,8 @@ public:
 				if (r1 == r2) {
 					continue;
 				}
-				Lit q = getSymLit(p, r1, r2);
-				lbool b = sat.value(q);
+				const Lit q = getSymLit(p, r1, r2);
+				const lbool b = sat.value(q);
 				if (b == l_True) {
 					continue;
 				}
@@ -785,14 +785,14 @@ public:
 		Clause& c = *r;
 
 		for (int i = 1; i < c.size(); i++) {
-			int var_id = sat.c_info[var(c[i])].cons_id;
+			const int var_id = sat.c_info[var(c[i])].cons_id;
 			// Not in sym, ignore
 			if (var_id == -1 || !which_vars[var_id]) {
 				ps.push(c[i]);
 				continue;
 			}
 			// In sym, check value
-			int v = getLitVal(c[i]);
+			const int v = getLitVal(c[i]);
 			// Value is ok, ignore
 			if (v != not_a_val) {
 				ps.push(c[i]);
@@ -824,23 +824,23 @@ public:
 	}
 
 	Lit getSymLit(Lit p, int r1, int r2) override {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (!which_vars[var_id]) {
 			return p;
 		}
-		int v = getLitVal(p);
+		const int v = getLitVal(p);
 		if (v == not_a_val) {
 			NOT_SUPPORTED;
 		}
 		for (int i = 0; i < occ[v - min].size(); i++) {
-			int r = occ[v - min][i] / m;
-			int c = occ[v - min][i] % m;
+			const int r = occ[v - min][i] / m;
+			const int c = occ[v - min][i] % m;
 			if (r == r1) {
-				int v2 = valseqs[r2][c];
+				const int v2 = valseqs[r2][c];
 				return toLit(toInt(p) - v * 2 + v2 * 2);
 			}
 			if (r == r2) {
-				int v2 = valseqs[r1][c];
+				const int v2 = valseqs[r1][c];
 				return toLit(toInt(p) - v * 2 + v2 * 2);
 			}
 		}
@@ -848,7 +848,7 @@ public:
 	}
 
 	static int getLitVal(Lit p) {
-		int var_id = sat.c_info[var(p)].cons_id;
+		const int var_id = sat.c_info[var(p)].cons_id;
 		if (var_id == -1) {
 			return not_a_val;
 		}

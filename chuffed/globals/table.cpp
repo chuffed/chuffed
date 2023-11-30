@@ -15,7 +15,7 @@ class TableChecker : public Checker {
 	vec<IntVar*> x;
 	vec<vec<int> > t;
 
-	TableChecker(vec<IntVar*>& _x, vec<vec<int> >& _t) { NOT_SUPPORTED; }
+	TableChecker(vec<IntVar*>& /*x*/, vec<vec<int> >& /*t*/) { NOT_SUPPORTED; }
 
 	bool check() override { NOT_SUPPORTED; }
 };
@@ -25,7 +25,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 	for (int i = 0; i < x.size(); i++) {
 		x[i]->specialiseToEL();
 	}
-	int base_lit = 2 * sat.nVars();
+	const int base_lit = 2 * sat.nVars();
 	if (x.size() != 2) {
 		for (int i = 0; i < t.size(); i++) {
 			sat.newVar();
@@ -35,13 +35,13 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 		}
 	}
 	for (int w = 0; w < x.size(); w++) {
-		int sup_off = x[w]->getMin();
+		const int sup_off = x[w]->getMin();
 		vec<vec<Lit> > sup;
 		for (int i = sup_off; i <= x[w]->getMax(); i++) {
 			sup.push();
 		}
 		for (int i = 0; i < t.size(); i++) {
-			int k = t[i][w] - sup_off;
+			const int k = t[i][w] - sup_off;
 			if (k < 0 || k >= sup.size()) {
 				if (DEBUG) {
 					printf("Warning: useless tuple (");
@@ -66,7 +66,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t) {
 			assert(sup[i].size() >= 1);
 			assert(i + sup_off <= x[w]->getMax());
 			sup[i].push(x[w]->getLit(i + sup_off, LR_NE));
-			Lit p = sup[i][0];
+			const Lit p = sup[i][0];
 			sup[i][0] = sup[i].last();
 			sup[i].last() = p;
 			sat.addClause(sup[i]);

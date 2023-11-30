@@ -32,7 +32,7 @@ void pushback_reason(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
 		return;
 	}  // Otherwise, fill in the reason for ~p...
 	for (int i = 1; i < cp->size(); i++) {
-		Lit q((*cp)[i]);
+		const Lit q((*cp)[i]);
 		if (sat.trailpos[var(q)] < 0) {
 			continue;
 		}
@@ -56,7 +56,7 @@ void pushback_reason(const P& is_extractable, Lit p, vec<Lit>& out_nogood) {
 		--i;
 
 		for (int j = 1; j < c->size(); j++) {
-			Lit r((*c)[j]);
+			const Lit r((*c)[j]);
 			if (!(sat.seen[var(r)] & 1)) {
 				sat.seen[var(r)] |= 1;
 				if (sat.trailpos[var(r)] < 0) {
@@ -106,7 +106,7 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 	// There _should_ be at least one atom at the current decision level.
 	int pending = 0;
 	for (int jj = 1; jj < (*cp).size(); ++jj) {
-		Lit p((*cp)[jj]);
+		const Lit p((*cp)[jj]);
 		assert(sat.value(p) == l_False);
 
 		sat.seen[var(p)] |= 1;
@@ -138,7 +138,7 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 			}
 
 			// Found the next literal.
-			Lit p(ctrail[index]);
+			const Lit p(ctrail[index]);
 			pending--;
 
 			assert(sat.value(p) == l_True);
@@ -183,7 +183,7 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 			assert(&c);
 
 			for (int j = 1; j < c.size(); j++) {
-				Lit q = c[j];
+				const Lit q = c[j];
 				if (!(sat.seen[var(q)] & 1)) {
 					sat.seen[var(q)] |= 1;
 					assert(sat.value(q) == l_False);

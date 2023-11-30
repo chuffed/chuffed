@@ -33,7 +33,7 @@ IntVarLL::IntVarLL(const IntVar& other) : IntVar(other), ld(2), li(0), hi(1) {
 	// explanation will use the reason which includes the actual
 	// bounds literals.
 	valLit = Lit(sat.nVars(), true);
-	int v = sat.newVar(1, ChannelInfo(var_id, 1, 0, 0));
+	const int v = sat.newVar(1, ChannelInfo(var_id, 1, 0, 0));
 	sat.flags[v].setDecidable(false);
 	sat.flags[v].setUIPable(false);
 	sat.flags[v].setLearnable(false);
@@ -122,7 +122,7 @@ inline Lit IntVarLL::getGELit(int v) {
 	}
 	assert(v >= min);
 	int ni = li;
-	int prev = prevDomVal(v);
+	const int prev = prevDomVal(v);
 	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = nextDomVal(v);
 	}
@@ -134,7 +134,7 @@ inline Lit IntVarLL::getGELit(int v) {
 		return Lit(ld[ni].var, true);
 	}
 	// overshot, create new var and insert before ni
-	int mi = getLitNode();
+	const int mi = getLitNode();
 #if DEBUG_VERBOSE
 	std::cerr << "created new literal: " << mi << ": " << varLabel << "(" << this << ") >= " << v
 						<< " || " << varLabel << "(" << this << ") <= " << prev << "\n";
@@ -187,9 +187,9 @@ Lit IntVarLL::getLit(int64_t v, LitRel t) {
 
 // Use when you've just set [x >= v]
 inline void IntVarLL::channelMin(int v, Lit p) {
-	Reason r(~p);
+	const Reason r(~p);
 	int ni;
-	int prev = prevDomVal(v);
+	const int prev = prevDomVal(v);
 	for (ni = ld[li].next; ld[ni].val < prev; ni = ld[ni].next) {
 		sat.cEnqueue(Lit(ld[ni].var, true), r);
 	}
@@ -199,7 +199,7 @@ inline void IntVarLL::channelMin(int v, Lit p) {
 
 // Use when you've just set [x <= v]
 inline void IntVarLL::channelMax(int v, Lit p) {
-	Reason r(~p);
+	const Reason r(~p);
 	int ni;
 	assert(!vals || vals[v]);
 	for (ni = ld[hi].prev; ld[ni].val > v; ni = ld[ni].prev) {
@@ -211,7 +211,7 @@ inline void IntVarLL::channelMax(int v, Lit p) {
 
 inline void IntVarLL::updateFixed() {
 	if (isFixed()) {
-		Reason r(getMinLit(), getMaxLit());
+		const Reason r(getMinLit(), getMaxLit());
 		sat.cEnqueue(valLit, r);
 		changes |= EVENT_F;
 	}
@@ -222,7 +222,7 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = nextDomVal(v);
 	}
-	Lit p = getGELit(v);
+	const Lit p = getGELit(v);
 	if (channel) {
 		sat.cEnqueue(p, r);
 	}
@@ -243,7 +243,7 @@ bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = prevDomVal(v);
 	}
-	Lit p = getLELit(v);
+	const Lit p = getLELit(v);
 	if (channel) {
 		sat.cEnqueue(p, r);
 	}
@@ -275,7 +275,7 @@ bool IntVarLL::setVal(int64_t v, Reason r, bool channel) {
 	return true;
 }
 
-bool IntVarLL::remVal(int64_t v, Reason r, bool channel) {
+bool IntVarLL::remVal(int64_t /*v*/, Reason /*r*/, bool channel) {  // NOLINT
 	assert(channel);
 	if (!engine.finished_init) {
 		NEVER;
@@ -284,8 +284,8 @@ bool IntVarLL::remVal(int64_t v, Reason r, bool channel) {
 }
 
 Lit IntVarLL::createLit(int _v) {
-	int v = _v >> 2;
-	int s = 1 - _v % 2;
+	const int v = _v >> 2;
+	const int s = 1 - _v % 2;
 	int ni = 1;
 	while (ld[ni].val > v) {
 		ni = ld[ni].prev;
@@ -295,7 +295,7 @@ Lit IntVarLL::createLit(int _v) {
 		return Lit(ld[ni].var, s != 0);
 	}
 	// overshot, create new var and insert before ni
-	int mi = getLitNode();
+	const int mi = getLitNode();
 	ld[mi].var = sat.getLazyVar(ChannelInfo(var_id, 1, 1, v));
 	ld[mi].val = v;
 	ld[mi].prev = ni;
@@ -303,8 +303,8 @@ Lit IntVarLL::createLit(int _v) {
 	ld[ni].next = mi;
 	ld[ld[mi].next].prev = mi;
 
-	Lit p = Lit(ld[ld[mi].next].var, true);
-	Lit q = Lit(ld[ld[mi].prev].var, false);
+	const Lit p = Lit(ld[ld[mi].next].var, true);
+	const Lit q = Lit(ld[ld[mi].prev].var, false);
 
 	//	printf("created var %d, ", ld[mi].var);
 
@@ -314,7 +314,7 @@ Lit IntVarLL::createLit(int _v) {
 		r->temp_expl = 1;
 		r->sz = 2;
 		(*r)[1] = ~p;
-		int l = sat.getLevel(var(p));
+		const int l = sat.getLevel(var(p));
 		sat.rtrail[l].push(r);
 		sat.aEnqueue(Lit(ld[mi].var, true), r, l);
 	}
@@ -324,7 +324,7 @@ Lit IntVarLL::createLit(int _v) {
 		r->temp_expl = 1;
 		r->sz = 2;
 		(*r)[1] = ~q;
-		int l = sat.getLevel(var(q));
+		const int l = sat.getLevel(var(q));
 		sat.rtrail[l].push(r);
 		sat.aEnqueue(Lit(ld[mi].var, false), r, l);
 	}

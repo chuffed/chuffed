@@ -17,7 +17,7 @@
 
 class LatinSquare : public Problem {
 public:
-	int const n;
+	const int n;
 	vec<vec<IntVar*> > x;  // squares labels
 
 	LatinSquare(int _n) : n(_n) {

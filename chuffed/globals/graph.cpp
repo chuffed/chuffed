@@ -87,7 +87,7 @@ void GraphPropagator::attachToAll() {
 	}
 }
 
-void GraphPropagator::wakeup(int i, int c) { pushInQueue(); }
+void GraphPropagator::wakeup(int /*i*/, int /*c*/) { pushInQueue(); }
 
 bool GraphPropagator::propagate() {
 	for (int i = 0; i < nbNodes(); i++) {
@@ -118,7 +118,7 @@ bool GraphPropagator::coherence_outedges(int node) {
  */
 bool GraphPropagator::coherence_outedges(int node, std::vector<edge_id>& remvd_e) {
 	for (int i = 0; i < adj[node].size(); i++) {
-		edge_id edge = adj[node][i];
+		const edge_id edge = adj[node][i];
 		// Edge with missing an endnode
 		if (es[edge].isFixed() && es[edge].getVal() == 1) {
 			if (so.lazy) {
@@ -160,7 +160,7 @@ bool GraphPropagator::coherence_innodes(int edge) {
  */
 bool GraphPropagator::coherence_innodes(int edge, std::vector<node_id>& added_n) {
 	for (int i = 0; i < endnodes[edge].size(); i++) {
-		int u = endnodes[edge][i];
+		const int u = endnodes[edge][i];
 		if (vs[u].isFixed() && vs[u].getVal() == 0) {
 			if (so.lazy) {
 				vec<Lit> ps;

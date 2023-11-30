@@ -51,10 +51,10 @@ inline void SAT::setConfl(Lit p, Lit q) {
 }
 
 inline void SAT::untrailToPos(vec<Lit>& t, int p) {
-	int dl = decisionLevel();
+	const int dl = decisionLevel();
 
 	for (int i = t.size(); i-- > p;) {
-		int x = var(t[i]);
+		const int x = var(t[i]);
 		assigns[x] = toInt(l_Undef);
 #if PHASE_SAVING
 		if (so.phase_saving >= 1 || (so.phase_saving == 1 && dl >= l0)) polarity[x] = sign(t[i]);
@@ -106,7 +106,7 @@ void SAT::init() {
 }
 
 int SAT::newVar(int n, ChannelInfo ci) {
-	int s = assigns.size();
+	const int s = assigns.size();
 
 	watches.growBy(n);
 	watches.growBy(n);
@@ -151,7 +151,7 @@ int SAT::getLazyVar(ChannelInfo ci) {
 
 void SAT::removeLazyVar(int v) {
 	return;
-	ChannelInfo& ci = c_info[v];
+	const ChannelInfo& ci = c_info[v];
 	assert(assigns[v] == toInt(l_Undef));
 	assert(watches[2 * v].size() == 0);
 	assert(watches[2 * v + 1].size() == 0);
@@ -305,7 +305,7 @@ void SAT::removeClause(Clause& c) {
 		//            learntClauseScore[c.clauseID()] = c.rawActivity();
 		/* if (so.debug) { */
 		if (so.learnt_stats) {
-			int id = c.clauseID();
+			const int id = c.clauseID();
 			learntStatsStream << learntClauseString[id];
 			learntStatsStream << ",";
 			learntStatsStream << c.rawActivity();
@@ -417,12 +417,12 @@ void SAT::enqueue(Lit p, Reason r) {
 	 * "\n"; */
 	/* } */
 	assert(value(p) == l_Undef);
-	int v = var(p);
+	const int v = var(p);
 	assigns[v] = toInt(lbool(!sign(p)));
 	trailpos[v] = engine.trailPos();
 	reason[v] = r;
 	trail.last().push(p);
-	ChannelInfo& ci = c_info[v];
+	const ChannelInfo& ci = c_info[v];
 	if (ci.cons_type == 1) {
 		engine.vars[ci.cons_id]->channel(ci.val, static_cast<LitRel>(ci.val_type),
 																		 static_cast<int>(sign(p)));
@@ -437,7 +437,7 @@ void SAT::cEnqueue(Lit p, Reason r) {
 	 * << "\n"; */
 	/* } */
 	assert(value(p) != l_True);
-	int v = var(p);
+	const int v = var(p);
 	if (value(p) == l_False) {
 		if (so.lazy) {
 			if (r == nullptr) {
@@ -464,7 +464,7 @@ void SAT::aEnqueue(Lit p, Reason r, int l) {
 							<< " and l=" << l << "\n";
 	}
 	assert(value(p) == l_Undef);
-	int v = var(p);
+	const int v = var(p);
 	assigns[v] = toInt(lbool(!sign(p)));
 	trailpos[v] = engine.trail_lim[l] - 1;
 	reason[v] = r;
@@ -511,7 +511,7 @@ bool SAT::propagate() {
 	while (qhead < trail.size()) {
 		num_props++;
 
-		Lit p = trail[qhead++];  // 'p' is enqueued fact to propagate.
+		const Lit p = trail[qhead++];  // 'p' is enqueued fact to propagate.
 		vec<WatchElem>& ws = watches[toInt(p)];
 
 		if (ws.size() == 0) {
@@ -523,12 +523,12 @@ bool SAT::propagate() {
 		WatchElem* end;
 
 		for (i = j = ws, end = i + ws.size(); i != end;) {
-			WatchElem& we = *i;
+			const WatchElem& we = *i;
 			switch (we.d.type) {
 				case 1: {
 					// absorbed binary clause
 					*j++ = *i++;
-					Lit q = toLit(we.d.d2);
+					const Lit q = toLit(we.d.d2);
 					switch (toInt(value(q))) {
 						case 0:
 							enqueue(q, ~p);
@@ -560,7 +560,7 @@ bool SAT::propagate() {
 						continue;
 					}
 
-					Lit false_lit = ~p;
+					const Lit false_lit = ~p;
 
 					// Make sure the false literal is data[1]:
 					if (c[0] == false_lit) {
@@ -675,7 +675,7 @@ void SAT::printStats() const {
 bool SAT::finished() {
 	assert(so.vsids);
 	while (!order_heap.empty()) {
-		int x = order_heap[0];
+		const int x = order_heap[0];
 		if ((assigns[x] == 0) && flags[x].decidable) {
 			return false;
 		}
@@ -691,7 +691,7 @@ DecInfo* SAT::branch() {
 
 	assert(!order_heap.empty());
 
-	int next = order_heap.removeMin();
+	const int next = order_heap.removeMin();
 
 	assert(!assigns[next]);
 	assert(flags[next].decidable);

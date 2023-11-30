@@ -127,7 +127,7 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 			int cause1 = it->cause1;
 			int cause2 = it->cause2;
 			int bridge = it->bridge;
-			bool isArt = bridge < 0;
+			const bool isArt = bridge < 0;
 			if (isArt) {
 				bridge = -(bridge + 1);
 			}
@@ -147,8 +147,8 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 			// becasue the reason is worse than the reason in newEdge
 			// UPDATE: just do it here....
 			if (isArt && toBePropagated[bridge] != -1) {
-				int e = toBePropagated[bridge];
-				int a = bridge;
+				const int e = toBePropagated[bridge];
+				const int a = bridge;
 				Clause* r = nullptr;
 				if (so.lazy) {
 					vec<Lit> ps;
@@ -211,14 +211,14 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 				ps.push(getNodeVar(cause1).getValLit());
 				assert(getNodeVar(cause2).isFixed());
 				ps.push(getNodeVar(cause2).getValLit());
-				for (int reason : reasons) {
+				for (const int reason : reasons) {
 					assert(getEdgeVar(reason).isFixed());
 					ps.push(getEdgeVar(reason).getValLit());
 				}
 				if (TREEPROP_DEBUG) {
 					std::cout << "BRIDGE " << bridge << " caused by " << cause1 << " and " << cause2
 										<< " and edges ";
-					for (int reason : reasons) {
+					for (const int reason : reasons) {
 						std::cout << reason << " ";
 					}
 					std::cout << '\n';
@@ -253,8 +253,8 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
  * return true if no conflict, false otherwise (explanation built inside)
  */
 bool TreePropagator::cycle_detect(int edge) {
-	int u = getEndnode(edge, 0);
-	int v = getEndnode(edge, 1);
+	const int u = getEndnode(edge, 0);
+	const int v = getEndnode(edge, 1);
 
 	if (uf.connected(u, v)) {
 		std::vector<int> pathn = ruf.connectionsFromTo(u, v);
@@ -289,8 +289,8 @@ bool TreePropagator::cycle_detect(int edge) {
 void TreePropagator::precycle_detect(int unk_edge) {
 	assert(!getEdgeVar(unk_edge).isFixed());
 
-	int u = getEndnode(unk_edge, 0);
-	int v = getEndnode(unk_edge, 1);
+	const int u = getEndnode(unk_edge, 0);
+	const int v = getEndnode(unk_edge, 1);
 
 	if (uf.connected(u, v)) {
 		std::vector<int> pathn = ruf.connectionsFromTo(u, v);
@@ -349,16 +349,16 @@ void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>
 	if (getNodeVar(u).isFixed() && getNodeVar(u).isTrue()) {
 		hits.push(u);
 	}
-	int prevHitsTop = hits.top();
+	const int prevHitsTop = hits.top();
 
 	int topChangedTo = -1;
 
 	for (int i = 0; i < adj[u].size(); i++) {
-		int e = adj[u][i];
+		const int e = adj[u][i];
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			continue;
 		}
-		int v = OTHER(getEndnode(e, 0), getEndnode(e, 1), u);
+		const int v = OTHER(getEndnode(e, 0), getEndnode(e, 1), u);
 		if (!visited[v]) {
 			s.push(e);
 			parent[v] = u;
@@ -436,7 +436,7 @@ void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>
  **/
 edge_id TreePropagator::findEdge(int u, int v, int idx) {
 	if (u > v) {  // If I only read one, I only need to update one...
-		int tmp = u;
+		const int tmp = u;
 		u = v;
 		v = tmp;
 	}
@@ -450,7 +450,7 @@ void TreePropagator::moveInEdgeToFront(int e) {
 	int u = getEndnode(e, 0);
 	int v = getEndnode(e, 1);
 	if (u > v) {  // If I only read one, I only need to update one...
-		int tmp = u;
+		const int tmp = u;
 		u = v;
 		v = tmp;
 	}
@@ -462,7 +462,7 @@ void TreePropagator::moveInEdgeToFront(int e) {
 	}
 	assert(i < nodes2edge[u][v].size());
 
-	int tmp = nodes2edge[u][v][0];
+	const int tmp = nodes2edge[u][v][0];
 	nodes2edge[u][v][0] = nodes2edge[u][v][i];
 	nodes2edge[u][v][i] = tmp;
 }
@@ -535,7 +535,7 @@ TreePropagator::TreePropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<e
 
 TreePropagator::~TreePropagator() { delete[] isTerminal; }
 
-void TreePropagator::wakeup(int i, int c) {
+void TreePropagator::wakeup(int i, int /*c*/) {
 	if (TREEPROP_DEBUG) {
 		std::cout << "Wakeup" << '\n';
 		std::cout << __FILE__ << " " << __LINE__ << " i " << i << '\n';
@@ -544,7 +544,7 @@ void TreePropagator::wakeup(int i, int c) {
 	// Check it's an event on edges
 	if (i >= nbNodes() && i < nbNodes() + nbEdges()) {
 		// EVENT ON EDGES
-		int j = i - nbNodes();
+		const int j = i - nbNodes();
 		if (last_state_e[j] != UNK) {
 			return;
 		}
@@ -575,7 +575,7 @@ bool TreePropagator::propagate() {
 
 	std::unordered_set<int>::iterator it;
 	for (it = newFixedE.begin(); it != newFixedE.end(); ++it) {
-		int j = *it;  // newFixedE[i];
+		const int j = *it;  // newFixedE[i];
 		if (getEdgeVar(j).isTrue()) {
 			if (!propagateNewEdge(j)) {
 				return false;
@@ -588,7 +588,7 @@ bool TreePropagator::propagate() {
 	}
 
 	for (it = newFixedN.begin(); it != newFixedN.end(); ++it) {
-		int j = *it;  // newFixedN[i];
+		const int j = *it;  // newFixedN[i];
 		if (!isTerminal[j]) {
 			nb_innodes = nb_innodes + ((getNodeVar(j).isTrue()) ? 1 : 0);
 		}
@@ -622,9 +622,9 @@ void TreePropagator::getCC(int node, std::vector<bool>& visited, CC* cc) {
 	cc->nodesIds.push_back(node);
 
 	for (int i = 0; i < adj[node].size(); i++) {
-		int e = adj[node][i];
+		const int e = adj[node][i];
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
-			int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), node);
+			const int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), node);
 			if (!visited[other]) {
 				getCC(other, visited, cc);
 			}
@@ -642,7 +642,7 @@ bool TreePropagator::propagateNewNode(int node) {
 
 	std::vector<bool> blue(nbNodes());
 	bool didBlueDFS = false;
-	int& count = newNodeCompleteCheckup_Count;
+	const int& count = newNodeCompleteCheckup_Count;
 	if (newNodeCompleteCheckup) {
 		articulations(node, blue, newNodeCompleteCheckup_Count);
 		didBlueDFS = true;
@@ -651,11 +651,11 @@ bool TreePropagator::propagateNewNode(int node) {
 
 	// See if the new node is bringing a potential cycle
 	for (int i = 0; i < adj[node].size(); i++) {
-		int e = adj[node][i];
+		const int e = adj[node][i];
 		if (getEdgeVar(e).isFixed()) {
 			continue;
 		}
-		int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), node);
+		const int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), node);
 		if (!getNodeVar(other).isFixed() || getNodeVar(other).isFalse()) {
 			continue;
 		}
@@ -679,7 +679,7 @@ bool TreePropagator::propagateRemNode(int node) {
 		1) Coherence
 	 */
 	std::vector<edge_id> remvd_e;
-	bool ok = coherence_outedges(node, remvd_e);
+	const bool ok = coherence_outedges(node, remvd_e);
 	newFixedE.insert(remvd_e.begin(), remvd_e.end());
 	return ok;  // GraphPropagator::coherence_outedges(node);
 }
@@ -699,8 +699,8 @@ bool TreePropagator::propagateNewEdge(int edge) {
 		return false;
 	}
 
-	int u = getEndnode(edge, 0);
-	int v = getEndnode(edge, 1);
+	const int u = getEndnode(edge, 0);
+	const int v = getEndnode(edge, 1);
 	unite(u, v);
 
 	if (!GraphPropagator::coherence_innodes(edge)) {
@@ -737,11 +737,11 @@ bool TreePropagator::propagateRemEdge(int edge) {
 
 	// Detect if we leave a node of degree 0
 	for (int i = 0; i < 2; i++) {
-		int node = getEndnode(edge, i);
+		const int node = getEndnode(edge, i);
 
 		// count the number of edges still connecting this node
 		int degree = 0;
-		for (int e : adj[node]) {
+		for (const int e : adj[node]) {
 			if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
 				degree++;
 			}
@@ -774,7 +774,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
 						assert(getNodeVar(unreachableNodeIn).isFixed());
 						ps.push(getNodeVar(unreachableNodeIn).getValLit());
 
-						for (int k : adj[node]) {
+						for (const int k : adj[node]) {
 							assert(getEdgeVar(k).isFixed());
 							ps.push(getEdgeVar(k).getValLit());
 						}
@@ -810,7 +810,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
 						ps.push();
 						assert(getNodeVar(unreachableNodeIn).isFixed());
 						ps.push(getNodeVar(unreachableNodeIn).getValLit());
-						for (int k : adj[node]) {
+						for (const int k : adj[node]) {
 							assert(getEdgeVar(k).isFixed());
 							ps.push(getEdgeVar(k).getValLit());
 						}
@@ -847,7 +847,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
 
 	std::vector<bool> blue(nbNodes());
 	bool didBlueDFS = false;
-	int& count = newNodeCompleteCheckup_Count;
+	const int& count = newNodeCompleteCheckup_Count;
 	if (newNodeCompleteCheckup) {
 		articulations(node, blue, newNodeCompleteCheckup_Count);
 		didBlueDFS = true;
@@ -886,7 +886,7 @@ void TreePropagator::getUnkEdgesInCC(int r, std::vector<bool>& visited,
 																		 std::unordered_set<edge_id>& unk) {
 	visited[r] = true;
 	for (int i = 0; i < adj[r].size(); i++) {
-		int e = adj[r][i];
+		const int e = adj[r][i];
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			continue;
 		}
@@ -894,7 +894,7 @@ void TreePropagator::getUnkEdgesInCC(int r, std::vector<bool>& visited,
 			unk.insert(e);
 			continue;
 		}
-		int other = getEndnode(e, 0) == r ? getEndnode(e, 1) : getEndnode(e, 0);
+		const int other = getEndnode(e, 0) == r ? getEndnode(e, 1) : getEndnode(e, 0);
 		if (visited[other]) {
 			continue;
 		}
@@ -909,13 +909,13 @@ void TreePropagator::DFSBlue(int r, std::vector<bool>& visited, int& count) {
 	visited[r] = true;
 	count++;
 	for (int i = 0; i < adj[r].size(); i++) {
-		int e = adj[r][i];
+		const int e = adj[r][i];
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			continue;
 		}
-		int e1 = getEndnode(e, 1);
-		int e0 = getEndnode(e, 0);
-		int other = e0 == r ? e1 : e0;
+		const int e1 = getEndnode(e, 1);
+		const int e0 = getEndnode(e, 0);
+		const int other = e0 == r ? e1 : e0;
 		if (getNodeVar(other).isFixed() && getNodeVar(other).isFalse()) {
 			continue;
 		}
@@ -933,10 +933,10 @@ void TreePropagator::DFSPink(int r, std::vector<bool>& visited, std::vector<bool
 														 std::unordered_set<edge_id>& badEdges) {
 	visited[r] = true;
 	for (int i = 0; i < adj[r].size(); i++) {
-		int e = adj[r][i];
-		int e1 = getEndnode(e, 1);
-		int e0 = getEndnode(e, 0);
-		int other = e0 == r ? e1 : e0;
+		const int e = adj[r][i];
+		const int e1 = getEndnode(e, 1);
+		const int e0 = getEndnode(e, 0);
+		const int other = e0 == r ? e1 : e0;
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 			if (blue[other]) {
 				badEdges.insert(e);
@@ -960,10 +960,10 @@ void TreePropagator::walkIsland(int r, std::vector<bool>& visited, int avoidBrid
 	visited[r] = true;
 
 	for (int i = 0; i < adj[r].size(); i++) {
-		int e = adj[r][i];
-		int e1 = getEndnode(e, 1);
-		int e0 = getEndnode(e, 0);
-		int other = e0 == r ? e1 : e0;
+		const int e = adj[r][i];
+		const int e1 = getEndnode(e, 1);
+		const int e0 = getEndnode(e, 0);
+		const int other = e0 == r ? e1 : e0;
 		if (isArt && other == avoidBridge) {
 			continue;
 		}
@@ -993,10 +993,10 @@ void TreePropagator::walkBrokenBridges(int r, std::vector<bool>& reachable,
 	// cout << "Walking my island again.... :" << r<<" "<<avoidBridge<<endl;
 	visited[r] = true;
 	for (int i = 0; i < adj[r].size(); i++) {
-		int e = adj[r][i];
-		int e1 = getEndnode(e, 1);
-		int e0 = getEndnode(e, 0);
-		int other = e0 == r ? e1 : e0;
+		const int e = adj[r][i];
+		const int e1 = getEndnode(e, 1);
+		const int e0 = getEndnode(e, 0);
+		const int other = e0 == r ? e1 : e0;
 		if (isArt && other == avoidBridge) {
 			continue;
 		}
@@ -1031,15 +1031,15 @@ bool TreePropagator::checkFinalSatisfied() {
 	std::vector<bool> vis = std::vector<bool>(nbNodes(), false);
 	std::vector<int> par = std::vector<int>(nbNodes(), -1);
 	while (!s.empty()) {
-		int curr = s.top();
+		const int curr = s.top();
 		s.pop();
 		vis[curr] = true;
 		for (unsigned int i = 0; i < adj[curr].size(); i++) {
-			int e = adj[curr][i];
+			const int e = adj[curr][i];
 			if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isFalse()) {
 				continue;
 			}
-			int o = getOtherEndnode(e, curr);
+			const int o = getOtherEndnode(e, curr);
 			if (par[curr] == o || o == curr) {
 				continue;
 			}
@@ -1098,8 +1098,8 @@ public:
 			}
 		}
 		for (int edge = 0; edge < p->nbEdges(); edge++) {
-			int from = p->getEndnode(edge, 0);
-			int to = p->getEndnode(edge, 1);
+			const int from = p->getEndnode(edge, 0);
+			const int to = p->getEndnode(edge, 1);
 			dist[from][to] = 1;
 			inf[from][to] = false;
 			dist[to][from] = 1;
@@ -1123,7 +1123,7 @@ public:
 		for (auto* p : TreePropagator::tree_propagators) {
 			leaving_cc.emplace_back();
 			border_cc.emplace_back();
-			int last_t = leaving_cc.size() - 1;
+			const int last_t = leaving_cc.size() - 1;
 			std::vector<bool> visited = std::vector<bool>(p->nbNodes(), false);
 			for (int n = 0; n < p->nbNodes(); n++) {
 				if (!p->getNodeVar(n).isFixed() || p->getNodeVar(n).isFalse()) {
@@ -1133,15 +1133,15 @@ public:
 				if (!visited[n]) {
 					leaving_cc[last_t].emplace_back();
 					border_cc[last_t].emplace_back();
-					int last_cc = leaving_cc[last_t].size() - 1;
+					const int last_cc = leaving_cc[last_t].size() - 1;
 					std::queue<int> q;
 					q.push(n);
 					while (!q.empty()) {
-						int c = q.front();
+						const int c = q.front();
 						q.pop();
 						visited[c] = true;
-						std::vector<int> adj = p->getAdjacentEdges(c);
-						for (int e : adj) {
+						const std::vector<int> adj = p->getAdjacentEdges(c);
+						for (const int e : adj) {
 							if (!p->getEdgeVar(e).isFixed()) {
 								leaving_cc[last_t][last_cc].emplace_back(e, p->getOtherEndnode(e, c));
 								if (border_cc[last_t][last_cc].empty() || border_cc[last_t][last_cc].back() != c) {
@@ -1204,12 +1204,12 @@ public:
 					}
 					for (unsigned int l1 = 0; l1 < leaving_cc[i][cc1].size(); l1++) {
 						for (unsigned int b2 = 0; b2 < border_cc[i][cc2].size(); b2++) {
-							int h1 = leaving_cc[i][cc1][l1].second;
-							int h2 = border_cc[i][cc2][b2];
+							const int h1 = leaving_cc[i][cc1][l1].second;
+							const int h2 = border_cc[i][cc2][b2];
 							if (inf[h1][h2]) {
 								continue;
 							}
-							int d = dist[h1][h2];
+							const int d = dist[h1][h2];
 							if (min_d == -1 || min_d > d) {
 								min_t = i;
 								min_e = leaving_cc[i][cc1][l1].first;
@@ -1217,9 +1217,9 @@ public:
 								min_d = d;
 							} else if (min_d == d) {
 								// Prefer one that goes to a mandatory node
-								int e = leaving_cc[i][cc1][l1].first;
-								int h = TreePropagator::tree_propagators[i]->getEndnode(e, 0);
-								int t = TreePropagator::tree_propagators[i]->getEndnode(e, 1);
+								const int e = leaving_cc[i][cc1][l1].first;
+								const int h = TreePropagator::tree_propagators[i]->getEndnode(e, 0);
+								const int t = TreePropagator::tree_propagators[i]->getEndnode(e, 1);
 								if (TreePropagator::tree_propagators[i]->getNodeVar(h).isFixed() &&
 										TreePropagator::tree_propagators[i]->getNodeVar(t).isFixed()) {
 									min_t = i;
@@ -1264,7 +1264,7 @@ public:
 					}
 					}*/
 		}
-		int arg_min = min_t * TreePropagator::tree_propagators[0]->nbEdges() + min_e;
+		const int arg_min = min_t * TreePropagator::tree_propagators[0]->nbEdges() + min_e;
 		if (false && arg_min >= 0) {
 			std::cout << "Tree " << min_t << " taking "
 								<< TreePropagator::tree_propagators[0]->getEndnode(min_e, 0) << " "

@@ -22,8 +22,8 @@ public:
 	vec<IntVar*> x;   // Vectex labels
 	IntVar* colours;  // Number of colours
 
-	GraphColouring(char* filename) {
-		int max_degree = v - 1;
+	GraphColouring(char* /*filename*/) {
+		const int max_degree = v - 1;
 
 		// Create vars
 

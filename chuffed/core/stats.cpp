@@ -12,7 +12,7 @@
 
 void Engine::printStats() {
 	auto total_time = std::chrono::duration_cast<duration>(chuffed_clock::now() - start_time);
-	duration search_time = total_time - init_time;
+	const duration search_time = total_time - init_time;
 
 	// MiniZinc standard statistics
 	printf("%%%%%%mzn-stat: nodes=%lld\n", nodes);

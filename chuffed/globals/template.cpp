@@ -29,7 +29,7 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) override { pushInQueue(); }
+	void wakeup(int /*i*/, int /*c*/) override { pushInQueue(); }
 
 	bool propagate() override { return true; }
 

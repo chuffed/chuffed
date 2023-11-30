@@ -22,8 +22,6 @@
 #define REFLECT 2
 #define RESTR 4
 
-#include <utility>
-
 // hlist.h
 //=======================================
 // Some syntactic sugar for cons-cell style lists;
@@ -447,7 +445,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 	hlist<intpair> dfa;
 	MDD pentmdd = tab.fff();
 
-	MDD restr = tab.ttt();
+	MDD const restr = tab.ttt();
 
 	//  if( flags&RESTR )
 	//  {
@@ -475,7 +473,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 			vec<vec<int> > transition;
 			int count = 0;
 			while (!dfa.is_empty()) {
-				intpair node = head(dfa);
+				const intpair node = head(dfa);
 
 				assert(transition.size() == count);
 				transition.push();
@@ -513,8 +511,8 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 			vec<int> accepts;
 			// accepts.push_back(count-1);
 			accepts.push(count);
-			int q0 = 1;
-			MDD orientation =
+			const int q0 = 1;
+			MDD const orientation =
 					MDD(&tab, fd_regular(tab, height * width, count + 1, transition, q0, accepts, false));
 			pentmdd = (restr & orientation) | pentmdd;
 		}
@@ -537,7 +535,7 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 				vec<vec<int> > transition;
 				int count = 0;
 				while (!dfa.is_empty()) {
-					intpair node = head(dfa);
+					const intpair node = head(dfa);
 
 					assert(transition.size() == count);
 					transition.push();
@@ -579,8 +577,8 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 				// transition, accepts)),
 				//                         pentmdd );
 				accepts.push(count);
-				int q0 = 1;
-				MDD orientation =
+				const int q0 = 1;
+				MDD const orientation =
 						MDD(&tab, fd_regular(tab, height * width, count + 1, transition, q0, accepts, false));
 				pentmdd = (restr & orientation) | pentmdd;
 			}
@@ -600,8 +598,8 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 class Pent : public Problem {
 public:
 	Pent(Opts& opts) {
-		MDDOpts mopts;
-		// == Read shapes. ==
+		const MDDOpts mopts;
+		// == Read const shapes. ==
 		gzFile file(gzdopen(0, "rb"));
 		Parse::StreamBuffer in(file);
 
@@ -616,12 +614,12 @@ public:
 			while (*in == '#') {
 				Parse::skipLine(in);
 			}
-			int r = Parse::parseInt(in);
-			int c = Parse::parseInt(in);
+			const int r = Parse::parseInt(in);
+			const int c = Parse::parseInt(in);
 			(void)c;
 
 			//      parseInt(in);
-			int count = Parse::parseInt(in);
+			const int count = Parse::parseInt(in);
 			counts = cons(count, counts);
 			nshapes += count;
 			Parse::skipLine(in);
@@ -665,12 +663,12 @@ public:
 		int shapeid = nshapes - 1;
 		while (!shapes.is_empty()) {
 			// Remember to correct for extra column.
-			int reps = head(counts);
+			const int reps = head(counts);
 			for (int rep = 0; rep < reps; rep++) {
 				//         std::cout << "START:" << shapeid << std::endl;
 				MDDTable tab((width + 1) * height);
 
-				MDD b(pentFD(tab, nshapes + 1, shapeid, height, width + 1, head(shapes), opts));
+				MDD const b(pentFD(tab, nshapes + 1, shapeid, height, width + 1, head(shapes), opts));
 
 				addMDD(inst, b, mopts);
 

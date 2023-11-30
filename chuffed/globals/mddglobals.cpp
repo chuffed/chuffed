@@ -70,10 +70,10 @@ static void addMDDProp(vec<IntVar*>& x, MDDTable& tab, MDDNodeInt m, const MDDOp
 // x: Vars | q: # states | s: alphabet size | d[state,symbol] -> state | q0: start state | f:
 // accepts States range from 1..q (0 is reserved as dead)
 //
-void mdd_regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f, bool offset,
-								 const MDDOpts& mopts) {
+void mdd_regular(vec<IntVar*>& x, int q, int /*s*/, vec<vec<int> >& d, int q0, vec<int>& f,
+								 bool offset, const MDDOpts& mopts) {
 	MDDTable tab(x.size());
-	MDDNodeInt m(fd_regular(tab, x.size(), q + 1, d, q0, f, offset));
+	const MDDNodeInt m(fd_regular(tab, x.size(), q + 1, d, q0, f, offset));
 	addMDDProp(x, tab, m, mopts);
 }
 
@@ -93,7 +93,7 @@ void mdd_table(vec<IntVar*>& x, vec<vec<int> >& t, const MDDOpts& mopts) {
 	MDDTable tab(x.size());
 
 	// Assumes a positive table.
-	MDDNodeInt m(mdd_table(tab, x.size(), doms, t, true));
+	const MDDNodeInt m(mdd_table(tab, x.size(), doms, t, true));
 
 	//   tab.print_mdd_tikz(m);
 
@@ -154,7 +154,7 @@ MDDNodeInt fd_regular(MDDTable& tab, int n, int nstates, vec<vec<int> >& transit
 		prevlevel++;
 	}
 
-	MDDNodeInt out(states[q0 - 1][states[0].size() - 1]);
+	const MDDNodeInt out(states[q0 - 1][states[0].size() - 1]);
 
 	return out;
 }
@@ -172,12 +172,12 @@ void wmdd_cost_regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, vec<vec
 		vec<int>& w_q(w[qi]);
 
 		for (int vi = 0; vi < s; vi++) {
-			WDFATrans t = {w_q[vi], d_q[vi]};
+			const WDFATrans t = {w_q[vi], d_q[vi]};
 			T.push(t);
 		}
 	}
 
 	EVLayerGraph g;
-	EVLayerGraph::NodeID root = wdfa_to_layergraph(g, x.size(), s, (WDFATrans*)T, q, q0, f);
+	const EVLayerGraph::NodeID root = wdfa_to_layergraph(g, x.size(), s, (WDFATrans*)T, q, q0, f);
 	evgraph_to_wmdd(x, cost, g, root, mopts);
 }

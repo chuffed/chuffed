@@ -22,16 +22,16 @@
 template <int U = 0>
 class SubCircuit : public Propagator {
 public:
-	int const size;
+	const int size;
 
 	IntView<U>* const x;
-	bool const check;    // use 'check' algorithm
-	bool const prevent;  // use 'prevent' algorithm
-	bool const scc;      // use strongly connected components algorithm
-	bool const pruneRoot;
-	bool const pruneSkip{true};
-	bool const fixReq{true};
-	bool const pruneWithin;
+	const bool check;    // use 'check' algorithm
+	const bool prevent;  // use 'prevent' algorithm
+	const bool scc;      // use strongly connected components algorithm
+	const bool pruneRoot;
+	const bool pruneSkip{true};
+	const bool fixReq{true};
+	const bool pruneWithin;
 	vec<int> chain_start;
 	bool* inCircuit;
 	bool* isStartChain;
@@ -169,7 +169,7 @@ public:
 			}
 
 			// find the end of the chain, and remove evidence vars which are in this chain
-			int startVar = chain_start[chainNumber];
+			const int startVar = chain_start[chainNumber];
 			int chainLength = 1;
 			int endVar = startVar;
 			if (so.preventevidence != 5) {
@@ -186,7 +186,7 @@ public:
 			if (x[endVar].remValNotR(startVar) && evidenceOptions.size() > 0) {
 				Clause* r = nullptr;
 				if (so.lazy) {
-					int evidenceVar = chooseEvidenceVar(evidenceOptions, so.preventevidence);
+					const int evidenceVar = chooseEvidenceVar(evidenceOptions, so.preventevidence);
 
 					if (so.preventevidence != 5) {
 						evidenceOptions.remove(startVar);
@@ -217,7 +217,7 @@ public:
 						}
 						assert(inStartChain.size() + outside.size() + 1 == size);
 						// reason is nothing in start of chain can reach outside chain
-						int explSize = inStartChain.size() * outside.size() + 2;
+						const int explSize = inStartChain.size() * outside.size() + 2;
 						r = Reason_new(explSize);
 
 						explainAcantreachB(r, 1, inStartChain, outside);
@@ -239,14 +239,14 @@ public:
 		vec<int> varsIn;
 		varsIn.clear();
 		for (int i = 0; i < potentialVarIndices.size(); i++) {
-			int varindex = potentialVarIndices[i];
+			const int varindex = potentialVarIndices[i];
 			if (!x[varindex].indomain(varindex)) {
 				varsIn.push(varindex);
 			}
 		}
 		// now choose one using our selection method
 		if (varsIn.size() > 0) {
-			int chosen = chooseEvidenceVar(varsIn, so.sccevidence);
+			const int chosen = chooseEvidenceVar(varsIn, so.sccevidence);
 			assert(!x[chosen].indomain(chosen));
 			bool found = false;
 			for (int i = 0; i < potentialVarIndices.size(); i++) {
@@ -329,8 +329,8 @@ public:
 					}
 
 					// Now check one node is definitely in
-					Lit evidenceIn = getEvidenceLit(inside);
-					Lit evidenceOut = getEvidenceLit(outside);
+					const Lit evidenceIn = getEvidenceLit(inside);
+					const Lit evidenceOut = getEvidenceLit(outside);
 					if (evidenceOut != lit_True) {
 						Clause* r = nullptr;
 						if (so.lazy) {
@@ -368,7 +368,7 @@ public:
 
 				// If w is from a subtree before the previous one prune this edge (if that option is set)
 				if (pruneSkip && index[child] < startPrevSubtree) {
-					Lit evidence = getEvidenceLit(prev);
+					const Lit evidence = getEvidenceLit(prev);
 					if (evidence != lit_True) {
 						// XXX [AS] Commented following line, because propagator related statistics
 						// should be collected within the propagator class.
@@ -421,7 +421,7 @@ public:
 				}
 			}
 
-			Lit evidenceInside = getEvidenceLit(inside);  // at this point inside excludes this node
+			const Lit evidenceInside = getEvidenceLit(inside);  // at this point inside excludes this node
 
 			inside.push(thisNode);  // now include this node
 
@@ -435,7 +435,7 @@ public:
 					explainAcantreachB(r, 2, inside, outside);
 				}
 				for (int i = 0; i < outside.size(); i++) {
-					int varOutside = outside[i];
+					const int varOutside = outside[i];
 					if (x[varOutside].setValNotR(varOutside)) {
 						// XXX [AS] Commented following line, because propagator related statistics
 						// should be collected within the propagator class.
@@ -538,7 +538,7 @@ public:
 
 		// explore children of the root node
 		for (typename IntView<U>::iterator i = x[root].begin(); i != x[root].end(); ++i) {
-			int child = *i;
+			const int child = *i;
 
 			if (index[child] == -1)  // if haven't explored this yet
 			{
@@ -559,7 +559,7 @@ public:
 					}
 				}
 
-				Lit evidenceThis = getEvidenceLit(thisSubtree);
+				const Lit evidenceThis = getEvidenceLit(thisSubtree);
 				Lit evidenceOther = getEvidenceLit(prev);
 				vec<int> alloutside;
 				if (prev.size() == 0) {
@@ -625,9 +625,9 @@ public:
 								this_later.push(later[i]);
 							}
 
-							int size1 = earlier.size() * prev_this_later.size();
-							int size2 = prev.size() * this_later.size();
-							int size3 = thisSubtree.size() * prev_later.size();
+							const int size1 = earlier.size() * prev_this_later.size();
+							const int size2 = prev.size() * this_later.size();
+							const int size3 = thisSubtree.size() * prev_later.size();
 							assert(prev_later.size() > 0);
 							Clause* r = Reason_new(size1 + size2 + size3 + 2);
 							(*r)[1] = evidenceThis;
@@ -688,9 +688,9 @@ public:
 									this_later.push(later[i]);
 								}
 
-								int size1 = earlier.size() * prev_this_later.size();
-								int size2 = prev.size() * this_later.size();
-								int size3 = thisSubtree.size() * prev_later.size();
+								const int size1 = earlier.size() * prev_this_later.size();
+								const int size2 = prev.size() * this_later.size();
+								const int size3 = thisSubtree.size() * prev_later.size();
 								r = Reason_new(size1 + size2 + size3 + 2);
 								(*r)[1] = evidenceThis;
 								(*r)[2] = evidenceOther;
@@ -739,11 +739,11 @@ public:
 					notseen.push(var);
 				}
 			}
-			int numNotSeen = size - nodesSeen;
+			const int numNotSeen = size - nodesSeen;
 			assert(seen.size() == nodesSeen);
 			assert(notseen.size() == numNotSeen);
 
-			Lit evidenceSeen = getEvidenceLit(seen);
+			const Lit evidenceSeen = getEvidenceLit(seen);
 			if (evidenceSeen != lit_True) {
 				// XXX [AS] Commented following line, because propagator related statistics
 				// should be collected within the propagator class.
@@ -757,7 +757,7 @@ public:
 					explainAcantreachB(r, 2, seen, notseen);
 				}
 				for (int i = 0; i < notseen.size(); i++) {
-					int outsideVar = notseen[i];
+					const int outsideVar = notseen[i];
 					if (x[outsideVar].setValNotR(outsideVar)) {
 						if (!x[outsideVar].setVal(outsideVar, r)) {
 							return false;
@@ -787,7 +787,7 @@ public:
 			}
 			assert(earlierSubtree.size() > 0);
 			assert(earlierSubtree.size() + lastSubtreeAndOutside.size() + 1 == size);
-			Lit evidenceLast = getEvidenceLit(lastSubtreeAndOutside);
+			const Lit evidenceLast = getEvidenceLit(lastSubtreeAndOutside);
 			if (evidenceLast != lit_True) {
 				// Build the reason if neccessary (it will be the same for all of the pruned edges)
 				Clause* r = nullptr;
@@ -821,7 +821,7 @@ public:
 
 		// Perform the propagations
 		for (int i = 0; i < propQueue.size(); i++) {
-			PROP p = propQueue[i];
+			PROP const p = propQueue[i];
 			// fprintf(stderr, "propagating\n");
 			if (p.fix) {
 				if (x[p.var].setValNotR(p.val)) {
@@ -845,7 +845,7 @@ public:
 		// then any variable not in the circuit must have its own index as a value
 		for (int i = 0; i < new_fixed.size(); i++) {
 			// new_fixed should only contain variables fixed to values other than their own indices
-			int startVar = new_fixed[i];
+			const int startVar = new_fixed[i];
 			assert(x[startVar].isFixed());
 			assert(x[startVar].getVal() != startVar);
 			int nextVar = startVar;
@@ -906,7 +906,7 @@ public:
 						r = Reason_new(inCycle.size() * notInCycle.size() + 2);
 						// the first literal is an evidence literal from inside the circuit
 						// choose the one from the highest level?
-						int chosenVar = chooseEvidenceVar(inCycle, so.checkevidence);
+						const int chosenVar = chooseEvidenceVar(inCycle, so.checkevidence);
 						(*r)[1] = x[chosenVar].getLit(chosenVar, LR_EQ);  // xi == i (is false)
 
 						if (so.checkexpl == 2) {  // inside can't reach out
@@ -948,7 +948,7 @@ public:
 				}
 				// now do the failing one(s) if there are any
 				if (failIndices.size() > 0) {
-					int chosenIndex = chooseEvidenceVar(failIndices, so.checkevidence);
+					const int chosenIndex = chooseEvidenceVar(failIndices, so.checkevidence);
 					if (x[chosenIndex].setVal(chosenIndex, r)) {
 						fprintf(stderr, "unexpected success\n");
 					}
@@ -1029,9 +1029,9 @@ public:
 					// sat.getLevel(var(x[options[0]].getLit(options[0], LR_NE))))
 					fprintf(stderr, "not same\n");
 				}
-				int v = options[i];
-				Lit p = x[v].getLit(v, LR_EQ);
-				int satvar = var(p);
+				const int v = options[i];
+				const Lit p = x[v].getLit(v, LR_EQ);
+				const int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?
 				if (sat.trailpos[satvar] > highestLevel)
@@ -1054,9 +1054,9 @@ public:
 			// int lowestLevel = sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ)));
 			int bestVar = options[0];
 			for (int i = 0; i < options.size(); i++) {
-				int v = options[i];
-				Lit p = x[v].getLit(v, LR_EQ);
-				int satvar = var(p);
+				const int v = options[i];
+				const Lit p = x[v].getLit(v, LR_EQ);
+				const int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
 				// Maybe it shoud be replaced by sat.getLevel(.)?
 				if (sat.trailpos[satvar] < lowestLevel)
@@ -1077,7 +1077,7 @@ public:
 		if (selectionMethod == 6) {
 			// fprintf(stderr, "random\n");
 			std::uniform_int_distribution<int> rnd_option(0, options.size() - 1);
-			int bestIndex = options[rnd_option(engine.rnd)];
+			const int bestIndex = options[rnd_option(engine.rnd)];
 			return options[bestIndex];
 		}
 		return options[0];
@@ -1109,7 +1109,7 @@ public:
 						}
 						for (int i = 0; i < size; i++) {
 							if (x[i].isFixed()) {
-								int v = x[i].getVal();
+								const int v = x[i].getVal();
 								if (valueTaken[v]) {
 									alldiffbroken = true;
 								}
@@ -1128,7 +1128,7 @@ public:
 					return propagateCheck();
 				}
 			} else {
-				int root = chooseRoot();
+				const int root = chooseRoot();
 				if (root < 0)  // means all vars are fixed self-cycles
 				{
 					if (check) {

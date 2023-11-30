@@ -33,7 +33,7 @@
 
 // Code for additional option handling.
 static char* hasPrefix(char* str, const char* prefix) {
-	int len = strlen(prefix);
+	const int len = strlen(prefix);
 	if (strncmp(str, prefix, len) == 0) {
 		return str + len;
 	}
@@ -48,17 +48,17 @@ enum GapT { G_R = 0, G_B = 0, G_L = 0, maxG = 1 };
 
 class ShiftSched : public Problem {
 public:
-	int const staff;
-	int const shifts;
-	int const acts;
-	int const dom;
+	const int staff;
+	const int shifts;
+	const int acts;
+	const int dom;
 	const vec<vec<int> > demand;
 	vec<vec<IntVar*> > xv;
 
 	vec<IntVar*> staff_cost;
 	IntVar* cost;
 
-	ShiftSched(int _staff, int _shifts, int _acts, vec<vec<int> >& _demand, int mode)
+	ShiftSched(int _staff, int _shifts, int _acts, vec<vec<int> >& _demand, int /*mode*/)
 			: staff(_staff), shifts(_shifts), acts(_acts), dom(acts + maxG), demand(_demand) {
 		for (int ww = 0; ww < staff; ww++) {
 			xv.push();
@@ -112,7 +112,7 @@ public:
 		}
 
 		EVLayerGraph graph;
-		EVLayerGraph::NodeID gcirc_evgraph(mdd_to_layergraph(graph, gcirc, slot_cost));
+		const EVLayerGraph::NodeID gcirc_evgraph(mdd_to_layergraph(graph, gcirc, slot_cost));
 
 		// Enforce the schedule for each worker.
 		MDDOpts mopts;
@@ -181,19 +181,19 @@ public:
 	}
 
 	static CFG::CFG buildSchedG(int n_acts, int first, int last) {
-		unsigned int rest(n_acts + G_R);
-		unsigned int brk(n_acts + G_B);
-		unsigned int lunch(n_acts + G_L);
+		const unsigned int rest(n_acts + G_R);
+		const unsigned int brk(n_acts + G_B);
+		const unsigned int lunch(n_acts + G_L);
 		CFG::CFG g(n_acts + maxG);
 
-		CFG::Sym S(g.newVar());
+		const CFG::Sym S(g.newVar());
 		g.setStart(S);
 
-		CFG::Sym R(g.newVar());
-		CFG::Sym P(g.newVar());
-		CFG::Sym W(g.newVar());
-		CFG::Sym L(g.newVar());
-		CFG::Sym F(g.newVar());
+		const CFG::Sym R(g.newVar());
+		const CFG::Sym P(g.newVar());
+		const CFG::Sym W(g.newVar());
+		const CFG::Sym L(g.newVar());
+		const CFG::Sym F(g.newVar());
 
 		CFG::Cond actLB(g.attach(new CFG::SpanLB(4)));
 		CFG::Cond lunEQ(g.attach(new CFG::Span(4, 4)));
@@ -203,7 +203,7 @@ public:
 
 		std::vector<CFG::Sym> activities;
 		for (int ii = 0; ii < n_acts; ii++) {
-			CFG::Sym act(g.newVar());
+			const CFG::Sym act(g.newVar());
 			activities.push_back(act);
 			g.prod(open(act), CFG::E() << ii << act);
 			g.prod(open(act), CFG::E() << ii);
@@ -240,7 +240,7 @@ public:
 			for (int ii = 0; ii < shifts; ii++) {
 				//        if(ii)
 				//            printf(", ");
-				int val(xv[ww][ii]->getVal());
+				const int val(xv[ww][ii]->getVal());
 				if (val < acts) {
 					os << val;
 				} else {

@@ -36,11 +36,11 @@ public:
 	vec<int> deletion_cost;
 	vec<int> substitution_cost;
 
-	int const seqSize;
+	const int seqSize;
 	IntView<>* const seq1;
 	IntView<>* const seq2;
 
-	IntView<> const ed;
+	const IntView<> ed;
 
 	const ExplLevel explLevel = E_FULL;
 
@@ -155,7 +155,7 @@ public:
 		std::cout << "]" << '\n';
 #endif
 
-		int ub = std::min(2 * seqSize * max_id_cost, lastBound + cellChanges * 2 * max_id_cost);
+		const int ub = std::min(2 * seqSize * max_id_cost, lastBound + cellChanges * 2 * max_id_cost);
 
 		updateDpMatrix(ub);
 		cellChanges = 0;
@@ -172,7 +172,7 @@ public:
 		//
 
 		// calc edit distance
-		int editDistanceLB = getEditDistanceLB();
+		const int editDistanceLB = getEditDistanceLB();
 
 		lastBound = editDistanceLB;
 
@@ -225,7 +225,7 @@ private:
 	int getMinimumDeletionCosts(IntView<>* const iVar) {
 		int min_deletion_costs = INT_MAX;
 		// find minimum deletion costs
-		for (int it : *iVar) {
+		for (const int it : *iVar) {
 			if (it > 0) {
 				min_deletion_costs = std::min(min_deletion_costs, deletion_cost[it - 1]);
 			} else {
@@ -240,7 +240,7 @@ private:
 	int getMinimumInsertionCosts(IntView<>* const jVar) {
 		int min_insertion_costs = INT_MAX;
 		// find minimum insertion costs
-		for (int it : *jVar) {
+		for (const int it : *jVar) {
 			if (it > 0) {
 				min_insertion_costs = std::min(min_insertion_costs, insertion_cost[it - 1]);
 			} else {
@@ -256,8 +256,8 @@ private:
 		int min_substitution_costs = INT_MAX;
 
 		// find minimum substitution costs
-		for (int i_val : *iVar) {
-			for (int j_val : *jVar) {
+		for (const int i_val : *iVar) {
+			for (const int j_val : *jVar) {
 				if (i_val == 0 && j_val == 0) {
 					return 0;
 				}
@@ -286,20 +286,20 @@ private:
 		if (i == 0 && j == 0) {
 			// top left position is always 0
 		} else if (i == 0) {
-			int min_insertion_costs = getMinimumInsertionCosts(jVar);
+			const int min_insertion_costs = getMinimumInsertionCosts(jVar);
 			dpMatrix[matrixCoord(i, j)] = dpMatrix[matrixCoord(0, j - 1)] + min_insertion_costs;
 		} else if (j == 0) {
-			int min_deletion_costs = getMinimumDeletionCosts(iVar);
+			const int min_deletion_costs = getMinimumDeletionCosts(iVar);
 			dpMatrix[matrixCoord(i, j)] = dpMatrix[matrixCoord(i - 1, 0)] + min_deletion_costs;
 		} else {
 			int minChange = seqSize * 2 * max_id_cost;
 
 			if (j - 1 >= i - d) {
-				int min_insertion_costs = getMinimumInsertionCosts(jVar);
+				const int min_insertion_costs = getMinimumInsertionCosts(jVar);
 				minChange = std::min(minChange, dpMatrix[matrixCoord(i, j - 1)] + min_insertion_costs);
 			}
 			if (j < i + d) {
-				int min_deletion_costs = getMinimumDeletionCosts(iVar);
+				const int min_deletion_costs = getMinimumDeletionCosts(iVar);
 				minChange = std::min(minChange, dpMatrix[matrixCoord(i - 1, j)] + min_deletion_costs);
 			}
 
@@ -307,8 +307,8 @@ private:
 				// both values fixed and equal
 				minChange = std::min(minChange, dpMatrix[matrixCoord(i - 1, j - 1)]);
 			} else {
-				int minDiagonalCost = getMinimumSubstitutionCost(iVar, jVar);
-				int diagonalCost = dpMatrix[matrixCoord(i - 1, j - 1)] + minDiagonalCost;
+				const int minDiagonalCost = getMinimumSubstitutionCost(iVar, jVar);
+				const int diagonalCost = dpMatrix[matrixCoord(i - 1, j - 1)] + minDiagonalCost;
 				minChange = std::min(minChange, diagonalCost);
 			}
 			dpMatrix[matrixCoord(i, j)] = minChange;
@@ -337,15 +337,15 @@ private:
 		}
 
 		// d = distance to diagonal that should be calculated in the matrix
-		int d = upperBound / min_id_cost + std::max(possible_0_inserts, possible_0_deletes);
+		const int d = upperBound / min_id_cost + std::max(possible_0_inserts, possible_0_deletes);
 
 #ifndef NDEBUG
 		std::cout << "d = " << d << '\n';
 #endif
 
 		for (int i = 0; i < seqSize + 1; i++) {
-			int startCol = std::max(0, i - d);
-			int endCol = std::min(seqSize, i + d);
+			const int startCol = std::max(0, i - d);
+			const int endCol = std::min(seqSize, i + d);
 			for (int j = startCol; j < endCol + 1; j++) {
 				updateDpPosition(i, j, d);
 			}
@@ -361,7 +361,7 @@ private:
 	Clause* getNaiveExplanation() const {
 		// count number of possible values in total
 
-		int clauseSize = seqSize * 2 + 1;
+		const int clauseSize = seqSize * 2 + 1;
 
 		Clause* r = Reason_new(clauseSize);
 
@@ -387,7 +387,7 @@ private:
 		std::cout << " Sequence1: " << '\n';
 		for (int i = 0; i < seqSize; i++) {
 			std::cout << "{";
-			for (int it : seq1[i]) {
+			for (const int it : seq1[i]) {
 				std::cout << it << ",";
 			}
 			if (seq1[i].isFixed()) {
@@ -400,7 +400,7 @@ private:
 		std::cout << " Sequence2: " << '\n';
 		for (int i = 0; i < seqSize; i++) {
 			std::cout << "{";
-			for (int it : seq2[i]) {
+			for (const int it : seq2[i]) {
 				std::cout << it << ",";
 			}
 			if (seq2[i].isFixed()) {

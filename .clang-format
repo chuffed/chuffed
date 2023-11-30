@@ -7,6 +7,7 @@ TabWidth: 2
 ColumnLimit: 100
 DerivePointerAlignment: false
 AccessModifierOffset: -2
+QualifierAlignment: Left
 
 IncludeBlocks: Regroup
 IncludeCategories:

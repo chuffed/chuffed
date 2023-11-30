@@ -60,7 +60,7 @@ public:
 	vec<vec<IntVar*> > b2i_slab_colour;  // whether slab i is assigned colour j
 
 	SteelMill(int n) : n_orders(n), n_slabs(n) {
-		for (int& csplib_capacitie : csplib_capacities) {
+		for (const int& csplib_capacitie : csplib_capacities) {
 			capacities.push(csplib_capacitie);
 		}
 		for (int i = 0; i < n_orders; i++) {
@@ -120,7 +120,7 @@ public:
 		// Channel constraints for slab/colour
 		for (int i = 0; i < n_slabs; i++) {
 			for (int j = 0; j < n_colours; j++) {
-				BoolView t = newBoolVar();
+				const BoolView t = newBoolVar();
 				bool2int(t, b2i_slab_colour[i][j]);
 				for (int k = 0; k < n_orders; k++) {
 					if (colour[k] != j + 1) {

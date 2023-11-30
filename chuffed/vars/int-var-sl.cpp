@@ -75,9 +75,9 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 	el = (IntVarEL*)v;
 
 	// Override literal name values
-	std::string label = intVarString[el];
+	const std::string label = intVarString[el];
 	for (int i = 0; i < values.size(); i++) {
-		std::string val = std::to_string(values[i]);
+		const std::string val = std::to_string(values[i]);
 		litString[toInt(el->getLit(i, LR_NE))] = label + "!=";
 		litString[toInt(el->getLit(i, LR_NE))] += val;
 		litString[toInt(el->getLit(i, LR_EQ))] = label + "==";
@@ -90,11 +90,11 @@ IntVarSL::IntVarSL(const IntVar& other, vec<int>& _values) : IntVar(other), valu
 
 	// rechannel channel info
 	for (int i = 0; i < values.size(); i++) {
-		Lit p = el->getLit(i, LR_NE);
+		const Lit p = el->getLit(i, LR_NE);
 		sat.c_info[var(p)].cons_id = var_id;
 	}
 	for (int i = 0; i <= values.size(); i++) {
-		Lit p = el->getLit(i, LR_GE);
+		const Lit p = el->getLit(i, LR_GE);
 		sat.c_info[var(p)].cons_id = var_id;
 	}
 
@@ -147,11 +147,11 @@ int IntVarSL::find_index(int v, RoundMode type) const {
 Lit IntVarSL::getLit(int64_t v, LitRel t) {
 	switch (t) {
 		case LR_NE: {
-			int u = find_index(v, ROUND_NONE);
+			const int u = find_index(v, ROUND_NONE);
 			return (u == -1 ? lit_True : el->getLit(u, LR_NE));
 		}
 		case LR_EQ: {
-			int u = find_index(v, ROUND_NONE);
+			const int u = find_index(v, ROUND_NONE);
 			return (u == -1 ? lit_False : el->getLit(u, LR_EQ));
 		}
 		case LR_GE:
@@ -187,7 +187,7 @@ bool IntVarSL::setMax(int64_t v, Reason r, bool channel) {
 
 bool IntVarSL::setVal(int64_t v, Reason r, bool channel) {
 	assert(setValNotR(v));
-	int u = find_index(v, ROUND_NONE);
+	const int u = find_index(v, ROUND_NONE);
 	if (u == -1) {
 		if (channel) {
 			sat.cEnqueue(lit_False, r);
@@ -209,7 +209,7 @@ bool IntVarSL::setVal(int64_t v, Reason r, bool channel) {
 
 bool IntVarSL::remVal(int64_t v, Reason r, bool channel) {
 	assert(remValNotR(v));
-	int u = find_index(v, ROUND_NONE);
+	const int u = find_index(v, ROUND_NONE);
 	assert(u != -1);
 	if (!el->remVal(u, r, channel)) {
 		return false;

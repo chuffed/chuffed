@@ -51,9 +51,9 @@ void mdd_gcc(vec<IntVar*>& vs, CardOp op, const vec<int>& cards) {
 			vars.last().push(tab.vareq(ii, jj));
 		}
 	}
-	MDD ret(circ_gcc(tab.fff(), vars, op, cards));
+	MDD const ret(circ_gcc(tab.fff(), vars, op, cards));
 
-	MDDOpts opts;
+	const MDDOpts opts;
 	addMDD(vs, ret, opts);
 }
 
@@ -128,12 +128,12 @@ public:
 		// sat_sets_mid_order(&S,nNurses*nDays,nShifts,tempvars,false);
 		//
 		// Coverage
-		vec<int> cov_props;  // Coverage propagator ids.
+		const vec<int> cov_props;  // Coverage propagator ids.
 		for (int j = 0; j < nDays; j++) {
 			if (opts.gcard == 0) {
 				for (int i = 0; i < nShifts; i++) {
 					// Required coverage for the day.
-					int req = coverage[j][i];
+					const int req = coverage[j][i];
 					if (req == 0) {
 						continue;
 					}
@@ -224,13 +224,13 @@ public:
 		accepts.push(2);
 		accepts.push(3);
 
-		int nStates = 4;
-		int q0 = 1;
+		const int nStates = 4;
+		const int q0 = 1;
 
 		MDDTable tab(nDays);
 
-		MDDNodeInt _spacing = fd_regular(tab, nDays, nStates, trans, q0, accepts, false);
-		MDD spacing(&tab, _spacing);
+		const MDDNodeInt _spacing = fd_regular(tab, nDays, nStates, trans, q0, accepts, false);
+		MDD const spacing(&tab, _spacing);
 		/* /
 		MDD spacing = tab.ttt();
 		/ */
@@ -281,11 +281,11 @@ public:
 			bsz.push(5);
 		}
 
-		MDD seq(multi_sequence(tab, nDays, bmin, bmax, bsz));
-		MDD seqprop(seq & spacing);
+		MDD const seq(multi_sequence(tab, nDays, bmin, bmax, bsz));
+		MDD const seqprop(seq & spacing);
 		//      MDD seqprop(spacing);
 
-		MDDOpts mopts;
+		const MDDOpts mopts;
 		vec<IntVar*> inst;
 		for (int i = 0; i < nNurses; i++) {
 			// Multi-sequence constraint
@@ -322,7 +322,7 @@ protected:
 };
 
 static char* hasPrefix(char* str, const char* prefix) {
-	int len = strlen(prefix);
+	const int len = strlen(prefix);
 	if (strncmp(str, prefix, len) == 0) {
 		return str + len;
 	}

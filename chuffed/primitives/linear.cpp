@@ -25,7 +25,7 @@ class LinearGE : public Propagator {
 	vec<int> pos;
 	vec<IntView<2 * S> > x;
 	vec<IntView<2 * S + 1> > y;
-	int const c;
+	const int c;
 	BoolView r;
 
 	// persistent data
@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int /*i*/, int /*c*/) override {
 		if ((R == 0) || !r.isFalse()) {
 			pushInQueue();
 		}
@@ -85,7 +85,7 @@ public:
 		//		if (R && max_sum < 0) setDom2(r, setVal, 0, x.size()+y.size());
 
 		if ((R != 0) && max_sum < 0) {
-			int64_t v = 0;
+			const int64_t v = 0;
 			if (r.setValNotR(v != 0)) {
 				Reason expl;
 				if (so.lazy) {
@@ -116,7 +116,7 @@ public:
 		//		}
 
 		for (int i = fix_x; i < x.size(); i++) {
-			int64_t v = x[i].getMax() - max_sum;
+			const int64_t v = x[i].getMax() - max_sum;
 			if (x[i].setMinNotR(v)) {
 				Reason expl;
 				if (so.lazy) {
@@ -139,7 +139,7 @@ public:
 		}
 
 		for (int i = fix_y; i < y.size(); i++) {
-			int64_t v = y[i].getMax() - max_sum;
+			const int64_t v = y[i].getMax() - max_sum;
 			if (y[i].setMinNotR(v)) {
 				Reason expl;
 				if (so.lazy) {
@@ -164,7 +164,7 @@ public:
 		return true;
 	}
 
-	Clause* explain(Lit p, int inf_id) override {
+	Clause* explain(Lit /*p*/, int inf_id) override {
 		if (inf_id == x.size() + y.size()) {
 			inf_id = -1;
 		}
@@ -189,10 +189,10 @@ public:
 template <int U, int V, int R = 0>
 class LinearNE : public Propagator {
 	int sp;
-	int const sz;
+	const int sz;
 	IntView<U>* x;
 	IntView<V>* y;
-	int const c;
+	const int c;
 	BoolView r;
 
 	// persistent state
@@ -228,7 +228,7 @@ public:
 		//		printf("LinearNE: %d %d %d %d %d\n", sp, sz, U, V, R);
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int i, int /*c*/) override {
 		if (i < sz) {
 			num_unfixed = num_unfixed - 1;
 			if (i < sp) {

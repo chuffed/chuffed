@@ -14,7 +14,7 @@
 
 class Queens : public Problem {
 public:
-	int const n;
+	const int n;
 	vec<IntVar*> x;  // placement of queens
 
 	Queens(int _n) : n(_n) {

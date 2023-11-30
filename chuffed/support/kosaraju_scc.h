@@ -35,9 +35,9 @@ public:
 
 	virtual ~KosarajuSCC() = default;
 
-	virtual bool ignore_edge(int e) { return false; }
-	virtual bool ignore_node(int n) { return false; }
-	virtual bool mandatory_node(int n) { return false; }
+	virtual bool ignore_edge(int /*e*/) { return false; }
+	virtual bool ignore_node(int /*n*/) { return false; }
+	virtual bool mandatory_node(int /*n*/) { return false; }
 
 	// The main function that finds and prints strongly connected
 	// components

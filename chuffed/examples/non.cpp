@@ -96,7 +96,7 @@ public:
 
 	void print(std::ostream& os) override {
 		for (int i = 0; i < x.size(); i++) {
-			int v = x[i]->getVal();
+			const int v = x[i]->getVal();
 			os << i << ": " << v << "\n";
 		}
 	}
@@ -110,7 +110,7 @@ static void nonogram(vec<IntVar*>& x, vec<int>& blocks) {
 
 	if (so.mdd) {
 		//        mdd_regular(x, dfa.size()+1, 2, dfa, 1, accepts);
-		MDDOpts mopts;
+		const MDDOpts mopts;
 		mdd_regular(x, dfa.size(), 2, dfa, 1, accepts, true, mopts);
 	} else {
 		//        regular(x, dfa.size()+1, 2, dfa, 1, accepts);

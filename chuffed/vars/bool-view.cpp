@@ -9,7 +9,7 @@
 #include "chuffed/vars/vars.h"
 
 void BoolView::attach(Propagator* p, int pos, int eflags) const {
-	WatchElem we(p->prop_id, pos);
+	const WatchElem we(p->prop_id, pos);
 	if ((eflags & EVENT_L) != 0 || (eflags & EVENT_F) != 0) {
 		sat.watches[2 * v + static_cast<int>(s)].push(we);
 	}
@@ -24,7 +24,7 @@ void BoolView::attach(Propagator* p, int pos, int eflags) const {
 double BoolView::getScore(VarBranch vb) {
 	double min = 0;
 	double max = 1;
-	bool fixed = isFixed();
+	const bool fixed = isFixed();
 	if (fixed) {
 		if (isTrue()) {
 			min = 1;
@@ -48,11 +48,11 @@ double BoolView::getScore(VarBranch vb) {
 		// TODO: Number of watches is only an estimate. Lit/Var can occur in more
 		// clauses, but not function as watch. Is there a better existing measure?
 		case VAR_DEGREE_MIN: {
-			vec<WatchElem>& ws = sat.watches[toInt(getValLit())];
+			const vec<WatchElem>& ws = sat.watches[toInt(getValLit())];
 			return -ws.size();
 		}
 		case VAR_DEGREE_MAX: {
-			vec<WatchElem>& ws = sat.watches[toInt(getValLit())];
+			const vec<WatchElem>& ws = sat.watches[toInt(getValLit())];
 			return ws.size();
 		}
 		case VAR_ACTIVITY:

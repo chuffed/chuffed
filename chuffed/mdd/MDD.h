@@ -42,7 +42,7 @@ using intpair = std::pair<int, int>;
 #define MDDFALSE 0
 
 struct ltnode {
-	bool operator()(const MDDNode a1, const MDDNode a2) const {
+	bool operator()(const MDDNode /*a1*/, const MDDNode /*a2*/) const {
 		assert(0);  // FIXME: out of date.
 		return false;
 	}
@@ -224,7 +224,7 @@ F transform_mdd(F fff, F ttt, std::vector<std::vector<F> >& vals, const std::vec
 		return fff;
 	}
 
-	int n_id = node;
+	const int n_id = node;
 	if (status[n_id] != 0) {
 		return cache[status[n_id] - 1];
 	}
@@ -235,8 +235,8 @@ F transform_mdd(F fff, F ttt, std::vector<std::vector<F> >& vals, const std::vec
 		if (nodes[n_id]->edges[ii].dest == MDDFALSE) {
 			continue;
 		}
-		int low = nodes[n_id]->edges[ii].val;
-		int high = nodes[n_id]->edges[ii + 1].val;
+		const int low = nodes[n_id]->edges[ii].val;
+		const int high = nodes[n_id]->edges[ii + 1].val;
 
 		F val = fff;
 		for (int v = low; v < high; v++) {

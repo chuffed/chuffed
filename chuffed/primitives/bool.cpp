@@ -9,7 +9,7 @@
 
 void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
 	//	NOT_SUPPORTED;
-	BoolView v[3] = {std::move(x), std::move(y), std::move(z)};
+	const BoolView v[3] = {std::move(x), std::move(y), std::move(z)};
 	int u = 0;
 
 	for (int l = 1; l <= 3; l++) {
@@ -47,7 +47,7 @@ void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
 					if ((i & (1 << m)) == 0) {
 						continue;
 					}
-					bool p = ((j >> m) & 1) != 0;
+					const bool p = ((j >> m) & 1) != 0;
 					if (l == 1) {
 						if (v[m].setValNotR(p)) {
 							if (!v[m].setVal(p)) {

@@ -121,7 +121,7 @@ class BoundedPathPropagator : public GraphPropagator {
 		std::vector<Lit> getLits() { return lits; }
 		void debug_toggle() { debug = !debug; }
 		void set_explaining(int ex) { explaining = ex; }
-		bool ignore_node(int n) override { return false; }
+		bool ignore_node(int /*n*/) override { return false; }
 		bool ignore_edge(int e) override {
 			if (p->getEdgeVar(e).isFixed() && p->getEdgeVar(e).isFalse()) {
 				if (verbose) {
@@ -136,13 +136,13 @@ class BoundedPathPropagator : public GraphPropagator {
 					return true;
 				}
 
-				int d_hd = back->distTo(p->getHead(e));  // Includes time spent in hd
+				const int d_hd = back->distTo(p->getHead(e));  // Includes time spent in hd
 				if (d_hd == -1) {
 					return false;  // Can cros the ones that are unreachable from the other end.
 				}
 
-				int d_tl = this->distTo(p->getTail(e));  // inlcudes time spent in tl
-				int w_e = weight(e);
+				const int d_tl = this->distTo(p->getTail(e));  // inlcudes time spent in tl
+				const int w_e = weight(e);
 				if (w_e < 0 || p->isSelfLoop(e)) {
 					return true;
 				}
@@ -214,14 +214,14 @@ class BoundedPathPropagator : public GraphPropagator {
 			return false;
 		}
 		std::vector<int>& mandatory_nodes() override { return p->in_nodes_list; }
-		bool ignore_node_scc(int u) override {
+		bool ignore_node_scc(int /*u*/) override {
 #ifdef BASIC_EXPL
 			return ignore_node(u);
 #else
 			return false;
 #endif
 		}
-		bool ignore_edge_scc(int e) override {
+		bool ignore_edge_scc(int /*e*/) override {
 #ifdef BASIC_EXPL
 			return ignore_edge(e);
 #else
@@ -263,22 +263,22 @@ class BoundedPathPropagator : public GraphPropagator {
 		}
 		std::vector<edge_id>& getExpl() { return explanation; }
 
-		bool ignore_node_scc(int u) override {
+		bool ignore_node_scc(int /*u*/) override {
 			// if (p->getNodeVar(u).isFixed() && p->getNodeVar(u).isFalse())
 			//         return true;
 			return false;
 		}
-		bool ignore_edge_scc(int e) override {
+		bool ignore_edge_scc(int /*e*/) override {
 			// if (p->getEdgeVar(e).isFixed() && p->getEdgeVar(e).isFalse())
 			//         return true;
 			return false;
 		}
 
-		bool ignore_node(int n) override { return false; }
-		bool stop_at_node(int n) override {
+		bool ignore_node(int /*n*/) override { return false; }
+		bool stop_at_node(int /*n*/) override {
 			tuple& current = current_iteration();
-			int here = current.node;
-			int cost_to_here = current.cost;
+			const int here = current.node;
+			const int cost_to_here = current.cost;
 
 			if (p->initial_dist_from_dest[here] + cost_to_here >= lim) {
 				return true;
@@ -294,7 +294,7 @@ class BoundedPathPropagator : public GraphPropagator {
 														 static_cast<int>(static_cast<int>((it->second).mand[i]) != 0))) != 0);
 				}
 				if (mand_union == target) {  // Union
-					int d = (it->second).cost;
+					const int d = (it->second).cost;
 					if (d + cost_to_here > lim) {
 						return true;
 					}
@@ -312,7 +312,7 @@ class BoundedPathPropagator : public GraphPropagator {
 				if (p->getTail(e) == p->dest) {
 					return true;
 				}
-				int d_tl = current.cost;  // includes time spent in tl
+				const int d_tl = current.cost;  // includes time spent in tl
 				if (weight(e) < 0 || p->isSelfLoop(e)) {
 					return true;
 				}
@@ -320,7 +320,7 @@ class BoundedPathPropagator : public GraphPropagator {
 				// This is for robustness, if the explanations takes too long
 				// kill it by adding all edges in the explanation and build
 				// a frontier.
-				double time_spent = wallClockTime() - start_time;
+				const double time_spent = wallClockTime() - start_time;
 				if (time_limit > 0 && time_limit <= time_spent) {
 					if (p->was_shortest[e] != 0) {
 						// explanation.push_back(e);
@@ -330,7 +330,7 @@ class BoundedPathPropagator : public GraphPropagator {
 				}
 
 				assert(current.node == p->getTail(e));
-				int hd = p->getHead(e);
+				const int hd = p->getHead(e);
 
 				DijkstraMandatory::table_iterator it = back->table[hd].begin();
 				for (; it != back->table[hd].end(); ++it) {
@@ -341,8 +341,8 @@ class BoundedPathPropagator : public GraphPropagator {
 									 static_cast<int>(static_cast<int>((it->second).mand[i]) != 0))) != 0);
 					}
 					if (mand_union == target) {
-						int d_hd = (it->second).cost;  // inlcudes time spent in hd
-						int w_e = weight(e);
+						const int d_hd = (it->second).cost;  // inlcudes time spent in hd
+						const int w_e = weight(e);
 
 						if (d_tl + w_e + d_hd <= lim) {
 							if (table[hd].count(hash_fn(current.mand)) > 0) {
@@ -428,7 +428,7 @@ protected:
 	bool _check_expl(const std::vector<int>& forbidden, int limit, int at, bool reverse = false) {
 		// std::cout << "Forbidden:"<<std::endl;
 		std::vector<bool> is_forbidden = std::vector<bool>(nbEdges(), false);
-		for (int i : forbidden) {
+		for (const int i : forbidden) {
 			is_forbidden[i] = true;
 			// std::cout
 			// <<"("<<getTail(forbidden[i])<<","<<getHead(forbidden[i])<<",w"<<ws[forbidden[i]]<<")"<<std::endl;
@@ -443,19 +443,19 @@ protected:
 		if (!reverse) {
 			pred[source] = source;
 			cost[source] = 0;
-			Dijkstra::tuple initial(source, 0);
+			const Dijkstra::tuple initial(source, 0);
 			q.push(initial);
 		} else {
 			pred[dest] = dest;
 			cost[dest] = 0;
-			Dijkstra::tuple initial(dest, 0);
+			const Dijkstra::tuple initial(dest, 0);
 			q.push(initial);
 		}
 
 		while (!q.empty() && count < nbNodes()) {
-			Dijkstra::tuple top = q.top();
+			const Dijkstra::tuple top = q.top();
 			q.pop();
-			int curr = top.node;
+			const int curr = top.node;
 			if (vis[curr]) {
 				continue;
 			}
@@ -467,7 +467,7 @@ protected:
 				in_or_out = in[curr];
 			}
 
-			for (int e : in_or_out) {
+			for (const int e : in_or_out) {
 				int other;
 				if (!reverse) {
 					other = getHead(e);
@@ -481,7 +481,7 @@ protected:
 					cost[other] = cost[curr] + ws[e];
 					assert(cost[other] != -1);
 					pred[other] = curr;
-					Dijkstra::tuple new_node(other, cost[other]);
+					const Dijkstra::tuple new_node(other, cost[other]);
 					if (reverse && other == source) {
 						continue;
 					}
@@ -515,12 +515,12 @@ protected:
 	bool check_expl(std::vector<int> forbidden, int limit, int at, bool reverse = false) {
 		// std::cout <<"Checking correct ("<<forbidden.size()<<",lim:"<<limit<<"):"<<std::endl;
 		// std::cout<< "Forbidden ("<<forbidden.size()<<"):";
-		for (int i : forbidden) {
+		for (const int i : forbidden) {
 			// std::cout<< forbidden[i]<<"("<<getTail(forbidden[i])<<","<<getHead(forbidden[i])<<") ";
 			assert(!isSelfLoop(i) && ws[i] >= 0);
 		}
 		// std::cout<<std::endl;
-		bool ok = _check_expl(forbidden, limit, at, reverse);
+		const bool ok = _check_expl(forbidden, limit, at, reverse);
 		if (!ok) {
 			std::cout << "Not correct" << '\n';
 			return false;
@@ -551,13 +551,13 @@ protected:
 		std::vector<std::unordered_map<size_t, DijkstraMandatory::tuple> > table;
 
 		std::vector<bool> is_forbidden = std::vector<bool>(nbEdges(), false);
-		for (int i : forbidden) {
+		for (const int i : forbidden) {
 			is_forbidden[i] = true;
 		}
 
-		std::vector<bool> vis = std::vector<bool>(nbNodes(), false);
-		std::vector<int> pred = std::vector<int>(nbNodes(), -1);
-		std::vector<int> cost = std::vector<int>(nbNodes(), -1);
+		const std::vector<bool> vis = std::vector<bool>(nbNodes(), false);
+		const std::vector<int> pred = std::vector<int>(nbNodes(), -1);
+		const std::vector<int> cost = std::vector<int>(nbNodes(), -1);
 
 		table.clear();
 		for (int i = 0; i < nbNodes(); i++) {
@@ -572,7 +572,7 @@ protected:
 		pathS[source] = true;
 		std::vector<bool> mandS(nbNodes(), false);
 		mandS[source] = true;
-		DijkstraMandatory::tuple initial(source, 0, pathS, mandS);
+		const DijkstraMandatory::tuple initial(source, 0, pathS, mandS);
 		table[source][DijkstraMandatory::hash_fn(mandS) /*.to_ulong()*/] = initial;
 
 		std::priority_queue<DijkstraMandatory::tuple, std::vector<DijkstraMandatory::tuple>,
@@ -587,23 +587,23 @@ protected:
 		while (!q.empty()) {
 			DijkstraMandatory::tuple top = q.top();
 			q.pop();
-			int curr = top.node;
+			const int curr = top.node;
 			if (table[curr][DijkstraMandatory::hash_fn(top.mand) /*.to_ulong()*/].cost < top.cost) {
 				continue;
 			}
 
-			for (int e : ou[curr]) {
+			for (const int e : ou[curr]) {
 				assert(getTail(e) == curr);
-				int other = getHead(e);  // Head of e
+				const int other = getHead(e);  // Head of e
 				if (is_forbidden[e] || ws[e] < 0) {
 					continue;
 				}
 				bool enqueue = true;
-				bool was_mand_other = top.mand[other];
+				const bool was_mand_other = top.mand[other];
 				if (target[other]) {
 					top.mand[other] = true;
 				}
-				std::unordered_map<size_t, DijkstraMandatory::tuple>::const_iterator it =
+				const std::unordered_map<size_t, DijkstraMandatory::tuple>::const_iterator it =
 						table[other].find(DijkstraMandatory::hash_fn(top.mand) /*.to_ulong()*/);
 				if (it != table[other].end()) {
 					if ((it->second).cost <= top.cost + ws[e]) {
@@ -657,7 +657,7 @@ protected:
 				}
 				std::cout << "Checked explanation::" << '\n';
 				std::cout << ct << '\n';
-				for (bool b : target) {
+				for (const bool b : target) {
 					std::cout << b;
 				}
 				std::cout << '\n';
@@ -666,11 +666,11 @@ protected:
 						table[dest].begin();
 				for (; it != table[dest].end(); ++it) {
 					std::cout << (it->second).node << " ";
-					for (bool b : (it->second).path) {
+					for (const bool b : (it->second).path) {
 						std::cout << b;
 					}
 					std::cout << " ";
-					for (bool b : (it->second).mand) {
+					for (const bool b : (it->second).mand) {
 						std::cout << b;
 					}
 					std::cout << " " << (it->second).cost << '\n';

@@ -81,7 +81,7 @@ public:
 			if (assignStr(pResult, arg)) {
 				return true;
 			}
-			std::istringstream iss(arg);
+			std::istringstream iss(arg);  // NOLINT
 			Value tmp;
 			if (!(iss >> tmp)) {
 				--i;
@@ -148,8 +148,8 @@ public:
 	}
 };  // class CLOParser
 
-void printHelp(int& argc, char**& argv, const std::string& fileExt) {
-	Options def;
+void printHelp(int& /*argc*/, char**& argv, const std::string& fileExt) {
+	const Options def;
 	std::cout << "Usage: " << argv[0] << " [options] ";
 	if (!fileExt.empty()) {
 		std::cout << "<file>." << fileExt;
@@ -196,7 +196,7 @@ void printHelp(int& argc, char**& argv, const std::string& fileExt) {
 
 void printLongHelp(int& argc, char**& argv, const std::string& fileExt) {
 	printHelp(argc, argv, fileExt);
-	Options def;
+	const Options def;
 	std::cout
 			<< "General Options:\n"
 				 "  --verbosity <n>\n"
@@ -616,7 +616,7 @@ void parseOptions(int& argc, char**& argv, std::string* fileArg, const std::stri
 
 	if (fileArg != nullptr) {
 		if (argc == 2) {
-			std::string filename(argv[1]);
+			const std::string filename(argv[1]);
 			if (!fileExt.empty()) {
 				if (filename.size() <= fileExt.size() + 1 ||
 						filename.substr(filename.size() - fileExt.size() - 1) != "." + fileExt) {

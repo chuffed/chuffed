@@ -27,7 +27,7 @@ DTreePropagator::DTreePropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 		: DReachabilityPropagator(_r, _vs, _es, _in, _out, _en), uf(nbNodes()), ruf(nbNodes()) {
 	priority = 1;
 
-	for (int e : in[get_root_idx()]) {
+	for (const int e : in[get_root_idx()]) {
 		if (getEdgeVar(e).setValNotR(false)) {
 			getEdgeVar(e).setVal(false, nullptr);
 		}
@@ -45,7 +45,7 @@ bool DTreePropagator::propagateNewEdge(int e) {
 		return false;
 	}
 
-	int hd = getHead(e);
+	const int hd = getHead(e);
 	/*
 	//Only one incident edge.
 	Clause* r = NULL;
@@ -84,10 +84,10 @@ bool DTreePropagator::propagateNewEdge(int e) {
 	// TODO: this could be done slightly faster with a DFS
 	for (int i = 0; i < nbNodes(); i++) {
 		if (uf.connected(hd, i)) {
-			for (int j : in[i]) {
+			for (const int j : in[i]) {
 				prevent_cycle(j);
 			}
-			for (int j : ou[i]) {
+			for (const int j : ou[i]) {
 				prevent_cycle(j);  //*/
 			}
 		}
@@ -157,10 +157,10 @@ bool DTreePropagator::propagateNewNode(int n) {
 		return false;
 	}
 
-	for (int i : in[n]) {
+	for (const int i : in[n]) {
 		prevent_cycle(i);
 	}
-	for (int i : ou[n]) {
+	for (const int i : ou[n]) {
 		prevent_cycle(i);
 	}
 
@@ -264,14 +264,14 @@ bool DTreePropagator::checkFinalSatisfied() {
 	s.push(get_root_idx());
 	std::vector<bool> vis = std::vector<bool>(nbNodes(), false);
 	while (!s.empty()) {
-		int curr = s.top();
+		const int curr = s.top();
 		s.pop();
 		vis[curr] = true;
-		for (int e : ou[curr]) {
+		for (const int e : ou[curr]) {
 			if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isFalse()) {
 				continue;
 			}
-			int o = getHead(e);
+			const int o = getHead(e);
 			if (!vis[o]) {
 				s.push(o);
 			} else {
@@ -326,7 +326,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 			parents[i]->setMin(0);
 		}
 		for (int j = 0; j < nbNodes(); j++) {
-			int e = findEdge(j, i);
+			const int e = findEdge(j, i);
 			if (e != -1) {
 				if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
 					in_deg++;
@@ -432,8 +432,8 @@ bool DTreeParenthoodPropagator::propagateRemEdge(int e) {
 }
 
 bool DTreeParenthoodPropagator::propagateNewParent(int e) {
-	int par = getTail(e);
-	int chi = getHead(e);
+	const int par = getTail(e);
+	const int chi = getHead(e);
 
 	Clause* r = nullptr;
 	// If the nodes is not in the tree, it's it's own parent
@@ -448,7 +448,7 @@ bool DTreeParenthoodPropagator::propagateNewParent(int e) {
 			r = Reason_new(ps);
 		}
 		for (unsigned int i = 0; i < in[chi].size(); i++) {
-			int edge = in[chi][i];
+			const int edge = in[chi][i];
 			if (getTail(edge) == getHead(edge)) {  // selfloop
 				continue;
 			}
@@ -499,8 +499,8 @@ bool DTreeParenthoodPropagator::propagateNewParent(int e) {
 }
 
 bool DTreeParenthoodPropagator::propagateRemParent(int e) {
-	int par = getTail(e);
-	int chi = getHead(e);
+	const int par = getTail(e);
+	const int chi = getHead(e);
 
 	Clause* r = nullptr;
 	if (!getEdgeVar(e).isFixed()) {
@@ -531,13 +531,13 @@ void DTreeParenthoodPropagator::wakeup(int i, int c) {
 	priority = 1;
 	bool ignore = true;
 	if (first_event <= i && i <= last_event) {
-		int idx = i - first_event;  // Corresponding BoolView
+		const int idx = i - first_event;  // Corresponding BoolView
 		assert(idx >= 0);
 		assert(idx < nbNodes() * nbNodes());
-		std::pair<int, int> hd_tl = event2parrel[i];  // head and tail of edge
-		int hd = hd_tl.first;
-		int tl = hd_tl.second;
-		int e = findEdge(tl, hd);
+		const std::pair<int, int> hd_tl = event2parrel[i];  // head and tail of edge
+		const int hd = hd_tl.first;
+		const int tl = hd_tl.second;
+		const int e = findEdge(tl, hd);
 		// No need to propagate that an edges that does not exist, does not exist
 		// or that I already propagated
 		if (e != -1 && dom_size[hd] != parents[hd]->size()) {
@@ -626,9 +626,9 @@ bool DTreeParenthoodPropagator::checkFinalSatisfied() {
 			assert(false);
 			return false;
 		}
-		int hd = i;
-		int tl = parents[i]->getVal();
-		int e = findEdge(tl, hd);
+		const int hd = i;
+		const int tl = parents[i]->getVal();
+		const int e = findEdge(tl, hd);
 		if (hd == get_root_idx()) {
 			assert(tl == hd);
 			if (tl != hd) {
@@ -1001,7 +1001,7 @@ PathDeg1::PathDeg1(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _
 	}
 }
 
-void PathDeg1::wakeup(int i, int c) {
+void PathDeg1::wakeup(int i, int /*c*/) {
 	if (getEdgeVar(i).isFixed() && getEdgeVar(i).isTrue()) {
 		new_edges.push_back(i);
 		pushInQueue();
@@ -1014,7 +1014,7 @@ void PathDeg1::clearPropState() {
 }
 
 bool PathDeg1::propagate() {
-	for (int e : new_edges) {
+	for (const int e : new_edges) {
 		for (unsigned int j = 0; j < ou[getTail(e)].size(); j++) {
 			if (ou[getTail(e)][j] == e) {
 				continue;

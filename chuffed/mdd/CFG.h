@@ -18,7 +18,7 @@ public:
 	Span(int _low, int _high) : low(_low), high(_high) {}
 
 	bool check(int start, int end) override {
-		int span(end - start);
+		const int span(end - start);
 		return low <= span && span <= high;
 	}
 
@@ -31,7 +31,7 @@ class Start : public ProdR {
 public:
 	Start(int _low, int _high) : low(_low), high(_high) {}
 
-	bool check(int start, int end) override { return low <= start && start <= high; }
+	bool check(int start, int /*end*/) override { return low <= start && start <= high; }
 
 protected:
 	int low;
@@ -43,7 +43,7 @@ public:
 	SpanLB(int _low) : low(_low) {}
 
 	bool check(int start, int end) override {
-		int span(end - start);
+		const int span(end - start);
 		return low <= span;
 	}
 
@@ -54,7 +54,7 @@ protected:
 class LB : public ProdR {
 public:
 	LB(int _lb) : lb(_lb) {}
-	bool check(int start, int end) override { return lb <= start; }
+	bool check(int start, int /*end*/) override { return lb <= start; }
 
 protected:
 	int lb;
@@ -115,7 +115,7 @@ protected:
 	ProdR* p;
 };
 
-std::ostream& operator<<(std::ostream& o, Sym s) {
+inline std::ostream& operator<<(std::ostream& o, Sym s) {
 	if (isVar(s)) {
 		o << (char)('A' + symID(s));
 	} else {
@@ -143,7 +143,7 @@ public:
 	std::vector<RSym> syms;
 };
 
-Rule E() { return {}; }
+inline Rule E() { return {}; }
 
 class CFG {
 public:
@@ -168,7 +168,7 @@ public:
 		return mkVar(i);
 	}
 	Sym newVar() {
-		int id = prods.size();
+		const int id = prods.size();
 		prods.emplace_back();
 		return mkVar(id);
 	}
@@ -181,7 +181,7 @@ public:
 	Sym startSym() const { return mkVar(start); }
 
 	void prod(RSym p, const Rule& r) {
-		int r_id = rules.size();
+		const int r_id = rules.size();
 		rules.push_back(r.syms);
 		prods[symID(p.sym)].emplace_back(p.cond, r_id);
 	}
@@ -192,7 +192,7 @@ public:
 		for (unsigned int ii = 0; ii < rules.size(); ii++) {
 			std::vector<RSym> nr(2);
 			while (rules[ii].size() > 2) {
-				Sym next(newVar());
+				const Sym next(newVar());
 				nr[1] = rules[ii].back();
 				rules[ii].pop_back();
 				nr[0] = rules[ii].back();

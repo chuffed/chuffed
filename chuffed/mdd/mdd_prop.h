@@ -114,7 +114,7 @@ public:
 	void verify();
 
 	// Wake up only parts relevant to this event
-	void wakeup(int i, int c) override {
+	void wakeup(int i, int /*c*/) override {
 		assert(boolvars[i].isFixed());
 		if (boolvars[i].getVal() != 0) {
 			assert(0);

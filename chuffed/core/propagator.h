@@ -35,7 +35,7 @@ enum ConLevel { CL_DEF, CL_VAL, CL_BND, CL_DOM };
 
 class Propagator {
 public:
-	int const prop_id;
+	const int prop_id;
 	int priority{0};
 
 	// Persistent state
@@ -57,7 +57,7 @@ public:
 	}
 
 	// Wake up only parts relevant to this event
-	virtual void wakeup(int i, int c) { pushInQueue(); }
+	virtual void wakeup(int /*i*/, int /*c*/) { pushInQueue(); }
 
 	// Propagate woken up parts
 	virtual bool propagate() = 0;
@@ -66,16 +66,16 @@ public:
 	virtual void clearPropState() { in_queue = false; }
 
 	// Explain propagation
-	virtual Clause* explain(Lit p, int inf_id) { NEVER; }
+	virtual Clause* explain(Lit /*p*/, int /*inf_id*/) { NEVER; }
 
 	// Free a lazily generated literal
-	virtual void freeLazyVar(int v) { NEVER; }
+	virtual void freeLazyVar(int /*v*/) { NEVER; }
 
 	// Check if constraint is satisfied, return cost of check
 	virtual int checkSatisfied() { return 0; }
 
 	// Print meaning of literal
-	virtual void printLit(int v, bool sign) { NEVER; }
+	virtual void printLit(int /*v*/, bool /*sign*/) { NEVER; }
 
 	// Print statistics
 	virtual void printStats() {}
@@ -136,7 +136,7 @@ static inline Clause* Reason_new(std::vector<Lit> ps) {
 
 #define setDom(var, op, val, ...)                  \
 	do {                                             \
-		int64_t m_v = (val);                           \
+		int64_t const m_v = (val);                     \
 		if (var.op##NotR(m_v)) {                       \
 			Reason m_r = NULL;                           \
 			if (so.lazy) new (&m_r) Reason(__VA_ARGS__); \
@@ -146,7 +146,7 @@ static inline Clause* Reason_new(std::vector<Lit> ps) {
 
 #define setDom2(var, op, val, index)                                             \
 	do {                                                                           \
-		int64_t v = (val);                                                           \
+		int64_t const v = (val);                                                     \
 		if ((var).op##NotR(v) && !(var).op(v, Reason(prop_id, index))) return false; \
 	} while (0)
 

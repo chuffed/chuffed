@@ -67,7 +67,7 @@ public:
 								y.push(q);
 								bool_clause(y);
 				*/
-				BoolView q = newBoolVar();
+				const BoolView q = newBoolVar();
 				qs.push(q);
 				int_rel_reif(x[i], IRT_NE, x[j], q);
 				bool_rel(~t[i], BRT_OR, q);
@@ -158,11 +158,11 @@ public:
 		srand(so.rnd_seed);
 		n = 25;
 		k = 5;
-		int total = 100;
+		const int total = 100;
 		for (int i = 0; i < n; i++) {
-			int len = rand() % (total / 4) + total / 8;
-			int s = rand() % (total - len);
-			int p = rand() % 3000;
+			const int len = rand() % (total / 4) + total / 8;
+			const int s = rand() % (total - len);
+			const int p = rand() % 3000;
 			start.push(s);
 			end.push(s + len);
 			price.push(p);

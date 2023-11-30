@@ -34,7 +34,7 @@ static BOOL SIGINT_handler(DWORD t) throw() {
 }
 #else
 /// Handler for catching Ctrl-C
-void SIGINT_handler(int signum) {
+void SIGINT_handler(int /*signum*/) {
 	fprintf(stderr, "*** INTERRUPTED ***\n");
 	// Flush last solution
 	if ((engine.opt_var != nullptr) && so.nof_solutions != 0) {
@@ -55,8 +55,8 @@ std::string get_bv_string(const BoolView& b, bool tryIntDom) {
 
 	if (tryIntDom) {
 		// Alternate version: prioritise intvars.
-		Lit l(b.getLit(true));
-		ChannelInfo ci(sat.c_info[var(l)]);
+		const Lit l(b.getLit(true));
+		const ChannelInfo ci(sat.c_info[var(l)]);
 		s = intVarString[engine.vars[ci.cons_id]];
 		if (ci.cons_type == 1 && !s.empty()) {
 			// Int literal
@@ -70,7 +70,7 @@ std::string get_bv_string(const BoolView& b, bool tryIntDom) {
 		if (s.empty()) {
 			BoolView o(b);
 			o.setSign(!o.getSign());
-			std::string ostring = boolVarString[o];
+			const std::string ostring = boolVarString[o];
 			if (!ostring.empty()) {
 				s = "~ " + ostring;
 			} else {
@@ -84,12 +84,12 @@ std::string get_bv_string(const BoolView& b, bool tryIntDom) {
 	if (bvstring.empty()) {
 		BoolView o(b);
 		o.setSign(!o.getSign());
-		std::string ostring = boolVarString[o];
+		const std::string ostring = boolVarString[o];
 		if (ostring.empty()) {
 			// Maybe it's attached to a (named) intvar.
-			Lit l(b.getLit(true));
-			ChannelInfo ci(sat.c_info[var(l)]);
-			std::string ivstring = intVarString[engine.vars[ci.cons_id]];
+			const Lit l(b.getLit(true));
+			const ChannelInfo ci(sat.c_info[var(l)]);
+			const std::string ivstring = intVarString[engine.vars[ci.cons_id]];
 			if (ci.cons_type == 1 && !ivstring.empty()) {
 				// If it is, return the denotation of b.
 				std::stringstream ss;

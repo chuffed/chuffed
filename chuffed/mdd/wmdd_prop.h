@@ -132,7 +132,7 @@ public:
 	inline bool edge_dead(int eid) { return dead_edges.elem(eid); }
 
 	inline int edge_pathC(int eid) {
-		Edge& e(edges[eid]);
+		const Edge& e(edges[eid]);
 		return nodes[e.begin].in_pathC + e.weight + nodes[e.end].out_pathC;
 	}
 

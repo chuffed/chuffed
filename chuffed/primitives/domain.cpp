@@ -39,7 +39,7 @@ public:
 		x->attach(this, 0, EVENT_F);
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int /*i*/, int /*c*/) override {
 		assert(x->isFixed());
 		pushInQueue();
 	}
@@ -63,7 +63,7 @@ public:
 		x.attach(this, 0, EVENT_F);
 	}
 
-	void wakeup(int i, int c) override {
+	void wakeup(int /*i*/, int /*c*/) override {
 		assert(x.isFixed());
 		pushInQueue();
 	}

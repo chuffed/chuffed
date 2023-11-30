@@ -4,8 +4,8 @@
 #include "chuffed/support/misc.h"
 #include "chuffed/support/vec.h"
 
-double processImpact(vec<int> const& previousSizes, vec<int> const& newSizes);
-double solvedImpact(vec<int> const& previousSizes);
+double processImpact(const vec<int>& previousSizes, const vec<int>& newSizes);
+double solvedImpact(const vec<int>& previousSizes);
 
 #endif
 #endif

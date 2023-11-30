@@ -23,15 +23,15 @@
 template <int U = 0>
 class Circuit : public Propagator {
 public:
-	bool const useCheck;         // use the 'check' algorithm
-	bool const usePrevent;       // use the 'prevent' algorithm
-	bool const useScc;           // use the 'scc' algorithm
-	bool const pruneRoot;        // use 'prune root' option for scc algorithm
-	bool const pruneSkip{true};  // prune arcs that skip subtrees (in scc)
-	bool const fixReq{true};     // fix required back edges (in scc)
-	bool const generaliseScc;    // use 'prune within' option for scc
+	const bool useCheck;         // use the 'check' algorithm
+	const bool usePrevent;       // use the 'prevent' algorithm
+	const bool useScc;           // use the 'scc' algorithm
+	const bool pruneRoot;        // use 'prune root' option for scc algorithm
+	const bool pruneSkip{true};  // prune arcs that skip subtrees (in scc)
+	const bool fixReq{true};     // fix required back edges (in scc)
+	const bool generaliseScc;    // use 'prune within' option for scc
 
-	int const size;  // total number of nodes
+	const int size;  // total number of nodes
 
 	IntView<U>* const x;  // successor variables
 
@@ -120,7 +120,7 @@ public:
 				for (typename IntView<U>::iterator it = x[unfixedVar].begin(); it != x[unfixedVar].end();
 						 ++it) {
 					// Starting point for not yet followed assigned path found
-					int j0 = *it;
+					const int j0 = *it;
 
 					if (x[j0].isFixed() && (lengthChain[j0] < 0)) {
 						// Follow assigned path until non-assigned view:
@@ -342,8 +342,8 @@ public:
 						r = Reason_new(earlier.size() * prevAndLater.size() + prev.size() * later.size() + 1 +
 													 preRoot.size());
 						addEqLits(r);
-						int size1 = prev.size() * later.size();
-						int size2 = earlier.size() * prevAndLater.size();
+						const int size1 = prev.size() * later.size();
+						const int size2 = earlier.size() * prevAndLater.size();
 						explainAcantreachB(r, preRoot.size() + 1, 1 + size1 + preRoot.size(), prev, later);
 						explainAcantreachB(r, preRoot.size() + 1 + size1, 1 + size1 + size2 + preRoot.size(),
 															 earlier, prevAndLater);
@@ -563,7 +563,7 @@ public:
 
 		// explore children of the root node
 		for (typename IntView<U>::iterator i = x[rootEnd].begin(); i != x[rootEnd].end(); ++i) {
-			int child = *i;
+			const int child = *i;
 
 			if (index[child] == -1)  // if haven't explored this yet
 			{
@@ -643,9 +643,9 @@ public:
 							this_later.push(later[i]);
 						}
 
-						int size1 = earlier.size() * prev_this_later.size();
-						int size2 = prev.size() * this_later.size();
-						int size3 = thisSubtree.size() * prev_later.size();
+						const int size1 = earlier.size() * prev_this_later.size();
+						const int size2 = prev.size() * this_later.size();
+						const int size3 = thisSubtree.size() * prev_later.size();
 						assert(prev_later.size() > 0);
 						assert(earlier.size() + prev.size() + later.size() + thisSubtree.size() +
 											 preRoot.size() ==
@@ -720,9 +720,9 @@ public:
 								this_later.push(later[i]);
 							}
 
-							int size1 = earlier.size() * prev_this_later.size();
-							int size2 = prev.size() * this_later.size();
-							int size3 = thisSubtree.size() * prev_later.size();
+							const int size1 = earlier.size() * prev_this_later.size();
+							const int size2 = prev.size() * this_later.size();
+							const int size3 = thisSubtree.size() * prev_later.size();
 							assert(prev_later.size() > 0);
 							r = Reason_new(size1 + size2 + size3 + preRoot.size());
 							addEqLits(r);
@@ -785,7 +785,7 @@ public:
 						notseen.push(var);
 					}
 				}
-				int numNotSeen = notseen.size();
+				const int numNotSeen = notseen.size();
 				assert(seen.size() == nodesSeen);
 				assert(numNotSeen + nodesSeen == size);
 
@@ -837,7 +837,7 @@ public:
 
 		// Perform the propagations
 		for (int i = 0; i < propQueue.size(); i++) {
-			PROP p = propQueue[i];
+			PROP const p = propQueue[i];
 			// fprintf(stderr, "propagating\n");
 			if (p.fix) {
 				if (x[p.var].setValNotR(p.val)) {
@@ -879,7 +879,7 @@ public:
 					}
 				}
 			} else {
-				int root = chooseRoot();
+				const int root = chooseRoot();
 				if (root < 0)  // means all vars are fixed
 				{
 					if (!useCheck) {
@@ -908,7 +908,7 @@ public:
 		double thisScore;
 		bool thisIsCycle;
 		while (new_fixed.size() > 0) {
-			int startVar = new_fixed[0];
+			const int startVar = new_fixed[0];
 			int nextVar = startVar;
 			thisCycle.clear();
 			thisScore = 0;
@@ -1029,7 +1029,7 @@ public:
 			bool result;
 
 			// create the reason clause
-			int chainLength = bestCycle.size();
+			const int chainLength = bestCycle.size();
 			if (so.checkexpl == 1) {
 				// equalities
 				r = Reason_new(chainLength);
@@ -1078,8 +1078,8 @@ public:
 				//  leave out the first one, as this is the one we'll set
 				r = Reason_new(chainLength * (2 + outsidebetween.size()));
 				for (int i = 0; i < chainLength; i++) {
-					int start = i * (2 + outsidebetween.size());
-					int varIndex = bestCycle[i];
+					const int start = i * (2 + outsidebetween.size());
+					const int varIndex = bestCycle[i];
 					if (i > 0) {                                                // leave out first literal
 						(*r)[start] = x[varIndex].getLit(smallestIn - 1, LR_LE);  // x <= smallest-1
 					}

@@ -49,7 +49,7 @@ IntVarLL;: Lazy lit class, lits are lazily generated
 
 class IntVar : public Var {
 public:
-	int const var_id;
+	const int var_id;
 
 	Tint min;
 	Tint max;
@@ -120,8 +120,8 @@ public:
 	bool finished() override { return isFixed(); }
 	double getScore(VarBranch vb) override;
 #ifdef HAS_VAR_IMPACT
-	double updateImpact(double const newImpact) {
-		double const weight = (1 - IMPACT_DAMPING) * impact_count++;
+	double updateImpact(const double newImpact) {
+		const double weight = (1 - IMPACT_DAMPING) * impact_count++;
 		return impact = (weight * impact + newImpact) / (weight + 1);
 	}
 #endif
@@ -216,7 +216,7 @@ public:
 #endif
 				return *this;
 			}
-			iterator operator++(int dummy) {
+			iterator operator++(int /*dummy*/) {
 				iterator temp = *this;
 				++*this;
 				return temp;
@@ -236,7 +236,7 @@ public:
 				}
 				return *this;
 			}
-			iterator operator--(int dummy) {
+			iterator operator--(int /*dummy*/) {
 				iterator temp = *this;
 				--*this;
 				return temp;
@@ -268,7 +268,7 @@ public:
 				--forward;
 				return *this;
 			}
-			reverse_iterator operator++(int dummy) {
+			reverse_iterator operator++(int /*dummy*/) {
 				reverse_iterator temp = *this;
 				++*this;
 				return temp;
@@ -277,7 +277,7 @@ public:
 				++forward;
 				return *this;
 			}
-			reverse_iterator operator--(int dummy) {
+			reverse_iterator operator--(int /*dummy*/) {
 				reverse_iterator temp = *this;
 				--*this;
 				return temp;
@@ -316,12 +316,12 @@ public:
 		virtual Lit getMinLit() const { NEVER; }
 		virtual Lit getMaxLit() const { NEVER; }
 		virtual Lit getValLit() const { NEVER; }
-		virtual Lit getFMinLit(int64_t v) { NEVER; }
-		virtual Lit getFMaxLit(int64_t v) { NEVER; }
+		virtual Lit getFMinLit(int64_t /*v*/) { NEVER; }
+		virtual Lit getFMaxLit(int64_t /*v*/) { NEVER; }
 
 		// NOTE: No support for INT_VAR_LL vars yet!
 		// t = 0: [x != v], t = 1: [x = v], t = 2: [x >= v], t = 3: [x <= v]
-		virtual Lit getLit(int64_t v, LitRel t) { NEVER; }
+		virtual Lit getLit(int64_t /*v*/, LitRel /*t*/) { NEVER; }
 
 		//--------------------------------------------------
 		// Domain operations

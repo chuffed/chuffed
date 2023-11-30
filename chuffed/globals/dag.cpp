@@ -67,7 +67,7 @@ void DAGPropagator::connectTo(int source, int dest) {
 	if (succs[source].get(dest)) {
 		return;
 	}
-	std::pair<node_id, node_id> dd(dest, dest);
+	const std::pair<node_id, node_id> dd(dest, dest);
 	succs[source].add(dd);
 	preds[dest].add(source);
 
@@ -83,8 +83,8 @@ void DAGPropagator::connectTo(int source, int dest) {
 
 	TrailedSuccList::const_iterator it_s;
 	for (it_s = succs[dest].begin(); it_s != succs[dest].end(); ++it_s) {
-		int s = (*it_s).first;
-		std::pair<int, int> s_to_d(s, dest);
+		const int s = (*it_s).first;
+		const std::pair<int, int> s_to_d(s, dest);
 		succs[source].add(s_to_d);  // go from source to s through dest
 		preds[s].add(source);       // sorce preceeds s
 
@@ -113,8 +113,8 @@ bool DAGPropagator::propagateNewEdge(int e) {
 
 	// Only checking the new ones
 	for (; succ_taile != succs[getTail(e)].end(); succ_taile++) {
-		int n = (*succ_taile).first;
-		for (int i : ou[n]) {
+		const int n = (*succ_taile).first;
+		for (const int i : ou[n]) {
 			prevent_cycle(i);
 		}
 	}
@@ -145,10 +145,10 @@ bool DAGPropagator::propagateNewNode(int n) {
 		return false;
 	}
 
-	for (int i : in[n]) {
+	for (const int i : in[n]) {
 		prevent_cycle(i);
 	}
-	for (int i : ou[n]) {
+	for (const int i : ou[n]) {
 		prevent_cycle(i);
 	}
 
@@ -159,7 +159,7 @@ bool DAGPropagator::propagateNewNode(int n) {
 void DAGPropagator::findPathFromTo(int u, int v, vec<Lit>& path) {
 	assert(u != v);
 	// 1-edge paths:
-	int e = findEdge(u, v);
+	const int e = findEdge(u, v);
 	if (e != -1 && getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
 		path.push(getEdgeVar(e).getValLit());
 		return;
@@ -173,9 +173,9 @@ void DAGPropagator::findPathFromTo(int u, int v, vec<Lit>& path) {
 	int current = u;
 	while (current != v) {
 		std::pair<int, int> pair;
-		bool ok = succs[current].get(v, &pair);
+		const bool ok = succs[current].get(v, &pair);
 		assert(ok);
-		edge_id e = findEdge(current, pair.second);
+		const edge_id e = findEdge(current, pair.second);
 		assert(e != -1);
 		assert(getEdgeVar(e).isFixed());
 		assert(getEdgeVar(e).isTrue());
@@ -311,9 +311,9 @@ bool DAGPropagator::checkFinalSatisfied() {
 bool DAGPropagator::check_correctness(int r, std::vector<int>& v) {
 	v[r] = -1;
 	// cout <<"Visiting "<<r<<endl;
-	for (int e : ou[r]) {
+	for (const int e : ou[r]) {
 		if (getEdgeVar(e).isFixed() && getEdgeVar(e).isTrue()) {
-			int hd = getHead(e);
+			const int hd = getHead(e);
 			assert(hd != r);
 			if (v[hd] == 0) {
 				if (!check_correctness(hd, v)) {

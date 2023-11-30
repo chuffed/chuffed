@@ -141,7 +141,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		}
 	}
 
-	int totalClauseLength = litVector.size();
+	const int totalClauseLength = litVector.size();
 
 	// generate full clause
 	Clause* r = Reason_new(totalClauseLength + 1);
@@ -170,22 +170,22 @@ void EdExplFinder::bfs_shortest_path() {
 	auto* nodeQueue = new std::queue<std::pair<int, int> >();
 	std::set<std::pair<int, int> > node_set;
 	// start with bottom right position
-	std::pair<int, int> start_node = std::pair<int, int>(seqSize, seqSize);
+	const std::pair<int, int> start_node = std::pair<int, int>(seqSize, seqSize);
 	nodeQueue->push(start_node);
 	node_set.insert(start_node);
 
 	// d = distance to diagonal that should be calculated in the matrix
-	int d = lb / min_id_cost;
+	const int d = lb / min_id_cost;
 
 	while (!nodeQueue->empty()) {
-		std::pair<int, int> currentNode = nodeQueue->front();
+		const std::pair<int, int> currentNode = nodeQueue->front();
 		nodeQueue->pop();
 		node_set.erase(currentNode);
 
-		int i = currentNode.first;
-		int j = currentNode.second;
+		const int i = currentNode.first;
+		const int j = currentNode.second;
 
-		int s_ij = (*shortestPathMatrix)[matrixCoord(i, j)];
+		const int s_ij = (*shortestPathMatrix)[matrixCoord(i, j)];
 
 		if (s_ij >= lb) {
 			continue;
@@ -206,17 +206,17 @@ void EdExplFinder::bfs_shortest_path() {
 				}
 			}
 			for (int c = cj_start; c <= max_char; c++) {
-				int ins_cost = c == 0 ? 0 : (*insertion_cost)[c - 1];
-				int d_ij_minus_1 = (*dpMatrix)[matrixCoord(i, j - 1)];
+				const int ins_cost = c == 0 ? 0 : (*insertion_cost)[c - 1];
+				const int d_ij_minus_1 = (*dpMatrix)[matrixCoord(i, j - 1)];
 				if (d_ij_minus_1 + ins_cost + s_ij < lb) {
 					// exclude character for position in explanation if a cheaper path could be established
 					(*seq2ExcludedCharacters)[excludedCharCoord(j - 1, c)] = true;
 				} else {
 					// update costs and push node to queue
-					int s_ij_minus_1 = (*shortestPathMatrix)[matrixCoord(i, j - 1)];
+					const int s_ij_minus_1 = (*shortestPathMatrix)[matrixCoord(i, j - 1)];
 					(*shortestPathMatrix)[matrixCoord(i, j - 1)] = std::min(s_ij_minus_1, s_ij + ins_cost);
 
-					std::pair<int, int> node = std::pair<int, int>(i, j - 1);
+					const std::pair<int, int> node = std::pair<int, int>(i, j - 1);
 					if (node_set.count(node) == 0) {
 						nodeQueue->push(node);
 						node_set.insert(node);
@@ -240,17 +240,17 @@ void EdExplFinder::bfs_shortest_path() {
 				}
 			}
 			for (int c = ci_start; c <= max_char; c++) {
-				int del_cost = c == 0 ? 0 : (*deletion_cost)[c - 1];
-				int d_i_minus_1_j = (*dpMatrix)[matrixCoord(i - 1, j)];
+				const int del_cost = c == 0 ? 0 : (*deletion_cost)[c - 1];
+				const int d_i_minus_1_j = (*dpMatrix)[matrixCoord(i - 1, j)];
 				if (d_i_minus_1_j + del_cost + s_ij < lb) {
 					// exclude character for position in explanation if a cheaper path could be established
 					(*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c)] = true;
 				} else {
 					// update costs and push node to queue
-					int s_i_minus_1_j = (*shortestPathMatrix)[matrixCoord(i - 1, j)];
+					const int s_i_minus_1_j = (*shortestPathMatrix)[matrixCoord(i - 1, j)];
 					(*shortestPathMatrix)[matrixCoord(i - 1, j)] = std::min(s_i_minus_1_j, s_ij + del_cost);
 
-					std::pair<int, int> node = std::pair<int, int>(i - 1, j);
+					const std::pair<int, int> node = std::pair<int, int>(i - 1, j);
 					if (node_set.count(node) == 0) {
 						nodeQueue->push(node);
 						node_set.insert(node);
@@ -265,8 +265,8 @@ void EdExplFinder::bfs_shortest_path() {
 		if (i - 1 >= 0 && j - 1 >= 0) {
 			for (int c1 = 1; c1 <= max_char; c1++) {
 				for (int c2 = 1; c2 <= max_char; c2++) {
-					int d_i_minus_1_j_minus_1 = (*dpMatrix)[matrixCoord(i - 1, j - 1)];
-					int subst_cost = (*substitution_cost)[substCoord(c1, c2)];
+					const int d_i_minus_1_j_minus_1 = (*dpMatrix)[matrixCoord(i - 1, j - 1)];
+					const int subst_cost = (*substitution_cost)[substCoord(c1, c2)];
 
 					if (d_i_minus_1_j_minus_1 + subst_cost + s_ij < lb) {
 						// we can either exclude the character for seq1 or seq2
@@ -278,11 +278,11 @@ void EdExplFinder::bfs_shortest_path() {
 							(*seq1ExcludedCharacters)[excludedCharCoord(i - 1, c1)] = true;
 						}
 					} else {
-						int s_i_minus_1_j_minus_1 = (*shortestPathMatrix)[matrixCoord(i - 1, j - 1)];
+						const int s_i_minus_1_j_minus_1 = (*shortestPathMatrix)[matrixCoord(i - 1, j - 1)];
 						(*shortestPathMatrix)[matrixCoord(i - 1, j - 1)] =
 								std::min(s_i_minus_1_j_minus_1, s_ij + subst_cost);
 
-						std::pair<int, int> node = std::pair<int, int>(i - 1, j - 1);
+						const std::pair<int, int> node = std::pair<int, int>(i - 1, j - 1);
 						if (node_set.count(node) == 0) {
 							nodeQueue->push(node);
 							node_set.insert(node);

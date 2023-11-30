@@ -35,7 +35,7 @@ inline std::string getLitString(int n) {
 	if (n == toInt(~lit_False)) {
 		return "true";
 	}
-	std::map<int, std::string>::const_iterator it = litString.find(n);
+	const std::map<int, std::string>::const_iterator it = litString.find(n);
 	if (it != litString.end()) {
 		return it->second;
 	}
@@ -163,7 +163,7 @@ public:
 	// Branching methods
 
 	bool finished() override;
-	double getScore(VarBranch vb) override { NEVER; }
+	double getScore(VarBranch /*vb*/) override { NEVER; }
 	DecInfo* branch() override;
 
 	// Solution-based phase saving
@@ -242,7 +242,7 @@ inline void SAT::decVarUse(int v) {
 }
 
 inline Clause* SAT::getExpl(Lit p) {
-	Reason& r = reason[var(p)];
+	const Reason& r = reason[var(p)];
 	switch (r.d.type) {
 		case 0:
 			return r.pt;

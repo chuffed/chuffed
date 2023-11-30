@@ -20,7 +20,7 @@
 
 void array_bool_element(IntVar* _x, vec<bool>& a, BoolView y, int offset) {
 	_x->specialiseToEL();
-	IntView<4> x(_x, 1, -offset);
+	const IntView<4> x(_x, 1, -offset);
 	for (int i = 0; i < a.size(); i++) {
 		sat.addClause(y = a[i], x != i);
 	}
@@ -62,8 +62,8 @@ void array_int_element(IntVar* _x, vec<int>& a, IntVar* _y, int offset) {
 	_y->specialiseToSL(z);
 	_x->specialiseToEL();
 
-	IntView<0> y(_y);
-	IntView<4> x(_x, 1, -offset);
+	const IntView<0> y(_y);
+	const IntView<4> x(_x, 1, -offset);
 
 	for (int i = 0; i < a.size(); i++) {
 		sat.addClause(y = a[i], x != i);
@@ -102,7 +102,7 @@ void array_int_element(IntVar* _x, vec<int>& a, IntVar* _y, int offset) {
 
 void array_var_bool_element(IntVar* _x, vec<BoolView>& a, BoolView y, int offset) {
 	_x->specialiseToEL();
-	IntView<4> x(_x, 1, -offset);
+	const IntView<4> x(_x, 1, -offset);
 	vec<Lit> ps1(a.size() + 1);
 	vec<Lit> ps2(a.size() + 1);
 	// Add clause !y \/ c_1 \/ ... \/ c_n
@@ -140,8 +140,8 @@ void array_var_bool_element(IntVar* _x, vec<BoolView>& a, BoolView y, int offset
 template <int U = 0, int V = 0, int W = 0>
 class IntElemBoundsImp : public Propagator {
 	BoolView b;
-	IntView<U> const y;
-	IntView<V> const x;
+	const IntView<U> y;
+	const IntView<V> x;
 	vec<IntView<W> > a;
 
 	// persistent state
@@ -227,7 +227,7 @@ public:
 		// y = a[fixed_index]
 		if (is_fixed != 0) {
 			assert(x.getVal() == fixed_index);
-			IntView<W>& f = a[fixed_index];
+			const IntView<W>& f = a[fixed_index];
 			if (b.isFixed()) {
 				setDom(y, setMin, f.getMin(), Reason_new({b.getValLit(), f.getMinLit(), x.getValLit()}));
 				setDom(f, setMin, y.getMin(), Reason_new({b.getValLit(), y.getMinLit(), x.getValLit()}));
@@ -292,14 +292,14 @@ public:
 		}
 
 		if (no_min_support) {
-			int64_t old_m = y.getMin();
+			const int64_t old_m = y.getMin();
 			int64_t new_m = INT64_MAX;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
 				if (!x.indomain(i)) {
 					continue;
 				}
-				int64_t cur_m = a[i].getMin();
+				const int64_t cur_m = a[i].getMin();
 				if (cur_m < new_m) {
 					best = i;
 					new_m = cur_m;
@@ -337,14 +337,14 @@ public:
 		}
 
 		if (no_max_support) {
-			int64_t old_m = y.getMax();
+			const int64_t old_m = y.getMax();
 			int64_t new_m = INT_MIN;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
 				if (!x.indomain(i)) {
 					continue;
 				}
-				int64_t cur_m = a[i].getMax();
+				const int64_t cur_m = a[i].getMax();
 				if (cur_m > new_m) {
 					best = i;
 					new_m = cur_m;
@@ -404,8 +404,8 @@ public:
 
 template <int U = 0, int V = 0, int W = 0>
 class IntElemBounds : public Propagator {
-	IntView<U> const y;
-	IntView<V> const x;
+	const IntView<U> y;
+	const IntView<V> x;
 	vec<IntView<W> > a;
 
 	// persistent state
@@ -467,7 +467,7 @@ public:
 		// y = a[fixed_index]
 		if (fixed_index >= 0) {
 			assert(x.getVal() == fixed_index);
-			IntView<W>& f = a[fixed_index];
+			const IntView<W>& f = a[fixed_index];
 			setDom(y, setMin, f.getMin(), f.getMinLit(), x.getValLit());
 			setDom(f, setMin, y.getMin(), y.getMinLit(), x.getValLit());
 			setDom(y, setMax, f.getMax(), f.getMaxLit(), x.getValLit());
@@ -491,14 +491,14 @@ public:
 		}
 
 		if (no_min_support) {
-			int64_t old_m = y.getMin();
+			const int64_t old_m = y.getMin();
 			int64_t new_m = INT64_MAX;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
 				if (!x.indomain(i)) {
 					continue;
 				}
-				int64_t cur_m = a[i].getMin();
+				const int64_t cur_m = a[i].getMin();
 				if (cur_m < new_m) {
 					best = i;
 					new_m = cur_m;
@@ -525,14 +525,14 @@ public:
 		}
 
 		if (no_max_support) {
-			int64_t old_m = y.getMax();
+			const int64_t old_m = y.getMax();
 			int64_t new_m = INT_MIN;
 			int best = -1;
 			for (int i = 0; i < a.size(); i++) {
 				if (!x.indomain(i)) {
 					continue;
 				}
-				int64_t cur_m = a[i].getMax();
+				const int64_t cur_m = a[i].getMax();
 				if (cur_m > new_m) {
 					best = i;
 					new_m = cur_m;
@@ -580,8 +580,8 @@ public:
 
 template <int U = 0, int V = 0, int W = 0>
 class IntElemDomain : public Propagator {
-	IntView<U> const y;
-	IntView<V> const x;
+	const IntView<U> y;
+	const IntView<V> x;
 	vec<IntView<W> > a;
 
 	// persistent state
@@ -649,12 +649,12 @@ public:
 					(*r)[1] = x.getMinLit();
 					(*r)[2] = x.getMaxLit();
 					for (int i = x.getMin(); i <= x.getMax(); i++) {
-						int reasonIndex = 3 + i - x.getMin();
+						const int reasonIndex = 3 + i - x.getMin();
 						if (x.indomain(i)) {
-							Lit l = ~a[i].getLit(v, LR_NE);
+							const Lit l = ~a[i].getLit(v, LR_NE);
 							(*r)[reasonIndex] = l;
 						} else {
-							Lit l = ~x.getLit(i, LR_NE);
+							const Lit l = ~x.getLit(i, LR_NE);
 							(*r)[reasonIndex] = l;
 						}
 					}
@@ -683,14 +683,14 @@ public:
 
 		// propagate holes in a_i
 		if (x.isFixed()) {
-			int v = x.getVal();
-			IntView<W>& f = a[v];
+			const int v = x.getVal();
+			const IntView<W>& f = a[v];
 			setDom(y, setMin, f.getMin(), f.getMinLit(), x.getValLit());
 			setDom(f, setMin, y.getMin(), y.getMinLit(), x.getValLit());
 			setDom(y, setMax, f.getMax(), f.getMaxLit(), x.getValLit());
 			setDom(f, setMax, y.getMax(), y.getMaxLit(), x.getValLit());
 			for (typename IntView<W>::iterator i = a[v].begin(); i != a[v].end();) {
-				int w = *i++;
+				const int w = *i++;
 				if (!y.indomain(w) &&
 						!a[v].remVal(w,
 												 so.lazy ? Reason(~y.getLit(w, LR_NE), ~x.getLit(v, LR_EQ)) : Reason())) {

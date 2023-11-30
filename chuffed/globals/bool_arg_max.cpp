@@ -11,9 +11,9 @@
 
 class BoolArgMax : public Propagator {
 public:
-	int const sz;
+	const int sz;
 	BoolView* const x;
-	IntView<> const y;
+	const IntView<> y;
 	int offset;
 	BoolArgMax(vec<BoolView> _x, int _offset, IntView<> _y)
 			: sz(_x.size()), x(_x.release()), y(_y), offset(_offset) {
@@ -30,7 +30,7 @@ public:
 		// u = index of first x that must be true
 		// y <= u because x[u]
 
-		int ol = y.getMin();
+		const int ol = y.getMin();
 		for (int i = 0; i < ol - offset; i++) {
 			if (x[i].setValNotR(false)) {
 				Clause* r = nullptr;
@@ -45,7 +45,7 @@ public:
 		}
 
 		if (y.isFixed()) {
-			int yl = y.getVal() - offset;
+			const int yl = y.getVal() - offset;
 			if (x[yl].setValNotR(true)) {
 				Clause* r = nullptr;
 				if (so.lazy) {
@@ -63,7 +63,7 @@ public:
 
 		vec<int> toFix;
 		for (typename IntView<>::iterator yi = y.begin(); yi != y.end(); ++yi) {
-			int i = *yi - offset;
+			const int i = *yi - offset;
 			if (l == sz && (!x[i].isFixed() || x[i].isTrue())) {
 				l = i;
 			}
@@ -112,7 +112,7 @@ public:
 		}
 
 		if (y.isFixed()) {
-			int yl = y.getVal() - offset;
+			const int yl = y.getVal() - offset;
 			if (x[yl].setValNotR(true)) {
 				Clause* r = nullptr;
 				if (so.lazy) {
@@ -124,7 +124,7 @@ public:
 				}
 			}
 		}
-		int nl = y.getMin();
+		const int nl = y.getMin();
 		for (int i = ol - offset; i < nl - offset; i++) {
 			if (x[i].setValNotR(false)) {
 				Clause* r = nullptr;

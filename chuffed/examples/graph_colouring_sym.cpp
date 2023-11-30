@@ -38,7 +38,7 @@ public:
 
 		partitions.growTo(p);
 		for (int i = 0; i < p; i++) {
-			int x_size = x.size();
+			const int x_size = x.size();
 			rassert(fscanf(fp, "%d %d\n", &temp, &temp2) == 2);
 			for (int j = 0; j < temp; j++) {
 				x.push(newIntVar(1, v));

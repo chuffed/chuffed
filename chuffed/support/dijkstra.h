@@ -59,9 +59,9 @@ public:
 	inline int isInShortestPath(int tl, int hd) { return static_cast<int>(pred[hd] == tl); }
 
 	virtual void on_visiting_node(int n) {}
-	virtual bool ignore_edge(int e) { return false; }
+	virtual bool ignore_edge(int /*e*/) { return false; }
 	virtual void on_ignore_edge(int e) {}
-	virtual bool ignore_node(int n) { return false; }
+	virtual bool ignore_node(int /*n*/) { return false; }
 	virtual void enqueue(tuple node) { q.push(node); }
 	void set_verbose(bool v) { verbose = v; }
 	void print_pred() const;
@@ -157,7 +157,7 @@ public:
 	std::vector<std::unordered_map<size_t, tuple>> table;
 	using map_type = std::unordered_map<size_t, tuple>;
 	static inline unsigned long hash_fn(std::vector<bool>& b) {
-		std::hash<std::vector<bool>> h;
+		const std::hash<std::vector<bool>> h;
 		return h(b);
 	}
 	using table_iterator = std::unordered_map<size_t, tuple>::const_iterator;
@@ -177,14 +177,14 @@ public:
 	virtual int run(bool* ok = nullptr, bool use_set_target = false);
 #endif
 
-	virtual bool ignore_edge(int e) { return false; }
-	virtual bool ignore_node(int n) { return false; }
-	virtual bool ignore_edge_scc(int e) { return false; }
-	virtual bool ignore_node_scc(int n) { return false; }
+	virtual bool ignore_edge(int /*e*/) { return false; }
+	virtual bool ignore_node(int /*n*/) { return false; }
+	virtual bool ignore_edge_scc(int /*e*/) { return false; }
+	virtual bool ignore_node_scc(int /*n*/) { return false; }
 	virtual void enqueue(const tuple& node) { q.emplace(node); }
-	virtual bool stop_at_node(int n) { return false; }
-	virtual bool mandatory_node(int n) { return false; }
-	virtual bool mandatory_edge(int e) { return false; }
+	virtual bool stop_at_node(int /*n*/) { return false; }
+	virtual bool mandatory_node(int /*n*/) { return false; }
+	virtual bool mandatory_edge(int /*e*/) { return false; }
 	static std::vector<int> DEFAULT_VECTOR;
 	virtual std::vector<int>& mandatory_nodes() { return DijkstraMandatory::DEFAULT_VECTOR; }
 	inline virtual int weight(int e, int time = -1) {
@@ -203,7 +203,7 @@ public:
 
 	inline void set_target(const std::vector<int>& tar) {
 		target = std::vector<bool>(tar.size(), false);
-		for (int i : tar) {
+		for (const int i : tar) {
 			target[i] = true;
 		}
 	}

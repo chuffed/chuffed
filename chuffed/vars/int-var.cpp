@@ -312,7 +312,7 @@ DecInfo* IntVar::branch() {
 			if (vals == nullptr) {
 				CHUFFED_ERROR("Median value selection is not supported this variable.\n");
 			} else {
-				int values = (size() - 1) / 2;
+				const int values = (size() - 1) / 2;
 				iterator j = begin();
 				for (int i = 0; i < values; ++i) {
 					++j;
@@ -358,7 +358,7 @@ inline void IntVar::updateFixed() {
 	}
 }
 
-bool IntVar::setMin(int64_t v, Reason r, bool channel) {
+bool IntVar::setMin(int64_t v, Reason /*r*/, bool /*channel*/) {
 	assert(setMinNotR(v));
 	if (v > max) {
 		return false;
@@ -385,7 +385,7 @@ bool IntVar::setMin(int64_t v, Reason r, bool channel) {
 	return true;
 }
 
-bool IntVar::setMax(int64_t v, Reason r, bool channel) {
+bool IntVar::setMax(int64_t v, Reason /*r*/, bool /*channel*/) {
 	assert(setMaxNotR(v));
 	if (v < min) {
 		return false;
@@ -412,7 +412,7 @@ bool IntVar::setMax(int64_t v, Reason r, bool channel) {
 	return true;
 }
 
-bool IntVar::setVal(int64_t v, Reason r, bool channel) {
+bool IntVar::setVal(int64_t v, Reason /*r*/, bool /*channel*/) {
 	assert(setValNotR(v));
 	if (!indomain(v)) {
 		return false;
@@ -432,7 +432,7 @@ bool IntVar::setVal(int64_t v, Reason r, bool channel) {
 	return true;
 }
 
-bool IntVar::remVal(int64_t v, Reason r, bool channel) {
+bool IntVar::remVal(int64_t v, Reason /*r*/, bool /*channel*/) {
 	assert(remValNotR(v));
 	if (isFixed()) {
 		return false;

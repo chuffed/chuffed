@@ -134,7 +134,7 @@ ValBranch ann2ivalsel(AST::Node* ann) {
 	return VAL_DEFAULT;
 }
 
-FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int setVars)
+FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int /*setVars*/)
 		: iv(intVars), iv_introduced(intVars), bv(boolVars), bv_introduced(boolVars) {
 	s = this;
 }
@@ -168,7 +168,7 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 				intVarString.insert(std::pair<IntVar*, std::string>(v, name));
 			} else {
 				vec<int> d;
-				for (int& i : sl->s) {
+				for (const int& i : sl->s) {
 					d.push(i);
 				}
 				std::sort((int*)d, (int*)d + d.size());
@@ -367,7 +367,7 @@ void FlatZincSpace::parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup*
 			// Removal of constants
 			IntVar* v = nullptr;
 			if (i->isInt()) {
-				int value = i->getInt();
+				const int value = i->getInt();
 				v = getConstant(value);
 			} else {
 				v = iv[i->getIntVar()];
@@ -396,7 +396,7 @@ void FlatZincSpace::parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup*
 }
 
 void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* branching,
-																					 int& nbNonEmptySearchAnnotations) {
+																					 int& /*nbNonEmptySearchAnnotations*/) {
 	vec<Lit> decs;
 	if (elemAnn->isCall("warm_start_bool")) {
 		AST::Call* call = elemAnn->getCall("warm_start_bool");
@@ -406,7 +406,7 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_bool annotation.\n");
 		}
-		int sz = std::min(vars->a.size(), vals->a.size());
+		const int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
 			decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
 		}
@@ -418,10 +418,10 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
 		}
-		int sz = std::min(vars->a.size(), vals->a.size());
+		const int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
 			IntVar* x(iv[vars->a[ii]->getIntVar()]);
-			int k(vals->a[ii]->getInt());
+			const int k(vals->a[ii]->getInt());
 			switch (x->getType()) {
 				case INT_VAR_EL:
 				case INT_VAR_SL:
@@ -429,7 +429,7 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 					break;
 				default:
 					// Fallback. TODO: Do something nicer here.
-					BoolView r = ::newBoolVar();
+					const BoolView r = ::newBoolVar();
 					int_rel_reif(x, IRT_EQ, k, r);
 					decs.push(r.getLit(true));
 					break;
@@ -626,7 +626,7 @@ void FlatZincSpace::setOutput() const {
 	for (auto* ai : output->a) {
 		if (ai->isArray()) {
 			AST::Array* aia = ai->getArray();
-			int size = aia->a.size();
+			const int size = aia->a.size();
 			for (int j = 0; j < size; j++) {
 				setOutputElem(aia->a[j]);
 			}
@@ -719,8 +719,8 @@ bool FlatZincSpace::onRestart(Engine* e) {
 		if (!solution_found) {
 			e->assumptions.clear();
 		} else if (e->assumptions.size() > 1) {
-			Lit p = e->opt_type != 0 ? e->opt_var->getLit(e->best_sol + 1, LR_GE)
-															 : e->opt_var->getLit(e->best_sol - 1, LR_LE);
+			const Lit p = e->opt_type != 0 ? e->opt_var->getLit(e->best_sol + 1, LR_GE)
+																		 : e->opt_var->getLit(e->best_sol - 1, LR_LE);
 			e->assumptions.clear();
 			e->assumptions.push(toInt(p));
 		}
@@ -736,7 +736,7 @@ bool FlatZincSpace::onRestart(Engine* e) {
 		}
 	};
 	auto assume_bool_val = [&](BoolView bv, bool v) {
-		BoolView nv = v ? bv : ~bv;
+		BoolView const nv = v ? bv : ~bv;
 		e->assumptions.push(toInt(nv));
 	};
 

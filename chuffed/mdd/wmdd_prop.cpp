@@ -31,7 +31,7 @@
 #define EARLY_CUTOFF
 
 DisjRef mkDisjRef(vec<EdgeID>& es) {
-	int mem_size = sizeof(Disj) + (es.size() - 1) * sizeof(EdgeID);
+	const int mem_size = sizeof(Disj) + (es.size() - 1) * sizeof(EdgeID);
 	void* mem = malloc(mem_size);
 	Disj* disj = new (mem) Disj;
 
@@ -88,11 +88,11 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 	// Literals for each assignment [| x != i |]
 	vec<vec<int> > val_edges;
 	for (int i = 0; i < intvars.size(); i++) {
-		int min = intvars[i].getMin();
-		int max = intvars[i].getMax();
-		int dom = max - min + 1;
-		int offset = boolvars.size();
-		VarInfo info(min, offset, dom);
+		const int min = intvars[i].getMin();
+		const int max = intvars[i].getMax();
+		const int dom = max - min + 1;
+		const int offset = boolvars.size();
+		const VarInfo info(min, offset, dom);
 		varinfo.push(info);
 
 		for (int j = min; j <= max; j++) {
@@ -122,8 +122,8 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 		in_vec[e.end].push(ei);
 		out_vec[e.begin].push(ei);
 
-		VarInfo vinfo(varinfo[_levels[e.begin]]);
-		int vidx = vinfo.offset + (e.val - vinfo.min);
+		const VarInfo vinfo(varinfo[_levels[e.begin]]);
+		const int vidx = vinfo.offset + (e.val - vinfo.min);
 		val_edges[vidx].push(ei);
 		// Rename the edge value to be the unique (var,val) index.
 		e.val = vidx;
@@ -147,8 +147,8 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 			assert(ni == 0);
 		}
 
-		Node curr = {// Basic properties
-								 _levels[ni], in_edges, out_edges};
+		const Node curr = {// Basic properties
+											 _levels[ni], in_edges, out_edges};
 		nodes.push(curr);
 
 		in_base.push(0);
@@ -157,14 +157,14 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 	expl_care.growTo(nodes.size());
 
 	for (int vv = 0; vv < intvars.size(); vv++) {
-		VarInfo vinfo(varinfo[vv]);
+		const VarInfo vinfo(varinfo[vv]);
 		int vidx = vinfo.offset;
 		int val = vinfo.min;
-		int end = vinfo.min + vinfo.dom;
+		const int end = vinfo.min + vinfo.dom;
 		for (; val < end; val++, vidx++) {
 			// Create the array of supports.
 			DisjRef disj(mkDisjRef(val_edges[vidx]));
-			Val vref = {vv, val, disj};
+			const Val vref = {vv, val, disj};
 			vals.push(vref);
 
 			// Set up the watches.
@@ -182,14 +182,14 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 	cost.attach(this, boolvars.size(), EVENT_U);
 
 	// Ensure all the paths are initialized.
-	bool okay = fullProp();
+	const bool okay = fullProp();
 	if (!okay) {
 		TL_FAIL();
 	}
 
 	for (int nID = 0; nID < nodes.size(); nID++) {
-		int inV = nodes[nID].in_value;
-		int outV = nodes[nID].out_value;
+		const int inV = nodes[nID].in_value;
+		const int outV = nodes[nID].out_value;
 		nodes[nID].in_pathC = inV;
 		nodes[nID].out_pathC = outV;
 
@@ -213,7 +213,7 @@ void WMDDProp::compact() {
 	int maxC = cost.getMax();
 #endif
 	for (int nID = 0; nID < nodes.size(); nID++) {
-		Node& node(nodes[nID]);
+		const Node& node(nodes[nID]);
 #ifndef FULL_PROP
 		in_base[nID] = node.in_pathC;
 		out_base[nID] = node.out_pathC;
@@ -224,7 +224,7 @@ void WMDDProp::compact() {
 
 		int jj = 0;
 		for (int ei = 0; ei < node.out->sz; ei++) {
-			int eid = node.out->edges[ei];
+			const int eid = node.out->edges[ei];
 #ifdef FULL_PROP
 			Edge& edge(edges[eid]);
 			if (boolvars[edge.val].isFalse() || nodes[edge.end].out_value == INT_MAX ||
@@ -242,7 +242,7 @@ void WMDDProp::compact() {
 
 		jj = 0;
 		for (int ei = 0; ei < node.in->sz; ei++) {
-			int eid = node.in->edges[ei];
+			const int eid = node.in->edges[ei];
 #ifdef FULL_PROP
 			Edge& edge(edges[eid]);
 			if (boolvars[edge.val].isFalse() || node.out_value == INT_MAX ||
@@ -260,7 +260,7 @@ void WMDDProp::compact() {
 	}
 #ifndef FULL_PROP
 	for (int vv = 0; vv < vals.size(); vv++) {
-		Val& vinfo(vals[vv]);
+		const Val& vinfo(vals[vv]);
 		int jj = 0;
 		for (int ii = 0; ii < vinfo.edges->sz; ii++) {
 			if (dead_edges.elem(vinfo.edges->edges[ii])) {
@@ -271,7 +271,7 @@ void WMDDProp::compact() {
 		vinfo.edges->sz = jj;
 		vinfo.edges->curr_sz = jj;
 		if (jj > 0) {
-			int eid = vinfo.edges->edges[0];
+			const int eid = vinfo.edges->edges[0];
 			if (!CHECK_WATCH(eid, W_VAL)) {
 				SET_WATCH(eid, W_VAL);
 			}
@@ -286,7 +286,7 @@ bool WMDDProp::propagate() {
 #else
 	nodes[T].status = 0;
 	nodes[root].status = 0;
-	bool ret = incProp();
+	const bool ret = incProp();
 #endif
 
 	if (sat.decisionLevel() == 0 && ret) {
@@ -319,13 +319,13 @@ bool WMDDProp::fullProp() {
 	int qidx = 0;
 
 	while (qidx < stateQ.size()) {
-		int nID = stateQ[qidx];
-		Node& node(nodes[nID]);
+		const int nID = stateQ[qidx];
+		const Node& node(nodes[nID]);
 
 		//    for(int ei = 0; ei < node.out->sz; ei++)
 		for (int ei = 0; ei < node.out->curr_sz; ei++) {
-			int eid = node.out->edges[ei];
-			Edge& e(edges[eid]);
+			const int eid = node.out->edges[ei];
+			const Edge& e(edges[eid]);
 
 			//      if(fixedvars.elem(e.val))
 			if (boolvars[e.val].isFalse()) {
@@ -345,8 +345,8 @@ bool WMDDProp::fullProp() {
 		qidx++;
 	}
 
-	int minC = nodes[T].in_value;
-	int maxC = cost.getMax();
+	const int minC = nodes[T].in_value;
+	const int maxC = cost.getMax();
 	// Check feasibility.
 	if (minC > maxC) {
 		// Clear the status flags.
@@ -366,7 +366,7 @@ bool WMDDProp::fullProp() {
 		return false;
 	}
 	if (cost.setMinNotR(minC)) {
-		Reason r = createReason((minC << 1) | 1);
+		const Reason r = createReason((minC << 1) | 1);
 		if (!cost.setMin(minC, r)) {
 			return false;
 		}
@@ -374,7 +374,7 @@ bool WMDDProp::fullProp() {
 
 	// Walk backwards, propagating the shortest path to T.
 	for (qidx = stateQ.size() - 1; qidx >= 0; qidx--) {
-		int nID = stateQ[qidx];
+		const int nID = stateQ[qidx];
 		Node& node(nodes[nID]);
 
 		// Reset the status flags on the way back.
@@ -384,16 +384,16 @@ bool WMDDProp::fullProp() {
 		int sz = node.out->curr_sz;
 		//    for(int ei = 0; ei < node.out->sz; ei++)
 		for (int ei = sz - 1; ei >= 0; ei--) {
-			int eid = node.out->edges[ei];
+			const int eid = node.out->edges[ei];
 
-			Edge& e(edges[eid]);
+			const Edge& e(edges[eid]);
 			//      if(fixedvars.elem(e.val))
 			if (boolvars[e.val].isFalse()) {
 				std::swap(node.out->edges[ei], node.out->edges[--sz]);
 				continue;
 			}
 
-			Node& dest(nodes[e.end]);
+			const Node& dest(nodes[e.end]);
 			// Need to be careful adding anything to INT_MAX when it's to be
 			// stored as an integer.
 			if (dest.out_value == INT_MAX || node.in_value + e.weight + dest.out_value > maxC) {
@@ -415,8 +415,8 @@ bool WMDDProp::fullProp() {
 #endif
 	for (int vv = 0; vv < vals.size(); vv++) {
 		if (vals[vv].status != 0U) {
-			int var(vals[vv].var);
-			int val(vals[vv].val);
+			const int var(vals[vv].var);
+			const int val(vals[vv].val);
 			if (intvars[var].remValNotR(val)) {
 #ifdef DEBUG_INFER
 				if (!changes) {
@@ -427,7 +427,7 @@ bool WMDDProp::fullProp() {
 				}
 				printf("%d", vv);
 #endif
-				Reason r = createReason(vv << 1);
+				const Reason r = createReason(vv << 1);
 				if (!intvars[var].remVal(val, r)) {
 					return false;
 				}
@@ -456,14 +456,14 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 		// Remove any additional edges corresponding to values removed from the current variable, and
 		// enqueue the affected nodes.
 		for (; clear_idx < clear_queue.size(); clear_idx++) {
-			int vv = clear_queue[clear_idx];
+			const int vv = clear_queue[clear_idx];
 			if (vals[vv].var != level) {
 				break;
 			}
 
 			DisjRef es(vals[vv].edges);
 			for (int ei = 0; ei < es->sz; ei++) {
-				int eid = es->edges[ei];
+				const int eid = es->edges[ei];
 				assert(eid < edges.size());
 				if (dead_edges.elem(eid)) {
 					continue;
@@ -481,9 +481,9 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			}
 		}
 
-		int down_next = downQ.size();
+		const int down_next = downQ.size();
 		for (; down_idx < down_next; down_idx++) {
-			int nID = downQ[down_idx];
+			const int nID = downQ[down_idx];
 			Node& node(nodes[nID]);
 			node.status = 0;
 #ifdef EARLY_CUTOFF
@@ -493,17 +493,18 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 #endif
 
 			// Compute the updated cost c(r -> n)
-			int oldC = node.in_pathC;
+			const int oldC = node.in_pathC;
 			int bestC = INT_MAX;
 			for (int ei = 0; ei < node.in->sz; ei++) {
-				int eid = node.in->edges[ei];
+				const int eid = node.in->edges[ei];
 				assert(eid < edges.size());
 				//        if(dead_edges.elem(eid))
 				if (fixedvars.elem(edges[eid].val)) {
 					continue;
 				}
-				Edge& e(edges[eid]);
-				int eC = nodes[e.begin].in_pathC == INT_MAX ? INT_MAX : nodes[e.begin].in_pathC + e.weight;
+				const Edge& e(edges[eid]);
+				const int eC =
+						nodes[e.begin].in_pathC == INT_MAX ? INT_MAX : nodes[e.begin].in_pathC + e.weight;
 				if (eC < bestC) {
 					bestC = eC;
 					if (bestC == oldC) {
@@ -522,7 +523,7 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			trailChange(node.in_pathC, bestC);
 			if (bestC == INT_MAX) {
 				for (int ei = 0; ei < node.out->sz; ei++) {
-					int eid = node.out->edges[ei];
+					const int eid = node.out->edges[ei];
 					assert(eid < edges.size());
 					if (dead_edges.elem(eid)) {
 						continue;
@@ -532,7 +533,7 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 						valQ.push(edges[eid].val);
 					}
 
-					Edge& e(edges[eid]);
+					const Edge& e(edges[eid]);
 
 					if (nodes[e.end].status == 0) {
 						nodes[e.end].status = 1;
@@ -542,14 +543,14 @@ void WMDDProp::incPropDown(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			} else {
 				// Propagate the affected nodes, updating
 				for (int ei = 0; ei < node.out->sz; ei++) {
-					int eid = node.out->edges[ei];
+					const int eid = node.out->edges[ei];
 					assert(eid < edges.size());
 					if (dead_edges.elem(eid)) {
 						continue;
 					}
 					// If nodes[e.end].out_pathC was INT_MAX, e would already
 					// be dead; so we don't need to worry about INT_MAX-y nodes.
-					Edge& e(edges[eid]);
+					const Edge& e(edges[eid]);
 					if (bestC + e.weight + nodes[e.end].out_pathC > maxC) {
 						dead_edges.insert(eid);
 						if (CHECK_WATCH(eid, W_VAL)) {
@@ -581,14 +582,14 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 		// Remove any additional edges corresponding to values removed from the current variable, and
 		// enqueue the affected nodes.
 		for (; clear_idx >= 0; clear_idx--) {
-			int vv = clear_queue[clear_idx];
+			const int vv = clear_queue[clear_idx];
 			if (vals[vv].var != level) {
 				break;
 			}
 
 			DisjRef es(vals[vv].edges);
 			for (int ei = 0; ei < es->sz; ei++) {
-				int eid = es->edges[ei];
+				const int eid = es->edges[ei];
 				assert(eid < edges.size());
 				// All these edges are already dead, since we've run incPropDown.
 				// We use kill-flags instead.
@@ -609,9 +610,9 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			}
 		}
 
-		int up_next = upQ.size();
+		const int up_next = upQ.size();
 		for (; up_idx < up_next; up_idx++) {
-			int nID = upQ[up_idx];
+			const int nID = upQ[up_idx];
 			assert(nID < nodes.size());
 			Node& node(nodes[nID]);
 			node.status = 0;
@@ -622,16 +623,17 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 #endif
 
 			// Compute the updated cost c(r -> n)
-			int oldC = node.out_pathC;
+			const int oldC = node.out_pathC;
 			int bestC = INT_MAX;
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 				//        if(dead_edges.elem(eid))
 				if (fixedvars.elem(e.val)) {
 					continue;
 				}
-				int eC = nodes[e.end].out_pathC == INT_MAX ? INT_MAX : nodes[e.end].out_pathC + e.weight;
+				const int eC =
+						nodes[e.end].out_pathC == INT_MAX ? INT_MAX : nodes[e.end].out_pathC + e.weight;
 				//        int eC = nodes[e.end].out_pathC + e.weight;
 				if (eC < bestC) {
 					bestC = eC;
@@ -651,7 +653,7 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			trailChange(node.out_pathC, bestC);
 			if (bestC == INT_MAX) {
 				for (int ei = 0; ei < node.in->sz; ei++) {
-					int eid = node.in->edges[ei];
+					const int eid = node.in->edges[ei];
 					assert(eid < edges.size());
 					if (dead_edges.elem(eid)) {
 						continue;
@@ -661,7 +663,7 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 						valQ.push(edges[eid].val);
 					}
 
-					Edge& e(edges[eid]);
+					const Edge& e(edges[eid]);
 					if (nodes[e.begin].status == 0) {
 						assert(e.begin < nodes.size());
 						nodes[e.begin].status = 1;
@@ -671,14 +673,14 @@ void WMDDProp::incPropUp(vec<int>& clear_queue, int maxC, vec<int>& valQ) {
 			} else {
 				// Propagate the affected nodes, updating
 				for (int ei = 0; ei < node.in->sz; ei++) {
-					int eid = node.in->edges[ei];
+					const int eid = node.in->edges[ei];
 					assert(eid < edges.size());
 					if (dead_edges.elem(eid)) {
 						continue;
 					}
 					// If nodes[e.end].in_pathC was INT_MAX, e would already
 					// be dead; so we don't need to worry about INT_MAX-y nodes.
-					Edge& e(edges[eid]);
+					const Edge& e(edges[eid]);
 					if (bestC + e.weight + nodes[e.begin].in_pathC > maxC) {
 						dead_edges.insert(eid);
 						if (CHECK_WATCH(eid, W_VAL)) {
@@ -705,7 +707,7 @@ bool WMDDProp::incProp() {
 	// So it should be sufficient to check the value watches
 	// for any edges such that
 	// c(r -> begin) + weight + c(dest -> T) > ub(cost)
-	int maxC = cost.getMax();
+	const int maxC = cost.getMax();
 	if (cost_changed) {
 		// Pretty sure this should never fire, since
 		// we should have propagated lb(cost) >= c(r -> T)
@@ -747,7 +749,7 @@ bool WMDDProp::incProp() {
 	incPropDown(clear_queue, maxC, valQ);
 
 	// Check if a path c(r -> n) is still feasible.
-	int minC = nodes[T].in_pathC;
+	const int minC = nodes[T].in_pathC;
 	if (minC > maxC) {
 		if (so.lazy) {
 			// Generate an explanation.
@@ -757,7 +759,7 @@ bool WMDDProp::incProp() {
 		return false;
 	}
 	if (cost.setMinNotR(minC)) {
-		Reason r = createReason((minC << 1) | 1);
+		const Reason r = createReason((minC << 1) | 1);
 		if (!cost.setMin(minC, r)) {
 			return false;
 		}
@@ -773,13 +775,13 @@ bool WMDDProp::incProp() {
 	std::sort((int*)valQ, ((int*)valQ) + valQ.size());
 
 	for (int vi = 0; vi < valQ.size(); vi++) {
-		int vv = valQ[vi];
+		const int vv = valQ[vi];
 		Val& vinfo(vals[vv]);
 		vinfo.status = 0;
 
 		// Search for a new watch.
 		for (int ei = 0; ei < vinfo.edges->sz; ei++) {
-			int eid = vinfo.edges->edges[ei];
+			const int eid = vinfo.edges->edges[ei];
 			if (!dead_edges.elem(eid)) {
 				// Update the watches.
 				CLEAR_WATCH(vinfo.edges->edges[0], W_VAL);
@@ -792,8 +794,8 @@ bool WMDDProp::incProp() {
 
 		// No watch. Kill the val.
 		{
-			int var(vinfo.var);
-			int val(vinfo.val);
+			const int var(vinfo.var);
+			const int val(vinfo.val);
 			if (intvars[var].remValNotR(val)) {
 #ifdef DEBUG_INFER
 				if (!changes) {
@@ -804,7 +806,7 @@ bool WMDDProp::incProp() {
 				}
 				printf("%d", vv);
 #endif
-				Reason r = createReason(vv << 1);
+				const Reason r = createReason(vv << 1);
 				if (!intvars[var].remVal(val, r)) {
 					return false;
 				}
@@ -874,14 +876,14 @@ int WMDDProp::compute_minC(int var, int val) {
 	nodes[T].in_value = INT_MAX;
 
 	while (qidx < stateQ.size()) {
-		int nID = stateQ[qidx];
-		Node& node(nodes[nID]);
+		const int nID = stateQ[qidx];
+		const Node& node(nodes[nID]);
 
 		// The path must pass through [|x = v|].
 		if (node.var == var) {
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 				if (e.val == val) {
 					Node& dest(nodes[e.end]);
 					if (dest.status == 0) {
@@ -896,8 +898,8 @@ int WMDDProp::compute_minC(int var, int val) {
 		} else {
 			// For any other node, just compute the distance similarly.
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 
 				//        if(boolvars[e.val].isFalse())
 				if (fixedvars.elem(e.val)) {
@@ -932,15 +934,15 @@ int WMDDProp::late_minC(int var, int val) {
 	nodes[T].in_value = INT_MAX;
 
 	while (qidx < stateQ.size()) {
-		int nID = stateQ[qidx];
+		const int nID = stateQ[qidx];
 		Node& node(nodes[nID]);
 		node.status = 0;
 
 		// The path must pass through [|x = v|].
 		if (node.var == var) {
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 				if (e.val == val) {
 					Node& dest(nodes[e.end]);
 					if (dest.status == 0) {
@@ -955,8 +957,8 @@ int WMDDProp::late_minC(int var, int val) {
 		} else {
 			// For any other node, just compute the distance similarly.
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 
 				//        if(boolvars[e.val].isFalse())
 				if (vals[e.val].status != 0U) {
@@ -998,10 +1000,10 @@ int WMDDProp::mark_frontier(int var, int val) {
 
 		if (node.var == var) {
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& e(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& e(edges[eid]);
 				if (e.val == val) {
-					int dC = nodes[e.end].out_value;
+					const int dC = nodes[e.end].out_value;
 					if (dC < INT_MAX) {
 						dist_from = dC + e.weight;
 					}
@@ -1009,15 +1011,15 @@ int WMDDProp::mark_frontier(int var, int val) {
 			}
 		} else {
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
+				const int eid = node.out->edges[ei];
 
-				Edge& e(edges[eid]);
+				const Edge& e(edges[eid]);
 				//        if(boolvars[e.val].isFalse())
 				if (fixedvars.elem(e.val)) {
 					continue;
 				}
 
-				Node& dest(nodes[e.end]);
+				const Node& dest(nodes[e.end]);
 				// Need to be careful adding anything to INT_MAX when it's to be
 				// stored as an integer.
 				if (dest.out_value == INT_MAX) {
@@ -1232,15 +1234,15 @@ void WMDDProp::minimize_expln(int var, int val, int maxC) {
 		// Ensure that we're keeping track of the levels correctly.
 		assert(nodes[stateQ[qhead]].var == level);
 
-		int qnext = stateQ.size();
+		const int qnext = stateQ.size();
 
 		if (level == var) {
 			for (; qhead < qnext; qhead++) {
-				int nID = stateQ[qhead];
+				const int nID = stateQ[qhead];
 				Node& node(nodes[nID]);
 				for (int ei = 0; ei < node.out->sz; ei++) {
-					int eid = node.out->edges[ei];
-					Edge& e(edges[eid]);
+					const int eid = node.out->edges[ei];
+					const Edge& e(edges[eid]);
 					if (e.val == val) {
 						if (nodes[e.end].status == 0) {
 							nodes[e.end].status = 1;
@@ -1259,15 +1261,15 @@ void WMDDProp::minimize_expln(int var, int val, int maxC) {
 			int val_count = 0;
 #endif
 			for (int qidx = qhead; qidx < qnext; qidx++) {
-				int nID = stateQ[qidx];
-				Node& node(nodes[nID]);
+				const int nID = stateQ[qidx];
+				const Node& node(nodes[nID]);
 				if (node.in_value + out_base[nID] > maxC) {
 					continue;
 				}
 				for (int ei = 0; ei < node.out->sz; ei++) {
-					int eid = node.out->edges[ei];
-					Edge& e(edges[eid]);
-					int dC = nodes[e.end].out_value;
+					const int eid = node.out->edges[ei];
+					const Edge& e(edges[eid]);
+					const int dC = nodes[e.end].out_value;
 					if (dC < INT_MAX && node.in_value + e.weight + dC <= maxC) {
 						assert(boolvars[e.val].isFalse());
 #ifdef WEAKNOGOOD
@@ -1292,7 +1294,7 @@ void WMDDProp::minimize_expln(int var, int val, int maxC) {
 #endif
 			// Add any nodes along unlocked edges to the next level.
 			for (; qhead < qnext; qhead++) {
-				int nID = stateQ[qhead];
+				const int nID = stateQ[qhead];
 				Node& node(nodes[nID]);
 				// Clear the status flags.
 				node.status = 0;
@@ -1301,8 +1303,8 @@ void WMDDProp::minimize_expln(int var, int val, int maxC) {
 					continue;
 				}
 				for (int ei = 0; ei < node.out->sz; ei++) {
-					int eid = node.out->edges[ei];
-					Edge& e(edges[eid]);
+					const int eid = node.out->edges[ei];
+					const Edge& e(edges[eid]);
 					if ((vals[e.val].status & VAL_LOCKED) == 0U) {
 						if (nodes[e.end].status == 0) {
 							nodes[e.end].status = 1;
@@ -1363,11 +1365,11 @@ Clause* WMDDProp::explainConflict() {
 	minimize_expln(-1, -1, maxC);
 	collect_lits(expln);
 #else
-	int currC = cost.getMax();
+	const int currC = cost.getMax();
 	mark_frontier(-1, -1);
 	minimize_expln(-1, -1, currC);
 
-	int maxC = late_minC(-1, -1);
+	const int maxC = late_minC(-1, -1);
 	if (maxC < INT_MAX) {
 		expln.push(cost.getLit(maxC, LR_GE));
 	}
@@ -1399,7 +1401,7 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 	engine.btToPos(pi.btpos);
 	int tag = pi.tag;
 	*/
-	int tag = inf;
+	const int tag = inf;
 
 	vec<Lit> expln;
 	expln.push();
@@ -1414,14 +1416,14 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 			incExplainUp(upQ, expln);
 		} else {
 			// Explaining lb(c) >= k
-			int maxC = (tag >> 1) - 1;
+			const int maxC = (tag >> 1) - 1;
 			mark_frontier(-1, -1);
 			minimize_expln(-1, -1, maxC);
 			collect_lits(expln);
 		}
 	} else {
-		int val = (tag >> 1);
-		int var = vals[val].var;
+		const int val = (tag >> 1);
+		const int var = vals[val].var;
 
 		if (opts.expl_alg == MDDOpts::E_GREEDY) {
 			return incExplain(p, var, val);
@@ -1443,11 +1445,11 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 		collect_lits(expln);
 #else
 		// Relax ub(c) later.
-		int currC = cost.getMax();
+		const int currC = cost.getMax();
 		mark_frontier(var, val);
 		minimize_expln(var, val, currC);
 
-		int maxC = late_minC(var, val);
+		const int maxC = late_minC(var, val);
 		if (maxC < INT_MAX) {
 			expln.push(cost.getLit(maxC, LR_GE));
 		}
@@ -1486,9 +1488,9 @@ Clause* WMDDProp::explain(Lit p, int inf) {
 //        cost to/from each node.
 //        Currently assuming this is stored in in_value
 //        and out_value.
-Clause* WMDDProp::incExplain(Lit p, int var, int val) {
+Clause* WMDDProp::incExplain(Lit p, int /*var*/, int val) {
 	// Check which set of edges we need to explain
-	Val& vinfo(vals[val]);
+	const Val& vinfo(vals[val]);
 
 	vec<Lit> expln;
 	expln.push(p);
@@ -1497,16 +1499,16 @@ Clause* WMDDProp::incExplain(Lit p, int var, int val) {
 	vec<int> upQ;
 	vec<int> downQ;
 
-	int minC = cost.getMax() + 1;
+	const int minC = cost.getMax() + 1;
 	for (int ei = 0; ei < vinfo.edges->sz; ei++) {
-		EdgeID eid(vinfo.edges->edges[ei]);
-		Edge& e(edges[eid]);
+		const EdgeID eid(vinfo.edges->edges[ei]);
+		const Edge& e(edges[eid]);
 
 		// Compute the amount by which the original minimum cost must be exceeded.
 		// NOTE: Assumes that inBase and outBase are smallish (not INT_MAX).
-		int inBase = in_base[e.begin];
-		int outBase = out_base[e.end];
-		int surplus = minC - (inBase + outBase + e.weight);
+		const int inBase = in_base[e.begin];
+		const int outBase = out_base[e.end];
+		const int surplus = minC - (inBase + outBase + e.weight);
 
 		// If the edge was infeasible to begin with, ignore it.
 		if (surplus <= 0) {
@@ -1517,8 +1519,8 @@ Clause* WMDDProp::incExplain(Lit p, int var, int val) {
 		// the invariant that c(r, s) + w + c(s, T) > maxC.
 
 		// Compute the minimum cost through the edge
-		int inC = nodes[e.begin].in_pathC;
-		int outC = nodes[e.end].out_pathC;
+		const int inC = nodes[e.begin].in_pathC;
+		const int outC = nodes[e.end].out_pathC;
 
 		// How  are we going to allocate the minC cost?
 		int in_part = 0;
@@ -1584,14 +1586,14 @@ void WMDDProp::incExplainUp(vec<int>& upQ, vec<Lit>& expln) {
 		// First scan, determine which values must remain
 		// fixed.
 		for (; qnext < upQ.size(); qnext++) {
-			int nID(upQ[qnext]);
-			Node& node(nodes[nID]);
+			const int nID(upQ[qnext]);
+			const Node& node(nodes[nID]);
 
-			int node_minC = node.status;
+			const int node_minC = node.status;
 
 			for (int ei = 0; ei < node.in->sz; ei++) {
-				int eID(node.in->edges[ei]);
-				Edge& e(edges[eID]);
+				const int eID(node.in->edges[ei]);
+				const Edge& e(edges[eID]);
 				if (nodes[e.begin].in_pathC == INT_MAX) {
 					continue;
 				}
@@ -1608,20 +1610,20 @@ void WMDDProp::incExplainUp(vec<int>& upQ, vec<Lit>& expln) {
 		}
 		// Second scan; check which edges
 		for (; qhead < qnext; qhead++) {
-			int nID(upQ[qhead]);
+			const int nID(upQ[qhead]);
 			Node& node(nodes[nID]);
 
-			int node_minC = node.status;
+			const int node_minC = node.status;
 
 			for (int ei = 0; ei < node.in->sz; ei++) {
-				int eID(node.in->edges[ei]);
-				Edge& e(edges[eID]);
+				const int eID(node.in->edges[ei]);
+				const Edge& e(edges[eID]);
 
 				// If the value is included in the explanation, ignore the edge.
 				if (vals[e.val].status != 0U) {
 					continue;
 				}
-				int dest_minC = node_minC - e.weight;
+				const int dest_minC = node_minC - e.weight;
 
 				// If the required cost is explained at the top level, ignore the edge.
 				if (dest_minC <= in_base[e.begin]) {
@@ -1648,7 +1650,7 @@ void WMDDProp::incExplainUp(vec<int>& upQ, vec<Lit>& expln) {
 	// Add the freshly fixed values to the explanation,
 	// and reset the status flags.
 	for (int vi = 0; vi < explVals.size(); vi++) {
-		int vv = explVals[vi];
+		const int vv = explVals[vi];
 		Val& vinfo(vals[vv]);
 		expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 
@@ -1667,14 +1669,14 @@ void WMDDProp::incExplainDown(vec<int>& downQ, vec<Lit>& expln) {
 		// First scan, determine which values must remain
 		// fixed.
 		for (; qnext < downQ.size(); qnext++) {
-			int nID(downQ[qnext]);
-			Node& node(nodes[nID]);
+			const int nID(downQ[qnext]);
+			const Node& node(nodes[nID]);
 
-			int node_minC = node.status;
+			const int node_minC = node.status;
 
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eID(node.out->edges[ei]);
-				Edge& e(edges[eID]);
+				const int eID(node.out->edges[ei]);
+				const Edge& e(edges[eID]);
 				if (nodes[e.end].out_pathC == INT_MAX) {
 					continue;
 				}
@@ -1691,22 +1693,22 @@ void WMDDProp::incExplainDown(vec<int>& downQ, vec<Lit>& expln) {
 		}
 		// Second scan; check which edges
 		for (; qhead < qnext; qhead++) {
-			int nID(downQ[qhead]);
+			const int nID(downQ[qhead]);
 			Node& node(nodes[nID]);
 
-			int node_minC = node.status;
+			const int node_minC = node.status;
 
 			bool flow = false;
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eID(node.out->edges[ei]);
-				Edge& e(edges[eID]);
+				const int eID(node.out->edges[ei]);
+				const Edge& e(edges[eID]);
 
 				// If the value is included in the explanation, ignore the edge.
 				if (vals[e.val].status != 0U) {
 					flow = true;
 					continue;
 				}
-				int dest_minC = node_minC - e.weight;
+				const int dest_minC = node_minC - e.weight;
 
 				// If the required cost is explained at the top level, ignore the edge.
 				if (dest_minC <= out_base[e.end]) {
@@ -1736,7 +1738,7 @@ void WMDDProp::incExplainDown(vec<int>& downQ, vec<Lit>& expln) {
 	// Add the freshly fixed values to the explanation,
 	// and reset the status flags.
 	for (int vi = 0; vi < explVals.size(); vi++) {
-		int vv = explVals[vi];
+		const int vv = explVals[vi];
 		Val& vinfo(vals[vv]);
 		expln.push(intvars[vinfo.var].getLit(vinfo.val, LR_EQ));
 
@@ -1753,9 +1755,9 @@ void WMDDProp::debugStateDot() {
 
 	while (nID < nodes.size()) {
 		// Scan through the nodes in each level.
-		int level = nodes[nID].var;
+		const int level = nodes[nID].var;
 		for (; nID < nodes.size() && nodes[nID].var == level; nID++) {
-			Node& node(nodes[nID]);
+			const Node& node(nodes[nID]);
 
 			//      printf("   { node [shape=record label=\"{<prefix>%d: (%d, %d) | {", nID,
 			//      node.in_value, node.out_value);
@@ -1763,8 +1765,8 @@ void WMDDProp::debugStateDot() {
 						 node.out_pathC);
 			bool first = true;
 			for (int ei = 0; ei < node.out->sz; ei++) {
-				int eid = node.out->edges[ei];
-				Edge& edge(edges[eid]);
+				const int eid = node.out->edges[ei];
+				const Edge& edge(edges[eid]);
 
 				if (first) {
 					first = false;
@@ -1791,7 +1793,7 @@ void WMDDProp::debugStateDot() {
 //          Or, indeed, that there aren't any repetitions or inversions in variable order.
 WMDDProp* evgraph_to_wmdd(vec<IntVar*> _vs, IntVar* _cost, EVLayerGraph& g,
 													EVLayerGraph::NodeID rootID, const MDDOpts& opts) {
-	int nNodes = g.traverse(rootID);
+	const int nNodes = g.traverse(rootID);
 
 	// Level for each node.
 	vec<int> level;
@@ -1810,9 +1812,9 @@ WMDDProp* evgraph_to_wmdd(vec<IntVar*> _vs, IntVar* _cost, EVLayerGraph& g,
 	for (EVNode curr = g.travBegin(); curr != g.travEnd(); ++curr) {
 		level[curr.id()] = curr.var();
 		for (int ei = 0; ei < curr.size(); ei++) {
-			EVEdge edge(curr[ei]);
+			const EVEdge edge(curr[ei]);
 
-			Edge e = {edge.val, edge.weight, curr.id(), edge.dest.id()};
+			const Edge e = {edge.val, edge.weight, curr.id(), edge.dest.id()};
 			edges.push(e);
 		}
 	}
@@ -1825,7 +1827,7 @@ WMDDProp* evgraph_to_wmdd(vec<IntVar*> _vs, IntVar* _cost, EVLayerGraph& g,
 	for (int i = 0; i < _vs.size(); i++) {
 		vs.push(IntView<>(_vs[i], 1, 0));
 	}
-	IntView<> cost(_cost, 1, 0);
+	const IntView<> cost(_cost, 1, 0);
 
 	// Create the propagator.
 	return new WMDDProp(vs, cost, level, edges, opts);

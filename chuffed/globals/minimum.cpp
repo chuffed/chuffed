@@ -17,9 +17,9 @@
 template <int U>
 class Minimum : public Propagator, public Checker {
 public:
-	int const sz;
+	const int sz;
 	IntView<U>* const x;
-	IntView<U> const y;
+	const IntView<U> y;
 
 	// Persistent state
 	Tint min_max_var;
@@ -46,13 +46,13 @@ public:
 	void wakeup(int i, int c) override {
 		if (i < sz) {
 			if ((c & EVENT_F) != 0) {
-				int64_t m = x[i].getVal();
+				const int64_t m = x[i].getVal();
 				if (m < min_fixed) {
 					min_fixed = m;
 				}
 			}
 
-			int64_t m = x[i].getMax();
+			const int64_t m = x[i].getMax();
 			if (m < min_max) {
 				min_max_var = i;
 				min_max = m;
@@ -74,7 +74,7 @@ public:
 			// make a greater than or equal to min(min(b_i))
 			int64_t m = INT64_MAX;
 			for (int i = 0; i < sz; i++) {
-				int64_t t = x[i].getMin();
+				const int64_t t = x[i].getMin();
 				if (t < m) {
 					m = t;
 				}
