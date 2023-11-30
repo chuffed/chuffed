@@ -1,13 +1,13 @@
 #ifndef EVMDD_PROP_H_
 #define EVMDD_PROP_H_
 // Propagator for weighted (edge-valued) MDDs.
-#include <chuffed/core/propagator.h>
-#include <chuffed/mdd/opts.h>
-#include <chuffed/mdd/weighted_dfa.h>
-#include <chuffed/support/BVec.h>
-#include <chuffed/support/misc.h>
-#include <chuffed/support/sparse_set.h>
-#include <chuffed/vars/int-view.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/mdd/weighted_dfa.h"
+#include "chuffed/support/BVec.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/sparse_set.h"
+#include "chuffed/vars/int-view.h"
 
 #include <climits>
 #include <utility>

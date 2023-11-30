@@ -1,8 +1,7 @@
 #ifndef CIRCUTIL_H
 #define CIRCUTIL_H
-#include <ext/hash_map>
-// #include <tr1/unordered_map>
-// #include <chuffed/circuit/MurmurHash3.h>
+
+#include <unordered_map>
 
 #define SEED 0xdeadbeef
 
@@ -45,7 +44,7 @@ struct AutoS {
 
 template <class S, class V>
 struct AutoC {
-	typedef __gnu_cxx::hash_map<const S, V, typename AutoS<S>::hash, typename AutoS<S>::eq> cache;
+	typedef std::unordered_map<const S, V, typename AutoS<S>::hash, typename AutoS<S>::eq> cache;
 	//  typedef std::tr1::unordered_map<const S, V, typename AutoS<S>::hash, typename AutoS<S>::eq>
 	//  cache;
 };

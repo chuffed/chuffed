@@ -1,7 +1,19 @@
-#include <chuffed/core/sat.h>
-#include <chuffed/vars/int-var.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
 
-#include <iostream>
+#include <cassert>
+#include <cstdint>
+#include <cstdlib>
+#include <map>
+#include <sstream>
+#include <string>
+#include <utility>
 
 extern std::map<IntVar*, std::string> intVarString;
 

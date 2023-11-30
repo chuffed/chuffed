@@ -1,7 +1,23 @@
-#include <chuffed/globals/dtree.h>
+#include "chuffed/globals/dtree.h"
 
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/dconnected.h"
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
 #include <iostream>
+#include <set>
 #include <stack>
+#include <utility>
+#include <vector>
 
 #define DEBUG 0
 

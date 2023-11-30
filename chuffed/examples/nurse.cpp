@@ -1,22 +1,25 @@
-#include <cerrno>
-#include <cstdint>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/circ_fns.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/ParseUtils.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/modelling.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <ctime>
 #include <iostream>
-#include <utility>
-
-// #define DUMP_ONLY
-
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/mddglobals.h>
-#include <chuffed/support/ParseUtils.h>
-#include <chuffed/vars/modelling.h>
-// #include <globals/circglobals.h>
-#include <chuffed/mdd/circ_fns.h>
+#include <zlib.h>
 
 #define HORIZON 28
+// #define DUMP_ONLY
 
 template <class T>
 T circ_gcc(T fff, vec<vec<T> >& xs, CardOp rel, const vec<int>& cards) {

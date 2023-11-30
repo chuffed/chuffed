@@ -1,9 +1,9 @@
 #ifndef int_view_h
 #define int_view_h
 
-#include <chuffed/core/sat-types.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/vars/int-var.h>
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/vars/int-var.h"
 
 #include <cassert>
 

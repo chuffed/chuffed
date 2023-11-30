@@ -1,6 +1,18 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/mip/mip.h>
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/mip/mip.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
 
+#include <cassert>
+#include <cstdint>
 #include <utility>
 
 // x >= y <- r

@@ -1,6 +1,7 @@
-#include <chuffed/mdd/opcache.h>
+#include "chuffed/mdd/opcache.h"
 
 #include <climits>
+#include <cstdint>
 #include <cstdlib>
 
 #include <thirdparty/MurmurHash3/MurmurHash3.h>

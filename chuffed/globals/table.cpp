@@ -1,4 +1,15 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <cstdio>
 
 class TableChecker : public Checker {
 	vec<IntVar*> x;

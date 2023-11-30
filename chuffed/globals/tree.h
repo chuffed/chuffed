@@ -1,8 +1,8 @@
 #ifndef TREE_PROPAGATOR_H
 #define TREE_PROPAGATOR_H
 
-#include <chuffed/globals/graph.h>
-#include <chuffed/support/union_find.h>
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/union_find.h"
 
 #include <map>
 #include <queue>

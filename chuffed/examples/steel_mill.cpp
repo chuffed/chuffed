@@ -1,10 +1,19 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/modelling.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/modelling.h"
+#include "chuffed/vars/vars.h"
 
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
+#include <ostream>
 
 int csplib_capacities[] = {12, 14, 17, 18, 19, 20, 23, 24, 25, 26,
 													 27, 28, 29, 30, 32, 35, 39, 42, 43, 44};

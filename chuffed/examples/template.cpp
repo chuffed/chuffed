@@ -1,10 +1,14 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/modelling.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/modelling.h"
 
 #include <cassert>
-#include <cstdio>
+#include <cstdlib>
+#include <ostream>
 
 class ProblemName : public Problem {
 public:

@@ -1,8 +1,8 @@
 #ifndef CHUFFED_WARMSTART_H
 #define CHUFFED_WARMSTART_H
 
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/sat.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/sat.h"
 
 // Warm-start brancher.
 // Once activated, it optimistically branches on the given literals

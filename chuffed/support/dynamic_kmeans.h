@@ -1,8 +1,8 @@
 #ifndef DYNAMICKMEANS_H
 #define DYNAMICKMEANS_H
 
-#include <chuffed/core/engine.h>
-#include <chuffed/support/floyd_warshall.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/support/floyd_warshall.h"
 
 #include <algorithm>
 #include <cassert>

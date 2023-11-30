@@ -1,5 +1,21 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/modelling.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/modelling.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <random>
 
 // a[i] forms a circuit
 // Value consistent propagator

@@ -1,7 +1,11 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/mddglobals.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
 
 #include <cassert>
 #include <cstdio>

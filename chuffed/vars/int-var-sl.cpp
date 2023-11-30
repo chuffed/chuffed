@@ -1,6 +1,19 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/vars/int-var.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <map>
+#include <string>
 
 extern std::map<IntVar*, std::string> intVarString;
 

@@ -1,8 +1,8 @@
 #ifndef mip_h
 #define mip_h
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/support/misc.h"
 
 #include <map>
 #include <set>

@@ -1,8 +1,8 @@
 #ifndef DAGPROPAGATOR_H
 #define DAGPROPAGATOR_H
 
-#include <chuffed/globals/dconnected.h>
-#include <chuffed/support/trailed_cst_list.h>
+#include "chuffed/globals/dconnected.h"
+#include "chuffed/support/trailed_cst_list.h"
 
 class DAGPropagator : public DReachabilityPropagator {
 	class TrailedSuccList final : public TrailedConstantAccessList<std::pair<int, int> > {

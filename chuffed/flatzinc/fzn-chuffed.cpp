@@ -1,11 +1,18 @@
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/flatzinc/flatzinc.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/support/vec.h"
 
 #include <csignal>
 #include <cstdio>
-#include <cstring>
+#include <cstdlib>
+#include <exception>
+#include <iostream>
+#include <ostream>
 #include <sstream>
+#include <string>
 
 std::stringstream output_buffer;
 

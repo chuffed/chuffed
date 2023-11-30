@@ -19,16 +19,15 @@ Assumptions:
 #ifndef propagator_h
 #define propagator_h
 
-#include <chuffed/core/engine.h>
-#include <chuffed/core/sat-types.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
 
 #include <algorithm>
 #include <climits>
 #include <new>
 #include <vector>
-// #include "core/prop-group.h"
 
 // Propagation onsistency levels for, e.g., alldifferent:
 //      default, value, bound, domain
@@ -153,10 +152,10 @@ static inline Clause* Reason_new(std::vector<Lit> ps) {
 		if ((var).op##NotR(v) && !(var).op(v, Reason(prop_id, index))) return false; \
 	} while (0)
 
-#include <chuffed/globals/globals.h>
-#include <chuffed/primitives/primitives.h>
-#include <chuffed/vars/bool-view.h>
-#include <chuffed/vars/int-var.h>
-#include <chuffed/vars/int-view.h>
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
 
 #endif

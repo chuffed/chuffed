@@ -1,6 +1,19 @@
-#include <chuffed/globals/dag.h>
+#include "chuffed/globals/dag.h"
 
-#include <iostream>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/dconnected.h"
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+
+#include <cassert>
+#include <set>
+#include <utility>
+#include <vector>
 
 DAGPropagator::DAGPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 														 vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en)

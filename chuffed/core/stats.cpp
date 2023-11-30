@@ -1,10 +1,13 @@
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/ldsb/ldsb.h>
-#include <chuffed/mip/mip.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/mip/mip.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
 
-#include <cassert>
+#include <chrono>
 #include <cstdio>
 
 void Engine::printStats() {

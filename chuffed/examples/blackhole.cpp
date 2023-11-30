@@ -1,11 +1,16 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/modelling.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/modelling.h"
+#include "chuffed/vars/vars.h"
 
 #include <cassert>
-#include <cstdio>
 #include <iomanip>
+#include <ostream>
+#include <random>
 
 #define SYM_BREAK 1
 #define DC_TABLE 1

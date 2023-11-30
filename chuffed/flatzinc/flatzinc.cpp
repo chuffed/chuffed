@@ -20,11 +20,32 @@
  *
  */
 
-#include <chuffed/branching/branching.h>
-#include <chuffed/branching/warm-start.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/flatzinc/flatzinc.h"
+
+#include "chuffed/branching/branching.h"
+#include "chuffed/branching/warm-start.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/flatzinc/ast.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <exception>
+#include <iostream>
+#include <ostream>
+#include <random>
+#include <string>
+#include <utility>
 
 namespace FlatZinc {
 

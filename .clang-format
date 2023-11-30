@@ -13,9 +13,6 @@ IncludeCategories:
   - Regex:           '^(<thirdparty/)'
     Priority:        3
     SortPriority:    3
-  - Regex:           '^(<chuffed/)'
-    Priority:        0
-    SortPriority:    0
   - Regex:           '^(<)'
     Priority:        2
     SortPriority:    2

@@ -1,6 +1,11 @@
-#include <chuffed/mdd/mdd_to_lgraph.h>
+#include "chuffed/mdd/mdd_to_lgraph.h"
+
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/weighted_dfa.h"
+#include "chuffed/support/vec.h"
 
 #include <algorithm>
+#include <vector>
 
 // Convert a MDD into a edge-valued layer graph according to an array of costs.
 EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& costs) {

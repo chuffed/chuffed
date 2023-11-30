@@ -1,8 +1,6 @@
-#include <chuffed/support/union_find.h>
+#include "chuffed/support/union_find.h"
 
-#include <cassert>
-#include <iostream>
-#include <vector>
+#include "chuffed/core/engine.h"
 
 template <>
 UF<Tint>::~UF() {

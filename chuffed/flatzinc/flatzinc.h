@@ -23,10 +23,10 @@
 #ifndef flatzinc_h
 #define flatzinc_h
 
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/flatzinc/ast.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/flatzinc/ast.h"
+#include "chuffed/support/vec.h"
 
 #include <algorithm>
 #include <array>

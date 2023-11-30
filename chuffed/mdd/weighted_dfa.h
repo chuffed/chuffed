@@ -1,8 +1,8 @@
 #ifndef WEIGHTED_DFA_H_
 #define WEIGHTED_DFA_H_
 
-#include <chuffed/mdd/opcache.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/mdd/opcache.h"
+#include "chuffed/support/vec.h"
 
 #include <memory>
 #include <unordered_map>

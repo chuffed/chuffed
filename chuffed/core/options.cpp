@@ -1,9 +1,16 @@
 
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/core/sat.h>
+#include "chuffed/core/options.h"
 
+#include "chuffed/core/engine.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 Options so;
 

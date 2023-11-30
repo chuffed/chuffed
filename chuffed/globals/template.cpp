@@ -1,4 +1,7 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
 
 class BinPacking : public Propagator {
 public:

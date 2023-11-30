@@ -1,16 +1,24 @@
-#include <algorithm>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/mdd/CFG.h"
+#include "chuffed/mdd/CYK.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <vector>
-// #include <chuffed/circuit/FDNNF.h>
-#include <chuffed/globals/mddglobals.h>
-#include <chuffed/mdd/CFG.h>
-#include <chuffed/mdd/CYK.h>
-#include <chuffed/mdd/MDD.h>
-// #include <chuffed/globals/circglobals.h>
-// #include <chuffed/circuit/nnfprop.h>
-#include <chuffed/mdd/circ_fns.h>
 
 // Using the simplified model, with infinite under-costs, and unit over-costs.
 // This maps to hard coverage constraints, and minimizing the # of worked hours.

@@ -1,9 +1,12 @@
-#include <chuffed/support/dijkstra.h>
-#include <chuffed/support/set_finder.h>
+#include "chuffed/support/dijkstra.h"
 
+#include <cassert>
+#include <cstddef>
 #include <iostream>
-#include <map>
+#include <queue>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 // The label on each node counts the cost of its duration! (i.e. Duration included)
 //  i.e. the label on each node says when will you be done with it.

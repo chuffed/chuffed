@@ -1,8 +1,8 @@
 #ifndef branching_h
 #define branching_h
 
-#include <chuffed/core/engine.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/support/misc.h"
 
 #include <cassert>
 #include <climits>

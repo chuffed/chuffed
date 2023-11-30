@@ -1,22 +1,22 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/mddglobals.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/support/ParseUtils.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/modelling.h"
 
 #include <cassert>
-#include <cerrno>
-#include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <iostream>
 #include <utility>
-// #include <chuffed/globals/circglobals.h>
-#include <chuffed/mdd/circ_fns.h>
-#include <chuffed/support/ParseUtils.h>
-#include <chuffed/vars/modelling.h>
-// #include <chuffed/hlist.h>
-// #include <chuffed/hlutils.h>
+#include <zlib.h>
 
 #define ROTATE 1
 #define REFLECT 2

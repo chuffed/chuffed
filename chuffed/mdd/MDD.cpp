@@ -1,9 +1,14 @@
-#include <chuffed/mdd/MDD.h>
+#include "chuffed/mdd/MDD.h"
+
+#include "chuffed/mdd/opcache.h"
+#include "chuffed/support/vec.h"
 
 #include <cassert>
 #include <climits>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 #define OPCACHE_SZ 100000
 #define CACHE_SZ 180000

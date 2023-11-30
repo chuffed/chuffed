@@ -20,14 +20,27 @@
  *
  */
 
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/globals/mddglobals.h>
-#include <chuffed/ldsb/ldsb.h>
-#include <chuffed/mdd/opts.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/flatzinc/ast.h"
+#include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
 
+#include <cassert>
+#include <iostream>
 #include <list>
+#include <ostream>
+#include <string>
 
 namespace FlatZinc {
 

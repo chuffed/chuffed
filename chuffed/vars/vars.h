@@ -1,7 +1,7 @@
 #ifndef vars_h
 #define vars_h
 
-#include <chuffed/branching/branching.h>
+#include "chuffed/branching/branching.h"
 
 enum EVENT_TYPE {
 	EVENT_C = 1,    // Any change in the domain of the variable

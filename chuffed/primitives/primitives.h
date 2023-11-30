@@ -1,7 +1,7 @@
 #ifndef primitives_h
 #define primitives_h
 
-#include <chuffed/support/misc.h>
+#include "chuffed/support/misc.h"
 
 enum IntRelType {
 	IRT_EQ,  // =	Equal to
@@ -67,8 +67,8 @@ enum BoolRelType {
 	BRT_R_IMPL = 0xd2
 };
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/bool-view.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/vars/bool-view.h"
 
 // bool.c
 

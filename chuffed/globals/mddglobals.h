@@ -1,8 +1,8 @@
 #ifndef MDDGLOBALS_H_
 #define MDDGLOBALS_H_
-#include <chuffed/core/propagator.h>
-#include <chuffed/mdd/MDD.h>
-#include <chuffed/mdd/opts.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/opts.h"
 
 void mdd_table(vec<IntVar*>& x, vec<vec<int> >& t, const MDDOpts& mopts);
 

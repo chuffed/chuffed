@@ -1,5 +1,12 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/bool-view.h>
+#include "chuffed/vars/bool-view.h"
+
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/vars.h"
 
 void BoolView::attach(Propagator* p, int pos, int eflags) const {
 	WatchElem we(p->prop_id, pos);

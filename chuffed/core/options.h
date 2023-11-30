@@ -1,7 +1,7 @@
 #ifndef options_h
 #define options_h
 
-#include <chuffed/support/misc.h>
+#include "chuffed/support/misc.h"
 
 #include <cstdlib>
 #include <cstring>

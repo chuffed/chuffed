@@ -1,6 +1,24 @@
-#include <chuffed/globals/bounded_path.h>
+#include "chuffed/globals/bounded_path.h"
 
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <cstring>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 #define DEBUG 0
 

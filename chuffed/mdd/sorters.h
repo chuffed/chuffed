@@ -1,7 +1,7 @@
 #ifndef SORTERS_H_
 #define SORTERS_H_
 
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/propagator.h"
 
 enum SorterKind { SRT_ODDEVEN, SRT_PAIRWISE, SRT_CARDNET, SRT_BDD };
 enum SorterFlags { SRT_FULL = 0, SRT_HALF = 1 };

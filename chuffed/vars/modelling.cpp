@@ -1,4 +1,10 @@
-#include <chuffed/vars/modelling.h>
+#include "chuffed/vars/modelling.h"
+
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+
+#include <cassert>
 
 void createVar(IntVar*& x, int min, int max, bool el) {
 	x = newIntVar(min, max);

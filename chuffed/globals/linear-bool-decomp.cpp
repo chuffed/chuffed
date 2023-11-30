@@ -1,6 +1,14 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/mdd/sorters.h>
-#include <chuffed/support/sparse_set.h>
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/sparse_set.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
 
 static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k);
 static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals, vec<Lit>& xs,

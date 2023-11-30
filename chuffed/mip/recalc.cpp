@@ -1,8 +1,11 @@
-#include <chuffed/mip/simplex.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/mip/simplex.h"
+#include "chuffed/support/vec.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
+#include <cstdio>
+#include <cstring>
 
 void LUFactor::multiply(long double* a) {
 	for (int i = 0; i < vals.size(); i++) {

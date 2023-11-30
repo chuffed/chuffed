@@ -1,12 +1,12 @@
 #ifndef INC_PROP_H_
 #define INC_PROP_H_
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/mdd/MDD.h>
-#include <chuffed/mdd/opts.h>
-#include <chuffed/support/misc.h>
-#include <chuffed/support/sparse_set.h>
-#include <chuffed/vars/int-view.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/sparse_set.h"
+#include "chuffed/vars/int-view.h"
 
 #include <climits>
 #include <utility>

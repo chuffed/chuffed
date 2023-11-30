@@ -1,7 +1,21 @@
-#include <chuffed/globals/dconnected.h>
+#include "chuffed/globals/dconnected.h"
 
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/lengauer_tarjan.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
 #include <cstring>
 #include <iostream>
+#include <set>
+#include <vector>
 
 #define DEBUG 0
 

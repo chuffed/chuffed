@@ -1,6 +1,20 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/ldsb/ldsb.h>
+#include "chuffed/ldsb/ldsb.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
+#include <utility>
 
 #define LDSB_DEBUG 0
 

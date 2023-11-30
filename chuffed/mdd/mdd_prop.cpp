@@ -1,11 +1,24 @@
-#include <chuffed/mdd/MDD.h>
-#include <chuffed/mdd/mdd_prop.h>
-#include <chuffed/mdd/opts.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/mdd/mdd_prop.h"
 
-#include <climits>
-#include <cstring>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/mdd/MDD.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/sparse_set.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdio>
 #include <iostream>
+#include <vector>
 
 // #define TIKZDEBUG
 

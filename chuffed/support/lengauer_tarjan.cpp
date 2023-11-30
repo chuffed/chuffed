@@ -1,9 +1,8 @@
-#include <chuffed/support/lengauer_tarjan.h>
+#include "chuffed/support/lengauer_tarjan.h"
 
-#include <cassert>
 #include <iostream>
-#include <set>
 #include <utility>
+#include <vector>
 
 std::vector<int> child;
 std::vector<int> size_;

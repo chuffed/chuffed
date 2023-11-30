@@ -19,7 +19,7 @@
 #define SEP_ '/'
 #endif
 
-#include <chuffed/support/vec.h>
+#include "chuffed/support/vec.h"
 
 #include <cstdint>
 

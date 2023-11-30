@@ -1,8 +1,8 @@
 #ifndef GRAPH_PROPAGATOR_H
 #define GRAPH_PROPAGATOR_H
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/support/union_find.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/support/union_find.h"
 
 #include <map>
 #include <queue>

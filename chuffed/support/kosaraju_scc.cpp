@@ -1,8 +1,12 @@
-#include <chuffed/support/kosaraju_scc.h>
+#include "chuffed/support/kosaraju_scc.h"
 
 #include <cstring>
-#include <iostream>
+#include <queue>
+#include <stack>
+#include <string>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 KosarajuSCC::KosarajuSCC(int v, std::vector<std::vector<int> > out,
 												 std::vector<std::vector<int> > in, std::vector<std::vector<int> > en)

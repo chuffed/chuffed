@@ -1,10 +1,10 @@
 #ifndef sat_h
 #define sat_h
 
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/sat-types.h>
-#include <chuffed/support/heap.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/support/heap.h"
+#include "chuffed/support/misc.h"
 
 #include <climits>
 #include <cmath>

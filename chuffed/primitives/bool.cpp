@@ -1,4 +1,9 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
 
 void bool_rel(BoolView x, BoolRelType t, BoolView y, BoolView z) {
 	//	NOT_SUPPORTED;

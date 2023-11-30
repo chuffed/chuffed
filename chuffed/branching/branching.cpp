@@ -1,8 +1,12 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/support/misc.h>
-#include <chuffed/vars/vars.h>
+#include "chuffed/branching/branching.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/vars.h"
+
+#include <random>
 
 BranchGroup::BranchGroup(VarBranch vb, bool t) : var_branch(vb), terminal(t), fin(0), cur(-1) {}
 

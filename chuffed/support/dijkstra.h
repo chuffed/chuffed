@@ -1,8 +1,8 @@
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
-#include <chuffed/core/propagator.h>  //For Tint
-#include <chuffed/support/dynamic_kmeans.h>
-#include <chuffed/support/kosaraju_scc.h>
+#include "chuffed/core/propagator.h"  //For Tint
+#include "chuffed/support/dynamic_kmeans.h"
+#include "chuffed/support/kosaraju_scc.h"
 
 #include <bitset>
 #include <cassert>

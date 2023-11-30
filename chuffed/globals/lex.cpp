@@ -1,4 +1,8 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
 
 void newBinGE(IntView<> x, IntView<> y, BoolView r);
 void newBinNE(IntView<> x, IntView<> y, BoolView r);

@@ -1,10 +1,19 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/vars/modelling.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/primitives/primitives.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/modelling.h"
+#include "chuffed/vars/vars.h"
 
 #include <cassert>
+#include <cmath>
 #include <cstdio>
+#include <cstdlib>
+#include <ostream>
 
 #define BALANCE 1
 #define USE_GLOBAL 1

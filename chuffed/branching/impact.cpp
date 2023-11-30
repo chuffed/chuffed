@@ -1,6 +1,5 @@
-#include <chuffed/branching/impact.h>
-#include <chuffed/support/misc.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
 
 constexpr double WEIGHT_LOCAL = 420;
 constexpr double WEIGHT_GLOBAL = 42;

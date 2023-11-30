@@ -1,6 +1,16 @@
-#include <chuffed/mip/mip.h>
-#include <chuffed/mip/simplex.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/mip/simplex.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/mip/mip.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 
 #define REFACTOR_FREQ 100
 #define AVOID_SMALL_PIVOT 0

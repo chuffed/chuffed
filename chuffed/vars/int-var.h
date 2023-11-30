@@ -1,11 +1,11 @@
 #ifndef int_var_h
 #define int_var_h
 
-#include <chuffed/core/engine.h>
-#include <chuffed/core/sat-types.h>
-#include <chuffed/support/misc.h>
-#include <chuffed/vars/bool-view.h>
-#include <chuffed/vars/vars.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/vars.h"
 
 #include <cstdint>
 #include <new>
@@ -420,8 +420,13 @@ public:
 
 #undef IMPACT_DAMPING
 
-#include <chuffed/vars/int-var-el.h>
-#include <chuffed/vars/int-var-ll.h>
-#include <chuffed/vars/int-var-sl.h>
+	class IntVarEL;
+#include "chuffed/vars/int-var-el.h"
+	class IntVarLL;
+#include "chuffed/vars/int-var-ll.h"
+	// A enumerated type use to distinguish between different rounding modes.
+	enum RoundMode { ROUND_DOWN = 0, ROUND_UP = 1, ROUND_NONE = 2 };
+	class IntVarSL;
+#include "chuffed/vars/int-var-sl.h"
 
 #endif

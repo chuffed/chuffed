@@ -1,6 +1,17 @@
-#include <chuffed/globals/graph.h>
+#include "chuffed/globals/graph.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/vars.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 #define GRAPHPROP_DEBUG 0
 

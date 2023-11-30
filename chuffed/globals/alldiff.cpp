@@ -1,5 +1,19 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
 
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstring>
 #include <utility>
 
 // AllDiff for mapping n vars to n values

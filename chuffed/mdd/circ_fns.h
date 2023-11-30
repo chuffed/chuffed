@@ -1,6 +1,6 @@
 #ifndef CIRC_FNS_H_
 #define CIRC_FNS_H_
-#include <chuffed/support/vec.h>
+#include "chuffed/support/vec.h"
 
 #include <cassert>
 

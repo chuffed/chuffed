@@ -1,7 +1,7 @@
 #ifndef simplex_h
 #define simplex_h
 
-#include <chuffed/core/engine.h>
+#include "chuffed/core/engine.h"
 
 #define SIMPLEX_DEBUG 0
 #define RECALC_DEBUG 0

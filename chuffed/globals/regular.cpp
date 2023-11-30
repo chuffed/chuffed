@@ -1,4 +1,10 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+
+#include <cassert>
 
 void regular_check(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f) {
 	assert(q >= 1);

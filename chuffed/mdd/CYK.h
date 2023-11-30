@@ -1,6 +1,6 @@
 #ifndef CYK_H_
 #define CYK_H_
-#include <chuffed/mdd/CFG.h>
+#include "chuffed/mdd/CFG.h"
 
 #include <map>
 

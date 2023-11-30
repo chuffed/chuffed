@@ -1,14 +1,15 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/mddglobals.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/globals/globals.h"
+#include "chuffed/globals/mddglobals.h"
+#include "chuffed/mdd/opts.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
 
-#include <cerrno>
-#include <cstdint>
-#include <cstring>
-#include <ctime>
+#include <cassert>
+#include <cstdio>
 #include <iostream>
-#include <utility>
 
 // Nonograms
 static void nonogram(vec<IntVar*>& x, vec<int>& blocks);

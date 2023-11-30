@@ -1,8 +1,8 @@
 #ifndef assume_h
 #define assume_h
-#include <chuffed/core/sat-types.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/support/misc.h>
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
 
 // Helper for pushing a failure back to externally visible literals.
 // WARNING: This assumes explanations are not lazy.

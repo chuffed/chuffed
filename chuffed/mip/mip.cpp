@@ -1,5 +1,23 @@
-#include <chuffed/mip/mip.h>
-#include <chuffed/mip/simplex.h>
+#include "chuffed/mip/mip.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/mip/simplex.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <random>
+#include <utility>
 
 #define MIP_DEBUG 0
 #define RC_BOUNDS 1

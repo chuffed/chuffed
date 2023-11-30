@@ -1,10 +1,22 @@
 //
 // Created by Felix Winter on 08.04.2019.
 //
+#include "chuffed/globals/EdExplFinder.h"
 
-#include <chuffed/globals/EdExplFinder.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-view.h"
+#include "chuffed/vars/vars.h"
 
+#include <algorithm>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
+#include <queue>
+#include <set>
+#include <utility>
+#include <vector>
 
 EdExplFinder::EdExplFinder()
 		: seq2(nullptr),

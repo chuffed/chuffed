@@ -1,7 +1,7 @@
 #ifndef BITVEC_H_
 #define BITVEC_H_
 
-#include <chuffed/core/engine.h>
+#include "chuffed/core/engine.h"
 
 #include <cassert>
 #include <cstdlib>

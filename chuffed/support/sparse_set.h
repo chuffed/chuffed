@@ -2,7 +2,7 @@
 #define SPARSE_SET_H_
 // U indicates whether to use FAST_FSET.
 
-#include <chuffed/core/engine.h>
+#include "chuffed/core/engine.h"
 
 #include <cassert>
 #include <cstdlib>

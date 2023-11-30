@@ -1,11 +1,26 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/tree.h>
-#include <chuffed/support/union_find.h>
+#include "chuffed/globals/tree.h"
+
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/graph.h"
+#include "chuffed/support/union_find.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/vars.h"
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
+#include <map>
 #include <queue>
-#include <set>
+#include <stack>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 /**
  *  Given a graph G, ensure its a tree.

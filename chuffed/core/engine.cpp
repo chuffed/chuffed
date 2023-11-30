@@ -1,20 +1,33 @@
-#include <chuffed/branching/branching.h>
-#include <chuffed/branching/impact.h>
-#include <chuffed/core/assume.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/ldsb/ldsb.h>
-#include <chuffed/mip/mip.h>
+#include "chuffed/core/engine.h"
 
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/assume.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/mip/mip.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/vars.h"
+
+#include <algorithm>
 #include <cassert>
+#include <chrono>
+#include <climits>
+#include <cmath>
+#include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <iterator>
+#include <map>
+#include <random>
+#include <set>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #ifdef HAS_PROFILER
@@ -192,7 +205,7 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 #endif
 			break;
 		default:
-			abort();
+			std::abort();
 	}
 }
 

@@ -1,10 +1,7 @@
 #ifndef int_var_sl_h
 #define int_var_sl_h
 
-#include <chuffed/core/options.h>
-
-// A enumerated type use to distinguish between different rounding modes.
-enum RoundMode { ROUND_DOWN = 0, ROUND_UP = 1, ROUND_NONE = 2 };
+#include "chuffed/core/options.h"
 
 // Integer variable with sparse domains.
 class IntVarSL : public IntVar {

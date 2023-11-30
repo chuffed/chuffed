@@ -1,15 +1,25 @@
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/mip/mip.h>
+#include "chuffed/core/sat.h"
+
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/mip/mip.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
 
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
+#include <string>
 
 #define PRINT_ANALYSIS 0
 

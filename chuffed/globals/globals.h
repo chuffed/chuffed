@@ -1,8 +1,8 @@
 #ifndef globals_h
 #define globals_h
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/primitives/primitives.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/primitives/primitives.h"
 
 #include <list>
 

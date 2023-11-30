@@ -1,10 +1,22 @@
-#include <chuffed/core/sat.h>
-#include <chuffed/vars/int-var.h>
+#include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
 
 #include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <string>
+#include <utility>
 
 extern std::map<IntVar*, std::string> intVarString;
 
@@ -30,7 +42,7 @@ IntVarEL::IntVarEL(const IntVar& other)
 	if (so.debug) {
 		std::cerr << "created integer variable " << intVarString[(IntVar*)(&other)] << "\n";
 		if (intVarString[(IntVar*)(&other)].empty()) {
-			abort();
+			std::abort();
 		}
 	}
 

@@ -1,15 +1,21 @@
-#include <chuffed/core/assume.h>
-#include <chuffed/core/engine.h>
-#include <chuffed/core/options.h>
-#include <chuffed/core/propagator.h>
-#include <chuffed/core/sat.h>
-#include <chuffed/ldsb/ldsb.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/support/misc.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/vars.h"
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <set>
 
 #define PRINT_ANALYSIS 0
 

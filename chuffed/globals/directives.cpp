@@ -1,4 +1,8 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/engine.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/ldsb/ldsb.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/int-var.h"
 
 void output_var(Branching* v) { engine.outputs.push(v); }
 

@@ -20,7 +20,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #ifndef heap_h
 #define heap_h
 
-#include <chuffed/support/vec.h>
+#include "chuffed/support/vec.h"
 
 //=================================================================================================
 // A heap implementation with support for decrease/increase key.

@@ -4,8 +4,8 @@
 // #define SPLIT_CACHE
 // #define USE_MAP
 
-#include <chuffed/mdd/opcache.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/mdd/opcache.h"
+#include "chuffed/support/vec.h"
 
 #include <cassert>
 #include <map>

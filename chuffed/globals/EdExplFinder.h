@@ -5,8 +5,8 @@
 #ifndef CHUFFED_EDEXPLFINDER_H
 #define CHUFFED_EDEXPLFINDER_H
 
-#include <chuffed/core/propagator.h>
-#include <chuffed/support/vec.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/support/vec.h"
 
 #include <queue>
 #include <vector>

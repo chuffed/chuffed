@@ -1,6 +1,11 @@
-#include <chuffed/mdd/weighted_dfa.h>
+#include "chuffed/mdd/weighted_dfa.h"
+
+#include "chuffed/mdd/opcache.h"
+#include "chuffed/support/vec.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
 
 #include <thirdparty/MurmurHash3/MurmurHash3.h>

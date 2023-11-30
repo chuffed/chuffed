@@ -1,10 +1,20 @@
-#include <chuffed/core/propagator.h>
-#include <chuffed/globals/tree.h>
-#include <chuffed/support/union_find.h>
+#include "chuffed/branching/branching.h"
+#include "chuffed/core/engine.h"
+#include "chuffed/core/options.h"
+#include "chuffed/core/propagator.h"
+#include "chuffed/core/sat-types.h"
+#include "chuffed/core/sat.h"
+#include "chuffed/globals/tree.h"
+#include "chuffed/support/union_find.h"
+#include "chuffed/support/vec.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
 
 #include <algorithm>  // std::min, std::sort
-#include <iostream>
-#include <set>
+#include <cassert>
+#include <utility>
+#include <vector>
 
 #define MSTPROP_DEBUG 0
 

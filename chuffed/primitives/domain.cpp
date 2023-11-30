@@ -1,4 +1,10 @@
-#include <chuffed/core/propagator.h>
+#include "chuffed/core/propagator.h"
+#include "chuffed/vars/bool-view.h"
+#include "chuffed/vars/int-var.h"
+#include "chuffed/vars/vars.h"
+
+#include <cassert>
+#include <utility>
 
 // y = |ub(x) - lb(y) + 1|
 class RangeSize : public Propagator {
