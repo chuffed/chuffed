@@ -219,7 +219,7 @@ LengauerTarjan::LengauerTarjan(int r, vvi_t _en, vvi_t _in, vvi_t _ou)
 	// init();
 }
 
-LengauerTarjan::~LengauerTarjan() {}
+LengauerTarjan::~LengauerTarjan() = default;
 
 void LengauerTarjan::run(int root) {
 	init();

@@ -21,12 +21,7 @@
 extern std::map<IntVar*, std::string> intVarString;
 
 IntVarEL::IntVarEL(const IntVar& other)
-		: IntVar(other),
-			lit_min(INT_MIN),
-			lit_max(INT_MIN),
-			base_vlit(INT_MIN),
-			base_blit(INT_MIN),
-			uiv_no(-1) {
+		: IntVar(other), lit_min(INT_MIN), lit_max(INT_MIN), base_vlit(INT_MIN), base_blit(INT_MIN) {
 	initVals();
 	initVLits();
 	initBLits();

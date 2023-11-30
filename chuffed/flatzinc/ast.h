@@ -47,7 +47,7 @@ private:
 	const char* _what = nullptr;
 
 public:
-	TypeError() {}
+	TypeError() = default;
 	TypeError(const char* what) : _what(what) {}
 	std::string what() const {
 		if (_what != nullptr) {
@@ -151,7 +151,7 @@ public:
 	int min;
 	int max;
 	std::vector<int> s;
-	SetLit() {}
+	SetLit() = default;
 	SetLit(int min0, int max0) : interval(true), min(min0), max(max0) {}
 	SetLit(std::vector<int> s0) : interval(false), s(std::move(s0)) {}
 	bool empty() const { return ((interval && min > max) || (!interval && s.empty())); }
@@ -268,7 +268,7 @@ public:
 	void print(std::ostream& os) override { os << "s(\"" << s << "\")"; }
 };
 
-inline Node::~Node() {}
+inline Node::~Node() = default;
 
 inline void Node::append(Node* newNode) {
 	auto* a = dynamic_cast<Array*>(this);

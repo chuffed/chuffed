@@ -22,9 +22,7 @@
 
 FilteredLT::FilteredLT(GraphPropagator* _p, int _r, std::vector<std::vector<int> > _en,
 											 std::vector<std::vector<int> > _in, std::vector<std::vector<int> > _ou)
-		: LengauerTarjan(_r, std::move(_en), std::move(_in), std::move(_ou)),
-			p(_p),
-			visited_innodes(0) {}
+		: LengauerTarjan(_r, std::move(_en), std::move(_in), std::move(_ou)), p(_p) {}
 
 int FilteredLT::get_visited_innodes() const {
 	// visited_innodes = 0;
@@ -303,7 +301,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 																								 vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out,
 																								 vec<vec<int> >& _en)
-		: GraphPropagator(_vs, _es, _en), lt(nullptr), root(_r), in_nodes_tsize(0), in_nodes_size(0) {
+		: GraphPropagator(_vs, _es, _en), root(_r), in_nodes_tsize(0) {
 	adj = std::vector<std::vector<int> >(_in.size(), std::vector<int>());
 	for (int i = 0; i < _in.size(); i++) {
 		for (int j = 0; j < _in[i].size(); j++) {

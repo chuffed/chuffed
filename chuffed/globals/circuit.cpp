@@ -23,13 +23,13 @@
 template <int U = 0>
 class Circuit : public Propagator {
 public:
-	bool const useCheck;       // use the 'check' algorithm
-	bool const usePrevent;     // use the 'prevent' algorithm
-	bool const useScc;         // use the 'scc' algorithm
-	bool const pruneRoot;      // use 'prune root' option for scc algorithm
-	bool const pruneSkip;      // prune arcs that skip subtrees (in scc)
-	bool const fixReq;         // fix required back edges (in scc)
-	bool const generaliseScc;  // use 'prune within' option for scc
+	bool const useCheck;         // use the 'check' algorithm
+	bool const usePrevent;       // use the 'prevent' algorithm
+	bool const useScc;           // use the 'scc' algorithm
+	bool const pruneRoot;        // use 'prune root' option for scc algorithm
+	bool const pruneSkip{true};  // prune arcs that skip subtrees (in scc)
+	bool const fixReq{true};     // fix required back edges (in scc)
+	bool const generaliseScc;    // use 'prune within' option for scc
 
 	int const size;  // total number of nodes
 
@@ -71,8 +71,7 @@ public:
 				usePrevent(so.circuitalg >= 2 && so.circuitalg < 4),
 				useScc(so.circuitalg >= 3),
 				pruneRoot(so.sccoptions >= 3),
-				pruneSkip(true),
-				fixReq(true),
+
 				generaliseScc(so.sccoptions == 2 || so.sccoptions == 4),
 				size(_x.size()),
 				x(_x.release()) {

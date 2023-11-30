@@ -29,7 +29,7 @@ struct edge_leq {
 	}
 } edge_leq;
 
-EVLayerGraph::EVLayerGraph() : opcache(OpCache(OPCACHE_SZ)), intermed_maxsz(2) {
+EVLayerGraph::EVLayerGraph() : opcache(OpCache(OPCACHE_SZ)) {
 	// Initialize \ttt
 	nodes.push_back(nullptr);  // true node
 	TravInfo tinfo = {0, -1, 1};
@@ -215,7 +215,7 @@ EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom,
 
 EVEdge EVNode::operator[](int eidx) const {
 	EVLayerGraph::EInfo edge(g->nodes[idx]->edges[eidx]);
-	return EVEdge(edge.val, edge.weight, EVNode(g, edge.dest));
+	return {edge.val, edge.weight, EVNode(g, edge.dest)};
 }
 
 int EVNode::id() const { return g->status[idx].id; }

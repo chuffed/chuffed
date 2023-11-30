@@ -14,7 +14,7 @@
 
 class FilteredLT : public LengauerTarjan {
 	GraphPropagator* p;
-	int visited_innodes;
+	int visited_innodes{0};
 
 protected:
 	void DFS(int r) override;
@@ -30,13 +30,13 @@ public:
 
 class DReachabilityPropagator : public GraphPropagator {
 private:
-	FilteredLT* lt;
+	FilteredLT* lt{nullptr};
 
 	int root;
 	std::vector<std::vector<int> > nodes2edge;
 
 	Tint in_nodes_tsize;
-	int in_nodes_size;
+	int in_nodes_size{0};
 
 	virtual bool remove_deg1(int u);
 

@@ -76,10 +76,10 @@ class NurseSeq : public Problem {
 public:
 	class Opts {
 	public:
-		Opts() : model(1), gcard(0) {}
+		Opts() = default;
 
-		int model;
-		int gcard;
+		int model{1};
+		int gcard{0};
 	};
 
 	NurseSeq(Opts& opts) {

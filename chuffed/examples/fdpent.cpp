@@ -358,12 +358,12 @@ hlist<T> replicate(int n, T el) {
 
 class Opts {
 public:
-	Opts() : reflect(true), rotate(true), restr(false), symbreak(false) {}
+	Opts() = default;
 
-	bool reflect;
-	bool rotate;
-	bool restr;
-	bool symbreak;
+	bool reflect{true};
+	bool rotate{true};
+	bool restr{false};
+	bool symbreak{false};
 };
 
 // combine(a, bs) === zipWith (:) a bs
@@ -401,7 +401,7 @@ hlist<hlist<T> > rotate(hlist<hlist<T> > original) {
 hlist<int> pent_seq(int width, hlist<hlist<int> > pattern) {
 	//   std::cout << pattern << std::endl;
 	if (pattern.is_empty()) {
-		return hlist<int>();
+		return {};
 	}
 
 	if (pattern.length() == 1) {

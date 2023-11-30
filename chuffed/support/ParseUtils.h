@@ -35,8 +35,8 @@ static const int buffer_size = 1048576;
 class StreamBuffer {
 	gzFile in;
 	unsigned char buf[buffer_size];
-	int pos;
-	int size;
+	int pos{0};
+	int size{0};
 
 	void assureLookahead() {
 		if (pos >= size) {
@@ -46,7 +46,7 @@ class StreamBuffer {
 	}
 
 public:
-	explicit StreamBuffer(gzFile i) : in(i), pos(0), size(0) { assureLookahead(); }
+	explicit StreamBuffer(gzFile i) : in(i) { assureLookahead(); }
 
 	int operator*() const { return (pos >= size) ? EOF : buf[pos]; }
 	void operator++() {

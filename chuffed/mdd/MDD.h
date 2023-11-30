@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-typedef unsigned int MDDNodeInt;
+using MDDNodeInt = unsigned int;
 
 // _MDD node format: var #edges low {(v_0, d_0), (v_1, d_1), ..., (v_k, d_k)}
 // Values [v_0, v_1) -> d_0, [v_1, v_2) -> d_1, etc.
@@ -21,23 +21,23 @@ typedef unsigned int MDDNodeInt;
 
 // Allows negation, with arbitrary domains, and canonicity.
 
-typedef struct {
+struct MDDEdge {
 	int val;
 	unsigned int dest;
-} MDDEdge;
+};
 
-typedef struct {
+struct MDDNodeEl {
 	unsigned int var;
 	unsigned int sz;
 
 	unsigned int low;  // (-inf,...)
 	MDDEdge edges[1];
-} MDDNodeEl;
+};
 
-typedef MDDNodeEl* MDDNode;
+using MDDNode = MDDNodeEl*;
 
-typedef std::pair<int, MDDNodeInt> edgepair;
-typedef std::pair<int, int> intpair;
+using edgepair = std::pair<int, MDDNodeInt>;
+using intpair = std::pair<int, int>;
 #define MDDTRUE 1
 #define MDDFALSE 0
 
@@ -88,7 +88,7 @@ struct hashnode {
 #ifdef USE_MAP
 typedef std::map<const MDDNode, int, ltnode> NodeCache;
 #else
-typedef std::unordered_map<const MDDNode, int, hashnode, eqnode> NodeCache;
+using NodeCache = std::unordered_map<const MDDNode, int, hashnode, eqnode>;
 #endif
 
 // class OpCache {
@@ -158,9 +158,9 @@ public:
 	MDDNodeInt tuple(vec<T>& /*tpl*/);
 	//   MDDNodeInt tuple(std::vector<int>&);
 
-	MDD vareq(int var, int val) { return MDD(this, mdd_vareq(var, val)); }
-	MDD ttt() { return MDD(this, MDDTRUE); }
-	MDD fff() { return MDD(this, MDDFALSE); }
+	MDD vareq(int var, int val) { return {this, mdd_vareq(var, val)}; }
+	MDD ttt() { return {this, MDDTRUE}; }
+	MDD fff() { return {this, MDDFALSE}; }
 
 	MDDNodeInt mdd_vareq(int var, int val);
 	MDDNodeInt mdd_varlt(int var, int val);
@@ -191,7 +191,7 @@ private:
 #endif
 
 	std::vector<MDDEdge> stack;
-	unsigned int intermed_maxsz;
+	unsigned int intermed_maxsz{2};
 	MDDNode intermed;
 
 	std::vector<MDDNode> nodes;

@@ -10,8 +10,8 @@
 #include <stack>
 #include <vector>
 
-typedef int edge_id;
-typedef int node_id;
+using edge_id = int;
+using node_id = int;
 
 class GraphPropagator : public Propagator {
 public:

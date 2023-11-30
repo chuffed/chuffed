@@ -10,7 +10,7 @@
 
 OpCache::OpCache(unsigned int sz)
 		: tablesz(sz),
-			members(0),
+
 			indices((unsigned int*)malloc(sizeof(unsigned int) * sz)),
 			entries((cache_entry*)malloc(sizeof(cache_entry) * sz)) {
 	//    collisions = 0;
@@ -22,11 +22,11 @@ OpCache::~OpCache() {
 	//    std::cout << members << ", " << collisions << std::endl;
 }
 
-typedef struct {
+struct cache_sig {
 	unsigned int op;
 	unsigned int a;
 	unsigned int b;
-} cache_sig;
+};
 
 inline unsigned int OpCache::hash(char op, unsigned int a, unsigned int b) const {
 #ifndef USE_MURMURHASH

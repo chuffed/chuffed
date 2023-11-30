@@ -21,14 +21,7 @@
 
 Simplex simplex;
 
-Simplex::Simplex()
-		: L_cols_zeros(0),
-			U_diag_units(0),
-			recalc_time(0),
-			simplexs(0),
-			refactors(0),
-			sort_col_ratio(ratio),
-			sort_col_nz(AV_nz) {}
+Simplex::Simplex() : sort_col_ratio(ratio), sort_col_nz(AV_nz) {}
 
 void Simplex::init() {
 	m = mip->ineqs.size();

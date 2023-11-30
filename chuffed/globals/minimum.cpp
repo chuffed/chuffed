@@ -27,7 +27,7 @@ public:
 	Tint64_t min_fixed;
 
 	// Intermediate state
-	bool lower_change;
+	bool lower_change{false};
 
 	Minimum(vec<IntView<U> > _x, IntView<U> _y)
 			: sz(_x.size()),
@@ -35,8 +35,7 @@ public:
 				y(_y),
 				min_max_var(-1),
 				min_max(INT_MAX),
-				min_fixed(INT_MAX),
-				lower_change(false) {
+				min_fixed(INT_MAX) {
 		priority = 1;
 		for (int i = 0; i < sz; i++) {
 			x[i].attach(this, i, EVENT_LU);

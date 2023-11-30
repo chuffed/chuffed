@@ -29,7 +29,7 @@ class IntVarEL : public IntVar {
 	void updateFixed();
 
 public:
-	int uiv_no;
+	int uiv_no{-1};
 
 	IntVarEL(const IntVar& other);
 

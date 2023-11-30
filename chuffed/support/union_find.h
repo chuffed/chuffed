@@ -113,7 +113,7 @@ private:
 
 public:
 	RerootedUnionFind(int _size);
-	~RerootedUnionFind();
+	virtual ~RerootedUnionFind();
 	int getSize() const override { return size; }
 	// No path compression, otherwise we loose the magic of knowing where
 	// explanations come from

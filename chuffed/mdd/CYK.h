@@ -5,11 +5,11 @@
 #include <map>
 
 // Conversion of a CFG to some formula type F.
-typedef struct {
+struct cyk_sig {
 	CFG::Sym s;
 	int start;
 	int end;
-} cyk_sig;
+};
 
 cyk_sig mk_sig(CFG::Sym s, int start, int end) {
 	cyk_sig sig = {s, start, end};
@@ -33,7 +33,7 @@ struct cyk_clt {
 // Currently assumes grammar has no nullable nonterminals.
 template <class F>
 class CYKParser {
-	typedef std::map<cyk_sig, int, cyk_clt> CacheT;
+	using CacheT = std::map<cyk_sig, int, cyk_clt>;
 	std::vector<F> fs;
 
 public:

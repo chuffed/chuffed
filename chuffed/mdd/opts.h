@@ -9,9 +9,9 @@ public:
 	enum ExplStrat { E_TEMP, E_KEEP };
 	enum Decomp { D_PROP, D_DOMAIN, D_TSEITIN };
 
-	MDDOpts() : expl_alg(E_GREEDY), expl_strat(E_KEEP), decomp(D_PROP) {}
+	MDDOpts() = default;
 
-	MDDOpts(const MDDOpts& o) : expl_alg(o.expl_alg), expl_strat(o.expl_strat), decomp(o.decomp) {}
+	MDDOpts(const MDDOpts& o) = default;
 
 	void parse_arg(const std::string& arg) {
 		if (arg == "explain_minimal") {
@@ -24,9 +24,9 @@ public:
 			expl_strat = E_KEEP;
 		}
 	}
-	ExplAlg expl_alg;
-	ExplStrat expl_strat;
-	Decomp decomp;
+	ExplAlg expl_alg{E_GREEDY};
+	ExplStrat expl_strat{E_KEEP};
+	Decomp decomp{D_PROP};
 };
 
 #endif

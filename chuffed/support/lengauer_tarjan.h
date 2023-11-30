@@ -18,7 +18,7 @@ class LengauerTarjan {
 
 private:
 	int root;
-	typedef std::vector<std::vector<int> > vvi_t;
+	using vvi_t = std::vector<std::vector<int>>;
 	vvi_t en;
 	vvi_t in;
 	vvi_t ou;

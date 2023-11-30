@@ -34,7 +34,7 @@ DTreePropagator::DTreePropagator(int _r, vec<BoolView>& _vs, vec<BoolView>& _es,
 	}
 }
 
-DTreePropagator::~DTreePropagator() {}
+DTreePropagator::~DTreePropagator() = default;
 
 bool DTreePropagator::propagateNewEdge(int e) {
 	if (!DReachabilityPropagator::propagateNewEdge(e)) {

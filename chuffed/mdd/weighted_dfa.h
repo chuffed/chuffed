@@ -55,30 +55,30 @@ public:
 class EVLayerGraph {
 	// Local structs
 	//==============
-	typedef struct {
+	struct TravInfo {
 		int id;
 		int next;
 		int flag;
-	} TravInfo;
+	};
 
 	// Globally visible structs
 	//=========================
 public:
-	typedef struct {
+	struct EInfo {
 		int val;
 		int weight;
 		int dest;
-	} EInfo;
+	};
 
-	typedef struct {
+	struct NodeInfo {
 		unsigned int var;
 		unsigned int sz;
 
 		EInfo edges[1];
-	} NodeInfo;
+	};
 
-	typedef NodeInfo* NodeRef;
-	typedef int NodeID;
+	using NodeRef = NodeInfo*;
+	using NodeID = int;
 
 	// Need to set up a nice interface for traversal.
 	class IterNode {
@@ -115,7 +115,7 @@ protected:
 		unsigned int operator()(NodeRef a1) const;
 	};
 
-	typedef std::unordered_map<const NodeRef, NodeID, hashnode, eqnode> NodeCache;
+	using NodeCache = std::unordered_map<const NodeRef, NodeID, hashnode, eqnode>;
 
 	// Public Methods
 public:
@@ -127,8 +127,8 @@ public:
 	// Initialize the traversal info stuff.
 	// Returns the size of the computed subgraph.
 	int traverse(NodeID idx);
-	EVNode travBegin() { return EVNode(this, status[0].next); }
-	EVNode travEnd() { return EVNode(this, -1); }
+	EVNode travBegin() { return {this, status[0].next}; }
+	EVNode travEnd() { return {this, -1}; }
 
 	const static int EVFalse;
 	const static int EVTrue;
@@ -142,7 +142,7 @@ protected:
 	OpCache opcache;
 	NodeCache cache;
 
-	int intermed_maxsz;
+	int intermed_maxsz{2};
 	NodeRef intermed;
 
 public:
@@ -153,10 +153,10 @@ public:
 };
 
 // Transition for a cost-regular constraint.
-typedef struct {
+struct WDFATrans {
 	int weight;
 	int dest;
-} WDFATrans;
+};
 
 inline void create_edges(EVLayerGraph& graph, vec<EVLayerGraph::EInfo>& edges,
 												 const vec<EVLayerGraph::NodeID>& previous_layer, const WDFATrans* T,

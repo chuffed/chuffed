@@ -15,22 +15,22 @@
 
 // #define INFINITY 10000
 
-typedef int edge_id;
-typedef int node_id;
+using edge_id = int;
+using node_id = int;
 
 struct partialExpl {
 	edge_id bridge;
 	node_id cause1;
-	node_id cause2;
-	partialExpl() : cause2(-1) {}
+	node_id cause2{-1};
+	partialExpl() = default;
 };
 
 class TreePropagator : public GraphPropagator {
 public:
 	struct CC {
-		int count;
+		int count{0};
 		std::vector<int> nodesIds;
-		CC() : count(0) {}
+		CC() = default;
 	};
 
 	static std::vector<TreePropagator*> tree_propagators;

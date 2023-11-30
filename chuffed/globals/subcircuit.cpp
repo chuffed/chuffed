@@ -29,13 +29,13 @@ public:
 	bool const prevent;  // use 'prevent' algorithm
 	bool const scc;      // use strongly connected components algorithm
 	bool const pruneRoot;
-	bool const pruneSkip;
-	bool const fixReq;
+	bool const pruneSkip{true};
+	bool const fixReq{true};
 	bool const pruneWithin;
 	vec<int> chain_start;
 	bool* inCircuit;
 	bool* isStartChain;
-	int defaultRoot;  // index of var used as root of scc tree by default
+	int defaultRoot{0};  // index of var used as root of scc tree by default
 
 	// Persistent state
 
@@ -68,10 +68,8 @@ public:
 				prevent(so.circuitalg >= 2 && so.circuitalg <= 3),
 				scc(so.circuitalg >= 3),
 				pruneRoot(so.sccoptions >= 3),
-				pruneSkip(true),
-				fixReq(true),
-				pruneWithin(so.sccoptions == 2 || so.sccoptions == 4),
-				defaultRoot(0) {
+
+				pruneWithin(so.sccoptions == 2 || so.sccoptions == 4) {
 		priority = 5;
 
 		new_fixed.reserve(size);

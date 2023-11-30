@@ -30,7 +30,7 @@ class Var : public Branching {
 public:
 	virtual VarType getType() = 0;
 	virtual void setPreferredVal(PreferredVal vb) = 0;
-	virtual ~Var() {}
+	virtual ~Var() = default;
 };
 
 #endif

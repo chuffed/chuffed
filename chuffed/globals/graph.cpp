@@ -75,7 +75,7 @@ GraphPropagator::GraphPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec
 	priority = 1;
 }
 
-GraphPropagator::~GraphPropagator() {}
+GraphPropagator::~GraphPropagator() = default;
 
 void GraphPropagator::attachToAll() {
 	// Do not use in inheriting classes!!

@@ -107,7 +107,7 @@ public:
 		IntVar::iterator forward;
 
 	public:
-		iterator() {}
+		iterator() = default;
 		iterator(const IntView* _view, IntVar::iterator _forward) : view(_view), forward(_forward) {}
 		int operator*() const {
 			int v;
@@ -160,7 +160,7 @@ public:
 			return (forward != rhs.forward);
 		}
 	};
-	typedef iterator const_iterator;
+	using const_iterator = iterator;
 	iterator begin() const { return iterator(this, (type & 1) != 0 ? var->end() : var->begin()); }
 	iterator end() const { return iterator(this, (type & 1) != 0 ? var->begin() : var->end()); }
 
@@ -168,7 +168,7 @@ public:
 		iterator forward;
 
 	public:
-		reverse_iterator() {}
+		reverse_iterator() = default;
 		reverse_iterator(iterator _forward) : forward(_forward) {}
 		int operator*() const {
 			iterator temp = forward;
@@ -196,7 +196,7 @@ public:
 		bool operator==(const reverse_iterator& rhs) const { return (forward == rhs.forward); }
 		bool operator!=(const reverse_iterator& rhs) const { return (forward != rhs.forward); }
 	};
-	typedef reverse_iterator const_reverse_iterator;
+	using const_reverse_iterator = reverse_iterator;
 	reverse_iterator rbegin() const { return reverse_iterator(end()); }
 	reverse_iterator rend() const { return reverse_iterator(begin()); }
 

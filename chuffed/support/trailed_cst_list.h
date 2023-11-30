@@ -22,7 +22,7 @@ public:
 		size = 0;
 	}
 
-	~TrailedConstantAccessList() {}
+	~TrailedConstantAccessList() = default;
 
 	virtual int key(T k) = 0;
 
@@ -84,7 +84,7 @@ public:
 	};
 
 	// typedef Iterator<T> iterator;
-	typedef Iterator<const T> const_iterator;
+	using const_iterator = Iterator<const T>;
 	const_iterator begin() { return Iterator<const T>(this, 0); }
 	const_iterator end() { return Iterator<const T>(this, size); }
 };

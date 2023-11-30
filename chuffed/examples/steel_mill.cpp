@@ -40,7 +40,7 @@ public:
 	vec<int> loss_table;  // Load -> Loss table
 	int max_cap;          // Maximum capacity
 	int max_loss;         // Maximum loss
-	int n_colours;        // Number of colours
+	int n_colours{88};    // Number of colours
 	int n_orders;         // Number of orders
 	int n_slabs;          // Number of slabs
 	vec<int> weight;      // weight of ith order
@@ -59,7 +59,7 @@ public:
 	vec<vec<IntVar*> > b2i_order_slab;   // whether order i is assigned to slab j
 	vec<vec<IntVar*> > b2i_slab_colour;  // whether slab i is assigned colour j
 
-	SteelMill(int n) : n_colours(88), n_orders(n), n_slabs(n) {
+	SteelMill(int n) : n_orders(n), n_slabs(n) {
 		for (int& csplib_capacitie : csplib_capacities) {
 			capacities.push(csplib_capacitie);
 		}

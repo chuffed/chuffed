@@ -913,12 +913,12 @@ public:
 		}
 	};
 
-	typedef struct DijkstraInfo {
-		int cost;
-		int prev;
-		int edge;
-		DijkstraInfo() : cost(0), prev(0), edge(0) {}
-	} DijkstraInfo;
+	struct DijkstraInfo {
+		int cost{0};
+		int prev{0};
+		int edge{0};
+		DijkstraInfo() = default;
+	};
 
 	/**
 	 * This implementation of Dijkstra stops when reaching a "terminal"

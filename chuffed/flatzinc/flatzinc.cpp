@@ -135,13 +135,7 @@ ValBranch ann2ivalsel(AST::Node* ann) {
 }
 
 FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int setVars)
-		: intVarCount(0),
-			boolVarCount(0),
-			iv(intVars),
-			iv_introduced(intVars),
-			bv(boolVars),
-			bv_introduced(boolVars),
-			output(nullptr) {
+		: iv(intVars), iv_introduced(intVars), bv(boolVars), bv_introduced(boolVars) {
 	s = this;
 }
 

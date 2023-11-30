@@ -9,7 +9,7 @@ namespace CFG {
 
 class ProdR {
 public:
-	virtual ~ProdR(){};
+	virtual ~ProdR() = default;
 	virtual bool check(int start, int end) = 0;
 };
 
@@ -108,8 +108,8 @@ class Cond {
 public:
 	Cond(ProdR* _p) : p(_p) {}
 
-	RSym operator()(const Sym& s) { return RSym(s, p); }
-	RSym operator()(int i) { return RSym(i, p); }
+	RSym operator()(const Sym& s) { return {s, p}; }
+	RSym operator()(int i) { return {i, p}; }
 
 protected:
 	ProdR* p;
@@ -128,7 +128,7 @@ class CFG;
 
 class Rule {
 public:
-	Rule() {}
+	Rule() = default;
 
 	Rule& operator<<(RSym s) {
 		syms.push_back(s);
@@ -143,7 +143,7 @@ public:
 	std::vector<RSym> syms;
 };
 
-Rule E() { return Rule(); }
+Rule E() { return {}; }
 
 class CFG {
 public:
@@ -232,7 +232,7 @@ public:
 
 	Cond attach(ProdR* p) {
 		conds.push_back(p);
-		return Cond(p);
+		return {p};
 	}
 
 	int alphsz;

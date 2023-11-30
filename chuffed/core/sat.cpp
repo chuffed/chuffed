@@ -73,27 +73,11 @@ SAT::SAT()
 			trail(1),
 			qhead(1, 0),
 			rtrail(1),
-			confl(nullptr),
-			var_inc(1),
-			cla_inc(1),
+
 			order_heap(VarOrderLt(activity)),
-			bin_clauses(0),
-			tern_clauses(0),
-			long_clauses(0),
-			learnt_clauses(0),
-			propagations(0),
-			back_jumps(0),
-			nrestarts(0),
-			next_simp_db(100000),
-			clauses_literals(0),
-			learnts_literals(0),
-			max_literals(0),
-			tot_literals(0),
-			avg_depth(100),
-			confl_rate(1000),
+
 			ll_time(chuffed_clock::now()),
-			ll_inc(1),
-			learnt_len_el(10),
+
 			learnt_len_occ(MAX_SHARE_LEN, learnt_len_el * 1000 / MAX_SHARE_LEN) {
 	newVar();
 	enqueue(Lit(0, true));

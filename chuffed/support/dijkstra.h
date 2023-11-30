@@ -15,7 +15,7 @@
 
 class Dijkstra {
 protected:
-	typedef std::vector<std::vector<int>> vvi_t;
+	using vvi_t = std::vector<std::vector<int>>;
 	int source;
 	int nb_nodes;
 	vvi_t en;
@@ -50,7 +50,7 @@ public:
 	Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int>& _ws);
 	Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<std::vector<int>>& _wst,
 					 std::vector<int> d = std::vector<int>());
-	virtual ~Dijkstra(){};
+	virtual ~Dijkstra() = default;
 	void run();
 
 	virtual void set_source(int s) { source = s; }
@@ -93,7 +93,7 @@ public:
 
 class DijkstraMandatory {
 public:
-	typedef std::vector<std::vector<int>> vvi_t;
+	using vvi_t = std::vector<std::vector<int>>;
 
 protected:
 	int source;
@@ -123,7 +123,7 @@ public:
 		std::vector<bool> path;
 		std::vector<bool> mand;
 	};
-	typedef DijkstraMandatory::tuple tuple;
+	using tuple = DijkstraMandatory::tuple;
 
 	class Priority {
 	public:
@@ -155,19 +155,19 @@ protected:
 
 public:
 	std::vector<std::unordered_map<size_t, tuple>> table;
-	typedef std::unordered_map<size_t, tuple> map_type;
+	using map_type = std::unordered_map<size_t, tuple>;
 	static inline unsigned long hash_fn(std::vector<bool>& b) {
 		std::hash<std::vector<bool>> h;
 		return h(b);
 	}
-	typedef std::unordered_map<size_t, tuple>::const_iterator table_iterator;
-	typedef std::vector<map_type> table_type;
+	using table_iterator = std::unordered_map<size_t, tuple>::const_iterator;
+	using table_type = std::vector<map_type>;
 
 	DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int> _ws);
 	DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in, vvi_t _ou,
 										std::vector<std::vector<int>> _wst, std::vector<int> _ds = std::vector<int>());
 	virtual void init();
-	virtual ~DijkstraMandatory(){};
+	virtual ~DijkstraMandatory() = default;
 
 #ifdef DIJKSTRAMANDATORY_ALLOW_CYCLE
 	virtual int run(bool* ok = NULL, bool use_set_target = false, int start = -1);

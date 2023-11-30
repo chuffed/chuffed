@@ -29,9 +29,9 @@ class LinearGE : public Propagator {
 	BoolView r;
 
 	// persistent data
-	int fix;
-	int fix_x;
-	int fix_y;
+	int fix{0};
+	int fix_x{0};
+	int fix_y{0};
 	int64_t fix_sum;
 	vec<Lit> ps;
 
@@ -40,9 +40,7 @@ public:
 			: pos(_x.size()),
 				c(_c),
 				r(std::move(_r)),
-				fix(0),
-				fix_x(0),
-				fix_y(0),
+
 				fix_sum(-c),
 				ps(R + _x.size()) {
 		priority = 2;

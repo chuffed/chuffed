@@ -23,17 +23,17 @@
 #define VAL_DEAD(val) (val_entries[(val)].supp_count == 0)
 #endif
 
-typedef int Value;
+using Value = int;
 
-typedef struct i_edge {
+struct inc_edge {
 	Value val;
 	unsigned int kill_flags;
 	char watch_flags;
 	int begin;
 	int end;
-} inc_edge;
+};
 
-typedef struct {
+struct inc_node {
 	int var;
 
 	int in_start;
@@ -47,9 +47,9 @@ typedef struct {
 
 	unsigned char stat_flag;
 	unsigned int kill_flag;
-} inc_node;
+};
 
-typedef struct {
+struct val_entry {
 	int var;
 	int val;
 	int first_off;
@@ -61,7 +61,7 @@ typedef struct {
 	//    unsigned char stat_flag;
 	signed char stat_flag;
 	int* search_cache;
-} val_entry;
+};
 
 class MDDTemplate {
 public:
@@ -190,7 +190,7 @@ private:
 	vec<inc_edge> edges;
 
 	double act_decay;
-	double act_inc;
+	double act_inc{1};
 	vec<double> activity;
 	void bumpActivity(int val) { activity[val] += act_inc; }
 	void decayActivity() { act_inc *= act_decay; }

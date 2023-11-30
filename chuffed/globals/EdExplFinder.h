@@ -45,20 +45,20 @@ public:
 private:
 	IntView<>* seq1{};
 
-	IntView<>* seq2;
+	IntView<>* seq2{nullptr};
 
 	// maximum character of alphabet
-	int max_char;
+	int max_char{0};
 
 	// minimum insertion/deletion cost
-	int min_id_cost;
+	int min_id_cost{0};
 
 	// vector of character insertion costs
-	const vec<int>* insertion_cost;
+	const vec<int>* insertion_cost{nullptr};
 	// vector of character deletion costs
-	const vec<int>* deletion_cost;
+	const vec<int>* deletion_cost{nullptr};
 	// vector of character substitution costs
-	const vec<int>* substitution_cost;
+	const vec<int>* substitution_cost{nullptr};
 
 	// structures to capture the characters that should be excluded for the sequence positions
 	// flat 2d vectors (sequence positions * characters)
@@ -66,11 +66,11 @@ private:
 	std::vector<bool>* seq2ExcludedCharacters{};
 
 	// read only pointer to dpMatrix
-	const vec<int>* dpMatrix;
+	const vec<int>* dpMatrix{nullptr};
 	// size of the sequences that are compared
-	int seqSize;
+	int seqSize{-1};
 	// valid lower bound for the edit distance
-	int lb;
+	int lb{-1};
 
 	/**
 	 * Do a breadth first search to fill shortest path matrix

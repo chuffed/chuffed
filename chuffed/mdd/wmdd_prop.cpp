@@ -79,8 +79,6 @@ WMDDProp::WMDDProp(vec<IntView<> >& _vs, IntView<> _c, vec<int>& _levels, vec<Ed
 		: intvars(_vs),
 			cost(_c),
 
-			root(1),
-			T(0),
 			edges(_edges),
 			dead_edges(_edges.size()),
 			fixedvars(0),  // Do we want to use this, or backtrack timestamps?

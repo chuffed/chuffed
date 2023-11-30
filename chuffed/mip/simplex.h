@@ -12,10 +12,10 @@ enum SimplexStatus { SIMPLEX_OPTIMAL, SIMPLEX_GOOD_ENOUGH, SIMPLEX_IN_PROGRESS, 
 
 class SimplexState {
 public:
-	int* rtoc;
-	int* ctor;
-	int* shift;
-	SimplexState() : rtoc(nullptr), ctor(nullptr), shift(nullptr) {}
+	int* rtoc{nullptr};
+	int* ctor{nullptr};
+	int* shift{nullptr};
+	SimplexState() = default;
 };
 
 class IndexVal {
@@ -39,7 +39,7 @@ class LUFactor {
 public:
 	int r;               // row which has non-zero entries
 	vec<IndexVal> vals;  // values in rth row
-	LUFactor() {}
+	LUFactor() = default;
 	void multiply(long double* a);
 	void Tmultiply(long double* a);
 };
@@ -85,9 +85,9 @@ public:
 	vec<vec<IndexVal> > U_cols;
 	vec<vec<IndexVal> > U_rows;
 	long double* U_diag;
-	int* U_perm;       // U' -> U where U' is upper triangular
-	int L_cols_zeros;  // number of empty columns from start
-	int U_diag_units;  // number of unit U_diag from start
+	int* U_perm;          // U' -> U where U' is upper triangular
+	int L_cols_zeros{0};  // number of empty columns from start
+	int U_diag_units{0};  // number of unit U_diag from start
 
 	LUFactor* lu_factors;
 	int num_lu_factors;
@@ -111,9 +111,9 @@ public:
 
 	SimplexState root;
 
-	long double recalc_time;
-	long long simplexs;
-	long long refactors;
+	long double recalc_time{0};
+	long long simplexs{0};
+	long long refactors{0};
 
 	struct SortColRatio {
 		long double*& ratio;

@@ -16,7 +16,7 @@ struct LinearIneq {
 	long double ub;
 	bool lb_notR;
 	bool ub_notR;
-	LinearIneq() {}
+	LinearIneq() = default;
 };
 
 struct BoundChange {
@@ -47,10 +47,10 @@ public:
 	vec<BoundChange> bctrail;
 	vec<int> bctrail_lim;
 
-	int level_lb;
-	int level_ub;
+	int level_lb{-1};
+	int level_ub{-1};
 
-	int status;
+	int status{0};
 
 	duration simplex_time;
 

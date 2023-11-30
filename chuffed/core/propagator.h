@@ -36,19 +36,17 @@ enum ConLevel { CL_DEF, CL_VAL, CL_BND, CL_DOM };
 class Propagator {
 public:
 	int const prop_id;
-	int priority;
+	int priority{0};
 
 	// Persistent state
 	Tchar satisfied;
 
 	// Intermediate state
-	bool in_queue;
+	bool in_queue{false};
 
-	Propagator() : prop_id(engine.propagators.size()), priority(0), satisfied(0), in_queue(false) {
-		engine.propagators.push(this);
-	}
+	Propagator() : prop_id(engine.propagators.size()), satisfied(0) { engine.propagators.push(this); }
 
-	virtual ~Propagator() {}
+	virtual ~Propagator() = default;
 
 	// Push propgator into queue if it isn't already there
 	void pushInQueue() {

@@ -22,8 +22,8 @@ struct sorter {
 	bool operator()(std::pair<int, int> i, std::pair<int, int> j) { return (i.second < j.second); }
 } sorter;
 
-typedef std::pair<int, int> iipair;
-typedef std::pair<int, iipair> iiipair;
+using iipair = std::pair<int, int>;
+using iiipair = std::pair<int, iipair>;
 /**
  * Returns the weight of an MST (pure MST)
  */
@@ -83,8 +83,8 @@ public:
 
 	struct sortByW {
 		MSTPropagator* p;
-		bool dec;
-		sortByW(MSTPropagator* _p) : p(_p), dec(false) {}
+		bool dec{false};
+		sortByW(MSTPropagator* _p) : p(_p) {}
 		bool operator()(int e1, int e2) const {
 			if (dec) {
 				return p->ws[e1] > p->ws[e2];

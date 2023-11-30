@@ -33,28 +33,7 @@ std::map<int, IntVar*> ic_map;
 extern std::map<IntVar*, std::string> intVarString;
 
 IntVar::IntVar(int _min, int _max)
-		: var_id(engine.vars.size()),
-			min(_min),
-			max(_max),
-			min0(_min),
-			max0(_max),
-			shadow_val(0),
-			in_scip(false),
-			all_in_scip(true),
-			should_be_learnable(true),
-			should_be_decidable(true),
-			vals(nullptr),
-			preferred_val(PV_MIN),
-			activity(0),
-			in_queue(false),
-			sbps_value_selection(false),
-			last_solution_value(-1)
-#ifdef HAS_VAR_IMPACT
-			,
-			impact(0.042),
-			impact_count(0)
-#endif
-{
+		: var_id(engine.vars.size()), min(_min), max(_max), min0(_min), max0(_max) {
 	assert(min_limit <= min && min <= max && max <= max_limit);
 	engine.vars.push(this);
 	changes = EVENT_C | EVENT_L | EVENT_U;

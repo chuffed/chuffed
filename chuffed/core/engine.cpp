@@ -210,20 +210,9 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 }
 
 Engine::Engine()
-		: finished_init(false),
-			problem(nullptr),
-			opt_var(nullptr),
-			best_sol(-1),
-			last_prop(nullptr)
-
-			,
-			start_time(chuffed_clock::now()),
+		: start_time(chuffed_clock::now()),
 			opt_time(duration::zero()),
-			conflicts(0),
-			nodes(1),
-			propagations(0),
-			solutions(0),
-			next_simp_db(0),
+
 			output_stream(&std::cout),
 			solution_callback(nullptr)
 #ifdef HAS_VAR_IMPACT

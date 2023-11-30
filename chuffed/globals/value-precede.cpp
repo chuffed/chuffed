@@ -26,8 +26,8 @@ class value_precede : public Propagator {
 		unsigned si : 15;
 		unsigned ti : 16;
 	};
-	static tag_t s_tag(int si, int ti) { return tag_t(si, ti, false); }
-	static tag_t t_tag(int ti) { return tag_t(0, ti, true); }
+	static tag_t s_tag(int si, int ti) { return {si, ti, false}; }
+	static tag_t t_tag(int ti) { return {0, ti, true}; }
 
 	Clause* ex_s(int si, int ti) {
 		Clause* r(Reason_new(ti + 1));

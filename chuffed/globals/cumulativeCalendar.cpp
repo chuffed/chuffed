@@ -106,31 +106,31 @@ public:
 	int** calendar;
 	int** workingPeriods;
 
-	const int minTime;  // Minimal time in the calendar
-	const int maxTime;  // Maximal time in the calendar
+	const int minTime{0};  // Minimal time in the calendar
+	const int maxTime;     // Maximal time in the calendar
 
 	// Options
-	const CUMU_BOOL idem;  // Whether the cumulative propagator should be idempotent
-	const CUMU_BOOL tt_check;
+	const CUMU_BOOL idem{false};  // Whether the cumulative propagator should be idempotent
+	const CUMU_BOOL tt_check{true};
 	CUMU_BOOL tt_filt;     // Timetabling bounds filtering of the start times
 	CUMU_BOOL ttef_check;  // Timetabling-edge-finding consistency check
 	CUMU_BOOL ttef_filt;   // Timetabling-edge-finding filtering of the start times
-	const CUMU_BOOL
-			tteef_filt;  // Opportunistic timetabling-extended-edge-finding filtering of the start times
-	long ttef_prop_factor;
+	const CUMU_BOOL tteef_filt{
+			false};  // Opportunistic timetabling-extended-edge-finding filtering of the start times
+	long ttef_prop_factor{100};
 
 	ExplDeg ttef_expl_deg;
 
 	// Counters
-	long nb_tt_incons;    // Number of timetabling inconsistencies
-	long nb_tt_filt;      // Number of timetabling propagations
-	long nb_ttef_incons;  // Number of timetabling-edge-finding inconsistencies
-	long nb_ttef_filt;    // Number of timetabling-edge-finding propagations
-	long nb_prop_calls;
-	long nb_ttefc_calls;
-	long nb_ttefc_steps;
-	long nb_ttef_lb_calls;
-	long nb_ttef_ub_calls;
+	long nb_tt_incons{0};    // Number of timetabling inconsistencies
+	long nb_tt_filt{0};      // Number of timetabling propagations
+	long nb_ttef_incons{0};  // Number of timetabling-edge-finding inconsistencies
+	long nb_ttef_filt{0};    // Number of timetabling-edge-finding propagations
+	long nb_prop_calls{0};
+	long nb_ttefc_calls{0};
+	long nb_ttefc_steps{0};
+	long nb_ttef_lb_calls{0};
+	long nb_ttef_ub_calls{0};
 
 	// Parameters
 	CUMU_BOOL bound_update;
@@ -180,24 +180,13 @@ public:
 				taskCalendar(_taskCal),
 				rho(_rho),
 				resCalendar(_resCalendar),
-				minTime(0),
+
 				maxTime(calendar2[0].size() - 1),
-				idem(false),
-				tt_check(true),
+
 				tt_filt(true),
 				ttef_check(true),
 				ttef_filt(true),
-				tteef_filt(false),
-				ttef_prop_factor(100),
-				nb_tt_incons(0),
-				nb_tt_filt(0),
-				nb_ttef_incons(0),
-				nb_ttef_filt(0),
-				nb_prop_calls(0),
-				nb_ttefc_calls(0),
-				nb_ttefc_steps(0),
-				nb_ttef_lb_calls(0),
-				nb_ttef_ub_calls(0),
+
 				bound_update(false),
 				sort_est_asc(this),
 				sort_lct_asc(this) {

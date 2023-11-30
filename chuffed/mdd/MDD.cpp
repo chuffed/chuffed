@@ -30,11 +30,11 @@ inline void MDDTable::deallocNode(MDDNode node)
 
 MDDTable::MDDTable(int _nvars)
 		: nvars(_nvars),
-			opcache(OpCache(OPCACHE_SZ)),
+			opcache(OpCache(OPCACHE_SZ))
 #ifdef SPLIT_CACHE
-			cache(new NodeCache[nvars]),
+					cache(new NodeCache[nvars])
 #endif
-			intermed_maxsz(2) {
+{
 	// Initialize \ttt and \fff.
 	nodes.push_back(nullptr);  // false node
 	nodes.push_back(nullptr);  // true node
@@ -771,29 +771,29 @@ void MDDTable::print_dot(MDDNodeInt r) {
 
 MDD operator|(const MDD& a, const MDD& b) {
 	assert(a.table == b.table);
-	return MDD(a.table, a.table->mdd_or(a.val, b.val));
+	return {a.table, a.table->mdd_or(a.val, b.val)};
 }
 
 MDD operator&(const MDD& a, const MDD& b) {
 	assert(a.table == b.table);
-	return MDD(a.table, a.table->mdd_and(a.val, b.val));
+	return {a.table, a.table->mdd_and(a.val, b.val)};
 }
 
 MDD operator^(const MDD& a, const MDD& b) {
 	assert(a.table == b.table);
 	assert(0);  // NOT IMPLEMENTED
 
-	return MDD(a.table, MDDFALSE);
+	return {a.table, MDDFALSE};
 }
 
 MDD mdd_iff(const MDD& a, const MDD& b) {
 	assert(a.table == b.table);
 	assert(0);  // NOT IMPLEMENTED
 
-	return MDD(a.table, MDDFALSE);
+	return {a.table, MDDFALSE};
 }
 
-MDD operator~(const MDD& r) { return MDD(r.table, r.table->mdd_not(r.val)); }
+MDD operator~(const MDD& r) { return {r.table, r.table->mdd_not(r.val)}; }
 
 bool operator<=(const MDD& a, const MDD& b) {
 	assert(a.table == b.table);

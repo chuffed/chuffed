@@ -40,13 +40,13 @@ public:
 	vec<PseudoProp*> pseudo_props;  // List of pseudo propagators
 	vec<Checker*> checkers;         // List of constraint checkers
 	vec<int> assumptions;           // List of assumption literals
-	bool finished_init;
+	bool finished_init{false};
 
-	Problem* problem;
+	Problem* problem{nullptr};
 	BranchGroup* branching;
-	IntVar* opt_var;
+	IntVar* opt_var{nullptr};
 	int opt_type;
-	int best_sol;
+	int best_sol{-1};
 	RESULT status;
 	time_point time_out;
 #ifdef HAS_VAR_IMPACT
@@ -56,7 +56,7 @@ public:
 	// Intermediate propagation state
 	vec<IntVar*> v_queue;            // List of changed vars
 	vec<vec<Propagator*> > p_queue;  // Queue of propagators to run
-	Propagator* last_prop;           // Last propagator run, set for idempotent propagators
+	Propagator* last_prop{nullptr};  // Last propagator run, set for idempotent propagators
 	bool async_fail;                 // Asynchronous failure
 
 	// Decision stack
@@ -70,7 +70,7 @@ public:
 	time_point start_time;
 	duration init_time, opt_time;
 	double base_memory;
-	long long int conflicts, nodes, propagations, solutions, next_simp_db;
+	long long int conflicts{0}, nodes{1}, propagations{0}, solutions{0}, next_simp_db{0};
 	int peak_depth;
 	int restart_count;
 

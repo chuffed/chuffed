@@ -140,7 +140,7 @@ MDDProp<U>* MDDProp_new(MDDTemplate* _templ, vec<IntView<U> >& _intvars) {
 
 template <int U>
 MDDProp<U>::MDDProp(MDDTemplate* _templ, vec<IntView<U> >& _intvars, const MDDOpts& _opts)
-		: opts(_opts), act_decay(1 / 0.95), act_inc(1), fixedvars(_templ->_val_entries.size()) {
+		: opts(_opts), act_decay(1 / 0.95), fixedvars(_templ->_val_entries.size()) {
 	assert(_intvars.size() == _templ->_doms.size());
 
 	// Larger domain stuff

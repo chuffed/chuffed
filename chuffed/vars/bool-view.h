@@ -11,10 +11,10 @@ class BoolView : public Var {
 	bool s;
 
 public:
-	BoolView() {}
+	BoolView() = default;
 	BoolView(Lit p) : v(var(p)), s(sign(p)) {}
 
-	friend BoolView operator~(BoolView& o) { return BoolView(o.getLit(false)); }
+	friend BoolView operator~(BoolView& o) { return {o.getLit(false)}; }
 
 	friend bool operator<(const BoolView& a, const BoolView& b) {
 		return (2 * a.v + static_cast<int>(a.s) < 2 * b.v + static_cast<int>(b.s));

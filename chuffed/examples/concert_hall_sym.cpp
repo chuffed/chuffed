@@ -20,7 +20,7 @@
 class ConcertHall : public Problem {
 public:
 	int n;           // number of offers
-	int k;           // number of halls
+	int k{8};        // number of halls
 	vec<int> start;  // start times
 	vec<int> end;    // end times
 	vec<int> price;  // prices
@@ -31,7 +31,7 @@ public:
 	vec<BoolView> qs;
 	IntVar* total;  // total profit
 
-	ConcertHall(char* filename) : k(8) {
+	ConcertHall(char* filename) {
 		readData(filename);
 
 		createVars(x, n, 0, k, true);

@@ -147,10 +147,10 @@ public:
 	ExplDeg ttef_expl_deg;
 
 	// Counters
-	long nb_tt_incons;    // Number of timetabling inconsistencies
-	long nb_tt_filt;      // Number of timetabling propagations
-	long nb_ttef_incons;  // Number of timetabling-edge-finding inconsistencies
-	long nb_ttef_filt;    // Number of timetabling-edge-finding propagations
+	long nb_tt_incons{0};    // Number of timetabling inconsistencies
+	long nb_tt_filt{0};      // Number of timetabling propagations
+	long nb_ttef_incons{0};  // Number of timetabling-edge-finding inconsistencies
+	long nb_ttef_filt{0};    // Number of timetabling-edge-finding propagations
 
 	// Parameters
 	CUMU_BOOL bound_update;
@@ -193,10 +193,7 @@ public:
 				tt_filt(true),
 				ttef_check(false),
 				ttef_filt(false),
-				nb_tt_incons(0),
-				nb_tt_filt(0),
-				nb_ttef_incons(0),
-				nb_ttef_filt(0),
+
 				bound_update(false),
 				sort_est_asc(this),
 				sort_lct_asc(this) {

@@ -60,7 +60,7 @@ public:
 			trailed_pinfo_sz = true;
 		}
 		p_info.push(Pinfo(var, est));
-		return Reason(prop_id, p_info.size() - 1);
+		return {prop_id, p_info.size() - 1};
 	}
 
 	bool propagate() override {
@@ -161,11 +161,11 @@ public:
 class DisjunctiveEF : public Propagator {
 	// structure to store propagation info for lazy explanation
 	struct Pinfo {
-		int ps_i;      // point in pre-emptive schedule that inference was made
-		int var;       // task which has to be after set of other tasks
-		int let;       // let of set used to make inference
-		Clause* expl;  // explanation for inference
-		Pinfo(int _ps_i, int _var, int _let) : ps_i(_ps_i), var(_var), let(_let), expl(nullptr) {}
+		int ps_i;               // point in pre-emptive schedule that inference was made
+		int var;                // task which has to be after set of other tasks
+		int let;                // let of set used to make inference
+		Clause* expl{nullptr};  // explanation for inference
+		Pinfo(int _ps_i, int _var, int _let) : ps_i(_ps_i), var(_var), let(_let) {}
 	};
 
 	bool trailed_pinfo_sz;
@@ -303,7 +303,7 @@ public:
 			trailed_pinfo_sz = true;
 		}
 		p_info.push(Pinfo(ps_i, var, let));
-		return Reason(prop_id, p_info.size() - 1);
+		return {prop_id, p_info.size() - 1};
 	}
 
 	bool doEdgeFinding() {

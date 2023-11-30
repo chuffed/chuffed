@@ -32,7 +32,7 @@ MIP* mip;
 //-----
 // Main propagator methods
 
-MIP::MIP() : level_lb(-1), level_ub(-1), status(0), simplex_time(duration::zero()) {
+MIP::MIP() : simplex_time(duration::zero()) {
 	//	priority = 3;
 	priority = 0;
 }

@@ -153,8 +153,8 @@ class IntElemBoundsImp : public Propagator {
 
 	// intermediate state
 
-	bool no_min_support;
-	bool no_max_support;
+	bool no_min_support{false};
+	bool no_max_support{false};
 
 public:
 	IntElemBoundsImp(BoolView _b, IntView<U> _y, IntView<V> _x, vec<IntView<W> >& _a)
@@ -165,9 +165,7 @@ public:
 				is_fixed(0),
 				min_support(-1),
 				max_support(-1),
-				fixed_index(-1),
-				no_min_support(false),
-				no_max_support(false) {
+				fixed_index(-1) {
 		for (int i = 0; i < a.size(); i++) {
 			a[i].attach(this, i, EVENT_LU);
 		}
@@ -418,19 +416,12 @@ class IntElemBounds : public Propagator {
 
 	// intermediate state
 
-	bool no_min_support;
-	bool no_max_support;
+	bool no_min_support{false};
+	bool no_max_support{false};
 
 public:
 	IntElemBounds(IntView<U> _y, IntView<V> _x, vec<IntView<W> >& _a)
-			: y(_y),
-				x(_x),
-				a(_a),
-				min_support(-1),
-				max_support(-1),
-				fixed_index(-1),
-				no_min_support(false),
-				no_max_support(false) {
+			: y(_y), x(_x), a(_a), min_support(-1), max_support(-1), fixed_index(-1) {
 		for (int i = 0; i < a.size(); i++) {
 			a[i].attach(this, i, EVENT_LU);
 		}

@@ -85,7 +85,7 @@ public:
 	vec<vec<Clause*> > rtrail;  // List of temporary reason clauses
 
 	// Intermediate state
-	Clause* confl;
+	Clause* confl{nullptr};
 	int index;
 	vec<Lit> out_learnt;
 	vec<int> out_learnt_level;
@@ -101,8 +101,8 @@ public:
 	Clause* short_confl;
 
 	// VSIDS
-	double var_inc;        // Amount to bump variable with.
-	double cla_inc;        // Amount to bump clause with.
+	double var_inc{1};     // Amount to bump variable with.
+	double cla_inc{1};     // Amount to bump clause with.
 	vec<double> activity;  // A heuristic measurement of the activity of a variable.
 	Heap<VarOrderLt>
 			order_heap;  // A priority queue of variables ordered with respect to the variable activity.
@@ -117,17 +117,17 @@ public:
 	void learntLenBumpActivity(int l);
 
 	// Statistics
-	int bin_clauses, tern_clauses, long_clauses, learnt_clauses;
-	long long int propagations, back_jumps, nrestarts, next_simp_db;
-	long long int clauses_literals, learnts_literals, max_literals, tot_literals;
-	double avg_depth;
-	double confl_rate;
+	int bin_clauses{0}, tern_clauses{0}, long_clauses{0}, learnt_clauses{0};
+	long long int propagations{0}, back_jumps{0}, nrestarts{0}, next_simp_db{100000};
+	long long int clauses_literals{0}, learnts_literals{0}, max_literals{0}, tot_literals{0};
+	double avg_depth{100};
+	double confl_rate{1000};
 
 	// Parallel
 
 	time_point ll_time;
-	double ll_inc;
-	double learnt_len_el;
+	double ll_inc{1};
+	double learnt_len_el{10};
 	vec<double> learnt_len_occ;
 
 	// Propagator methods

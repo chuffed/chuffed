@@ -19,17 +19,8 @@
 #include <vector>
 
 EdExplFinder::EdExplFinder()
-		: seq2(nullptr),
-			max_char(0),
-			min_id_cost(0),
-			insertion_cost(nullptr),
-			deletion_cost(nullptr),
-			substitution_cost(nullptr),
-			seq1ExcludedCharacters(nullptr),
-			seq2ExcludedCharacters(nullptr),
-			dpMatrix(nullptr),
-			seqSize(-1),
-			lb(-1) {}
+
+		= default;
 
 Clause*
 

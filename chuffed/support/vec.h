@@ -192,14 +192,14 @@ public:
 template <class T>
 class queue {
 public:
-	int sz;
-	int cap;
-	int head;
-	int tail;
-	bool fifo;
+	int sz{0};
+	int cap{10};
+	int head{0};
+	int tail{0};
+	bool fifo{false};
 	T* data;
 
-	queue() : sz(0), cap(10), head(0), tail(0), fifo(false) { data = (T*)malloc(cap * sizeof(T)); }
+	queue() { data = (T*)malloc(cap * sizeof(T)); }
 
 	void reserve() {
 		if (++sz == cap) {

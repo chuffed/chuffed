@@ -91,7 +91,7 @@ public:
 	/// Whether the variable *looks* introduced by the mzn2fzn translation
 	bool looks_introduced;
 	/// Destructor
-	virtual ~VarSpec() {}
+	virtual ~VarSpec() = default;
 	/// Variable index
 	int i;
 	/// Whether the variable aliases another variable
@@ -256,7 +256,7 @@ public:
 class Registry {
 public:
 	/// Type of constraint posting function
-	typedef void (*poster)(const ConExpr&, AST::Node*);
+	using poster = void (*)(const ConExpr&, AST::Node*);
 	/// Add posting function \a p with identifier \a id
 	void add(const std::string& id, poster p);
 	/// Post constraint specified by \a ce
@@ -293,9 +293,9 @@ public:
 class FlatZincSpace : public Problem {
 public:
 	/// Number of integer variables
-	int intVarCount;
+	int intVarCount{0};
 	/// Number of Boolean variables
-	int boolVarCount;
+	int boolVarCount{0};
 
 	/// The integer variables
 	vec<IntVar*> iv;
@@ -308,7 +308,7 @@ public:
 
 	vec<BoolView> assumptions;
 
-	AST::Array* output;
+	AST::Array* output{nullptr};
 
 	// === Experimental `on_restart` support ===
 	// Index of the status() variable
@@ -533,8 +533,8 @@ private:
 
 extern FlatZincSpace* s;
 
-typedef std::pair<std::string, Option<std::vector<int>*>> intvartype;
-typedef std::pair<std::string, VarSpec*> varspec;
+using intvartype = std::pair<std::string, Option<std::vector<int>*>>;
+using varspec = std::pair<std::string, VarSpec*>;
 
 /// State of the FlatZinc parser
 class ParserState {
@@ -637,7 +637,7 @@ private:
 
 public:
 	Error(const std::string& where, const std::string& what) : msg(where + ": " + what) {}
-	~Error() throw() {}
+	~Error() noexcept = default;
 	const std::string& toString() const { return msg; }
 };
 

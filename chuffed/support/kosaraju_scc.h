@@ -33,7 +33,7 @@ public:
 	KosarajuSCC(int v, std::vector<std::vector<int> > outgoing,
 							std::vector<std::vector<int> > ingoing, std::vector<std::vector<int> > ends);
 
-	virtual ~KosarajuSCC() {}
+	virtual ~KosarajuSCC() = default;
 
 	virtual bool ignore_edge(int e) { return false; }
 	virtual bool ignore_node(int n) { return false; }

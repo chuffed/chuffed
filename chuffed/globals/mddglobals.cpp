@@ -13,11 +13,11 @@
 #include <cassert>
 #include <vector>
 
-typedef struct {
+struct dfa_trans {
 	int state;
 	int value;
 	int dest;
-} dfa_trans;
+};
 
 static void addMDDProp(vec<IntVar*>& x, MDDTable& tab, MDDNodeInt m, const MDDOpts& mopts);
 
