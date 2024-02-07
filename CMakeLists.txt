@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 project(chuffed CXX C)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # The version number.
 set(chuffed_VERSION_MAJOR 0)
 set(chuffed_VERSION_MINOR 13)
 set(chuffed_VERSION_PATCH 2)
+set(chuffed_SOVERSION 0)
 
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
@@ -77,7 +80,7 @@ set_target_properties(thirdparty_murmur PROPERTIES
 
 # ------------- Main Chuffed Definition -------------
 
-add_library(chuffed
+add_library(chuffed SHARED
   chuffed/vars/int-var.cpp
   chuffed/vars/int-var-el.cpp
   chuffed/vars/modelling.cpp
@@ -197,6 +200,11 @@ if(CP_PROFILER)
   target_compile_definitions(chuffed PRIVATE HAS_PROFILER)
 endif()
 
+set_target_properties(chuffed PROPERTIES
+  VERSION ${chuffed_SOVERSION}.${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}
+  SOVERSION ${chuffed_SOVERSION}
+)
+
 # ------------- FZN Chuffed -------------
 
 find_package(BISON 3.4)
@@ -246,13 +254,18 @@ set_target_properties(flatzinc_parser PROPERTIES
   CXX_CLANG_TIDY ""
 )
 
-add_library(chuffed_fzn
+add_library(chuffed_fzn SHARED
   chuffed/flatzinc/registry.cpp
   chuffed/flatzinc/flatzinc.cpp
   chuffed/flatzinc/flatzinc.h
   chuffed/flatzinc/ast.h
 
   $<TARGET_OBJECTS:flatzinc_parser>
+)
+
+set_target_properties(chuffed_fzn PROPERTIES
+  VERSION ${chuffed_SOVERSION}.${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}
+  SOVERSION ${chuffed_SOVERSION}
 )
 
 add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
