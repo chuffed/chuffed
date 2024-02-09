@@ -78,7 +78,7 @@ void DAGPropagator::connectTo(int source, int dest) {
 		assert(d_ptc.second != -1);
 		d_ptc.first = dest;       // d_ptc == go from p to dest the same...
 		succs[*it_p].add(d_ptc);  // ...way you go from p tou source
-		preds[dest].add(*it_p);   // p preceeds dest
+		preds[dest].add(*it_p);   // p precedes dest
 	}
 
 	TrailedSuccList::const_iterator it_s;
@@ -86,14 +86,14 @@ void DAGPropagator::connectTo(int source, int dest) {
 		const int s = (*it_s).first;
 		const std::pair<int, int> s_to_d(s, dest);
 		succs[source].add(s_to_d);  // go from source to s through dest
-		preds[s].add(source);       // sorce preceeds s
+		preds[s].add(source);       // source precedes s
 
 		for (it_p = preds[source].begin(); it_p != preds[source].end(); ++it_p) {
 			succs[*it_p].get(source, &d_ptc);  // d_ptc == how to go from p to source
 			assert(d_ptc.second != -1);
 			d_ptc.first = s;          // d_ptc == go from p to s the same...
 			succs[*it_p].add(d_ptc);  // ...way you go from p to source
-			preds[s].add(*it_p);      // p preceeds s
+			preds[s].add(*it_p);      // p precedes s
 		}
 	}
 }
@@ -123,7 +123,7 @@ bool DAGPropagator::propagateNewEdge(int e) {
 	for (int n = 0; n < nbNodes(); n++) {
 			if (reachable(n,getTail(e))) {
 					for (int i = 0; i < in[n].size(); i++) {
-							assert(!prevent_cycle(in[n][i])); //Assert because already cehcked before
+							assert(!prevent_cycle(in[n][i])); //Assert because already checked before
 					}
 			}
 	}

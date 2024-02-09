@@ -61,8 +61,8 @@ public:
 	std::map<int, int> lit_to_index;
 	std::map<int, ConjRule*> body_lit_to_rule;
 
-	vec<vec<ConjRule*> > head_occ_rules;  // occurences in rule head
-	vec<vec<ConjRule*> > body_occ_rules;  // occurences in rule body
+	vec<vec<ConjRule*> > head_occ_rules;  // occurrences in rule head
+	vec<vec<ConjRule*> > body_occ_rules;  // occurrences in rule body
 	vec<vec<ConjRule*> > watches;         // rules where it is being watched
 
 	// SCC calc stuff

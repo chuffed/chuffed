@@ -1726,7 +1726,7 @@ minmax:
     |   MAXIMIZE
 
 /********************************/
-/* annotation expresions        */
+/* annotation expressions       */
 /********************************/
 
 annotations :

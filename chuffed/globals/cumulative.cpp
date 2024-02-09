@@ -335,7 +335,7 @@ public:
 			const int i = task_id[ii];
 			if ((CUMU_PT_ISFIXED(start[i]) && CUMU_PT_ISFIXED(dur[i]) && CUMU_PT_ISFIXED(usage[i])) ||
 					max_dur(i) <= 0 || max_usage(i) <= 0) {
-				// Swaping the id's
+				// Swapping the id's
 				task_id[ii] = task_id[new_unfixed];
 				task_id[new_unfixed] = i;
 				new_unfixed--;
@@ -349,7 +349,7 @@ public:
 		// idempotent
 		do {
 			bound_update = false;
-			// Reseting the profile size
+			// Resetting the profile size
 			tt_profile_size = 0;
 			// Time-table propagators
 			if (tt_check || tt_filt) {
@@ -699,7 +699,7 @@ public:
 	// Analysing the conflict and generation of the explanations
 	// NOTE: Fixed durations and resource usages are assumed!!!
 	//
-	// Explanation is created for the time interval [begin, end), i.e., exluding end.
+	// Explanation is created for the time interval [begin, end), i.e., excluding end.
 	//
 	void analyse_limit_and_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks, CUMU_INT lift_usage,
 															 CUMU_INT begin, CUMU_INT end);
@@ -1840,7 +1840,7 @@ bool CumulativeProp::ttef_bounds_propagation_ub(int shift_in(const int, const in
 			continue;
 		}
 
-		// Intialisation for the minimal avaible energy of a time interval starting
+		// Initialisation for the minimal available energy of a time interval starting
 		// at begin
 		// TODO dominance rule for skipping time intervals
 		min_en_avail = max_limit() * (lct(task_id_lct[last_unfixed]) - est(task_id_est[0]));

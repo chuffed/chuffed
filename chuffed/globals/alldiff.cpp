@@ -996,7 +996,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		// consistency level is specified as "domain". There is an issue with the
 		// value propagator in the case "IntVarLL" integer variables are involved
 		// (see Issue #10). In the future, it needs to be decided how to
-		// permamently fix this issue.
+		// permanently fix this issue.
 		vec<IntView<> > u;
 		for (int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, -min));

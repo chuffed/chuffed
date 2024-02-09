@@ -128,7 +128,7 @@ void BoundedPathPropagator::constructWeights(vec<vec<int> >& _wst, IntVar* /*_w*
 }
 
 void BoundedPathPropagator::constructBasicExplanations() {
-	// Leave a space at the beginning for the literal fo the maximim weight.
+	// Leave a space at the beginning for the literal for the maximum weight.
 	//* OLD EXPLANATIONS
 #ifdef BASIC_EXPL
 	fail_expl.push();
@@ -962,7 +962,7 @@ bool BoundedPathPropagator::propagate_dijkstra() {
 		// to de destination: hd_to_d = backward_sp->distTo(hd).
 		// We know how long it takes to get from the source to the tail
 		// of this edge: s_to_tl = forward_sp->distTo(tl).
-		// How long would it take to get fromt he source to the destination
+		// How long would it take to get from the source to the destination
 		// if we used this edge:
 		// s_to_d_through_e = s_to_tl + ws[e] + hd_to_d
 

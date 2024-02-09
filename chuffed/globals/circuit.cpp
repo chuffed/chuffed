@@ -801,7 +801,7 @@ public:
 		// If we're pruning root edges and there was more than one subtree,
 		// prune edges from the root to earlier subtrees
 		if (pruneRoot && startSubtree > 1) {
-			// Build the reason if neccessary (it will be the same for all of the pruned edges)
+			// Build the reason if necessary (it will be the same for all of the pruned edges)
 			Clause* r = nullptr;
 			if (so.lazy) {
 				// First find the nodes in the last subtree and those in the earlier ones
@@ -927,7 +927,7 @@ public:
 					case 4:  // cycle with lowest ave level,
 					case 5:  // cycle with highest ave level,
 						// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-						// Maybe it shoud be replaced by sat.getLevel(.)?
+						// Maybe it should be replaced by sat.getLevel(.)?
 						level = sat.trailpos[var(x[nextVar].getValLit())];
 						// level = sat.getLevel(var(x[nextVar].getValLit()));
 						thisScore += level;
@@ -941,7 +941,7 @@ public:
 						break;
 					case 9:  // highest min level, so need to calculate min level
 						// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-						// Maybe it shoud be replaced by sat.getLevel(.)?
+						// Maybe it should be replaced by sat.getLevel(.)?
 						level = sat.trailpos[var(x[nextVar].getValLit())];
 						// level = sat.getLevel(var(x[nextVar].getValLit()));
 						if (thisScore > level || noScoreYet) {
@@ -950,7 +950,7 @@ public:
 						break;
 					case 10:  // lowest max level, so need to calculate max level
 						// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-						// Maybe it shoud be replaced by sat.getLevel(.)?
+						// Maybe it should be replaced by sat.getLevel(.)?
 						level = sat.trailpos[var(x[nextVar].getValLit())];
 						// level = sat.getLevel(var(x[nextVar].getValLit()));
 						if (thisScore < level || noScoreYet) {

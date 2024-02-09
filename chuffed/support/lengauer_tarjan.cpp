@@ -92,7 +92,7 @@ void LengauerTarjan::DFS(int v) {
 }
 
 //*/
-//* //It is a mistery why this causes a bug in the instance
+//* //It is a mystery why this causes a bug in the instance
 // complete_15_7_true_152
 
 void LengauerTarjan::find_doms() {

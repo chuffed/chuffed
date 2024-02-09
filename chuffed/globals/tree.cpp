@@ -29,7 +29,7 @@
 #define TREEPROP_DEBUG 0
 
 /**
- * Detect that whe cannot reach some otehr node from 'node'
+ * Detect that we cannot reach some other node from 'node'
  * return true if no conflict, false otherwise (explanation built inside)
  */
 bool TreePropagator::reachable(int node, std::vector<bool>& blue, bool doDFS) {
@@ -144,7 +144,7 @@ int TreePropagator::articulations(int n, std::vector<bool>& reachable, int& coun
 			}
 
 			// Dont build articulations that are extremities of bridge
-			// becasue the reason is worse than the reason in newEdge
+			// because the reason is worse than the reason in newEdge
 			// UPDATE: just do it here....
 			if (isArt && toBePropagated[bridge] != -1) {
 				const int e = toBePropagated[bridge];
@@ -258,7 +258,7 @@ bool TreePropagator::cycle_detect(int edge) {
 
 	if (uf.connected(u, v)) {
 		std::vector<int> pathn = ruf.connectionsFromTo(u, v);
-		// u and v where already connected thorugh pathn
+		// u and v where already connected through pathn
 		// This detects a new cycle created
 		if (so.lazy) {
 			vec<Lit> pathe;
@@ -368,7 +368,7 @@ void TreePropagator::_findAndBuildBridges(int u, int& count, std::stack<edge_id>
 													 articuExpl);
 
 			if (!getNodeVar(u).isFixed() && hits.top() != prevHitsTop) {
-				// always prefer terminals, explanations witht hem will eb mroe reusable
+				// always prefer terminals, explanations with them will be more reusable
 				if (topChangedTo == -1 || isTerminal[topChangedTo]) {
 					topChangedTo = hits.top();
 				}
@@ -801,7 +801,7 @@ bool TreePropagator::propagateRemEdge(int edge) {
 							break;
 						}
 					}
-					assert(unreachableNodeIn != -1);  // There is anothe node in
+					assert(unreachableNodeIn != -1);  // There is another node in
 					// node is in at the same time as another node (we chose one)
 
 					Clause* r = nullptr;
@@ -952,7 +952,7 @@ void TreePropagator::DFSPink(int r, std::vector<bool>& visited, std::vector<bool
 }
 
 /**
- * Goes through in and unkown edges. Avoid 'avoidBridge'
+ * Goes through in and unknown edges. Avoid 'avoidBridge'
  */
 void TreePropagator::walkIsland(int r, std::vector<bool>& visited, int avoidBridge, bool isArt,
 																int parent) {
