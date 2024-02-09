@@ -290,7 +290,7 @@ public:
 				M = xs[ii]->getMax();
 			}
 			if (xs[ii]->getMin() > low_f) {
-				// Iniitalize limits.
+				// Initialize limits.
 				const int m = xs[ii]->getMin();
 				for (; m > low_f; ++low_f) {
 					limit.push(ii);

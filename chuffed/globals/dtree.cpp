@@ -1113,7 +1113,7 @@ void reversedptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _
 	//     engine.propagators.push(dt);
 }
 
-// For teh tests against CPBioNet
+// For the tests against CPBioNet
 // void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es,
 // 							vec< vec<edge_id> >& _in, vec< vec<edge_id> >& _out,
 // 							vec< vec<int> >& _en) {

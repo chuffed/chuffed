@@ -182,7 +182,7 @@ EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom,
 	int curr = 0;
 	int prev = 1;
 
-	// At the bottem level, only accept states can reach T
+	// At the bottom level, only accept states can reach T
 	for (int si = 0; si < nstates; si++) {
 		layers[curr].push(EVLayerGraph::EVFalse);
 	}

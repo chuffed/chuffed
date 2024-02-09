@@ -314,7 +314,7 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
 	}
 	path.push_back(i);
 	seen[i] = path.size() - 1;
-	// If we got to the root, without seing the other guy, then he is
+	// If we got to the root, without seeing the other guy, then he is
 	// a sibling, and we have to add his path to the previous explored path
 	if (parents[i] == i && i != limit) {
 		std::vector<int> path2;

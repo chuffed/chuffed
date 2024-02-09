@@ -45,7 +45,7 @@ extern std::map<BoolView, std::string> boolVarString;
 
 // Controls whether expressions like bool_sum_eq([x[i] = j | i in 1..n], 1)
 // access the underlying literals x[i] = j or new ones via int_eq_reif(...)
-// NOTE:    Implemention isn't 100% ideal at this stage so kept it conditional
+// NOTE:    Implementation isn't 100% ideal at this stage so kept it conditional
 #define EXPOSE_INT_LITS 0
 
 namespace FlatZinc {

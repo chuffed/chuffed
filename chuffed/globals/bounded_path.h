@@ -138,10 +138,10 @@ class BoundedPathPropagator : public GraphPropagator {
 
 				const int d_hd = back->distTo(p->getHead(e));  // Includes time spent in hd
 				if (d_hd == -1) {
-					return false;  // Can cros the ones that are unreachable from the other end.
+					return false;  // Can cross the ones that are unreachable from the other end.
 				}
 
-				const int d_tl = this->distTo(p->getTail(e));  // inlcudes time spent in tl
+				const int d_tl = this->distTo(p->getTail(e));  // includes time spent in tl
 				const int w_e = weight(e);
 				if (w_e < 0 || p->isSelfLoop(e)) {
 					return true;
@@ -341,7 +341,7 @@ class BoundedPathPropagator : public GraphPropagator {
 									 static_cast<int>(static_cast<int>((it->second).mand[i]) != 0))) != 0);
 					}
 					if (mand_union == target) {
-						const int d_hd = (it->second).cost;  // inlcudes time spent in hd
+						const int d_hd = (it->second).cost;  // includes time spent in hd
 						const int w_e = weight(e);
 
 						if (d_tl + w_e + d_hd <= lim) {

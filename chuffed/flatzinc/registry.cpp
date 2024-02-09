@@ -550,7 +550,7 @@ void p_set_in_reif(const ConExpr& ce, AST::Node* /*unused*/) {
 	AST::SetLit* sl = ce[1]->getSet();
 	IntVar* v = getIntVar(ce[0]);
 	const BoolView r = getBoolVar(ce[2]);
-	// TODO: Seems a bit wastefull to create new boolvars here
+	// TODO: Seems a bit wasteful to create new boolvars here
 	auto add_reif_lbl = [](const BoolView& v, std::string&& label) {
 		std::string const lbl = "(" + label + ")";
 		boolVarString.emplace(v, label);

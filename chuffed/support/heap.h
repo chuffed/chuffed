@@ -134,7 +134,7 @@ public:
 	}
 
 	// Delete elements from the heap using a given filter function (-object).
-	// *** this could probaly be replaced with a more general "buildHeap(vec<int>&)" method ***
+	// *** this could probably be replaced with a more general "buildHeap(vec<int>&)" method ***
 	template <class F>
 	void filter(const F& filt) {
 		int i;

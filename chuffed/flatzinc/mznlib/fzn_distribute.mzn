@@ -1,5 +1,5 @@
 %-----------------------------------------------------------------------------%
-% Requires that 'card[i]' is the number of occurences of 'value[i]' in 'base'.
+% Requires that 'card[i]' is the number of occurrences of 'value[i]' in 'base'.
 %
 % XXX: currently the values in 'value' need not be distinct.  Perhaps they
 %      should be?

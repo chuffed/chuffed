@@ -378,7 +378,7 @@ class DCMSTSearch : public BranchGroup {
 				const int i = mst_p->getEndnode(e, 0);
 				const int j = mst_p->getEndnode(e, 1);
 				// Is v the MIN or the SUM?? Its not clear from the paper that
-				// describes the searchs trategy....
+				// describes the search strategy....
 				const int v = std::min(tmp[i].second, tmp[j].second);
 				sums.emplace_back(e, v);
 				std::vector<std::pair<int, int> > cost;
@@ -515,7 +515,7 @@ public:
 					to_look = costs[sum.first];
 					decisions.clear();
 					last_dec_level = engine.decisionLevel() - 1;
-					// cout <<"foudn new root"<<endl;
+					// cout <<"found new root"<<endl;
 					return di;
 				}
 			}

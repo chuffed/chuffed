@@ -391,7 +391,7 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 	if (!getNodeVar(root).isFixed()) {
 		getNodeVar(root).setVal(true, nullptr);
 	} else if (getNodeVar(root).isFalse()) {
-		return;  // Will fail anyway beacause of unreachability.
+		return;  // Will fail anyway because of unreachability.
 	}
 	last_state_n[root] = VT_IN;
 	add_innode(root);

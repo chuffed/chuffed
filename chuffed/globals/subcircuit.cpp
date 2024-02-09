@@ -789,7 +789,7 @@ public:
 			assert(earlierSubtree.size() + lastSubtreeAndOutside.size() + 1 == size);
 			const Lit evidenceLast = getEvidenceLit(lastSubtreeAndOutside);
 			if (evidenceLast != lit_True) {
-				// Build the reason if neccessary (it will be the same for all of the pruned edges)
+				// Build the reason if necessary (it will be the same for all of the pruned edges)
 				Clause* r = nullptr;
 				if (so.lazy) {
 					// Reason should state that no var in an earlier sub tree reaches a var
@@ -1016,13 +1016,13 @@ public:
 		if (selectionMethod == 3) {
 			// highest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-			// Maybe it shoud be replaced by sat.getLevel(.)?
+			// Maybe it should be replaced by sat.getLevel(.)?
 			int highestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))];
 			// int highestLevel = sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ)));
 			int bestVar = options[0];
 			for (int i = 0; i < options.size(); i++) {
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-				// Maybe it shoud be replaced by sat.getLevel(.)?
+				// Maybe it should be replaced by sat.getLevel(.)?
 				if (sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))] !=
 						sat.trailpos[var(x[options[0]].getLit(options[0], LR_NE))]) {
 					// if(sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ))) !=
@@ -1033,12 +1033,12 @@ public:
 				const Lit p = x[v].getLit(v, LR_EQ);
 				const int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-				// Maybe it shoud be replaced by sat.getLevel(.)?
+				// Maybe it should be replaced by sat.getLevel(.)?
 				if (sat.trailpos[satvar] > highestLevel)
 				// if(sat.getLevel(satvar) > highestLevel)
 				{
 					// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-					// Maybe it shoud be replaced by sat.getLevel(.)?
+					// Maybe it should be replaced by sat.getLevel(.)?
 					highestLevel = sat.trailpos[satvar];
 					// highestLevel = sat.getLevel(satvar);
 					bestVar = v;
@@ -1049,7 +1049,7 @@ public:
 		if (selectionMethod == 4) {
 			// lowest level
 			// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-			// Maybe it shoud be replaced by sat.getLevel(.)?
+			// Maybe it should be replaced by sat.getLevel(.)?
 			int lowestLevel = sat.trailpos[var(x[options[0]].getLit(options[0], LR_EQ))];
 			// int lowestLevel = sat.getLevel(var(x[options[0]].getLit(options[0], LR_EQ)));
 			int bestVar = options[0];
@@ -1058,12 +1058,12 @@ public:
 				const Lit p = x[v].getLit(v, LR_EQ);
 				const int satvar = var(p);
 				// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-				// Maybe it shoud be replaced by sat.getLevel(.)?
+				// Maybe it should be replaced by sat.getLevel(.)?
 				if (sat.trailpos[satvar] < lowestLevel)
 				// if(sat.getLevel(satvar) < lowestLevel)
 				{
 					// XXX [AS] Replaced 'sat.level' by 'sat.trailpos', because it was replaced in rev. 441
-					// Maybe it shoud be replaced by sat.getLevel(.)?
+					// Maybe it should be replaced by sat.getLevel(.)?
 					lowestLevel = sat.trailpos[satvar];
 					// lowestLevel = sat.getLevel(satvar);
 					if (lowestLevel == 0 && (sat.value(p) != l_False)) {

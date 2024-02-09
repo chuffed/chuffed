@@ -469,7 +469,7 @@ public:
 	}
 
 	void retrieveEnergyParameters(const int i) {
-		// NOTE it is assumpted that the arrays est_2, lst_2, ect_2, and lct_2 are up to date!
+		// NOTE it is assumed that the arrays est_2, lst_2, ect_2, and lct_2 are up to date!
 		// Minimal required energy for executing the task
 		min_energy2[i] = retrieveMinEnergy(i);
 		// Free energy
@@ -667,7 +667,7 @@ public:
 			// Check whether the task 'i' is fixed
 			if ((CUMU_PT_ISFIXED(start[i]) && CUMU_PT_ISFIXED(dur[i]) && CUMU_PT_ISFIXED(usage[i])) ||
 					max_dur(i) <= 0 || max_usage(i) <= 0) {
-				// Swaping the id's
+				// Swapping the id's
 				task_id[ii] = task_id[new_unfixed];
 				task_id[new_unfixed] = i;
 				new_unfixed--;
@@ -693,7 +693,7 @@ public:
 		// idempotent
 		do {
 			bound_update = false;
-			// Reseting the profile size
+			// Resetting the profile size
 			tt_profile_size = 0;
 			// Time-table propagators
 			if (tt_check || tt_filt) {
@@ -1053,7 +1053,7 @@ public:
 	// Analysing the conflict and generation of the explanations
 	// NOTE: Fixed durations and resource usages are assumed!!!
 	//
-	// Explanation is created for the time interval [begin, end), i.e., exluding end.
+	// Explanation is created for the time interval [begin, end), i.e., excluding end.
 	//
 	void analyse_limit_and_tasks(vec<Lit>& expl, std::set<CUMU_INT>& tasks, CUMU_INT lift_usage,
 															 CUMU_INT begin, CUMU_INT end);
@@ -1818,7 +1818,7 @@ bool CumulativeCalProp::ttef_bounds_propagation(int shift_in1, int shift_in2) {
 	// TODO LB bound on the limit
 	// LB bounds on the start times
 #if CUMUVERB > 0
-	fprintf(stderr, "Entering TTEF Bounds Propagtion\n");
+	fprintf(stderr, "Entering TTEF Bounds Propagation\n");
 #endif
 	if (!ttef_bounds_propagation_lb(shift_in1, update1)) {
 		// Inconsistency
@@ -1830,7 +1830,7 @@ bool CumulativeCalProp::ttef_bounds_propagation(int shift_in1, int shift_in2) {
 		return false;
 	}
 #if CUMUVERB > 0
-	fprintf(stderr, "TTEF Bounds Propagtion\n");
+	fprintf(stderr, "TTEF Bounds Propagation\n");
 #endif
 	// Updating the bounds
 	if (!ttef_update_bounds(shift_in1, update1)) {
@@ -1840,7 +1840,7 @@ bool CumulativeCalProp::ttef_bounds_propagation(int shift_in1, int shift_in2) {
 		return false;
 	}
 #if CUMUVERB > 0
-	fprintf(stderr, "Leaving TTEF Bounds Propagtion\n");
+	fprintf(stderr, "Leaving TTEF Bounds Propagation\n");
 #endif
 	return true;
 }
@@ -2122,7 +2122,7 @@ bool CumulativeCalProp::ttef_bounds_propagation_ub(int shift_in,
 		}
 		est_idx_last = ii;
 
-		// Intialisation for the minimal avaible energy of a time interval starting
+		// Initialisation for the minimal available energy of a time interval starting
 		// at begin
 		min_en_avail = maxLimit * (lct_2[task_id_lct[last_unfixed]] - est_2[task_id_est[0]]);
 		min_end = minTime - 1;

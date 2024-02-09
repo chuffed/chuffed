@@ -39,7 +39,7 @@
 #define TREEPROP_DEBUG 0
 
 //*
-// This version needs to work in conjucntion with a TreePropagator
+// This version needs to work in conjunction with a TreePropagator
 // It won't do the propagations of treeness, only inherits from it
 // to avoid replicating code
 class IncrementalMinimumWTreePropagator : public TreePropagator {
@@ -401,7 +401,7 @@ public:
 
 	bool propagateNewNode(int n) override {
 		// Full Dijkstra from this node
-		//  -> udpate spTo[n], spC[n] and spFrom[n]
+		//  -> update spTo[n], spC[n] and spFrom[n]
 		//  -> for all other mandatories,
 		//      if spC[other] > full_dijkstra(n)[other]
 		//          splb -= spC[other]
@@ -478,7 +478,7 @@ public:
 		const int n_r = uf.find(ru);
 		// cout<<"United "<<u<<" "<<v<<" ->"<<n_r<<endl;
 
-		// United to CCs that had each otehr as SP
+		// United to CCs that had each other as SP
 		if (spTo[ru] == rv && spTo[rv] == ru) {
 			assert(ru != rv);
 			const int loser = n_r == ru ? rv : ru;
@@ -738,7 +738,7 @@ protected:
 			return true;
 		}
 		// A steiner node (non-terminal) of degree 2 MUST use its two edges.
-		// Otherwise its costing us wieght for nothing
+		// Otherwise its costing us weight for nothing
 		// If adding that new edge creates a cycle, we will fail and learn later
 		// If we cant add the second edge, we fail.
 		//!\This is only valid if tree() is the only constraint forcing terminals in
@@ -1049,11 +1049,11 @@ public:
 	 * Update node i if its a representative of a CC
 	 * eopt is used to force the update in case of an edge removal
 	 *  because the weight of the newlly found sp might be == to the old
-	 *  one and thus look like its not necesary to do anything, yet it is
+	 *  one and thus look like its not necessary to do anything, yet it is
 	 *  because a removed edge is used.
 	 */
 	bool elementaryUpdate(int i, int eopt = -1) {
-		// The || condition is required at the begining, when all ndoes have
+		// The || condition is required at the beginning, when all nodes have
 		// shortestPathsInfo[node][0] = -1
 		if (getNodeVar(i).isFixed() && getNodeVar(i).isTrue() &&
 				(/*shortestPathsInfo[i][0] != -1 ||*/ ruf.isRoot(i))) {
@@ -1415,7 +1415,7 @@ public:
 				}
 			}
 		}
-		if (nb_innodes == 1) {  // One ndoe in in the entire graph
+		if (nb_innodes == 1) {  // One node in in the entire graph
 			lowerBound = 0;
 			return true;
 		}
@@ -1554,7 +1554,7 @@ public:
 	}
 };
 
-// Very dodgy/experimental way of chekcing if it is better to combine the two bounding propagators
+// Very dodgy/experimental way of checking if it is better to combine the two bounding propagators
 // or have the LP alone with the tree propagations.
 #define TREEPROPAGATORCLASS 0
 #define MINIMUMWTREEPROPAGATORCLASS 1
@@ -2079,8 +2079,8 @@ public:
 		// if (nb_innodes < 2) return SUPERTREEPROPCLASS::propagate();
 
 		// The methods in LPLBsteinr tree wont get called because MWST avoids
-		// slow computation fo the lower bound by calling the treepropagator
-		// methods when a new node is in, thus skipping thise methos. We update
+		// slow computation for the lower bound by calling the treepropagator
+		// methods when a new node is in, thus skipping these methods. We update
 		// the lower bounds by hand then
 		std::unordered_set<int>::iterator it;
 #if SUPERTREEPROPCLASSCHOOSE == MINIMUMWTREEPROPAGATORCLASS

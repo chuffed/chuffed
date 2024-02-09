@@ -36,7 +36,7 @@ public:
 };
 
 /**
- * K-means algorithm in graphs (non Euclidian) that can change
+ * K-means algorithm in graphs (non Euclidean) that can change
  * over time (dynamic). The graph is never given, only queried.
  */
 template <typename T>
