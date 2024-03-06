@@ -102,7 +102,7 @@ public:
 	unsigned int temp_expl : 1;  // is it a temporary explanation clause
 	unsigned int padding : 6;    // save some bits for other bitflags
 	unsigned int sz : 24;        // the size of the clause
-	Lit data[0];                 // the literals of the clause
+	Lit data[1];                 // the literals of the clause
 															 /* 	float data2[0]; */
 															 /* int data3[0]; */
 															 /* int data4[0]; */
@@ -166,7 +166,11 @@ public:
 
 template <class V>
 static Clause* Clause_new(const V& ps, bool learnt = false) {
-	const int mem_size = sizeof(Clause) + ps.size() * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
+	size_t s = 0;
+	if (ps.size() != 0) {
+		s = ps.size() - 1;
+	}
+	const int mem_size = sizeof(Clause) + s * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
 	void* mem = malloc(mem_size);
 	auto* newClause = new (mem) Clause(ps, learnt);
 	return newClause;
@@ -219,14 +223,16 @@ const ChannelInfo ci_null(0, 0, 0, 0);
 
 class WatchElem {
 public:
+	struct WatchElemT {
+		unsigned int type : 2;  // which type of watch elem if it's not a clause pointer
+		unsigned int d1 : 30;   // data 1
+		unsigned int d2 : 32;   // data 2
+	};
+
 	union {
 		Clause* pt;  // clause pointer
-		struct {
-			unsigned int type : 2;  // which type of watch elem if it's not a clause pointer
-			unsigned int d1 : 30;   // data 1
-			unsigned int d2 : 32;   // data 2
-		} d;
 		int64_t a;
+		WatchElemT d;
 	};
 	WatchElem() : a(0) {}
 	WatchElem(Clause* c) : pt(c) {
@@ -248,14 +254,16 @@ public:
 
 class Reason {
 public:
+	struct ReasonT {
+		unsigned int type : 2;  // which type of reason if it's not a clause pointer
+		unsigned int d1 : 30;   // data 1
+		unsigned int d2 : 32;   // data 2
+	};
+
 	union {
 		Clause* pt;  // clause pointer
-		struct {
-			unsigned int type : 2;  // which type of reason if it's not a clause pointer
-			unsigned int d1 : 30;   // data 1
-			unsigned int d2 : 32;   // data 2
-		} d;
 		int64_t a;
+		ReasonT d;
 	};
 	Reason() : a(0) {}
 	Reason(Clause* c) : pt(c) {

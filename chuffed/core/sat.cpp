@@ -31,7 +31,7 @@ std::map<int, std::string> learntClauseString;
 std::ofstream learntStatsStream;
 
 cassert(sizeof(Lit) == 4);
-cassert(sizeof(Clause) == 4);
+cassert(sizeof(Clause) == 8);
 cassert(sizeof(WatchElem) == 8);
 cassert(sizeof(Reason) == 8);
 

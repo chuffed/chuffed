@@ -358,7 +358,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 		}
 	}
 
-	fprintf(out, "\\foreach \\pos/\\name/\\stat in \{");
+	fprintf(out, "\\foreach \\pos/\\name/\\stat in {");
 
 	bool first = true;
 	for (int i = 0; i < var_nodes.size(); i++) {
@@ -388,7 +388,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 		fprintf(out, "}\n\t\t\\node[vertex] (\\name) at \\pos {$x_{\\stat}$};\n");
 	}
 
-	fprintf(out, "\\foreach \\source/\\dest/\\label in \{");
+	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 
 	first = true;
 	for (int i = 0; i < edges.size(); i++) {
@@ -416,7 +416,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	}
 	fprintf(out, "}\n\t\t\\path[edge] (\\source) -- node {$\\label$} (\\dest);\n");
 
-	fprintf(out, "\\foreach \\source/\\dest/\\label in \{");
+	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
 	for (int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 1) != 0U)) {
@@ -431,7 +431,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	}
 	fprintf(out, "}\n\t\t\\path[kaedge] (\\source) -- node {$\\label$} (\\dest);\n");
 
-	fprintf(out, "\\foreach \\source/\\dest/\\label in \{");
+	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
 	for (int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 2) != 0U)) {
@@ -446,7 +446,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	}
 	fprintf(out, "}\n\t\t\\path[kbedge] (\\source) -- node {$\\label$} (\\dest);\n");
 
-	fprintf(out, "\\foreach \\source/\\dest/\\label in \{");
+	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
 	for (int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 4) != 0U)) {

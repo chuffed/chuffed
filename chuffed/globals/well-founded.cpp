@@ -8,6 +8,7 @@
 #include "chuffed/vars/bool-view.h"
 #include "chuffed/vars/vars.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -27,7 +28,7 @@ public:
 	int sz;
 	Lit body_lit;
 	int w;
-	int body[0];
+	int body[1];
 
 	ConjRule(int h, vec<int>& b, Lit bl) : head(h), sz(b.size()), body_lit(bl) {
 		for (int i = 0; i < b.size(); i++) {
@@ -39,7 +40,7 @@ public:
 };
 
 ConjRule* ConjRule_new(int h, vec<int>& b, Lit bl) {
-	void* mem = malloc(sizeof(ConjRule) + b.size() * sizeof(int));
+	void* mem = malloc(sizeof(ConjRule) + std::max(0, b.size() - 1) * sizeof(int));
 	return new (mem) ConjRule(h, b, bl);
 }
 
