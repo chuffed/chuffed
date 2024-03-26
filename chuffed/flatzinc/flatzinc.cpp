@@ -408,7 +408,10 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		}
 		const int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
-			decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
+			// Ignore constants
+			if (vars->a[ii]->isBoolVar()) {
+				decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
+			}
 		}
 	} else {
 		AST::Call* call = elemAnn->getCall("warm_start_int");
@@ -420,6 +423,10 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		}
 		const int sz = std::min(vars->a.size(), vals->a.size());
 		for (int ii = 0; ii < sz; ii++) {
+			if (vars->a[ii]->isInt()) {
+				// Ignore constants
+				continue;
+			}
 			IntVar* x(iv[vars->a[ii]->getIntVar()]);
 			const int k(vals->a[ii]->getInt());
 			switch (x->getType()) {
