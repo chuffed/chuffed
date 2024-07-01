@@ -364,7 +364,7 @@ void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView 
 			new LinearGE<S, 1>(b, x, -c, r);
 			break;
 		case IRT_NE:
-			new LinearNE<2 * S, 2 * S + 1, 1>(a, x, c, r); 
+			new LinearNE<2 * S, 2 * S + 1, 1>(a, x, c, r);
 			break;
 		case IRT_LE:
 			int_linear_imp<S>(b, x, IRT_GE, -c, r);
