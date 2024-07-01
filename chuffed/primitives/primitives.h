@@ -108,6 +108,8 @@ void int_rel_half_reif(IntVar* x, IntRelType t, int c, BoolView r);
 
 // sum a*x rel c <-> r
 void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolView& r = bv_true);
+// sum a*x rel c <-> r
+void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolView& r = bv_true);
 // sum x rel c <-> r
 void int_linear(vec<IntVar*>& x, IntRelType t, int c, const BoolView& r = bv_true);
 // sum a*x rel y <-> r

@@ -350,6 +350,39 @@ void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c) {
 
 //-----
 
+// sum a*x rel c <- r
+
+template <int S>
+void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
+	vec<int> b;
+	for (int i = 0; i < a.size(); i++) {
+		b.push(-a[i]);
+	}
+	switch (t) {
+		case IRT_EQ:
+			new LinearGE<S, 1>(a, x, c, r);
+			new LinearGE<S, 1>(b, x, -c, r);
+			break;
+		case IRT_NE:
+			new LinearNE<2 * S, 2 * S + 1, 1>(a, x, c, ~r); 
+			break;
+		case IRT_LE:
+			int_linear_imp<S>(b, x, IRT_GE, -c, r);
+			break;
+		case IRT_LT:
+			int_linear_imp<S>(b, x, IRT_GE, -c + 1, r);
+			break;
+		case IRT_GE:
+			new LinearGE<S, 1>(a, x, c, r);
+			break;
+		case IRT_GT:
+			int_linear_imp<S>(a, x, IRT_GE, c + 1, r);
+			break;
+		default:
+			NEVER;
+	}
+}
+
 // sum a*x rel c <-> r
 
 template <int S>
@@ -382,6 +415,38 @@ void int_linear_reif(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView
 			break;
 		default:
 			NEVER;
+	}
+}
+
+// sum a*x rel c <- r
+void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolView& r) {
+	assert(a.size() == x.size());
+
+	bool scale = false;
+	double limit = abs(c);
+	for (int i = 0; i < x.size(); i++) {
+		assert(a[i]);
+		if (a[i] != 1 && a[i] != -1) {
+			scale = true;
+		}
+		limit += abs(a[i]) * IntVar::max_limit + INT_MAX;
+	}
+	if (limit >= INT64_MAX) {
+		CHUFFED_ERROR("Linear constraint may overflow, not yet supported\n");
+	}
+
+	if (r.isTrue()) {
+		if (scale) {
+			int_linear<1>(a, x, t, c);
+		} else {
+			int_linear<0>(a, x, t, c);
+		}
+	} else {
+		if (scale) {
+			int_linear_imp<1>(a, x, t, c, r);
+		} else {
+			int_linear_imp<0>(a, x, t, c, r);
+		}
 	}
 }
 
