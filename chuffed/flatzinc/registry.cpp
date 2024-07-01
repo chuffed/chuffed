@@ -284,18 +284,39 @@ void p_int_lin_CMP_reif(IntRelType irt, const ConExpr& ce, AST::Node* ann) {
 	arg2intvarargs(iv, ce[1]);
 	int_linear(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
 }
+void p_int_lin_CMP_imp(IntRelType irt, const ConExpr& ce, AST::Node* ann) {
+	if (ce[3]->isBool()) {
+		if (ce[3]->getBool()) {
+			p_int_lin_CMP(irt, ce, ann);
+		} else {
+			p_int_lin_CMP(!irt, ce, ann);
+		}
+		return;
+	}
+	vec<int> ia;
+	arg2intargs(ia, ce[0]);
+	vec<IntVar*> iv;
+	arg2intvarargs(iv, ce[1]);
+	int_linear_imp(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
+}
 void p_int_lin_eq(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_EQ, ce, ann); }
 void p_int_lin_eq_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_EQ, ce, ann); }
+void p_int_lin_eq_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_EQ, ce, ann); }
 void p_int_lin_ne(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_NE, ce, ann); }
 void p_int_lin_ne_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_NE, ce, ann); }
+void p_int_lin_ne_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_NE, ce, ann); }
 void p_int_lin_le(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_LE, ce, ann); }
 void p_int_lin_le_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LE, ce, ann); }
+void p_int_lin_le_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_LE, ce, ann); }
 void p_int_lin_lt(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_LT, ce, ann); }
 void p_int_lin_lt_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LT, ce, ann); }
+void p_int_lin_lt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_LT, ce, ann); }
 void p_int_lin_ge(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_GE, ce, ann); }
 void p_int_lin_ge_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GE, ce, ann); }
+void p_int_lin_ge_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_GE, ce, ann); }
 void p_int_lin_gt(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_GT, ce, ann); }
 void p_int_lin_gt_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GT, ce, ann); }
+void p_int_lin_gt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_GT, ce, ann); }
 
 /* arithmetic constraints */
 
@@ -1840,16 +1861,22 @@ public:
 		registry().add("int_lt_reif", &p_int_lt_reif);
 		registry().add("int_lin_eq", &p_int_lin_eq);
 		registry().add("int_lin_eq_reif", &p_int_lin_eq_reif);
+		registry().add("int_lin_eq_imp", &p_int_lin_eq_imp);
 		registry().add("int_lin_ne", &p_int_lin_ne);
 		registry().add("int_lin_ne_reif", &p_int_lin_ne_reif);
+		registry().add("int_lin_ne_imp", &p_int_lin_ne_imp);
 		registry().add("int_lin_le", &p_int_lin_le);
 		registry().add("int_lin_le_reif", &p_int_lin_le_reif);
+		registry().add("int_lin_le_imp", &p_int_lin_le_imp);
 		registry().add("int_lin_lt", &p_int_lin_lt);
 		registry().add("int_lin_lt_reif", &p_int_lin_lt_reif);
+		registry().add("int_lin_lt_imp", &p_int_lin_lt_imp);
 		registry().add("int_lin_ge", &p_int_lin_ge);
 		registry().add("int_lin_ge_reif", &p_int_lin_ge_reif);
+		registry().add("int_lin_ge_imp", &p_int_lin_ge_imp);
 		registry().add("int_lin_gt", &p_int_lin_gt);
 		registry().add("int_lin_gt_reif", &p_int_lin_gt_reif);
+		registry().add("int_lin_gt_imp", &p_int_lin_gt_imp);
 		registry().add("int_plus", &p_int_plus);
 		registry().add("int_minus", &p_int_minus);
 		registry().add("int_pow", &p_int_pow);
@@ -1906,8 +1933,8 @@ public:
 		registry().add("chuffed_cumulative_cal", &p_cumulative_cal);
 		registry().add("chuffed_circuit", &p_circuit);
 		registry().add("chuffed_subcircuit", &p_subcircuit);
-		registry().add("array_int_minimum", &p_minimum);
-		registry().add("array_int_maximum", &p_maximum);
+		registry().add("chuffed_array_int_minimum", &p_minimum);
+		registry().add("chuffed_array_int_maximum", &p_maximum);
 		registry().add("chuffed_maximum_arg_bool", &p_bool_arg_max);
 		registry().add("lex_less_int", &p_lex_less);
 		registry().add("lex_lesseq_int", &p_lex_lesseq);

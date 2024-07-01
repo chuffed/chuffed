@@ -97,6 +97,43 @@ predicate int_gt_imp(var int: a, var int: b, var bool: r);
 predicate int_le_imp(var int: a, var int: b, var bool: r);
 predicate int_lt_imp(var int: a, var int: b, var bool: r);
 
+predicate int_lin_eq_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+predicate int_lin_le_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+predicate int_lin_lt_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+predicate int_lin_ge_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+predicate int_lin_gt_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+predicate int_lin_ne_imp(
+    array [int] of int: as,
+    array [int] of var int: bs,
+    int: c,
+    var bool: r
+);
+
 predicate array_var_int_element_imp(var int: b, array [int] of var int: as, var int: c, var bool: r);
 
 %%% NOTE: because of a mistake in the MiniZinc standard library, the
