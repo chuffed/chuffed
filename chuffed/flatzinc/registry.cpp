@@ -269,7 +269,7 @@ void p_int_lin_CMP(IntRelType irt, const ConExpr& ce, AST::Node* /*ann*/) {
 
 	int_linear(ia, iv, irt, ce[2]->getInt(), bv_true);
 }
-void p_int_lin_CMP_reif(IntRelType irt, const ConExpr& ce, AST::Node* ann, bool half_reif=false) {
+void p_int_lin_CMP_reif(IntRelType irt, const ConExpr& ce, AST::Node* ann) {
 	if (ce[3]->isBool()) {
 		if (ce[3]->getBool()) {
 			p_int_lin_CMP(irt, ce, ann);
@@ -282,29 +282,41 @@ void p_int_lin_CMP_reif(IntRelType irt, const ConExpr& ce, AST::Node* ann, bool 
 	arg2intargs(ia, ce[0]);
 	vec<IntVar*> iv;
 	arg2intvarargs(iv, ce[1]);
-	if (half_reif) 
-		int_linear_imp(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
-	else
-		int_linear(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
+	int_linear(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
+}
+void p_int_lin_CMP_imp(IntRelType irt, const ConExpr& ce, AST::Node* ann) {
+	if (ce[3]->isBool()) {
+		if (ce[3]->getBool()) {
+			p_int_lin_CMP(irt, ce, ann);
+		} else {
+			p_int_lin_CMP(!irt, ce, ann);
+		}
+		return;
+	}
+	vec<int> ia;
+	arg2intargs(ia, ce[0]);
+	vec<IntVar*> iv;
+	arg2intvarargs(iv, ce[1]);
+	int_linear_imp(ia, iv, irt, ce[2]->getInt(), getBoolVar(ce[3]));
 }
 void p_int_lin_eq(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_EQ, ce, ann); }
 void p_int_lin_eq_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_EQ, ce, ann); }
-void p_int_lin_eq_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_EQ, ce, ann, true); }
+void p_int_lin_eq_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_EQ, ce, ann); }
 void p_int_lin_ne(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_NE, ce, ann); }
 void p_int_lin_ne_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_NE, ce, ann); }
-void p_int_lin_ne_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_NE, ce, ann, true); }
+void p_int_lin_ne_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_NE, ce, ann); }
 void p_int_lin_le(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_LE, ce, ann); }
 void p_int_lin_le_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LE, ce, ann); }
-void p_int_lin_le_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LE, ce, ann, true); }
+void p_int_lin_le_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_LE, ce, ann); }
 void p_int_lin_lt(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_LT, ce, ann); }
 void p_int_lin_lt_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LT, ce, ann); }
-void p_int_lin_lt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_LT, ce, ann, true); }
+void p_int_lin_lt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_LT, ce, ann); }
 void p_int_lin_ge(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_GE, ce, ann); }
 void p_int_lin_ge_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GE, ce, ann); }
-void p_int_lin_ge_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GE, ce, ann, true); }
+void p_int_lin_ge_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_GE, ce, ann); }
 void p_int_lin_gt(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP(IRT_GT, ce, ann); }
 void p_int_lin_gt_reif(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GT, ce, ann); }
-void p_int_lin_gt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_reif(IRT_GT, ce, ann, true); }
+void p_int_lin_gt_imp(const ConExpr& ce, AST::Node* ann) { p_int_lin_CMP_imp(IRT_GT, ce, ann); }
 
 /* arithmetic constraints */
 
