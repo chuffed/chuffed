@@ -392,6 +392,9 @@ install(FILES ${CMAKE_BINARY_DIR}/chuffed.msc DESTINATION ${CMAKE_INSTALL_DATARO
 # ------------- CMake export configuration -------------
 include(CMakePackageConfigHelpers)
 
+file(RELATIVE_PATH REL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/chuffed/ ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
+file(RELATIVE_PATH REL_DATAROOTDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/chuffed/ ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR})
+
 export(EXPORT chuffed-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/chuffed-targets.cmake)
 
 configure_package_config_file(
