@@ -1162,7 +1162,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		// New format
 		for (int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			// The -1 is becaise indexes in MZ start at 1
+			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
 			en[i].push(en_flat[es.size() + i] - 1);
 		}
@@ -1248,7 +1248,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 		// New format
 		for (int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			// The -1 is becaise indexes in MZ start at 1
+			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
 			en[i].push(en_flat[es.size() + i] - 1);
 		}
@@ -1339,7 +1339,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		// New format
 		for (int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			// The -1 is becaise indexes in MZ start at 1
+			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
 			en[i].push(en_flat[es.size() + i] - 1);
 		}
@@ -1430,7 +1430,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 		// New format
 		for (int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			// The -1 is becaise indexes in MZ start at 1
+			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
 			en[i].push(en_flat[es.size() + i] - 1);
 		}
@@ -1684,7 +1684,7 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<vec<int> > en;
 	for (int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
-		// The -1 is becaise indexes in MZ start at 1
+		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
 		en[i].push(en_flat[es.size() + i] - 1);
 	}
@@ -1767,7 +1767,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<vec<int> > en;
 	for (int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
-		// The -1 is becaise indexes in MZ start at 1
+		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
 		en[i].push(en_flat[es.size() + i] - 1);
 	}

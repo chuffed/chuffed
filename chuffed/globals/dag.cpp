@@ -77,7 +77,7 @@ void DAGPropagator::connectTo(int source, int dest) {
 		succs[*it_p].get(source, &d_ptc);  // d_ptc == how to go from p to source
 		assert(d_ptc.second != -1);
 		d_ptc.first = dest;       // d_ptc == go from p to dest the same...
-		succs[*it_p].add(d_ptc);  // ...way you go from p tou source
+		succs[*it_p].add(d_ptc);  // ...way you go from p to source
 		preds[dest].add(*it_p);   // p precedes dest
 	}
 
