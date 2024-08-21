@@ -6,10 +6,17 @@ set(chuffed_VERSION_MAJOR 0)
 set(chuffed_VERSION_MINOR 13)
 set(chuffed_VERSION_PATCH 3)
 
+set(chuffed_VERSION "${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}")
+
+# NOTE: SOVERSION is a completely different entity from VERSION!
+set(chuffed_SOVERSION_OVERRIDE "0" CACHE STRING "SOVERSION to set for custom chuffed packaging")
+mark_as_advanced(chuffed_SOVERSION_OVERRIDE)
+
 ### Additional Definitions:
 option(STATIC "compile with the -static linker flag" OFF)
 option(CP_PROFILER "Build with the CP Profiler Integration" ON)
 option(SUPPORT_VAR_IMPACT "Build with support for impact branching" OFF)
+
 # ------------- Compiler Configuration -------------
 
 if(STATIC)
@@ -197,6 +204,10 @@ if(CP_PROFILER)
   target_compile_definitions(chuffed PRIVATE HAS_PROFILER)
 endif()
 
+set_target_properties(chuffed PROPERTIES
+                      VERSION ${chuffed_VERSION}
+                      SOVERSION ${chuffed_SOVERSION_OVERRIDE})
+
 # ------------- FZN Chuffed -------------
 
 find_package(BISON 3.4)
@@ -254,6 +265,10 @@ add_library(chuffed_fzn
 
   $<TARGET_OBJECTS:flatzinc_parser>
 )
+
+set_target_properties(chuffed_fzn PROPERTIES
+                      VERSION ${chuffed_VERSION}
+                      SOVERSION ${chuffed_SOVERSION_OVERRIDE})
 
 add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
 target_link_libraries(fzn-chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
@@ -402,7 +417,7 @@ configure_package_config_file(
 
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/chuffed-config-version.cmake"
-  VERSION "${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}"
+  VERSION "${chuffed_VERSION}"
   COMPATIBILITY AnyNewerVersion
 )
 

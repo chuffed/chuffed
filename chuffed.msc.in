@@ -2,7 +2,7 @@
   "id": "org.chuffed.chuffed",
   "name": "Chuffed",
   "description": "Chuffed FlatZinc executable",
-  "version": "${chuffed_VERSION_MAJOR}.${chuffed_VERSION_MINOR}.${chuffed_VERSION_PATCH}",
+  "version": "${chuffed_VERSION}",
   "mznlib": "../chuffed",
   "executable": "${REL_INSTALL_BINARY}",
   "tags": ["cp","lcg","int"],
