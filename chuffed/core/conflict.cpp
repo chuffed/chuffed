@@ -103,21 +103,21 @@ inline void SAT::claDecayActivity() {
 Clause* SAT::_getExpl(Lit p) {
 	//	fprintf(stderr, "L%d - %d\n", decisionLevel(), trailpos[var(p)]);
 	const Reason& r = reason[var(p)];
-	return engine.propagators[r.d.d2]->explain(p, r.d.d1);
+	return engine.propagators[r.d2()]->explain(p, r.d1());
 }
 
 Clause* SAT::getConfl(Reason& r, Lit p) const {
-	switch (r.d.type) {
+	switch (r.type()) {
 		case 0:
-			return r.pt;
+			return r.pt();
 		case 1:
-			return engine.propagators[r.d.d2]->explain(p, r.d.d1);
+			return engine.propagators[r.d2()]->explain(p, r.d1());
 		default:
 			Clause& c = *short_expl;
-			c.sz = r.d.type;
-			c[1] = toLit(r.d.d1);
+			c.sz = r.type();
+			c[1] = toLit(r.d1());
 			if (c.sz == 3) {
-				c[2] = toLit(r.d.d2);
+				c[2] = toLit(r.d2());
 			}
 			return short_expl;
 	}
