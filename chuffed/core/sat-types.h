@@ -8,6 +8,7 @@
 // so that they can be used as array indices.
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <new>
