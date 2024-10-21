@@ -39,7 +39,7 @@ cassert(sizeof(Reason) == 8);
 // inline methods
 
 inline void SAT::insertVarOrder(int x) {
-	if (!order_heap.inHeap(x) && flags[x].decidable) {
+	if (!order_heap.inHeap(x) && flags[x].decidable()) {
 		order_heap.insert(x);
 	}
 }
@@ -116,7 +116,7 @@ int SAT::newVar(int n, ChannelInfo ci) {
 	seen.growBy(n, 0);
 	activity.growBy(n, 0);
 	polarity.growBy(n, true);
-	flags.growBy(n, 7);
+	flags.growBy(n, LitFlags(true, true, true));
 
 	for (int i = 0; i < n; i++) {
 		c_info.push(ci);
@@ -140,7 +140,7 @@ int SAT::getLazyVar(ChannelInfo ci) {
 		c_info[v] = ci;
 		activity[v] = 0;
 		polarity[v] = true;
-		flags[v] = 7;
+		flags[v] = LitFlags(true, true, true);
 	} else {
 		v = newVar(1, ci);
 		num_used.push(0);
@@ -676,7 +676,7 @@ bool SAT::finished() {
 	assert(so.vsids);
 	while (!order_heap.empty()) {
 		const int x = order_heap[0];
-		if ((assigns[x] == 0) && flags[x].decidable) {
+		if ((assigns[x] == 0) && flags[x].decidable()) {
 			return false;
 		}
 		order_heap.removeMin();

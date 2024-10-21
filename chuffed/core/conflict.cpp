@@ -358,7 +358,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 			std::cerr << "selected " << getLitString(toInt(p)) << " as next literal to explain away\n";
 		}
 
-		if (pathC == 0 && flags[var(p)].uipable) {
+		if (pathC == 0 && flags[var(p)].uipable()) {
 			if (so.debug) {
 				std::cerr << "one only literal left at current level; finished\n";
 			}
@@ -422,7 +422,7 @@ void SAT::explainUnlearnable(std::set<int>& /*contributingNogoods*/) {
 	vec<Lit> removed;
 	for (int i = 1; i < out_learnt.size(); i++) {
 		const Lit p = out_learnt[i];
-		if (flags[var(p)].learnable) {
+		if (flags[var(p)].learnable()) {
 			continue;
 		}
 		assert(!reason[var(p)].isLazy());

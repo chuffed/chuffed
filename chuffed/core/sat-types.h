@@ -120,7 +120,10 @@ public:
 	}
 
 	// -- use this function instead:
-	void clearFlags() { *((char*)this) = 0; }
+	void clearFlags() {
+		learnt = 0;
+		temp_expl = 0;
+	}
 	int size() const { return sz; }
 
 	void resize(unsigned int newSize) {
@@ -179,28 +182,34 @@ static Clause* Clause_new(const V& ps, bool learnt = false) {
 //=================================================================================================
 // LitFlags -- store info concerning literal:
 
-struct LitFlags {
-	unsigned int decidable : 1;  // can be used as decision var
-	unsigned int uipable : 1;    // can be used as head of learnt clause
-	unsigned int learnable : 1;  // can be used in tail of learnt clause
-	unsigned int padding : 5;    // leave some space for other flags
+class LitFlags {
+private:
+	unsigned int _decidable : 1;  // can be used as decision var
+	unsigned int _uipable : 1;    // can be used as head of learnt clause
+	unsigned int _learnable : 1;  // can be used in tail of learnt clause
+	unsigned int _padding : 5;    // leave some space for other flags
+public:
+	LitFlags(bool d, bool u, bool l) : _decidable(d), _uipable(u), _learnable(l), _padding(0) {}
 
-	LitFlags(char f) { *((char*)this) = f; }
 	void setDecidable(bool b) {
 		if (b) {
-			decidable = uipable = 1;
+			_decidable = _uipable = 1;
 		} else {
-			decidable = 0;
+			_decidable = 0;
 		}
 	}
 	void setUIPable(bool b) {
 		if (b) {
-			uipable = 1;
+			_uipable = 1;
 		} else {
-			uipable = decidable = 0;
+			_uipable = _decidable = 0;
 		}
 	}
-	void setLearnable(bool b) { learnable = b; }
+	void setLearnable(bool b) { _learnable = b; }
+
+	bool decidable() const { return _decidable; }
+	bool uipable() const { return _uipable; }
+	bool learnable() const { return _learnable; }
 };
 
 //=================================================================================================
