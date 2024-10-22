@@ -240,7 +240,7 @@ private:
 
 public:
 	unsigned int type() const {
-		return static_cast<unsigned int>(reinterpret_cast<ptrdiff_t>(_pt) & 3);
+		return static_cast<unsigned int>(reinterpret_cast<std::ptrdiff_t>(_pt) & 3);
 	}
 	unsigned int d1() const {
 		assert(type() == 2);
@@ -264,12 +264,12 @@ public:
 	}
 
 	WatchElem(Lit p) {
-		uint64_t d = static_cast<uint64_t>(toInt(p));
+		const auto d = static_cast<uint64_t>(toInt(p));
 		_a = (d << 32) | 1;
 	}
 	WatchElem(int prop_id, int pos) {
-		uint64_t d = static_cast<uint64_t>(prop_id) << 32;
-		uint64_t d2 = static_cast<uint64_t>(pos) << 2;
+		const auto d = static_cast<uint64_t>(prop_id) << 32;
+		const auto d2 = static_cast<uint64_t>(pos) << 2;
 		_a = d | d2 | 2;
 	}
 	bool operator!=(WatchElem o) const { return _a != o._a; }
@@ -288,7 +288,7 @@ private:
 
 public:
 	unsigned int type() const {
-		return static_cast<unsigned int>(reinterpret_cast<ptrdiff_t>(_pt) & 3);
+		return static_cast<unsigned int>(reinterpret_cast<std::ptrdiff_t>(_pt) & 3);
 	}
 	unsigned int d1() const {
 		assert(type() == 1 || type() == 3);
@@ -311,19 +311,19 @@ public:
 		}
 	}
 	Reason(int prop_id, int inf_id) {
-		uint64_t d2 = static_cast<uint64_t>(prop_id) << 32;
-		uint64_t d1 = static_cast<uint64_t>(inf_id) << 2;
+		const auto d2 = static_cast<uint64_t>(prop_id) << 32;
+		const auto d1 = static_cast<uint64_t>(inf_id) << 2;
 		_a = d2 | d1 | 1;
 	}
 
 	Reason(Lit p) {
-		uint64_t d1 = static_cast<uint64_t>(toInt(p));
+		const auto d1 = static_cast<uint64_t>(toInt(p));
 		_a = (d1 << 2) | 2;
 	}
 
 	Reason(Lit p, Lit q) {
-		uint64_t d1 = static_cast<uint64_t>(toInt(p)) << 2;
-		uint64_t d2 = static_cast<uint64_t>(toInt(q)) << 32;
+		const auto d1 = static_cast<uint64_t>(toInt(p)) << 2;
+		const auto d2 = static_cast<uint64_t>(toInt(q)) << 32;
 		_a = d2 | d1 | 3;
 	}
 	bool operator==(Reason o) const { return _a == o._a; }
