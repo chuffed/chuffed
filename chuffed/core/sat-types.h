@@ -291,11 +291,11 @@ public:
 		return static_cast<unsigned int>(reinterpret_cast<std::ptrdiff_t>(_pt) & 3);
 	}
 	unsigned int d1() const {
-		assert(type() == 1 || type() == 3);
+		assert(type() != 0);
 		return static_cast<unsigned int>((_a & 0xFFFFFFFF) >> 2);
 	}
 	unsigned int d2() const {
-		assert(type() != 0);
+		assert(type() == 1 || type() == 3);
 		return static_cast<unsigned int>(_a >> 32);
 	}
 	Clause* pt() const {
