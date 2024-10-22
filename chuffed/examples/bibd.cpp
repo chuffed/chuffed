@@ -94,7 +94,7 @@ public:
 	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
 		for (int i = 0; i < sat.nVars(); i++) {
-			sat.flags[i] = 0;
+			sat.flags[i] = LitFlags(false, false, false);
 		}
 		for (int i = 0; i < v; i++) {
 			for (int j = 0; j < b; j++) {

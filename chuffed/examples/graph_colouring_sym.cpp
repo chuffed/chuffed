@@ -1,6 +1,7 @@
 #include "chuffed/branching/branching.h"
 #include "chuffed/core/engine.h"
 #include "chuffed/core/options.h"
+#include "chuffed/core/sat-types.h"
 #include "chuffed/core/sat.h"
 #include "chuffed/globals/globals.h"
 #include "chuffed/ldsb/ldsb.h"
@@ -107,7 +108,7 @@ public:
 	void restrict_learnable() override {
 		printf("Setting learnable white list\n");
 		for (int i = 0; i < sat.nVars(); i++) {
-			sat.flags[i] = 0;
+			sat.flags[i] = LitFlags(false, false, false);
 		}
 		for (int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);

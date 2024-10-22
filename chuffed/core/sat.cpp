@@ -694,7 +694,7 @@ DecInfo* SAT::branch() {
 	const int next = order_heap.removeMin();
 
 	assert(!assigns[next]);
-	assert(flags[next].decidable);
+	assert(flags[next].decidable());
 
 	return new DecInfo(nullptr, 2 * next + static_cast<int>(polarity[next]));
 }
