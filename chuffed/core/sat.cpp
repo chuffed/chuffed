@@ -39,7 +39,7 @@ cassert(sizeof(Reason) == 8);
 // inline methods
 
 inline void SAT::insertVarOrder(int x) {
-	if (!order_heap.inHeap(x) && flags[x].decidable) {
+	if (!order_heap.inHeap(x) && flags[x].decidable()) {
 		order_heap.insert(x);
 	}
 }
@@ -116,7 +116,7 @@ int SAT::newVar(int n, ChannelInfo ci) {
 	seen.growBy(n, 0);
 	activity.growBy(n, 0);
 	polarity.growBy(n, true);
-	flags.growBy(n, 7);
+	flags.growBy(n, LitFlags(true, true, true));
 
 	for (int i = 0; i < n; i++) {
 		c_info.push(ci);
@@ -140,7 +140,7 @@ int SAT::getLazyVar(ChannelInfo ci) {
 		c_info[v] = ci;
 		activity[v] = 0;
 		polarity[v] = true;
-		flags[v] = 7;
+		flags[v] = LitFlags(true, true, true);
 	} else {
 		v = newVar(1, ci);
 		num_used.push(0);
@@ -378,12 +378,12 @@ bool SAT::simplify(Clause& c) const {
 
 std::string showReason(Reason r) {
 	std::stringstream ss;
-	switch (r.d.type) {
+	switch (r.type()) {
 		case 0:
-			if (r.pt == nullptr) {
+			if (r.pt() == nullptr) {
 				ss << "no reason";
 			} else {
-				Clause& c = *r.pt;
+				Clause& c = *r.pt();
 				ss << "clause";
 				for (int i = 0; i < c.size(); i++) {
 					ss << " " << getLitString(toInt(~c[i]));
@@ -394,11 +394,11 @@ std::string showReason(Reason r) {
 			ss << "absorbed binary clause?";
 			break;
 		case 2:
-			ss << "single literal " << getLitString(toInt(~toLit(r.d.d1)));
+			ss << "single literal " << getLitString(toInt(~toLit(r.d1())));
 			break;
 		case 3:
-			ss << "two literals " << getLitString(toInt(~toLit((r.d.d1)))) << " & "
-				 << getLitString(toInt(~toLit((r.d.d2))));
+			ss << "two literals " << getLitString(toInt(~toLit((r.d1())))) << " & "
+				 << getLitString(toInt(~toLit((r.d2()))));
 			break;
 		default:
 			assert(false);
@@ -524,11 +524,11 @@ bool SAT::propagate() {
 
 		for (i = j = ws, end = i + ws.size(); i != end;) {
 			const WatchElem& we = *i;
-			switch (we.d.type) {
+			switch (we.type()) {
 				case 1: {
 					// absorbed binary clause
 					*j++ = *i++;
-					const Lit q = toLit(we.d.d2);
+					const Lit q = toLit(we.d2());
 					switch (toInt(value(q))) {
 						case 0:
 							enqueue(q, ~p);
@@ -547,11 +547,11 @@ bool SAT::propagate() {
 				case 2: {
 					// wake up FD propagator
 					*j++ = *i++;
-					engine.propagators[we.d.d2]->wakeup(we.d.d1, 0);
+					engine.propagators[we.d2()]->wakeup(we.d1(), 0);
 					continue;
 				}
 				default:
-					Clause& c = *we.pt;
+					Clause& c = *we.pt();
 					i++;
 
 					// Check if already satisfied
@@ -676,7 +676,7 @@ bool SAT::finished() {
 	assert(so.vsids);
 	while (!order_heap.empty()) {
 		const int x = order_heap[0];
-		if ((assigns[x] == 0) && flags[x].decidable) {
+		if ((assigns[x] == 0) && flags[x].decidable()) {
 			return false;
 		}
 		order_heap.removeMin();
@@ -694,7 +694,7 @@ DecInfo* SAT::branch() {
 	const int next = order_heap.removeMin();
 
 	assert(!assigns[next]);
-	assert(flags[next].decidable);
+	assert(flags[next].decidable());
 
 	return new DecInfo(nullptr, 2 * next + static_cast<int>(polarity[next]));
 }

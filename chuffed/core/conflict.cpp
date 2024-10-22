@@ -103,21 +103,21 @@ inline void SAT::claDecayActivity() {
 Clause* SAT::_getExpl(Lit p) {
 	//	fprintf(stderr, "L%d - %d\n", decisionLevel(), trailpos[var(p)]);
 	const Reason& r = reason[var(p)];
-	return engine.propagators[r.d.d2]->explain(p, r.d.d1);
+	return engine.propagators[r.d2()]->explain(p, r.d1());
 }
 
 Clause* SAT::getConfl(Reason& r, Lit p) const {
-	switch (r.d.type) {
+	switch (r.type()) {
 		case 0:
-			return r.pt;
+			return r.pt();
 		case 1:
-			return engine.propagators[r.d.d2]->explain(p, r.d.d1);
+			return engine.propagators[r.d2()]->explain(p, r.d1());
 		default:
 			Clause& c = *short_expl;
-			c.sz = r.d.type;
-			c[1] = toLit(r.d.d1);
+			c.sz = r.type();
+			c[1] = toLit(r.d1());
 			if (c.sz == 3) {
-				c[2] = toLit(r.d.d2);
+				c[2] = toLit(r.d2());
 			}
 			return short_expl;
 	}
@@ -358,7 +358,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 			std::cerr << "selected " << getLitString(toInt(p)) << " as next literal to explain away\n";
 		}
 
-		if (pathC == 0 && flags[var(p)].uipable) {
+		if (pathC == 0 && flags[var(p)].uipable()) {
 			if (so.debug) {
 				std::cerr << "one only literal left at current level; finished\n";
 			}
@@ -422,7 +422,7 @@ void SAT::explainUnlearnable(std::set<int>& /*contributingNogoods*/) {
 	vec<Lit> removed;
 	for (int i = 1; i < out_learnt.size(); i++) {
 		const Lit p = out_learnt[i];
-		if (flags[var(p)].learnable) {
+		if (flags[var(p)].learnable()) {
 			continue;
 		}
 		assert(!reason[var(p)].isLazy());

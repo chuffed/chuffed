@@ -8,6 +8,7 @@
 // so that they can be used as array indices.
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <new>
@@ -120,7 +121,10 @@ public:
 	}
 
 	// -- use this function instead:
-	void clearFlags() { *((char*)this) = 0; }
+	void clearFlags() {
+		learnt = 0;
+		temp_expl = 0;
+	}
 	int size() const { return sz; }
 
 	void resize(unsigned int newSize) {
@@ -179,28 +183,34 @@ static Clause* Clause_new(const V& ps, bool learnt = false) {
 //=================================================================================================
 // LitFlags -- store info concerning literal:
 
-struct LitFlags {
-	unsigned int decidable : 1;  // can be used as decision var
-	unsigned int uipable : 1;    // can be used as head of learnt clause
-	unsigned int learnable : 1;  // can be used in tail of learnt clause
-	unsigned int padding : 5;    // leave some space for other flags
+class LitFlags {
+private:
+	unsigned int _decidable : 1;  // can be used as decision var
+	unsigned int _uipable : 1;    // can be used as head of learnt clause
+	unsigned int _learnable : 1;  // can be used in tail of learnt clause
+	unsigned int _padding : 5;    // leave some space for other flags
+public:
+	LitFlags(bool d, bool u, bool l) : _decidable(d), _uipable(u), _learnable(l), _padding(0) {}
 
-	LitFlags(char f) { *((char*)this) = f; }
 	void setDecidable(bool b) {
 		if (b) {
-			decidable = uipable = 1;
+			_decidable = _uipable = 1;
 		} else {
-			decidable = 0;
+			_decidable = 0;
 		}
 	}
 	void setUIPable(bool b) {
 		if (b) {
-			uipable = 1;
+			_uipable = 1;
 		} else {
-			uipable = decidable = 0;
+			_uipable = _decidable = 0;
 		}
 	}
-	void setLearnable(bool b) { learnable = b; }
+	void setLearnable(bool b) { _learnable = b; }
+
+	bool decidable() const { return _decidable; }
+	bool uipable() const { return _uipable; }
+	bool learnable() const { return _learnable; }
 };
 
 //=================================================================================================
@@ -222,30 +232,47 @@ const ChannelInfo ci_null(0, 0, 0, 0);
 // relies on all pointers being aligned to multiples of 4
 
 class WatchElem {
-public:
-	struct WatchElemT {
-		unsigned int type : 2;  // which type of watch elem if it's not a clause pointer
-		unsigned int d1 : 30;   // data 1
-		unsigned int d2 : 32;   // data 2
+private:
+	union {
+		Clause* _pt;  // clause pointer
+		uint64_t _a;
 	};
 
-	union {
-		Clause* pt;  // clause pointer
-		int64_t a;
-		WatchElemT d;
-	};
-	WatchElem() : a(0) {}
-	WatchElem(Clause* c) : pt(c) {
+public:
+	unsigned int type() const {
+		return static_cast<unsigned int>(reinterpret_cast<std::ptrdiff_t>(_pt) & 3);
+	}
+	unsigned int d1() const {
+		assert(type() == 2);
+		return static_cast<unsigned int>((_a & 0xFFFFFFFF) >> 2);
+	}
+	unsigned int d2() const {
+		assert(type() != 0);
+		return static_cast<unsigned int>(_a >> 32);
+	}
+	Clause* pt() const {
+		assert(type() == 0);
+		return _pt;
+	}
+
+	WatchElem() : _a(0) {}
+	WatchElem(Clause* c) : _pt(c) {
 		if (sizeof(Clause*) == 4) {
-			d.d2 = 0;
+			// Make sure the highest and lowest bits are 0
+			_a = _a & 0xFFFFFFFC;
 		}
 	}
+
 	WatchElem(Lit p) {
-		d.type = 1;
-		d.d2 = toInt(p);
+		const auto d = static_cast<uint64_t>(toInt(p));
+		_a = (d << 32) | 1;
 	}
-	WatchElem(int prop_id, int pos) { d.type = 2, d.d1 = pos, d.d2 = prop_id; }
-	bool operator!=(WatchElem o) const { return a != o.a; }
+	WatchElem(int prop_id, int pos) {
+		const auto d = static_cast<uint64_t>(prop_id) << 32;
+		const auto d2 = static_cast<uint64_t>(pos) << 2;
+		_a = d | d2 | 2;
+	}
+	bool operator!=(WatchElem o) const { return _a != o._a; }
 };
 
 //=================================================================================================
@@ -253,40 +280,54 @@ public:
 // relies on all pointers being aligned to multiples of 4
 
 class Reason {
-public:
-	struct ReasonT {
-		unsigned int type : 2;  // which type of reason if it's not a clause pointer
-		unsigned int d1 : 30;   // data 1
-		unsigned int d2 : 32;   // data 2
+private:
+	union {
+		Clause* _pt;  // clause pointer
+		uint64_t _a;
 	};
 
-	union {
-		Clause* pt;  // clause pointer
-		int64_t a;
-		ReasonT d;
-	};
-	Reason() : a(0) {}
-	Reason(Clause* c) : pt(c) {
+public:
+	unsigned int type() const {
+		return static_cast<unsigned int>(reinterpret_cast<std::ptrdiff_t>(_pt) & 3);
+	}
+	unsigned int d1() const {
+		assert(type() != 0);
+		return static_cast<unsigned int>((_a & 0xFFFFFFFF) >> 2);
+	}
+	unsigned int d2() const {
+		assert(type() == 1 || type() == 3);
+		return static_cast<unsigned int>(_a >> 32);
+	}
+	Clause* pt() const {
+		assert(type() == 0);
+		return _pt;
+	}
+
+	Reason() : _a(0) {}
+	Reason(Clause* c) : _pt(c) {
 		if (sizeof(Clause*) == 4) {
-			d.d2 = 0;
+			// Make sure the highest and lowest bits are 0
+			_a = _a & 0xFFFFFFFC;
 		}
 	}
 	Reason(int prop_id, int inf_id) {
-		d.type = 1;
-		d.d1 = inf_id;
-		d.d2 = prop_id;
+		const auto d2 = static_cast<uint64_t>(prop_id) << 32;
+		const auto d1 = static_cast<uint64_t>(inf_id) << 2;
+		_a = d2 | d1 | 1;
 	}
+
 	Reason(Lit p) {
-		d.type = 2;
-		d.d1 = toInt(p);
+		const auto d1 = static_cast<uint64_t>(toInt(p));
+		_a = (d1 << 2) | 2;
 	}
+
 	Reason(Lit p, Lit q) {
-		d.type = 3;
-		d.d1 = toInt(p);
-		d.d2 = toInt(q);
+		const auto d1 = static_cast<uint64_t>(toInt(p)) << 2;
+		const auto d2 = static_cast<uint64_t>(toInt(q)) << 32;
+		_a = d2 | d1 | 3;
 	}
-	bool operator==(Reason o) const { return a == o.a; }
-	bool isLazy() const { return d.type == 1; }
+	bool operator==(Reason o) const { return _a == o._a; }
+	bool isLazy() const { return type() == 1; }
 };
 
 #endif

@@ -192,7 +192,7 @@ public:
 	int decisionLevel() const { return trail.size() - 1; }
 	Lit decLit(int i) const { return trail[i][0]; }
 	lbool value(Lit p) const { return toLbool(assigns[var(p)]) ^ sign(p); }
-	bool locked(Clause& c) const { return reason[var(c[0])].pt == &c && value(c[0]) == l_True; }
+	bool locked(Clause& c) const { return reason[var(c[0])].pt() == &c && value(c[0]) == l_True; }
 
 	void newDecisionLevel();
 	void incVarUse(int v);
@@ -243,18 +243,18 @@ inline void SAT::decVarUse(int v) {
 
 inline Clause* SAT::getExpl(Lit p) {
 	const Reason& r = reason[var(p)];
-	switch (r.d.type) {
+	switch (r.type()) {
 		case 0:
-			return r.pt;
+			return r.pt();
 		case 1:
 			btToPos(index, trailpos[var(p)]);
 			return _getExpl(p);
 		default:
 			Clause& c = *short_expl;
-			c.sz = r.d.type;
-			c[1] = toLit(r.d.d1);
+			c.sz = r.type();
+			c[1] = toLit(r.d1());
 			if (c.sz == 3) {
-				c[2] = toLit(r.d.d2);
+				c[2] = toLit(r.d2());
 			}
 			return short_expl;
 	}
