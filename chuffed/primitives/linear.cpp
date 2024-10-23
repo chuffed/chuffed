@@ -431,7 +431,7 @@ void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const Boo
 		}
 		limit += abs(a[i]) * IntVar::max_limit + INT_MAX;
 	}
-	if (limit >= INT64_MAX) {
+	if (limit >= (double)INT64_MAX) {
 		CHUFFED_ERROR("Linear constraint may overflow, not yet supported\n");
 	}
 

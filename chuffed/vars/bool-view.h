@@ -75,7 +75,7 @@ public:
 
 	bool setVal2(bool x, Reason r = nullptr) const {
 		assert(setValNotR(x));
-		sat.enqueue(getLit(x), r);
+		sat.enqueue(getLit(x), r.pt());
 		return (sat.confl == nullptr);
 	}
 

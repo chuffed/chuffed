@@ -246,12 +246,13 @@ public:
 		}
 
 		// initialise data structures
-		ps_times = (Tint*)malloc(static_cast<size_t>(4 * x.size()) * sizeof(Tint));
-		ps_tasks = (Tint*)malloc(static_cast<size_t>(4 * x.size()) * sizeof(Tint));
-		residual = (Tint*)malloc(x.size() * sizeof(Tint));
+		unsigned tmpsize = x.size();
+		ps_times = (Tint*)malloc(static_cast<size_t>(4 * tmpsize) * sizeof(Tint));
+		ps_tasks = (Tint*)malloc(static_cast<size_t>(4 * tmpsize) * sizeof(Tint));
+		residual = (Tint*)malloc(static_cast<size_t>(tmpsize) * sizeof(Tint));
 
-		ests = (int*)malloc(x.size() * sizeof(int));
-		lets = (int*)malloc(x.size() * sizeof(int));
+		ests = (int*)malloc(static_cast<size_t>(tmpsize) * sizeof(int));
+		lets = (int*)malloc(static_cast<size_t>(tmpsize) * sizeof(int));
 
 		for (int i = 0; i < x.size(); i++) {
 			ests[i] = lets[i] = i;
