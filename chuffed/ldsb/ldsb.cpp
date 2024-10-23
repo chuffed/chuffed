@@ -672,8 +672,9 @@ public:
 		for (int i = 0; i < v.size(); i++) {
 			vars.push(v[i]);
 		}
-		active = (Tchar*)malloc(n * sizeof(Tchar));
-		for (int i = 0; i < n; i++) {
+		unsigned tmp_n = n;
+		active = (Tchar*)malloc(tmp_n * sizeof(Tchar));
+		for (unsigned i = 0; i < n; i++) {
 			active[i] = 1;
 		}
 		for (int i = 0; i < v.size(); i++) {

@@ -20,7 +20,8 @@ public:
 		}
 	}
 	vec(int _sz, const T& pad) : sz(_sz), cap(sz) {
-		data = sz != 0 ? (T*)malloc(cap * sizeof(T)) : nullptr;
+		unsigned mcap = cap;
+		data = sz != 0 ? (T*)malloc(mcap * sizeof(T)) : nullptr;
 		for (int i = 0; i < sz; i++) {
 			new (&data[i]) T(pad);
 		}
