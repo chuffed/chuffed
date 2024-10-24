@@ -56,11 +56,11 @@ public:
 
 	Reason createReason(int var, int est) {
 		if (!trailed_pinfo_sz) {
-			engine.trail.push(TrailElem(&p_info._size(), 4));
+			engine.trail.push(TrailElem(reinterpret_cast<int*>(&p_info._size()), 4));
 			trailed_pinfo_sz = true;
 		}
 		p_info.push(Pinfo(var, est));
-		return {prop_id, p_info.size() - 1};
+		return {prop_id, static_cast<int>(p_info.size() - 1)};
 	}
 
 	bool propagate() override {
@@ -299,11 +299,11 @@ public:
 
 	Reason createReason(int ps_i, int var, int let) {
 		if (!trailed_pinfo_sz) {
-			engine.trail.push(TrailElem(&p_info._size(), 4));
+			engine.trail.push(TrailElem(reinterpret_cast<int*>(&p_info._size()), 4));
 			trailed_pinfo_sz = true;
 		}
 		p_info.push(Pinfo(ps_i, var, let));
-		return {prop_id, p_info.size() - 1};
+		return {prop_id, static_cast<int>(p_info.size() - 1)};
 	}
 
 	bool doEdgeFinding() {
