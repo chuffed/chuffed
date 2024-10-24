@@ -40,7 +40,7 @@ public:
 };
 
 ConjRule* ConjRule_new(int h, vec<int>& b, Lit bl) {
-	void* mem = malloc(sizeof(ConjRule) + std::max(0, b.size() - 1) * sizeof(int));
+	void* mem = malloc(sizeof(ConjRule) + (b.size()==0 ? 0 : b.size() - 1) * sizeof(int));
 	return new (mem) ConjRule(h, b, bl);
 }
 

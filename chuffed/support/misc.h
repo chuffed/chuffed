@@ -11,6 +11,7 @@
 #ifdef HAS_PROFILER
 #include <winsock2.h>
 #endif
+#define NOMINMAX
 #include <windows.h>
 #define SEP_ '\\'
 #else
