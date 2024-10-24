@@ -146,8 +146,8 @@ public:
 	Tchar* active;
 
 	VarSym(vec<IntVar*>& v) : n(v.size()) {
-		vars = (int*)malloc(n * sizeof(int));
-		active = (Tchar*)malloc(n * sizeof(Tchar));
+		vars = (int*)malloc(static_cast<unsigned int>(n) * sizeof(int));
+		active = (Tchar*)malloc(static_cast<unsigned int>(n) * sizeof(Tchar));
 		for (int i = 0; i < n; i++) {
 			vars[i] = v[i]->var_id;
 			active[i] = 1;
@@ -482,9 +482,9 @@ public:
 			printf("n = %d, m = %d, v.size() = %d\n", n, m, v.size());
 		}
 		rassert(n * m == v.size());
-		vars = (IntVar***)malloc(n * sizeof(IntVar**));
+		vars = (IntVar***)malloc(static_cast<unsigned int>(n) * sizeof(IntVar**));
 		for (int i = 0; i < n; i++) {
-			vars[i] = (IntVar**)malloc(m * sizeof(IntVar*));
+			vars[i] = (IntVar**)malloc(static_cast<unsigned int>(m) * sizeof(IntVar*));
 			values.push();
 			for (int j = 0; j < m; j++) {
 				vars[i][j] = v[i * m + j];
@@ -672,7 +672,7 @@ public:
 		for (int i = 0; i < v.size(); i++) {
 			vars.push(v[i]);
 		}
-		active = (Tchar*)malloc(n * sizeof(Tchar));
+		active = (Tchar*)malloc(static_cast<unsigned int>(n) * sizeof(Tchar));
 		for (int i = 0; i < n; i++) {
 			active[i] = 1;
 		}
