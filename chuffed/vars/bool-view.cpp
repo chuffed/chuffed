@@ -49,7 +49,7 @@ double BoolView::getScore(VarBranch vb) {
 		// clauses, but not function as watch. Is there a better existing measure?
 		case VAR_DEGREE_MIN: {
 			const vec<WatchElem>& ws = sat.watches[toInt(getValLit())];
-			return -ws.size();
+			return -static_cast<double>(ws.size());
 		}
 		case VAR_DEGREE_MAX: {
 			const vec<WatchElem>& ws = sat.watches[toInt(getValLit())];

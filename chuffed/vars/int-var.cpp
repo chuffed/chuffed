@@ -240,7 +240,7 @@ double IntVar::getScore(VarBranch vb) {
 			return max - min;
 #endif
 		case VAR_DEGREE_MIN:
-			return -pinfo.size();
+			return -static_cast<double>(pinfo.size());
 		case VAR_DEGREE_MAX:
 			return pinfo.size();
 		case VAR_REDUCED_COST:

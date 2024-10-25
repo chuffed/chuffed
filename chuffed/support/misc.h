@@ -111,7 +111,7 @@ static inline double wallClockTime() {
 	ularge.LowPart = file_time.dwLowDateTime;
 	ularge.HighPart = file_time.dwHighDateTime;
 
-	long sec = (ularge.QuadPart - epoch) / 10000000L;
+	long sec = static_cast<long>((ularge.QuadPart - epoch)) / 10000000L;
 	long msec = system_time.wMilliseconds;
 	return (double)sec + (double)msec / 1000;
 #else

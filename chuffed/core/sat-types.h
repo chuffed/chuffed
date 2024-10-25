@@ -144,7 +144,7 @@ public:
 	}
 
 	Lit& operator[](int i) {
-		if (i >= sz) {
+		if (i >= static_cast<int>(sz)) {
 			abort();
 		}
 		return data[i];
