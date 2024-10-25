@@ -612,6 +612,10 @@ static const flex_int32_t yy_rule_can_match_eol[56] =
  *
  */
 
+#ifdef WIN32
+#define strdup _strdup
+#endif
+
 void yyerror(void*, const char*);
 #define yyerror(s) yyerror(yyextra, s)
 

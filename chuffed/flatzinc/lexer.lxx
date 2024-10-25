@@ -28,6 +28,10 @@
 
 %{
 
+#ifdef WIN32
+#define strdup _strdup
+#endif
+
 void yyerror(void*, const char*);
 #define yyerror(s) yyerror(yyextra, s)
 
