@@ -106,7 +106,6 @@ public:
 	void retrieveReason(vec<int>& out, int var, int val, int lim, int threshold = 2);
 
 	void static_inference(vec<int>& inferences);
-	void static_inference(vec<Lit>& inferences);
 
 	inline int numNodes() { return nodes.size(); }
 
@@ -171,7 +170,6 @@ public:
 	}
 
 private:
-	void clear_val(Value v);
 	void kill_dom(unsigned int /*lim*/, inc_edge* e, vec<int>& kfa, vec<int>& kfb);
 
 	// Parameters
