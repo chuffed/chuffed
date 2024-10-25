@@ -8,14 +8,14 @@
 #include <cstring>
 
 void LUFactor::multiply(long double* a) {
-	for (int i = 0; i < vals.size(); i++) {
+	for (unsigned int i = 0; i < vals.size(); i++) {
 		a[r] += a[vals[i].index()] * vals[i].val();
 	}
 }
 
 void LUFactor::Tmultiply(long double* a) {
 	if (a[r] != 0) {
-		for (int i = 0; i < vals.size(); i++) {
+		for (unsigned int i = 0; i < vals.size(); i++) {
 			a[vals[i].index()] += vals[i].val() * a[r];
 		}
 	}
@@ -27,7 +27,7 @@ void Simplex::Lmultiply(long double* a) {
 	}
 	for (int i = L_cols_zeros; i < m; i++) {
 		if (a[i] != 0) {
-			for (int j = 0; j < L_cols[i].size(); j++) {
+			for (unsigned int j = 0; j < L_cols[i].size(); j++) {
 				tm[L_cols[i][j].index()] += a[i] * L_cols[i][j].val();
 			}
 		}
@@ -42,7 +42,7 @@ void Simplex::LTmultiply(long double* a) {
 	}
 	for (int i = m - 1; i >= L_cols_zeros; i--) {
 		if (a[i] != 0) {
-			for (int j = 0; j < L_rows[i].size(); j++) {
+			for (unsigned int j = 0; j < L_rows[i].size(); j++) {
 				tm[L_rows[i][j].index()] += a[i] * L_rows[i][j].val();
 			}
 		}
@@ -59,7 +59,7 @@ void Simplex::Umultiply(long double* a) {
 			continue;
 		}
 		a[i] /= U_diag[i];
-		for (int j = 0; j < U_cols[i].size(); j++) {
+		for (unsigned int j = 0; j < U_cols[i].size(); j++) {
 			a[U_cols[i][j].index()] -= a[i] * U_cols[i][j].val();
 		}
 	}
@@ -73,7 +73,7 @@ void Simplex::UTmultiply(long double* a) {
 			continue;
 		}
 		a[i] /= U_diag[i];
-		for (int j = 0; j < U_rows[i].size(); j++) {
+		for (unsigned int j = 0; j < U_rows[i].size(); j++) {
 			a[U_rows[i][j].index()] -= a[i] * U_rows[i][j].val();
 		}
 	}
@@ -173,7 +173,7 @@ void Simplex::updateBasis() {
 
 	// get rth row in dense form
 	memset(tm, 0, m * sizeof(long double));
-	for (int i = 0; i < U_rows[r].size(); i++) {
+	for (unsigned int i = 0; i < U_rows[r].size(); i++) {
 		tm[U_rows[r][i].index()] = U_rows[r][i].val();
 	}
 
@@ -197,7 +197,7 @@ void Simplex::updateBasis() {
 		}
 		const long double a = -tm[i] / U_diag[i];
 		f.vals.push(IndexVal(i, a));
-		for (int j = 0; j < U_rows[i].size(); j++) {
+		for (unsigned int j = 0; j < U_rows[i].size(); j++) {
 			tm[U_rows[i][j].index()] += a * U_rows[i][j].val();
 		}
 	}
@@ -229,9 +229,9 @@ void Simplex::updateBasis() {
 
 	// update U_col for i != r
 
-	for (int i = 0; i < U_rows[r].size(); i++) {
+	for (unsigned int i = 0; i < U_rows[r].size(); i++) {
 		vec<IndexVal>& col = U_cols[U_rows[r][i].index()];
-		for (int j = 0; j < col.size(); j++) {
+		for (unsigned int j = 0; j < col.size(); j++) {
 			//		for (int j = col.size(); j--; ) {
 			if (col[j].index() == r) {
 				col[j] = col.last();
@@ -253,7 +253,7 @@ void Simplex::updateBasis() {
 		type[i] = ((column[i] != 0 && i != r) ? 1 : 0);
 	}
 
-	for (int i = 0; i < U_cols[r].size(); i++) {
+	for (unsigned int i = 0; i < U_cols[r].size(); i++) {
 		type[U_cols[r][i].index()] += 2;
 	}
 	U_cols[r].clear();
@@ -275,7 +275,7 @@ void Simplex::updateBasis() {
 		}
 		if (type[i] == 2) {
 			// remove element from U_rows[i]
-			for (int j = 0; j < row.size(); j++) {
+			for (unsigned int j = 0; j < row.size(); j++) {
 				if (row[j].index() == r) {
 					row[j] = row.last();
 					row.pop();
@@ -285,7 +285,7 @@ void Simplex::updateBasis() {
 		}
 		if (type[i] == 3) {
 			// change element in U_rows[i]
-			for (int j = 0; j < row.size(); j++) {
+			for (unsigned int j = 0; j < row.size(); j++) {
 				if (row[j].index() == r) {
 					row[j].val() = column[i];
 					break;
@@ -365,7 +365,7 @@ void Simplex::refactorB() {
 		}
 	}
 
-	for (int i = 0; i < non_col_sing.size(); i++) {
+	for (unsigned int i = 0; i < non_col_sing.size(); i++) {
 		col_perm2[cs + i] = non_col_sing[i];
 	}
 
@@ -458,10 +458,10 @@ void Simplex::refactorB() {
 				continue;
 			}
 			const long double a = -R1[j][i] / R1[nr][i];
-			for (int k = 0; k < U_rows[i + cs].size(); k++) {
+			for (unsigned int k = 0; k < U_rows[i + cs].size(); k++) {
 				R1[j][U_rows[i + cs][k].index() - cs] += a * U_rows[i + cs][k].val();
 			}
-			for (int k = 0; k < L_rows[i + cs].size(); k++) {
+			for (unsigned int k = 0; k < L_rows[i + cs].size(); k++) {
 				R2[j][L_rows[i + cs][k].index() - cs] += a * L_rows[i + cs][k].val();
 			}
 			R2[j][i] += a * 1;
@@ -680,7 +680,7 @@ void Simplex::printL() {
 		if (L_rows[i].size() != 0) {
 			fprintf(stderr, "row %d: ", i);
 		}
-		for (int j = 0; j < L_rows[i].size(); j++) {
+		for (unsigned int j = 0; j < L_rows[i].size(); j++) {
 			fprintf(stderr, "%d:%.3Lf ", L_rows[i][j].index(), L_rows[i][j].val());
 		}
 		if (L_rows[i].size() != 0) {
@@ -691,7 +691,7 @@ void Simplex::printL() {
 		if (L_cols[i].size() != 0) {
 			fprintf(stderr, "col %d: ", i);
 		}
-		for (int j = 0; j < L_cols[i].size(); j++) {
+		for (unsigned int j = 0; j < L_cols[i].size(); j++) {
 			fprintf(stderr, "%d:%.3Lf ", L_cols[i][j].index(), L_cols[i][j].val());
 		}
 		if (L_cols[i].size() != 0) {
@@ -706,7 +706,7 @@ void Simplex::printU() {
 		if (U_rows[i].size() != 0) {
 			fprintf(stderr, "row %d: ", i);
 		}
-		for (int j = 0; j < U_rows[i].size(); j++) {
+		for (unsigned int j = 0; j < U_rows[i].size(); j++) {
 			fprintf(stderr, "%d:%.3Lf ", U_rows[i][j].index(), U_rows[i][j].val());
 		}
 		if (U_rows[i].size() != 0) {
@@ -717,7 +717,7 @@ void Simplex::printU() {
 		if (U_cols[i].size() != 0) {
 			fprintf(stderr, "col %d: ", i);
 		}
-		for (int j = 0; j < U_cols[i].size(); j++) {
+		for (unsigned int j = 0; j < U_cols[i].size(); j++) {
 			fprintf(stderr, "%d:%.3Lf ", U_cols[i][j].index(), U_cols[i][j].val());
 		}
 		if (U_cols[i].size() != 0) {
@@ -735,7 +735,7 @@ void Simplex::printLUF() const {
 	for (int i = 0; i < num_lu_factors; i++) {
 		LUFactor& f = lu_factors[i];
 		fprintf(stderr, "r = %d: ", f.r);
-		for (int j = 0; j < f.vals.size(); j++) {
+		for (unsigned int j = 0; j < f.vals.size(); j++) {
 			fprintf(stderr, "%d:%.3Lf ", f.vals[j].index(), f.vals[j].val());
 		}
 		fprintf(stderr, "\n");

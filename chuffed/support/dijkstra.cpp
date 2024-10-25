@@ -13,7 +13,7 @@
 
 Dijkstra::Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<int>& _ws)
 		: source(_s),
-			nb_nodes(_in.size()),
+			nb_nodes(static_cast<int>(_in.size())),
 			en(std::move(_en)),
 			in(_in),
 			out(std::move(_ou)),
@@ -22,7 +22,7 @@ Dijkstra::Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou, std::vector<i
 Dijkstra::Dijkstra(int _s, vvi_t _en, const vvi_t& _in, vvi_t _ou,
 									 std::vector<std::vector<int> >& _wst, std::vector<int> d)
 		: source(_s),
-			nb_nodes(_in.size()),
+			nb_nodes(static_cast<int>(_in.size())),
 			en(std::move(_en)),
 			in(_in),
 			out(std::move(_ou)),
@@ -224,7 +224,7 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in
 																		 std::vector<int> _ws)
 		: source(_s),
 			dest(_d),
-			nb_nodes(_in.size()),
+			nb_nodes(static_cast<int>(_in.size())),
 			en(std::move(_en)),
 			in(_in),
 			out(std::move(_ou)),
@@ -246,7 +246,7 @@ DijkstraMandatory::DijkstraMandatory(int _s, int _d, vvi_t _en, const vvi_t& _in
 																		 std::vector<std::vector<int> > _wst, std::vector<int> _ds)
 		: source(_s),
 			dest(_d),
-			nb_nodes(_in.size()),
+			nb_nodes(static_cast<int>(_in.size())),
 			en(std::move(_en)),
 			in(_in),
 			out(std::move(_ou)),

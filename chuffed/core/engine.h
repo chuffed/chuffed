@@ -217,12 +217,12 @@ static inline void trailSave(T& v) {
 		t operator++() { return *this = v + 1; }      \
 		t operator--() { return *this = v - 1; }      \
 		t operator++(int dummy) {                     \
-			int tmp = v;                                \
+			t tmp = v;                                  \
 			*this = v + 1;                              \
 			return tmp;                                 \
 		}                                             \
 		t operator--(int dummy) {                     \
-			int tmp = v;                                \
+			t tmp = v;                                  \
 			*this = v - 1;                              \
 			return tmp;                                 \
 		}                                             \

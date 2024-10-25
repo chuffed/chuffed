@@ -105,7 +105,7 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 
 	// There _should_ be at least one atom at the current decision level.
 	int pending = 0;
-	for (int jj = 1; jj < (*cp).size(); ++jj) {
+	for (unsigned int jj = 1; jj < (*cp).size(); ++jj) {
 		const Lit p((*cp)[jj]);
 		assert(sat.value(p) == l_False);
 
@@ -150,7 +150,7 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 					out_nogood.push(~p);
 				} else {
 					// If every antecedent is already seen, we don't need it.
-					for (int j = 1; j < (*expl).size(); ++j) {
+					for (unsigned int j = 1; j < (*expl).size(); ++j) {
 						if (!(sat.seen[var((*expl)[j])] & 1)) {
 							// Needed after all
 							out_nogood.push(~p);
@@ -182,12 +182,12 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 			Clause& c = *sat.getExpl(p);
 			assert(&c);
 
-			for (int j = 1; j < c.size(); j++) {
+			for (unsigned int j = 1; j < c.size(); j++) {
 				const Lit q = c[j];
 				if (!(sat.seen[var(q)] & 1)) {
 					sat.seen[var(q)] |= 1;
 					assert(sat.value(q) == l_False);
-					assert(sat.trailpos[var(q)] <= engine.trail.size());
+					assert(sat.trailpos[var(q)] <= static_cast<int>(engine.trail.size()));
 					if (sat.trailpos[var(q)] < 0) {
 						removed.push(q);
 					} else {
@@ -208,10 +208,10 @@ void pushback_reason_lazy(const Pred& is_extractable, Lit p, vec<Lit>& out_nogoo
 pushback_finished:
 	assert(pending == 0);
 
-	for (int i = 0; i < removed.size(); i++) {
+	for (unsigned int i = 0; i < removed.size(); i++) {
 		sat.seen[var(removed[i])] &= (~1);
 	}
-	for (int i = 0; i < out_nogood.size(); i++) {
+	for (unsigned int i = 0; i < out_nogood.size(); i++) {
 		sat.seen[var(out_nogood[i])] &= (~1);
 	}
 }

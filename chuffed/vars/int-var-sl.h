@@ -26,10 +26,12 @@ public:
 	Lit getMaxLit() const override { return el->getMaxLit(); }
 	Lit getValLit() const override { return el->getValLit(); }
 	Lit getFMinLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(find_index(v, ROUND_UP), LR_GE) : el->getMinLit();
+		return so.finesse ? ~el->getLit(find_index(static_cast<int>(v), ROUND_UP), LR_GE)
+											: el->getMinLit();
 	}
 	Lit getFMaxLit(int64_t v) override {
-		return so.finesse ? ~el->getLit(find_index(v, ROUND_DOWN), LR_LE) : el->getMaxLit();
+		return so.finesse ? ~el->getLit(find_index(static_cast<int>(v), ROUND_DOWN), LR_LE)
+											: el->getMaxLit();
 	}
 
 	bool setMin(int64_t v, Reason r = nullptr, bool channel = true) override;

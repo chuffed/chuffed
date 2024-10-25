@@ -129,7 +129,7 @@ public:
 		int min = INT_MAX;
 		for (int i = 0; i < sz; i++) {
 			if (x[i].getShadowVal() < min) {
-				min = x[i].getShadowVal();
+				min = static_cast<int>(x[i].getShadowVal());
 			}
 		}
 		return (y.getShadowVal() == min);
@@ -148,7 +148,7 @@ public:
 
 void minimum(vec<IntVar*>& x, IntVar* y) {
 	vec<IntView<> > w;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		w.push(IntView<>(x[i]));
 	}
 	new Minimum<0>(w, IntView<>(y));
@@ -156,7 +156,7 @@ void minimum(vec<IntVar*>& x, IntVar* y) {
 
 void maximum(vec<IntVar*>& x, IntVar* y) {
 	vec<IntView<> > w;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		w.push(IntView<>(x[i]));
 	}
 	new Minimum<1>(w, IntView<>(y));

@@ -51,8 +51,6 @@ inline void SAT::setConfl(Lit p, Lit q) {
 }
 
 inline void SAT::untrailToPos(vec<Lit>& t, int p) {
-	const int dl = decisionLevel();
-
 	for (int i = t.size(); i-- > p;) {
 		const int x = var(t[i]);
 		assigns[x] = toInt(l_Undef);
@@ -92,10 +90,10 @@ SAT::SAT()
 }
 
 SAT::~SAT() {
-	for (int i = 0; i < clauses.size(); i++) {
+	for (unsigned int i = 0; i < clauses.size(); i++) {
 		free(clauses[i]);
 	}
-	for (int i = 0; i < learnts.size(); i++) {
+	for (unsigned int i = 0; i < learnts.size(); i++) {
 		free(learnts[i]);
 	}
 }
@@ -190,8 +188,8 @@ void SAT::addClause(Lit p, Lit q) {
 }
 
 void SAT::addClause(vec<Lit>& ps, bool one_watch) {
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	for (i = j = 0; i < ps.size(); i++) {
 		if (value(ps[i]) == l_True) {
 			return;
@@ -236,7 +234,7 @@ void SAT::addClause(Clause& c, bool one_watch) {
 
 	// Mark lazy lits which are used
 	if (c.learnt) {
-		for (int i = 0; i < c.size(); i++) {
+		for (unsigned int i = 0; i < c.size(); i++) {
 			incVarUse(var(c[i]));
 		}
 	}
@@ -264,7 +262,7 @@ void SAT::addClause(Clause& c, bool one_watch) {
 		learnts.push(&c);
 		if (so.learnt_stats) {
 			std::set<int> levels;
-			for (int i = 0; i < c.size(); i++) {
+			for (unsigned int i = 0; i < c.size(); i++) {
 				levels.insert(out_learnt_level[i]);
 			}
 			std::stringstream s;
@@ -272,7 +270,7 @@ void SAT::addClause(Clause& c, bool one_watch) {
 			s << c.clauseID() << "," << c.size() << "," << levels.size();
 			if (so.learnt_stats_nogood) {
 				s << ",";
-				for (int i = 0; i < c.size(); i++) {
+				for (unsigned int i = 0; i < c.size(); i++) {
 					s << (i == 0 ? "" : " ") << getLitString(toInt(c[i]));
 					//              s << " (" << out_learnt_level[i] << ")";
 				}
@@ -296,7 +294,7 @@ void SAT::removeClause(Clause& c) {
 	}
 
 	if (c.learnt) {
-		for (int i = 0; i < c.size(); i++) {
+		for (unsigned int i = 0; i < c.size(); i++) {
 			decVarUse(var(c[i]));
 		}
 	}
@@ -330,7 +328,7 @@ void SAT::topLevelCleanUp() {
 		simplifyDB();
 	}
 
-	for (int i = 0; i < trail[0].size(); i++) {
+	for (unsigned int i = 0; i < trail[0].size(); i++) {
 		if (so.debug) {
 			std::cerr << "setting true at top-level: " << getLitString(toInt(trail[0][i])) << "\n";
 		}
@@ -342,8 +340,8 @@ void SAT::topLevelCleanUp() {
 }
 
 void SAT::simplifyDB() {
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	for (i = j = 0; i < learnts.size(); i++) {
 		if (simplify(*learnts[i])) {
 			removeClause(*learnts[i]);
@@ -362,8 +360,8 @@ bool SAT::simplify(Clause& c) const {
 	if (value(c[1]) == l_True) {
 		return true;
 	}
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	for (i = j = 2; i < c.size(); i++) {
 		if (value(c[i]) == l_True) {
 			return true;
@@ -385,7 +383,7 @@ std::string showReason(Reason r) {
 			} else {
 				Clause& c = *r.pt();
 				ss << "clause";
-				for (int i = 0; i < c.size(); i++) {
+				for (unsigned int i = 0; i < c.size(); i++) {
 					ss << " " << getLitString(toInt(~c[i]));
 				}
 			}
@@ -508,7 +506,7 @@ bool SAT::propagate() {
 	int& qhead = this->qhead.last();
 	vec<Lit>& trail = this->trail.last();
 
-	while (qhead < trail.size()) {
+	while (qhead < static_cast<int>(trail.size())) {
 		num_props++;
 
 		const Lit p = trail[qhead++];  // 'p' is enqueued fact to propagate.
@@ -568,7 +566,7 @@ bool SAT::propagate() {
 					}
 
 					// Look for new watch:
-					for (int k = 2; k < c.size(); k++) {
+					for (unsigned int k = 2; k < c.size(); k++) {
 						if (value(c[k]) != l_False) {
 							c[1] = c[k];
 							c[k] = false_lit;
@@ -591,7 +589,7 @@ bool SAT::propagate() {
 				FoundWatch:;
 			}
 		}
-		ws.shrink(i - j);
+		ws.shrink(static_cast<int>(i - j));
 	}
 	propagations += num_props;
 
@@ -602,8 +600,8 @@ struct activity_lt {
 	bool operator()(Clause* x, Clause* y) { return x->activity() < y->activity(); }
 };
 void SAT::reduceDB() {
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 
 	std::sort((Clause**)learnts, (Clause**)learnts + learnts.size(), activity_lt());
 
@@ -626,7 +624,7 @@ void SAT::reduceDB() {
 
 std::string showClause(Clause& c) {
 	std::stringstream ss;
-	for (int i = 0; i < c.size(); i++) {
+	for (unsigned int i = 0; i < c.size(); i++) {
 		ss << " " << getLitString(toInt(c[i]));
 	}
 	return ss.str();
@@ -646,7 +644,7 @@ void SAT::printLearntStats() {
 
 	std::sort((Clause**)learnts, (Clause**)learnts + learnts.size(), raw_activity_gt());
 	std::cerr << "top ten clauses:\n";
-	for (int i = 0; i < 10 && i < learnts.size(); i++) {
+	for (unsigned int i = 0; i < 10 && i < learnts.size(); i++) {
 		std::cerr << i << ": " << learnts[i]->rawActivity() << " " << showClause(*learnts[i]) << "\n";
 	}
 }
@@ -700,11 +698,11 @@ DecInfo* SAT::branch() {
 }
 
 void Clause::debug() const {
-	for (size_t i = 0; i < size(); i++) {
+	for (unsigned int i = 0; i < size(); i++) {
 		if (i > 0) {
 			std::cerr << " \\/ ";
 		}
-		std::cerr << getLitString(toInt(operator[](i)));
+		std::cerr << getLitString(toInt(operator[](static_cast<int>(i))));
 	}
 	std::cerr << "\n";
 }

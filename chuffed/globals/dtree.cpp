@@ -173,7 +173,7 @@ void DTreePropagator::explain_cycle(int u, int v, vec<Lit>& pathe) {
 	assert(u != v);
 	std::vector<int> pathn = ruf.connectionsFromTo(u, v);
 	assert(!pathn.empty());
-	for (int k = 0; k < pathn.size() - 1; k++) {
+	for (unsigned int k = 0; k < pathn.size() - 1; k++) {
 		int de = findEdge(pathn[k], pathn[k + 1]);
 		if (de == -1 || !getEdgeVar(de).isFixed() || getEdgeVar(de).isFalse()) {
 			de = findEdge(pathn[k + 1], pathn[k]);
@@ -298,7 +298,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 																										 vec<vec<edge_id> >& _in,
 																										 vec<vec<edge_id> >& _out, vec<vec<int> >& _en)
 		: DTreePropagator(_r, _vs, _es, _in, _out, _en), parents(_parents) {
-	assert(parents.size() == nbNodes());
+	assert(static_cast<int>(parents.size()) == nbNodes());
 
 	first_event = nbNodes() + nbEdges() + 1;
 	int count = first_event;
@@ -313,12 +313,11 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 	}
 	last_event = count;
 
-	assert(equalities.size() == nbNodes() * nbNodes());
+	assert(static_cast<int>(equalities.size()) == nbNodes() * nbNodes());
 
 	// Figure out the domains of the int vars
 	dom_size = new Tint[nbNodes()];
 	for (int i = 0; i < nbNodes(); i++) {
-		int in_deg = 0;
 		if (parents[i]->setMaxNotR(nbNodes() - 1)) {
 			parents[i]->setMax(nbNodes() - 1);
 		}
@@ -329,7 +328,6 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 			const int e = findEdge(j, i);
 			if (e != -1) {
 				if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
-					in_deg++;
 				} else {
 					if (i != j && parents[i]->remValNotR(j)) {
 						parents[i]->remVal(j, nullptr);
@@ -982,16 +980,16 @@ void DTreeParenthoodPropagator::clearPropState() {
 PathDeg1::PathDeg1(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 									 vec<vec<edge_id> >& _out, vec<vec<int> >& _en)
 		: GraphPropagator(_vs, _es, _en) {
-	for (int i = 0; i < _in.size(); i++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
 		in.emplace_back();
-		for (int j = 0; j < _in[i].size(); j++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			in[i].push_back(_in[i][j]);
 		}
 	}
 
-	for (int i = 0; i < _out.size(); i++) {
+	for (unsigned int i = 0; i < _out.size(); i++) {
 		ou.emplace_back();
-		for (int j = 0; j < _out[i].size(); j++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			ou[i].push_back(_out[i][j]);
 		}
 	}
@@ -1074,6 +1072,7 @@ bool PathDeg1::propagate() {
 void dtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 					 vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	auto* dt = new DTreePropagator(r, _vs, _es, _in, _out, _en);
+	(void)dt;
 	// if (so.check_prop)
 	//     engine.propagators.push(dt);
 	// return dt;
@@ -1082,12 +1081,13 @@ void dtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _i
 void reversedtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 									vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	vec<vec<int> > endnodes;
-	for (int i = 0; i < _en.size(); i++) {
+	for (unsigned int i = 0; i < _en.size(); i++) {
 		endnodes.push(vec<int>());
 		endnodes[i].push(_en[i][1]);
 		endnodes[i].push(_en[i][0]);
 	}
 	auto* dt = new DTreePropagator(r, _vs, _es, _out, _in, endnodes);
+	(void)dt;
 	// if (so.check_prop)
 	//     engine.propagators.push(dt);
 	// return dt;
@@ -1096,6 +1096,7 @@ void reversedtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id
 void dptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _par,
 						vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	Propagator* dt = new DTreeParenthoodPropagator(r, _vs, _es, _par, _in, _out, _en);
+	(void)dt;
 	// if (so.check_prop)
 	//     engine.propagators.push(dt);
 }
@@ -1103,12 +1104,13 @@ void dptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _par,
 void reversedptree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<IntVar*> _par,
 									 vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	vec<vec<int> > endnodes;
-	for (int i = 0; i < _en.size(); i++) {
+	for (unsigned int i = 0; i < _en.size(); i++) {
 		endnodes.push(vec<int>());
 		endnodes[i].push(_en[i][1]);
 		endnodes[i].push(_en[i][0]);
 	}
 	Propagator* dt = new DTreeParenthoodPropagator(r, _vs, _es, _par, _out, _in, endnodes);
+	(void)dt;
 	// if (so.check_prop)
 	//     engine.propagators.push(dt);
 }

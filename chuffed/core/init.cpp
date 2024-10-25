@@ -11,7 +11,7 @@ void process_ircs();
 
 void Engine::init() {
 	// Get the vars ready
-	for (int i = 0; i < vars.size(); i++) {
+	for (unsigned int i = 0; i < vars.size(); i++) {
 		IntVar* v = vars[i];
 		if (v->pinfo.size() == 0) {
 			v->in_queue = true;
@@ -21,7 +21,7 @@ void Engine::init() {
 	}
 
 	if (so.lazy) {
-		for (int i = 0; i < vars.size(); i++) {
+		for (unsigned int i = 0; i < vars.size(); i++) {
 			if (vars[i]->getMax() - vars[i]->getMin() <= so.eager_limit) {
 				vars[i]->specialiseToEL();
 			} else {
@@ -32,7 +32,7 @@ void Engine::init() {
 			}
 		}
 	} else {
-		for (int i = 0; i < vars.size(); i++) {
+		for (unsigned int i = 0; i < vars.size(); i++) {
 			vars[i]->initVals(true);
 		}
 	}

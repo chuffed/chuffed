@@ -38,7 +38,7 @@ MIP::MIP() : simplex_time(duration::zero()) {
 }
 
 void MIP::addConstraint(vec<int>& a, vec<IntVar*>& x, long double lb, long double ub) {
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		var_set.insert(x[i]);
 	}
 	ineqs.push();
@@ -47,7 +47,7 @@ void MIP::addConstraint(vec<int>& a, vec<IntVar*>& x, long double lb, long doubl
 	x.copyTo(li.x);
 	int red_lb = 0;
 	int red_ub = 0;
-	for (int i = 0; i < a.size(); i++) {
+	for (unsigned int i = 0; i < a.size(); i++) {
 		if (a[i] > 0) {
 			red_lb += a[i] * x[i]->getMin();
 			red_ub += a[i] * x[i]->getMax();
@@ -167,7 +167,7 @@ void MIP::unboundedFailure() {
 	assert(simplex.row[0] == 0);
 
 	vec<Lit> ps;
-	for (int i = 1; i < vars.size(); i++) {
+	for (unsigned int i = 1; i < vars.size(); i++) {
 		ps.push(simplex.shift[i] == 0 ? vars[i]->getMinLit() : vars[i]->getMaxLit());
 	}
 	Clause* m_r = Clause_new(ps);
@@ -182,7 +182,7 @@ bool MIP::propagateAllBounds() {
 	//	simplex.checkObjective();
 	//	simplex.checkObjective2();
 
-	for (int i = 1; i < vars.size(); i++) {
+	for (unsigned int i = 1; i < vars.size(); i++) {
 		RL[i] = simplex.obj[i];
 		//		printf("%.3f ", RL[i]);
 	}
@@ -196,7 +196,7 @@ bool MIP::propagateAllBounds() {
 	if (so.lazy) {
 		place[0] = 0;
 		ps.push(engine.opt_type == OPT_MIN ? vars[0]->getMaxLit() : vars[0]->getMinLit());
-		for (int i = 1; i < vars.size(); i++) {
+		for (unsigned int i = 1; i < vars.size(); i++) {
 			place[i] = ps.size();
 			if (RL[i] > 0) {
 				ps.push(vars[i]->getMinLit());
@@ -229,7 +229,7 @@ bool MIP::propagateAllBounds() {
 	}
 
 	if (RC_BOUNDS) {
-		for (int i = 1; i < vars.size(); i++) {
+		for (unsigned int i = 1; i < vars.size(); i++) {
 			if (RL[i] == 0) {
 				continue;
 			}
@@ -281,10 +281,10 @@ long double MIP::objVarBound() {
 
 long double MIP::getRC(IntVar* v) {
 	const int r = var_map.find(v)->second;
-	if (!(0 <= r && r < vars.size())) {
+	if (!(0 <= r && r < static_cast<int>(vars.size()))) {
 		printf("%d %d\n", r, vars.size());
 	}
-	assert(0 <= r && r < vars.size());
+	assert(0 <= r && r < static_cast<int>(vars.size()));
 	if (simplex.ctor[r] == -1) {
 		simplex.reduced_costs[r] = simplex.obj[r];
 	}
@@ -306,9 +306,9 @@ long double MIP::getRC(IntVar* v) {
 
 void MIP::updateBounds() {
 	// Update all bounds changes
-	for (int i = 0; i < new_bc.size(); i++) {
+	for (unsigned int i = 0; i < new_bc.size(); i++) {
 		const int v = new_bc[i];
-		assert(0 < v && v < vars.size());
+		assert(0 < v && v < static_cast<int>(vars.size()));
 		const int min = vars[v]->getMin();
 		const int max = vars[v]->getMax();
 		if (min != simplex.lb[v]) {

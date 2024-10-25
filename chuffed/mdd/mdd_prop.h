@@ -147,7 +147,7 @@ public:
 
 		if (opts.expl_strat == MDDOpts::E_KEEP) {
 			vec<Lit> ps(expl.size());
-			for (int k = 1; k < expl.size(); k++) {
+			for (unsigned int k = 1; k < expl.size(); k++) {
 				ps[k] = get_val_lit(expl[k]);
 			}
 			ps[0] = p;
@@ -158,7 +158,7 @@ public:
 			return c;
 		}
 		Clause* r = Reason_new(expl.size());
-		for (int k = 1; k < expl.size(); k++) {
+		for (unsigned int k = 1; k < expl.size(); k++) {
 			(*r)[k] = get_val_lit(expl[k]);
 		}
 		return r;

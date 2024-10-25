@@ -47,8 +47,8 @@ EVLayerGraph::~EVLayerGraph() {
 
 EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 	// Ensure there's adequate space in the intermed node.
-	if (intermed_maxsz < edges.size()) {
-		while (intermed_maxsz < edges.size()) {
+	if (intermed_maxsz < static_cast<int>(edges.size())) {
+		while (intermed_maxsz < static_cast<int>(edges.size())) {
 			intermed_maxsz *= 2;
 		}
 
@@ -59,8 +59,8 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 	// Normalize the edges, and copy them to the checker.
 	std::sort(((EInfo*)edges), ((EInfo*)edges) + edges.size(), edge_leq);
 
-	int jj = 0;
-	int ii;
+	unsigned int jj = 0;
+	unsigned int ii;
 	// Copy the first non-F edge to the intermed node.
 	for (ii = 0; ii < edges.size(); ii++) {
 		if (edges[ii].dest != EVFalse) {
@@ -100,7 +100,7 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 
 	std::memcpy(node, intermed, sizeof(NodeInfo) + (((int)intermed->sz) - 1) * (sizeof(EInfo)));
 
-	const int nID = nodes.size();
+	const int nID = static_cast<int>(nodes.size());
 	cache[node] = nID;
 	nodes.push_back(node);
 	const TravInfo tinfo = {0, 0, 0};
@@ -112,7 +112,7 @@ EVLayerGraph::NodeID EVLayerGraph::insert(int level, vec<EInfo>& edges) {
 // Set up the traversal information from a given node.
 int EVLayerGraph::traverse(NodeID idx) {
 	vec<int> queue;
-	int qhead = 0;
+	unsigned int qhead = 0;
 
 	status[0].flag = 1;
 	status[0].id = 0;
@@ -187,7 +187,7 @@ EVLayerGraph::NodeID wdfa_to_layergraph(EVLayerGraph& graph, int nvars, int dom,
 		layers[curr].push(EVLayerGraph::EVFalse);
 	}
 
-	for (int ai = 0; ai < accepts.size(); ai++) {
+	for (unsigned int ai = 0; ai < accepts.size(); ai++) {
 		layers[curr][accepts[ai] - 1] = EVLayerGraph::EVTrue;
 	}
 

@@ -122,8 +122,8 @@ static inline Clause* Reason_new(T& ps) {
 }
 
 static inline Clause* Reason_new(std::vector<Lit> ps) {
-	Clause* c = Reason_new(ps.size() + 1);
-	for (int i = 0; i < ps.size(); i++) {
+	Clause* c = Reason_new(static_cast<int>(ps.size() + 1));
+	for (unsigned int i = 0; i < ps.size(); i++) {
 		(*c)[i + 1] = ps[i];
 	}
 	return c;

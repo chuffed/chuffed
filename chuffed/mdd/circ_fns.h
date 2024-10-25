@@ -10,10 +10,10 @@ enum CardOp { CARD_EQ, CARD_LE, CARD_GE };
 template <class T>
 T card_range(T fff, vec<T>& args, unsigned int start, unsigned int end, unsigned int lb,
 						 unsigned int ub) {
-	assert((int)start < args.size());
-	assert((int)end <= args.size());
+	assert(start < args.size());
+	assert(end <= args.size());
 
-	if ((int)ub > args.size() - 1) {
+	if (ub > args.size() - 1) {
 		ub = args.size() - 1;
 	}
 

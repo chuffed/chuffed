@@ -40,7 +40,7 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, int k) {
 	}
 
 	vec<Lit> vs;
-	for (int ii = 0; ii < x.size(); ii++) {
+	for (unsigned int ii = 0; ii < x.size(); ii++) {
 		vs.push(x[ii].getLit(polarity));
 	}
 
@@ -100,7 +100,7 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 	}
 
 	vec<Lit> xv;
-	for (int ii = 0; ii < x.size(); ii++) {
+	for (unsigned int ii = 0; ii < x.size(); ii++) {
 		xv.push(x[ii].getLit(true));
 	}
 
@@ -120,19 +120,19 @@ void bool_linear_decomp(vec<BoolView>& x, IntRelType t, IntVar* kv) {
 static void bool_linear_leq(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	// Special cases
 	if (k == 0) {
-		for (int ii = 0; ii < xs.size(); ii++) {
+		for (unsigned int ii = 0; ii < xs.size(); ii++) {
 			sat.enqueue(~xs[ii]);
 		}
 		return;
 	}
-	if (k >= xs.size()) {
+	if (k >= static_cast<int>(xs.size())) {
 		return;
 	}
 
-	if (k == xs.size() - 1) {
+	if (k == static_cast<int>(xs.size()) - 1) {
 		// sum_i ~xs[i] >= 1
 		vec<Lit> cl;
-		for (int ii = 0; ii < xs.size(); ii++) {
+		for (unsigned int ii = 0; ii < xs.size(); ii++) {
 			cl.push(~xs[ii]);
 		}
 		sat.addClause(cl);
@@ -158,8 +158,8 @@ static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals,
 		return lit_False;
 	}
 
-	if (vv == xs.size()) {
-		assert(cc < terminals.size());
+	if (vv == static_cast<int>(xs.size())) {
+		assert(cc < static_cast<int>(terminals.size()));
 		return terminals[cc];
 	}
 
@@ -206,7 +206,7 @@ static Lit bool_linear_leq(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& terminals,
 static void bool_linear_leq_std(vec<Lit>& terminals, vec<Lit>& xs, int k) {
 	// Special cases
 	if (k == 0) {
-		for (int ii = 0; ii < xs.size(); ii++) {
+		for (unsigned int ii = 0; ii < xs.size(); ii++) {
 			sat.enqueue(~xs[ii]);
 		}
 		return;
@@ -241,8 +241,8 @@ static Lit bool_linear_leq_std(SparseSet<>& elts, vec<Lit>& vs, vec<Lit>& termin
 		return lit_False;
 	}
 
-	if (vv == xs.size()) {
-		assert(cc < terminals.size());
+	if (vv == static_cast<int>(xs.size())) {
+		assert(cc < static_cast<int>(terminals.size()));
 		return terminals[cc];
 	}
 

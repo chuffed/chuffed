@@ -49,7 +49,7 @@ void Engine::printStats() {
 		int el = 0;
 		int ll = 0;
 		int sl = 0;
-		for (int i = 0; i < vars.size(); i++) {
+		for (unsigned int i = 0; i < vars.size(); i++) {
 			switch (vars[i]->getType()) {
 				case INT_VAR:
 					nl++;
@@ -81,7 +81,7 @@ void Engine::printStats() {
 		if (so.mip) {
 			mip->printStats();
 		}
-		for (int i = 0; i < engine.propagators.size(); i++) {
+		for (unsigned int i = 0; i < engine.propagators.size(); i++) {
 			engine.propagators[i]->printStats();
 		}
 	}
@@ -98,7 +98,7 @@ void Engine::checkMemoryUsage() {
 	fprintf(stderr, "Size of Propagator: %d\n", static_cast<int>(sizeof(Propagator)));
 
 	long long var_mem = 0;
-	for (int i = 0; i < vars.size(); i++) {
+	for (unsigned int i = 0; i < vars.size(); i++) {
 		var_mem += sizeof(IntVarLL);
 		/*
 				var_mem += vars[i]->sz;
@@ -110,7 +110,7 @@ void Engine::checkMemoryUsage() {
 	fprintf(stderr, "%lld bytes used by vars\n", var_mem);
 
 	long long prop_mem = 0;
-	for (int i = 0; i < propagators.size(); i++) {
+	for (unsigned int i = 0; i < propagators.size(); i++) {
 		prop_mem += sizeof(*propagators[i]);
 	}
 	fprintf(stderr, "%lld bytes used by propagators\n", prop_mem);
@@ -122,7 +122,7 @@ void Engine::checkMemoryUsage() {
 		fprintf(stderr, "%lld range sum in vars\n", var_range_sum);
 	*/
 	long long clause_mem = 0;
-	for (int i = 0; i < sat.clauses.size(); i++) {
+	for (unsigned int i = 0; i < sat.clauses.size(); i++) {
 		clause_mem += sizeof(Lit) * sat.clauses[i]->size();
 	}
 	fprintf(stderr, "%lld bytes used by sat clauses\n", clause_mem);

@@ -207,7 +207,7 @@ protected:
 			q.pop();
 			count++;
 
-			for (int i = 0; i < adj[curr].size(); i++) {
+			for (unsigned int i = 0; i < adj[curr].size(); i++) {
 				const int e = adj[curr][i];
 				if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 					continue;  // Cannot take this edge
@@ -302,7 +302,7 @@ protected:
 			q.pop();
 			count++;
 
-			for (int i = 0; i < adj[curr].size(); i++) {
+			for (unsigned int i = 0; i < adj[curr].size(); i++) {
 				const int e = adj[curr][i];
 				if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 					continue;  // Cannot take this edge
@@ -346,7 +346,7 @@ public:
 		priority = 5;
 		nb_innodes = 0;
 
-		for (int i = 0; i < _ws.size(); i++) {
+		for (unsigned int i = 0; i < _ws.size(); i++) {
 			weights.push(_ws[i]);
 		}
 
@@ -428,7 +428,6 @@ public:
 
 		for (int i = 0; i < nbNodes(); i++) {
 			if (eInSP[i][e] != 0) {
-				const int tmp = splb;
 				splb -= spC[i] / 2;
 				short_dijkstra(i);
 				assert(spTo[i] != i);
@@ -535,7 +534,7 @@ public:
 	}
 
 	bool propagate() override {
-		if (explv_sz < explvf.size()) {
+		if (explv_sz < static_cast<int>(explvf.size())) {
 			explvf.resize(explv_sz);
 			explvp.resize(explv_sz + 1);
 		}
@@ -573,8 +572,8 @@ public:
 				assert(!uf.connected(getEndnode(*it, 0), getEndnode(*it, 1)));
 				// cout<<"new edge "<<*it<<" ("<<getEndnode(*it,0)<<" "<<getEndnode(*it,1)<<"
 				// ccs:"<<ccs<<endl;
-				const int u = getEndnode(*it, 0);
-				const int v = getEndnode(*it, 1);
+				// const int u = getEndnode(*it, 0);
+				// const int v = getEndnode(*it, 1);
 				// if (spC[uf.find(u)] != -1 && spC[uf.find(v)] != -1)
 				ccs--;
 				propagateNewEdge(*it);
@@ -607,7 +606,7 @@ public:
 
 		// cout<<"4. spC[0] = "<<spC[0]<<endl;
 
-		const int old = splb;
+		// const int old = splb;
 		int sum = 0;
 		int minspC = -1;
 		const int ccc = ccs;
@@ -811,7 +810,7 @@ public:
 				mandatoryWeight(0),  // apsp(this),
 				lowerBound(0),
 				totalWeight(_w) {
-		for (int i = 0; i < _ws.size(); i++) {
+		for (unsigned int i = 0; i < _ws.size(); i++) {
 			weights.push(_ws[i]);
 		}
 
@@ -845,13 +844,13 @@ public:
 		shortestPathsInfo = new Tint*[nbNodes()];
 		for (int i = 0; i < nbNodes(); i++) {
 			shortestPathsEdges[i] = new Tint[nbEdges()];
-			std::memset(shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
+			std::memset((int*)shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
 			shortestPathsInfo[i] = new Tint[2];
-			std::memset(shortestPathsInfo[i], -1, sizeof(Tint) * 2);
+			std::memset((int*)shortestPathsInfo[i], -1, sizeof(Tint) * 2);
 		}
 
 		removedEdgesFromSP = new Tint[nbEdges()];
-		std::memset(removedEdgesFromSP, 0, sizeof(Tint) * nbEdges());
+		std::memset((int*)removedEdgesFromSP, 0, sizeof(Tint) * nbEdges());
 
 		return;
 
@@ -958,7 +957,7 @@ public:
 			visited[curr] = true;
 			count++;
 
-			for (int i = 0; i < adj[curr].size(); i++) {
+			for (unsigned int i = 0; i < adj[curr].size(); i++) {
 				const int e = adj[curr][i];
 				const int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), curr);
 
@@ -1014,7 +1013,7 @@ public:
 			visited[curr] = true;
 			count++;
 
-			for (int i = 0; i < adj[curr].size(); i++) {
+			for (unsigned int i = 0; i < adj[curr].size(); i++) {
 				const int e = adj[curr][i];
 				const int other = OTHER(getEndnode(e, 0), getEndnode(e, 1), curr);
 
@@ -1117,13 +1116,13 @@ public:
 					shortestPathsInfo[repN][1] = other;
 				}
 			} else {
-				std::memset(shortestPathsEdges[rep], 0, sizeof(Tint) * nbEdges());
+				std::memset((int*)shortestPathsEdges[rep], 0, sizeof(Tint) * nbEdges());
 				shortestPathsInfo[rep][0] = -1;
 				shortestPathsInfo[rep][1] = -1;
 			}
 		} else {
 			if (shortestPathsInfo[i][0] != -1) {
-				std::memset(shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
+				std::memset((int*)shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
 				shortestPathsInfo[i][0] = -1;
 				shortestPathsInfo[i][1] = -1;
 			}
@@ -1180,7 +1179,7 @@ public:
 					assert(shortestPathsInfo[i][0] != -1 || i == repN);
 					int prev1 = i;
 					int prev2 = dijkstraPath[prev1].prev;
-					std::memset(shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
+					std::memset((int*)shortestPathsEdges[i], 0, sizeof(Tint) * nbEdges());
 					int count = 0;
 					while (prev1 != repN) {
 						shortestPathsEdges[i][dijkstraPath[prev1].edge] = 1;
@@ -1200,7 +1199,7 @@ public:
 		if (argmin != -1) {  // more CCs
 			int prev1 = argmin;
 			int prev2 = dijkstraPath[prev1].prev;
-			std::memset(shortestPathsEdges[repN], 0, sizeof(Tint) * nbEdges());
+			std::memset((int*)shortestPathsEdges[repN], 0, sizeof(Tint) * nbEdges());
 			int count = 0;
 			while (prev1 != repN) {
 				shortestPathsEdges[repN][dijkstraPath[prev1].edge] = 1;
@@ -1248,7 +1247,7 @@ public:
 			if (TREEPROP_DEBUG) {
 				std::cout << "been here3 " << maxR << '\n';
 			}
-			std::memset(shortestPathsEdges[maxR], 0, sizeof(Tint) * nbEdges());
+			std::memset((int*)shortestPathsEdges[maxR], 0, sizeof(Tint) * nbEdges());
 			shortestPathsInfo[maxR][0] = -1;
 			shortestPathsInfo[maxR][1] = -1;
 			int count = 0;
@@ -1261,7 +1260,8 @@ public:
 				if (TREEPROP_DEBUG) {
 					std::cout << "been here2 " << newR << '\n';
 				}
-				std::memcpy(shortestPathsEdges[newR], shortestPathsEdges[minR], sizeof(Tint) * nbEdges());
+				std::memcpy((int*)shortestPathsEdges[newR], (int*)shortestPathsEdges[minR],
+										sizeof(Tint) * nbEdges());
 				shortestPathsInfo[newR][0] = shortestPathsInfo[minR][0];
 				shortestPathsInfo[newR][1] = shortestPathsInfo[minR][1];
 			}
@@ -1269,7 +1269,7 @@ public:
 				if (TREEPROP_DEBUG) {
 					std::cout << "been here1 " << minR << '\n';
 				}
-				std::memset(shortestPathsEdges[minR], 0, sizeof(Tint) * nbEdges());
+				std::memset((int*)shortestPathsEdges[minR], 0, sizeof(Tint) * nbEdges());
 				shortestPathsInfo[minR][0] = -1;
 				shortestPathsInfo[minR][1] = -1;
 			}
@@ -1283,20 +1283,22 @@ public:
 			if (wasE0Fixed && !wasE1Fixed) {
 				assert(ruf.find(e1) == e0);
 				if (newR != rep0) {
-					std::memcpy(shortestPathsEdges[newR], shortestPathsEdges[rep0], sizeof(Tint) * nbEdges());
+					std::memcpy((int*)shortestPathsEdges[newR], (int*)shortestPathsEdges[rep0],
+											sizeof(Tint) * nbEdges());
 					shortestPathsInfo[newR][0] = shortestPathsInfo[rep0][0];
 					shortestPathsInfo[newR][1] = shortestPathsInfo[rep0][1];
-					std::memset(shortestPathsEdges[rep0], 0, sizeof(Tint) * nbEdges());
+					std::memset((int*)shortestPathsEdges[rep0], 0, sizeof(Tint) * nbEdges());
 					shortestPathsInfo[rep0][0] = -1;
 					shortestPathsInfo[rep0][1] = -1;
 				}
 			} else if (wasE1Fixed && !wasE0Fixed) {
 				assert(ruf.find(e0) == e1);
 				if (newR != rep1) {
-					std::memcpy(shortestPathsEdges[newR], shortestPathsEdges[rep1], sizeof(Tint) * nbEdges());
+					std::memcpy((int*)shortestPathsEdges[newR], (int*)shortestPathsEdges[rep1],
+											sizeof(Tint) * nbEdges());
 					shortestPathsInfo[newR][0] = shortestPathsInfo[rep1][0];
 					shortestPathsInfo[newR][1] = shortestPathsInfo[rep1][1];
-					std::memset(shortestPathsEdges[rep1], 0, sizeof(Tint) * nbEdges());
+					std::memset((int*)shortestPathsEdges[rep1], 0, sizeof(Tint) * nbEdges());
 					shortestPathsInfo[rep1][0] = -1;
 					shortestPathsInfo[rep1][1] = -1;
 				}
@@ -1440,17 +1442,17 @@ public:
 				}
 
 				mandatoryWeight += weights[j];
-				Clause* r = nullptr;
-				if (so.lazy) {
-					vec<Lit> ps;
-					ps.push();
-					for (int i = 0; i < nbEdges(); i++) {
-						if (getEdgeVar(i).isFixed() && getEdgeVar(i).isTrue()) {
-							ps.push(getEdgeVar(i).getValLit());
-						}
-					}
-					r = Reason_new(ps);
-				}
+				// Clause* r = nullptr;
+				// if (so.lazy) {
+				// 	vec<Lit> ps;
+				// 	ps.push();
+				// 	for (int i = 0; i < nbEdges(); i++) {
+				// 		if (getEdgeVar(i).isFixed() && getEdgeVar(i).isTrue()) {
+				// 			ps.push(getEdgeVar(i).getValLit());
+				// 		}
+				// 	}
+				// 	r = Reason_new(ps);
+				// }
 				// if (totalWeight->setMinNotR(mandatoryWeight))
 				//     totalWeight->setMin(mandatoryWeight,r);
 			} else {

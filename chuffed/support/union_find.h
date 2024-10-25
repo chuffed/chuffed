@@ -58,14 +58,14 @@ private:
 	std::vector<int> id;
 
 public:
-	int getSize() const override { return id.size(); }
+	int getSize() const override { return static_cast<int>(id.size()); }
 
 	void reset() override { id = std::vector<int>(); }
 
 	// Created a new node associated to parent
 	void push_back(int parent) {
 		id.push_back(parent);
-		assert(parent < id.size());
+		assert(parent < static_cast<int>(id.size()));
 	}
 
 	int find(int p) override {
@@ -309,11 +309,11 @@ std::vector<int> RerootedUnionFind<T>::connectionsFromTo(int u, int v) const {
 	std::vector<int> seen(size, -1);
 	while (i != limit && i != parents[i]) {  // We stop at the root
 		path.push_back(i);
-		seen[i] = path.size() - 1;
+		seen[i] = static_cast<int>(path.size()) - 1;
 		i = parents[i];
 	}
 	path.push_back(i);
-	seen[i] = path.size() - 1;
+	seen[i] = static_cast<int>(path.size()) - 1;
 	// If we got to the root, without seeing the other guy, then he is
 	// a sibling, and we have to add his path to the previous explored path
 	if (parents[i] == i && i != limit) {

@@ -74,7 +74,7 @@
 template <class T>
 std::ostream& operator<<(std::ostream& out, vec<T>& list) {
 	out << "[";
-	for (int i = 0; i < list.size(); i++) {
+	for (unsigned int i = 0; i < list.size(); i++) {
 		if (i > 0) {
 			out << ",";
 		}
@@ -153,7 +153,7 @@ MDDProp<U>::MDDProp(MDDTemplate* _templ, vec<IntView<U> >& _intvars, const MDDOp
 
 	_intvars.copyTo(intvars);
 
-	for (int i = 0; i < intvars.size(); i++) {
+	for (unsigned int i = 0; i < intvars.size(); i++) {
 		for (int j = 0; j < _templ->_doms[i]; j++) {
 			//         assert( intvars[i].getMin() <= j && j <= intvars[i].getMax() );
 			boolvars.push(intvars[i].getLit(j, LR_EQ));  // v[i] \eq j
@@ -171,7 +171,7 @@ MDDProp<U>::MDDProp(MDDTemplate* _templ, vec<IntView<U> >& _intvars, const MDDOp
 
 	// Static propagation.
 	//   assert( val_entries.size() == boolvars.size() );
-	for (int i = 0; i < val_entries.size(); i++) {
+	for (unsigned int i = 0; i < val_entries.size(); i++) {
 		if (val_entries[i].count == 0) {
 			if (intvars[val_entries[i].var].remValNotR(val_entries[i].val)) {
 				if (!intvars[val_entries[i].var].remVal(val_entries[i].val)) {
@@ -280,10 +280,10 @@ void MDDProp<U>::shrinkReason(vec<int>& reason, Value value, int /*threshold*/) 
 
 	const int off = value == -1 ? 0 : 1;
 
-	for (int k = 0; k < val_entries.size(); k++) {
+	for (unsigned int k = 0; k < val_entries.size(); k++) {
 		val_entries[k].stat_flag = 0;
 	}
-	for (int k = off; k < reason.size(); k++) {
+	for (unsigned int k = off; k < reason.size(); k++) {
 		val_entries[reason[k]].stat_flag = 1;
 	}
 	int lcount = 0;
@@ -294,7 +294,7 @@ void MDDProp<U>::shrinkReason(vec<int>& reason, Value value, int /*threshold*/) 
 	reason.clear();
 	reason.push(temp);
 
-	for (int v = 0; v < val_entries.size(); v++) {
+	for (unsigned int v = 0; v < val_entries.size(); v++) {
 		assert(val_entries[v].stat_flag >= 0 && val_entries[v].stat_flag <= 1);
 		lcount += val_entries[v].stat_flag;
 		if (val_entries[v].count > 0) {
@@ -314,7 +314,7 @@ void MDDProp<U>::shrinkReason(vec<int>& reason, Value value, int /*threshold*/) 
 		}
 	}
 
-	for (int v = 0; v < val_entries.size(); v++) {
+	for (unsigned int v = 0; v < val_entries.size(); v++) {
 		assert(val_entries[v].stat_flag >= -1 && val_entries[v].stat_flag <= 1);
 
 		if (val_entries[v].stat_flag != 0) {
@@ -345,15 +345,15 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	int maxw = 0;
 	const int maxvar = nodes[0].var;
 
-	for (int i = 0; i < nodes.size(); i++) {
+	for (unsigned int i = 0; i < nodes.size(); i++) {
 		const inc_node node = nodes[i];
-		while (var_nodes.size() <= node.var) {
+		while (static_cast<int>(var_nodes.size()) <= node.var) {
 			var_nodes.push();
 		}
 
 		var_nodes[node.var].push(i);
 
-		if (var_nodes[node.var].size() > maxw) {
+		if (static_cast<int>(var_nodes[node.var].size()) > maxw) {
 			maxw = var_nodes[node.var].size();
 		}
 	}
@@ -361,11 +361,11 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	fprintf(out, "\\foreach \\pos/\\name/\\stat in {");
 
 	bool first = true;
-	for (int i = 0; i < var_nodes.size(); i++) {
+	for (unsigned int i = 0; i < var_nodes.size(); i++) {
 		int off;
 		off = maxw - var_nodes[i].size() + 1;
 
-		for (int j = 0; j < var_nodes[i].size(); j++) {
+		for (unsigned int j = 0; j < var_nodes[i].size(); j++) {
 			if (first) {
 				first = false;
 			} else {
@@ -391,7 +391,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 
 	first = true;
-	for (int i = 0; i < edges.size(); i++) {
+	for (unsigned int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) == 0 || (edges[i].kill_flags) > ((lim << 3) | 7)) {
 			if (first) {
 				first = false;
@@ -418,7 +418,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 
 	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
-	for (int i = 0; i < edges.size(); i++) {
+	for (unsigned int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 1) != 0U)) {
 			if (first) {
 				first = false;
@@ -433,7 +433,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 
 	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
-	for (int i = 0; i < edges.size(); i++) {
+	for (unsigned int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 2) != 0U)) {
 			if (first) {
 				first = false;
@@ -448,7 +448,7 @@ void MDDProp<U>::debugStateTikz(unsigned int lim, bool debug) {
 
 	fprintf(out, "\\foreach \\source/\\dest/\\label in {");
 	first = true;
-	for (int i = 0; i < edges.size(); i++) {
+	for (unsigned int i = 0; i < edges.size(); i++) {
 		if ((edges[i].kill_flags) < ((lim << 3) | 7) && (((edges[i].kill_flags) & 4) != 0U)) {
 			if (first) {
 				first = false;
@@ -501,8 +501,8 @@ void MDDProp<U>::incConstructReason(unsigned int lim, vec<int>& out, Value val, 
 		}
 	}
 
-	int i = 0;
-	int j;
+	unsigned int i = 0;
+	unsigned int j;
 	while (i < kfa.size()) {
 #ifdef WEAKNOGOOD
 		int resbegin = out.size();
@@ -691,7 +691,7 @@ void MDDProp<U>::incConstructReason(unsigned int lim, vec<int>& out, Value val, 
 	}
 
 	//    for( int v = 0; v < out.size(); v++ )
-	for (int v = 0; v < val_entries.size(); v++) {
+	for (unsigned int v = 0; v < val_entries.size(); v++) {
 		//        val_entries[out[v]].stat_flag = 0;
 		val_entries[v].stat_flag = 0;
 	}
@@ -712,10 +712,10 @@ void MDDProp<U>::incConstructReason(unsigned int lim, vec<int>& out, Value val, 
 template <int U>
 void MDDProp<U>::fullConstructReason(int lim, vec<int>& out, Value val) {
 	nodes[0].stat_flag = 1;
-	for (int i = 1; i < nodes.size(); i++) {
+	for (unsigned int i = 1; i < nodes.size(); i++) {
 		nodes[i].stat_flag = 0;
 	}
-	for (int i = 0; i < val_entries.size(); i++) {
+	for (unsigned int i = 0; i < val_entries.size(); i++) {
 		val_entries[i].stat_flag = 0;
 	}
 
@@ -732,7 +732,7 @@ void MDDProp<U>::fullConstructReason(int lim, vec<int>& out, Value val) {
 	retrieveReason(out, var, val, lim);
 	//    assert(checkReason(var,val,lim));
 
-	for (int i = 0; i < val_entries.size(); i++) {
+	for (unsigned int i = 0; i < val_entries.size(); i++) {
 		val_entries[i].stat_flag = 0;
 	}
 }
@@ -810,8 +810,8 @@ void MDDProp<U>::retrieveReason(vec<int>& out, int var, int val, int /*lim*/, in
 	kfb.clear();
 	kfb.push(1);  // Root node.
 
-	int i = 0;  // Start of the level
-	int j;      // Current position (kinda)
+	unsigned int i = 0;  // Start of the level
+	unsigned int j;      // Current position (kinda)
 
 	int* edge;
 	int* end;
@@ -939,7 +939,7 @@ bool MDDProp<U>::fullProp() {
 
 	// verify();
 
-	for (int c = 0; c < clear_queue.size(); c++) {
+	for (unsigned int c = 0; c < clear_queue.size(); c++) {
 		assert(fixedvars.elem(clear_queue[c]));
 
 		val_entries[clear_queue[c]].stat_flag = 0;
@@ -963,12 +963,12 @@ bool MDDProp<U>::fullProp() {
 	if ((nodes[0].stat_flag & MAXTIME) != 0) {
 		nodes[0].stat_flag = 3;
 
-		for (int i = 1; i < nodes.size(); i++) {
+		for (unsigned int i = 1; i < nodes.size(); i++) {
 			nodes[i].stat_flag = 0;
 		}
 	}
 
-	for (int i = 0; i < val_entries.size(); i++) {
+	for (unsigned int i = 0; i < val_entries.size(); i++) {
 		if (fixedvars.elem(i)) {
 			val_entries[i].stat_flag = 0;
 		} else {
@@ -980,7 +980,7 @@ bool MDDProp<U>::fullProp() {
 	if ((res & 1) != 0) {
 		const int lim = fixedvars.size();
 
-		for (int i = 0; i < val_entries.size(); i++) {
+		for (unsigned int i = 0; i < val_entries.size(); i++) {
 			if (val_entries[i].stat_flag == 1) {
 				inferences.push(i);
 				fixedvars.insert(i);
@@ -1000,7 +1000,7 @@ bool MDDProp<U>::fullProp() {
 			vec<int> expl;
 			genReason(expl, -1);
 			Clause* r = Reason_new(expl.size());
-			for (int i = 0; i < expl.size(); i++) {
+			for (unsigned int i = 0; i < expl.size(); i++) {
 				// Fixme: adjust to handle WEAKNOGOOD
 #ifndef WEAKNOGOOD
 				(*r)[i] = intvars[val_entries[expl[i]].var].getLit(val_entries[expl[i]].val, LR_EQ);
@@ -1016,7 +1016,7 @@ bool MDDProp<U>::fullProp() {
 		return false;
 	}
 
-	for (int i = 0; i < inferences.size(); i++) {
+	for (unsigned int i = 0; i < inferences.size(); i++) {
 		const int v = val_entries[inferences[i]].var;
 		const int val = val_entries[inferences[i]].val;
 
@@ -1078,7 +1078,7 @@ unsigned char MDDProp<U>::fullPropRec(int node, int timestamp) {
 // Assumes propagator has just been run.
 template <int U>
 void MDDProp<U>::verify() {
-	for (int i = 0; i < val_entries.size(); i++) {
+	for (unsigned int i = 0; i < val_entries.size(); i++) {
 		assert(intvars[val_entries[i].var].indomain(val_entries[i].val) == fixedvars.elem(i));
 
 		if (fixedvars.elem(i)) {
@@ -1102,7 +1102,7 @@ bool MDDProp<U>::propagate() {
 
 	unsigned int count = fixedvars.size() << 3;
 
-	for (int c = 0; c < clear_queue.size(); c++) {
+	for (unsigned int c = 0; c < clear_queue.size(); c++) {
 		assert(fixedvars.elem(clear_queue[c]));
 
 		const int val = clear_queue[c];
@@ -1134,7 +1134,7 @@ bool MDDProp<U>::propagate() {
 
 	count = fixedvars.size() << 3;
 
-	int i = 0;
+	unsigned int i = 0;
 	while (i < kfa.size()) {
 #ifdef INSTRUMENT
 //        node_visits++;
@@ -1246,7 +1246,7 @@ bool MDDProp<U>::propagate() {
 			vec<int> expl;
 			genReason(expl, -1);
 			Clause* r = Reason_new(expl.size());
-			for (int i = 0; i < expl.size(); i++) {
+			for (unsigned int i = 0; i < expl.size(); i++) {
 				// Fixme: adjust to handle WEAKNOGOOD
 				//               (*r)[i] = boolvars[expl[i]].getLit(0);
 				(*r)[i] = expl[i] >= 0
@@ -1439,7 +1439,7 @@ bool MDDProp<U>::propagate() {
 		}
 	}
 #else
-	for (int i = 1; i < inferences.size(); i++) {
+	for (unsigned int i = 1; i < inferences.size(); i++) {
 		const int val = inferences[i];
 		int j;
 		for (j = i; j >= 1 && val < inferences[j - 1]; j--) {
@@ -1449,7 +1449,7 @@ bool MDDProp<U>::propagate() {
 	}
 #endif
 
-	for (int i = 0; i < inferences.size(); i++) {
+	for (unsigned int i = 0; i < inferences.size(); i++) {
 		const int v = val_entries[inferences[i]].var;
 		const int val = val_entries[inferences[i]].val;
 
@@ -1521,7 +1521,7 @@ MDDTemplate::MDDTemplate(MDDTable& tab, MDDNodeInt root, vec<int>& domain_sizes)
 
 	// Restrict the MDD to the defined sizes.
 	vec<intpair> ranges;
-	for (int ii = 0; ii < _doms.size(); ii++) {
+	for (unsigned int ii = 0; ii < _doms.size(); ii++) {
 		ranges.push(intpair(0, _doms[ii]));
 	}
 	const MDDNodeInt inst = MDDTable::bound(root, ranges);
@@ -1554,15 +1554,15 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 	vec<vec<int> > node_out_edges;
 
 	int valoff = 0;
-	for (int i = 0; i < domain_sizes.size(); i++) {
+	for (unsigned int i = 0; i < domain_sizes.size(); i++) {
 		val_offs.push(valoff);
 		for (int j = 0; j < domain_sizes[i]; j++) {
 			const val_entry next = {
-					i,  // var
-					j,  // val
-					0,  // Start
-					0,  // Edge count
-					0   // Limit
+					static_cast<int>(i),  // var
+					j,                    // val
+					0,                    // Start
+					0,                    // Edge count
+					0                     // Limit
 			};
 			val_entries.push(next);
 
@@ -1611,7 +1611,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 	node_in_edges.push();
 	node_out_edges.push();
 
-	int qindex = 0;
+	unsigned int qindex = 0;
 	while (qindex < node_queue.size()) {
 		const int node = node_queue[qindex];
 		const int nodeid = status[node] - 1;
@@ -1679,11 +1679,11 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 		qindex++;
 	}
 
-	for (int i = 0; i < val_edges_sep.size(); i++) {
+	for (unsigned int i = 0; i < val_edges_sep.size(); i++) {
 		val_entries[i].first_off = val_edges.size();     // Start
 		val_entries[i].count = val_edges_sep[i].size();  // Edge count
 
-		for (int j = 0; j < val_edges_sep[i].size(); j++) {
+		for (unsigned int j = 0; j < val_edges_sep[i].size(); j++) {
 			val_edges.push(val_edges_sep[i][j]);
 		}
 #ifdef USE_WATCHES
@@ -1699,7 +1699,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 
 	assert(node_in_edges.size() == inc_nodes.size());
 
-	for (int i = 0; i < node_in_edges.size(); i++) {
+	for (unsigned int i = 0; i < node_in_edges.size(); i++) {
 		inc_node& curr = inc_nodes[i];
 		curr.in_start = node_edges.size();
 		curr.num_in = node_in_edges[i].size();
@@ -1722,7 +1722,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 		}
 #endif
 
-		for (int j = 0; j < node_in_edges[i].size(); j++) {
+		for (unsigned int j = 0; j < node_in_edges[i].size(); j++) {
 			node_edges.push(node_in_edges[i][j]);
 		}
 #ifdef USE_WATCHES
@@ -1734,7 +1734,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 		//        inc_nodes[i] = curr;
 	}
 
-	for (int i = 0; i < node_out_edges.size(); i++) {
+	for (unsigned int i = 0; i < node_out_edges.size(); i++) {
 		inc_node& curr = inc_nodes[i];
 		curr.out_start = node_edges.size();
 		curr.num_out = node_out_edges[i].size();
@@ -1757,7 +1757,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 		}
 #endif
 
-		for (int j = 0; j < node_out_edges[i].size(); j++) {
+		for (unsigned int j = 0; j < node_out_edges[i].size(); j++) {
 			node_edges.push(node_out_edges[i][j]);
 		}
 
@@ -1768,7 +1768,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 #endif
 	}
 
-	for (int i = 0; i < node_queue.size(); i++) {
+	for (unsigned int i = 0; i < node_queue.size(); i++) {
 		status[node_queue[i]] = 0;
 	}
 }
@@ -1776,7 +1776,7 @@ void MDDCompile(MDDTable& t, MDDNodeInt root, vec<int>& domain_sizes, vec<val_en
 void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 	vec<intpair> ranges;
 	vec<int> domain_sizes;
-	for (int ii = 0; ii < xs.size(); ii++) {
+	for (unsigned int ii = 0; ii < xs.size(); ii++) {
 		ranges.push(intpair(xs[ii]->getMin(), xs[ii]->getMax()));
 		domain_sizes.push(xs[ii]->getMax() + 1);
 
@@ -1794,17 +1794,17 @@ void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 
 	// Compute the decomposition.
 	vec<Lit> nodevars;
-	for (int ni = 0; ni < nodes.size(); ni++) {
+	for (unsigned int ni = 0; ni < nodes.size(); ni++) {
 		nodevars.push(Lit(sat.newVar(), true));
 	}
 
 	vec<Lit> edgevars;
-	for (int ei = 0; ei < edges.size(); ei++) {
+	for (unsigned int ei = 0; ei < edges.size(); ei++) {
 		edgevars.push(Lit(sat.newVar(), true));
 	}
 
 	// Edge constraints
-	for (int ei = 0; ei < edges.size(); ei++) {
+	for (unsigned int ei = 0; ei < edges.size(); ei++) {
 		const inc_edge& e(edges[ei]);
 		// ~dest -> ~e
 		sat.addClause(nodevars[e.end], ~edgevars[ei]);
@@ -1818,7 +1818,7 @@ void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 	}
 
 	// Node constraints
-	for (int ni = 0; ni < nodes.size(); ni++) {
+	for (unsigned int ni = 0; ni < nodes.size(); ni++) {
 		const inc_node& node(nodes[ni]);
 		// (~p_0, ~p_1, ...) -> ~n
 		if (node.num_in > 0) {
@@ -1857,7 +1857,7 @@ void mdd_decomp_dc(vec<IntVar*> xs, MDDTable& t, MDDNodeInt root) {
 	}
 
 	// Val constraints
-	for (int vi = 0; vi < vals.size(); vi++) {
+	for (unsigned int vi = 0; vi < vals.size(); vi++) {
 		const val_entry& vinfo(vals[vi]);
 		const Lit vlit = xs[vinfo.var]->getLit(vinfo.val, LR_EQ);
 		if (vinfo.count > 0) {

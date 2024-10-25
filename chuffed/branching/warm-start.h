@@ -23,14 +23,14 @@ public:
 			return true;
 		}
 
-		if (pos < decs.size()) {
+		if (pos < static_cast<int>(decs.size())) {
 			if (sat.value(decs[pos]) == l_Undef) {
 				return false;
 			}
 			if (engine.conflicts < init_conflicts) {
 				trailSave(pos);
 			}
-			for (++pos; pos < decs.size(); ++pos) {
+			for (++pos; pos < static_cast<int>(decs.size()); ++pos) {
 				if (sat.value(decs[pos]) == l_Undef) {
 					return false;
 				}
@@ -48,10 +48,10 @@ public:
 				trailSave(init_conflicts);
 				trailSave(pos);
 			}
-			init_conflicts = engine.conflicts;
+			init_conflicts = static_cast<int>(engine.conflicts);
 		}
-		if (engine.conflicts == init_conflicts && pos < decs.size()) {
-			for (; pos < decs.size(); ++pos) {
+		if (engine.conflicts == init_conflicts && pos < static_cast<int>(decs.size())) {
+			for (; pos < static_cast<int>(decs.size()); ++pos) {
 				if (sat.value(decs[pos]) == l_Undef) {
 					return new DecInfo(nullptr, toInt(decs[pos]));
 				}

@@ -113,9 +113,9 @@ public:
 	Clause(const V& ps, bool learnt) {
 		assert(ps.size() < (1 << 24));
 		clearFlags();
-		sz = ps.size();
+		sz = static_cast<unsigned int>(ps.size());
 		this->learnt = learnt;
-		for (int i = 0; i < ps.size(); i++) {
+		for (unsigned int i = 0; i < ps.size(); i++) {
 			data[i] = ps[i];
 		}
 	}
@@ -125,7 +125,7 @@ public:
 		learnt = 0;
 		temp_expl = 0;
 	}
-	int size() const { return sz; }
+	unsigned int size() const { return sz; }
 
 	void resize(unsigned int newSize) {
 		// Careful of the order of operations here: don't overwrite sz
@@ -174,7 +174,7 @@ static Clause* Clause_new(const V& ps, bool learnt = false) {
 	if (ps.size() != 0) {
 		s = ps.size() - 1;
 	}
-	const int mem_size = sizeof(Clause) + s * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
+	const size_t mem_size = sizeof(Clause) + s * sizeof(Lit) + (learnt ? 3 : 0) * sizeof(int);
 	void* mem = malloc(mem_size);
 	auto* newClause = new (mem) Clause(ps, learnt);
 	return newClause;

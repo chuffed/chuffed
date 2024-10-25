@@ -386,9 +386,9 @@ public:
 		for (auto* ai : output->a) {
 			if (ai->isArray()) {
 				AST::Array* aia = ai->getArray();
-				const int size = aia->a.size();
+				const auto size = aia->a.size();
 				out << "[";
-				for (int j = 0; j < size; j++) {
+				for (unsigned int j = 0; j < size; j++) {
 					printElem(aia->a[j], out);
 					if (j < size - 1) {
 						out << ", ";
@@ -427,7 +427,7 @@ public:
 		out << "{";
 		bool outerFirst = true;
 
-		for (int i = 0; i < iv.size(); i++) {
+		for (unsigned int i = 0; i < iv.size(); i++) {
 			if (iv_introduced[i]) {
 				continue;
 			}
@@ -463,7 +463,7 @@ public:
 			out << "]";
 		}
 
-		for (int i = 0; i < bv.size(); i++) {
+		for (unsigned int i = 0; i < bv.size(); i++) {
 			if (bv_introduced[i]) {
 				continue;
 			}
@@ -495,7 +495,6 @@ public:
 			out << boolVarString[bview] << ":";
 			/* out << litString[toInt(bview.getLit(true))] << ":"; */
 			/* out << litString[toInt(bview.getLit(false))] << ":"; */
-			const bool first = true;
 			if (!bview.isFixed()) {
 				out << "'undef'";
 			} else if (bview.isTrue()) {
@@ -540,7 +539,12 @@ using varspec = std::pair<std::string, VarSpec*>;
 class ParserState {
 public:
 	ParserState(const std::string& b, std::ostream& err0)
-			: buf(b.c_str()), pos(0), length(b.size()), fg(nullptr), hadError(false), err(err0) {}
+			: buf(b.c_str()),
+				pos(0),
+				length(static_cast<unsigned int>(b.size())),
+				fg(nullptr),
+				hadError(false),
+				err(err0) {}
 
 	ParserState(const char* buf0, int length0, std::ostream& err0)
 			: buf(buf0), pos(0), length(length0), fg(nullptr), hadError(false), err(err0) {}

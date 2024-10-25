@@ -150,7 +150,7 @@ public:
 	void print_mdd(MDDNodeInt r);
 	static void print_mdd_tikz(MDDNodeInt r);
 	static void print_dot(MDDNodeInt r);
-	int cache_sz() { return cache.size(); }
+	int cache_sz() { return static_cast<int>(cache.size()); }
 
 	MDDNodeInt insert(unsigned int var, unsigned int low, unsigned int start, bool expand = false);
 

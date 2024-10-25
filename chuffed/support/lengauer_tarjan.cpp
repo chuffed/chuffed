@@ -34,13 +34,13 @@ void LengauerTarjan::COMPRESS(int v) {
 }
 
 void LengauerTarjan::init() {
-	const int n = in.size();
+	const int n = static_cast<int>(in.size());
 	preds = std::vector<std::vector<int> >(n, std::vector<int>());
 	succs = std::vector<std::vector<int> >(n, std::vector<int>());
 	for (int i = 0; i < n; i++) {
 		// succs.push_back(vector<int>());
 		// cout <<"Succs of "<<i<<": ";
-		for (int j = 0; j < ou[i].size(); j++) {
+		for (unsigned int j = 0; j < ou[i].size(); j++) {
 			const int e = ou[i][j];
 			if (ignore_edge(e)) {
 				continue;
@@ -335,7 +335,7 @@ void ex1() {
 	lt.run(12);
 
 	const std::vector<bool> vis(in.size(), false);
-	for (int i = 0; i < in.size(); i++) {
+	for (unsigned int i = 0; i < in.size(); i++) {
 		std::cout << "(" << i << "," << lt.dominator(i) << ") ";
 	}
 	std::cout << '\n';

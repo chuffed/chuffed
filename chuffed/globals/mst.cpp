@@ -54,7 +54,7 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 	}
 
 	// Maximum ST
-	unsigned int i2 = sorted.size() - 1;
+	unsigned int i2 = static_cast<unsigned int>(sorted.size() - 1);
 	int in2 = 0;
 	int cost2 = 0;
 	UF<int> uf2(n);
@@ -96,7 +96,7 @@ public:
 	MSTPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _adj,
 								vec<vec<int> >& _en, IntVar* _w, vec<int>& _ws)
 			: TreePropagator(_vs, _es, _adj, _en), w(_w), sort_by_w(this) {
-		for (int i = 0; i < _ws.size(); i++) {
+		for (unsigned int i = 0; i < _ws.size(); i++) {
 			ws.push_back(_ws[i]);
 		}
 
@@ -182,7 +182,7 @@ public:
 					//  ^ used to see if the path used mandatory edges BECAUSE e is
 					// forbidden and there in no other way of connecting its endnodes
 
-					for (int k = 0; k < path.size() - 1; k++) {
+					for (unsigned int k = 0; k < path.size() - 1; k++) {
 						const int e_path = findEdge(path[k], path[k + 1]);
 						arg_maxw = ws[e_path] > ws[arg_maxw] ? e_path : arg_maxw;
 						heavier |= ws[e_path] > w;
@@ -234,7 +234,7 @@ public:
 				if (so.lazy) {
 					if (!computed_expl) {
 						ps.push();
-						for (int i = 0; i < expl_fail.size(); i++) {
+						for (unsigned int i = 0; i < expl_fail.size(); i++) {
 							ps.push(expl_fail[i]);
 						}
 						explain_mandatory(ps, c, subs);
@@ -251,7 +251,6 @@ public:
 	}
 
 	void explain_mandatory(vec<Lit>& expl_fail, int c, std::vector<int>& substitute) {
-		int add = 0;
 		/*std::vector<int> in_edges;
 			for (int j = 0; j < nbEdges(); j++)
 			if (es[j].isFixed() && es[j].isTrue())
@@ -276,7 +275,6 @@ public:
 				cost = cost - ws[e] + ws[substitute[e]];
 			} else {
 				expl_fail.push(getEdgeVar(e).getValLit());
-				add++;
 			}
 		}
 	}
@@ -417,7 +415,7 @@ public:
 		if (fin != 0) {
 			return true;
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			if (!x[i]->finished()) {
 				// cout <<"Not finished with "<<i<<endl;
 				return false;
@@ -533,7 +531,7 @@ public:
 				decisions.clear();
 				// Will go to decisions.empty()
 			} else {
-				struct Action const failed = decisions.back();
+				struct const Action failed = decisions.back();
 				// if (failed.act != 0)
 				//     cout <<"failed.act "<<failed.act<<endl;
 				assert(failed.act == 0 || so.lazy);

@@ -35,7 +35,7 @@ public:
 
 	Clause* getSymClause(Clause* r, int r1, int r2) {
 		vec<Lit> ps(r->size());
-		for (int i = 1; i < r->size(); i++) {
+		for (unsigned int i = 1; i < r->size(); i++) {
 			ps[i] = getSymLit((*r)[i], r1, r2);
 			if (sat.value(ps[i]) != l_False) {
 				return nullptr;
@@ -50,10 +50,10 @@ public:
 
 void LDSB::init() {
 	ldsb_time = duration::zero();
-	for (int i = 0; i < engine.vars.size(); i++) {
+	for (unsigned int i = 0; i < engine.vars.size(); i++) {
 		lookupTable.push();
 	}
-	for (int i = 0; i < symmetries.size(); i++) {
+	for (unsigned int i = 0; i < symmetries.size(); i++) {
 		symmetries[i]->init();
 	}
 }
@@ -66,7 +66,7 @@ void LDSB::processDec(Lit p) {
 
 	vec<std::pair<int, int> >& syms = lookupTable[var_id];
 
-	for (int i = 0; i < syms.size(); i++) {
+	for (unsigned int i = 0; i < syms.size(); i++) {
 		symmetries[syms[i].first]->processDec(p, syms[i].second);
 	}
 }
@@ -79,7 +79,7 @@ bool LDSB::processImpl(Clause* c) {
 
 	addLearntClause(*c, -1);
 
-	for (int k = 0; k < sym_learnts.size(); k++) {
+	for (unsigned int k = 0; k < sym_learnts.size(); k++) {
 		//	for (int k = 0; k < 1; k++) {
 		const Lit p = (*sym_learnts[k])[0];
 
@@ -93,7 +93,7 @@ bool LDSB::processImpl(Clause* c) {
 
 		vec<std::pair<int, int> >& syms = lookupTable[var_id];
 
-		for (int i = 0; i < syms.size(); i++) {
+		for (unsigned int i = 0; i < syms.size(); i++) {
 			if (syms[i].first == sl_origin[k]) {
 				continue;
 			}
@@ -285,7 +285,7 @@ public:
 
 	void init() override {
 		which_vars = (bool*)malloc(engine.vars.size() * sizeof(bool));
-		for (int i = 0; i < engine.vars.size(); i++) {
+		for (unsigned int i = 0; i < engine.vars.size(); i++) {
 			which_vars[i] = false;
 		}
 		for (int i = 0; i < n; i++) {
@@ -384,7 +384,7 @@ public:
 
 		Clause& c = *r;
 
-		for (int i = 1; i < c.size(); i++) {
+		for (unsigned int i = 1; i < c.size(); i++) {
 			const int var_id = sat.c_info[var(c[i])].cons_id;
 			// Not in sym, ignore
 			if (var_id == -1 || !which_vars[var_id]) {
@@ -478,10 +478,10 @@ public:
 	vec<vec<Tint> > values;
 
 	VarSeqSym(int _n, int _m, vec<IntVar*>& v) : n(_n), m(_m) {
-		if (n * m != v.size()) {
+		if (n * m != static_cast<int>(v.size())) {
 			printf("n = %d, m = %d, v.size() = %d\n", n, m, v.size());
 		}
-		rassert(n * m == v.size());
+		rassert(n * m == static_cast<int>(v.size()));
 		vars = (IntVar***)malloc(static_cast<unsigned int>(n) * sizeof(IntVar**));
 		for (int i = 0; i < n; i++) {
 			vars[i] = (IntVar**)malloc(static_cast<unsigned int>(m) * sizeof(IntVar*));
@@ -492,13 +492,13 @@ public:
 			}
 		}
 		priority = 2;
-		for (int i = 0; i < v.size(); i++) {
+		for (unsigned int i = 0; i < v.size(); i++) {
 			v[i]->attach(this, i, EVENT_F);
 		}
 	}
 
 	void init() override {
-		for (int i = 0; i < engine.vars.size(); i++) {
+		for (unsigned int i = 0; i < engine.vars.size(); i++) {
 			occ.push();
 		}
 		for (int i = 0; i < n; i++) {
@@ -529,7 +529,7 @@ public:
 
 		//	printf("processing var %d implication\n", sat.c_info[var(p)].cons_id);
 
-		for (int i = 0; i < occ[var_id].size(); i++) {
+		for (unsigned int i = 0; i < occ[var_id].size(); i++) {
 			const int r1 = occ[var_id][i] / m;
 			for (int r2 = 0; r2 < n; r2++) {
 				if (r1 == r2) {
@@ -611,7 +611,7 @@ public:
 			return p;
 		}
 
-		for (int i = 0; i < occ[var_id].size(); i++) {
+		for (unsigned int i = 0; i < occ[var_id].size(); i++) {
 			//		printf("%d %d %d %d\n", var_id, occ.size(), i, occ[var_id].size());
 			const int r = occ[var_id][i] / m;
 			const int c = occ[var_id][i] % m;
@@ -648,10 +648,10 @@ public:
 	static const int not_a_val = -1000000000;
 
 	ValSeqSym(int _n, int _m, vec<IntVar*>& v, vec<int>& a) : n(_n), m(_m) {
-		assert(n * m == a.size());
+		assert(n * m == static_cast<int>(a.size()));
 		min = 1000000000;
 		max = -1000000000;
-		for (int i = 0; i < a.size(); i++) {
+		for (unsigned int i = 0; i < a.size(); i++) {
 			if (a[i] < min) {
 				min = a[i];
 			}
@@ -669,14 +669,14 @@ public:
 				occ[a[i * m + j] - min].push(i * m + j);
 			}
 		}
-		for (int i = 0; i < v.size(); i++) {
+		for (unsigned int i = 0; i < v.size(); i++) {
 			vars.push(v[i]);
 		}
 		active = (Tchar*)malloc(static_cast<unsigned int>(n) * sizeof(Tchar));
 		for (int i = 0; i < n; i++) {
 			active[i] = 1;
 		}
-		for (int i = 0; i < v.size(); i++) {
+		for (unsigned int i = 0; i < v.size(); i++) {
 			assert(v[i]->getMin() == min);
 			assert(v[i]->getMax() == max);
 		}
@@ -684,10 +684,10 @@ public:
 
 	void init() override {
 		which_vars = (bool*)malloc(engine.vars.size() * sizeof(bool));
-		for (int i = 0; i < engine.vars.size(); i++) {
+		for (unsigned int i = 0; i < engine.vars.size(); i++) {
 			which_vars[i] = false;
 		}
-		for (int i = 0; i < vars.size(); i++) {
+		for (unsigned int i = 0; i < vars.size(); i++) {
 			assert(vars[i]->getType() == INT_VAR_EL);
 			ldsb.lookupTable[vars[i]->var_id].push(std::pair<int, int>(sym_id, i));
 			which_vars[vars[i]->var_id] = true;
@@ -703,7 +703,7 @@ public:
 		if (v < min || v > max) {
 			return;
 		}
-		for (int i = 0; i < occ[v - min].size(); i++) {
+		for (unsigned int i = 0; i < occ[v - min].size(); i++) {
 			const int p = occ[v - min][i];
 			if (active[p / m] != 0) {
 				active[p / m] = 0;
@@ -724,7 +724,7 @@ public:
 
 		Clause* rc = cleanClause(r);
 
-		for (int k = 0; k < occ[v - min].size(); k++) {
+		for (unsigned int k = 0; k < occ[v - min].size(); k++) {
 			const int r1 = occ[v - min][k] / m;
 			if (!so.ldsbta && (active[r1] == 0)) {
 				continue;
@@ -784,7 +784,7 @@ public:
 
 		Clause& c = *r;
 
-		for (int i = 1; i < c.size(); i++) {
+		for (unsigned int i = 1; i < c.size(); i++) {
 			const int var_id = sat.c_info[var(c[i])].cons_id;
 			// Not in sym, ignore
 			if (var_id == -1 || !which_vars[var_id]) {
@@ -832,7 +832,7 @@ public:
 		if (v == not_a_val) {
 			NOT_SUPPORTED;
 		}
-		for (int i = 0; i < occ[v - min].size(); i++) {
+		for (unsigned int i = 0; i < occ[v - min].size(); i++) {
 			const int r = occ[v - min][i] / m;
 			const int c = occ[v - min][i] % m;
 			if (r == r1) {

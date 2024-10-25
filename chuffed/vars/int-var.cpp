@@ -113,8 +113,8 @@ void IntVar::specialiseToSL(vec<int>& values) {
 
 	vec<int> v = values;
 	std::sort((int*)v, (int*)v + v.size());
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	for (i = j = 0; i < v.size(); i++) {
 		if (i == 0 || v[i] != v[i - 1]) {
 			v[j++] = v[i];
@@ -130,7 +130,7 @@ void IntVar::specialiseToSL(vec<int>& values) {
 	}
 
 	// determine whether it is sparse or dense
-	if (v.last() - v[0] >= v.size() * mylog2(v.size())) {
+	if (v.last() - v[0] >= static_cast<int>(v.size() * mylog2(v.size()))) {
 		// fprintf(stderr, "SL\n");
 		new (this) IntVarSL(*((IntVar*)this), v);
 	} else {
@@ -156,7 +156,7 @@ void IntVar::initVals(bool optional) {
 		perror("malloc()");
 		exit(1);
 	}
-	memset(vals, 1, max - min + 2);
+	memset((char*)vals, 1, max - min + 2);
 	vals -= min;
 	if (vals == nullptr) {
 		vals++;  // Hack to make vals != NULL whenever it's allocated
@@ -202,8 +202,8 @@ void IntVar::wakePropagators() {
 }
 
 int IntVar::simplifyWatches() {
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	for (i = j = 0; i < pinfo.size(); i++) {
 		if (pinfo[i].p->satisfied == 0) {
 			pinfo[j++] = pinfo[i];
@@ -374,7 +374,7 @@ bool IntVar::setMin(int64_t v, Reason /*r*/, bool /*channel*/) {
 		min = v;
 	changes |= EVENT_C | EVENT_L;
 #else
-	min = v;
+	min = static_cast<int>(v);
 	changes |= EVENT_C | EVENT_L;
 	if (vals != nullptr) {
 		updateMin();
@@ -401,7 +401,7 @@ bool IntVar::setMax(int64_t v, Reason /*r*/, bool /*channel*/) {
 		max = v;
 	changes |= EVENT_C | EVENT_U;
 #else
-	max = v;
+	max = static_cast<int>(v);
 	changes |= EVENT_C | EVENT_U;
 	if (vals != nullptr) {
 		updateMax();
@@ -418,11 +418,11 @@ bool IntVar::setVal(int64_t v, Reason /*r*/, bool /*channel*/) {
 		return false;
 	}
 	if (min < v) {
-		min = v;
+		min = static_cast<int>(v);
 		changes |= EVENT_C | EVENT_L | EVENT_F;
 	}
 	if (max > v) {
-		max = v;
+		max = static_cast<int>(v);
 		changes |= EVENT_C | EVENT_U | EVENT_F;
 	}
 #if INT_DOMAIN_LIST
@@ -474,7 +474,7 @@ bool IntVar::allowSet(vec<int>& v, Reason r, bool channel) {
 	if ((vals == nullptr) && !engine.finished_init) {
 		NOT_SUPPORTED;
 	}
-	int i = 0;
+	unsigned int i = 0;
 	int m = min;
 	while (i < v.size() && v[i] < m) {
 		i++;

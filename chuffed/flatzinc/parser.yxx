@@ -186,9 +186,9 @@ void initfg(ParserState* pp) {
 #endif
 
     if (!pp->hadError)
-        pp->fg = new FlatZincSpace(pp->intvars.size(),
-                                   pp->boolvars.size(),
-                                   pp->setvars.size());
+        pp->fg = new FlatZincSpace(static_cast<int>(pp->intvars.size()),
+                                   static_cast<int>(pp->boolvars.size()),
+                                   static_cast<int>(pp->setvars.size()));
 
     for (unsigned int i = 0; i < pp->intvars.size(); i++) {
         if (!pp->hadError) {
@@ -241,7 +241,7 @@ void initfg(ParserState* pp) {
             pp->setvars[i].second = nullptr;
         }
     }
-    for (unsigned int i = pp->domainConstraints.size(); i--;) {
+    for (auto i = pp->domainConstraints.size(); i--;) {
         if (!pp->hadError) {
             try {
                 assert(pp->domainConstraints[i]->args->a.size() == 2);
@@ -573,9 +573,9 @@ vardecl_item :
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !$2() || !$2.some()->empty(), "Empty var int domain.");
             bool print = $5 && $5->hasAtom("output_var");
-            pp->intvarTable.put($4, pp->intvars.size());
+            pp->intvarTable.put($4, static_cast<int>(pp->intvars.size()));
             if (print) {
-                pp->output(std::string($4), new AST::IntVar(pp->intvars.size()));
+                pp->output(std::string($4), new AST::IntVar(static_cast<int>(pp->intvars.size())));
             }
             bool introduced = $5 && $5->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($4, "X_INTRODUCED_", 13) == 0);
@@ -592,7 +592,7 @@ vardecl_item :
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_in",
-                        new AST::IntVar(pp->intvars.size()-1), $2);
+                        new AST::IntVar(static_cast<int>(pp->intvars.size())-1), $2);
                 delete arg;
             } else {
                 pp->intvars.push_back(varspec($4, new IntVarSpec($2,print,introduced,looks_introduced)));
@@ -604,9 +604,9 @@ vardecl_item :
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = $5 && $5->hasAtom("output_var");
-            pp->boolvarTable.put($4, pp->boolvars.size());
+            pp->boolvarTable.put($4, static_cast<int>(pp->boolvars.size()));
             if (print) {
-                pp->output(std::string($4), new AST::BoolVar(pp->boolvars.size()));
+                pp->output(std::string($4), new AST::BoolVar(static_cast<int>(pp->boolvars.size())));
             }
             bool introduced = $5 && $5->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($4, "X_INTRODUCED_", 13) == 0);
@@ -623,7 +623,7 @@ vardecl_item :
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_in",
-                        new AST::BoolVar(pp->boolvars.size()-1), $2);
+                        new AST::BoolVar(static_cast<int>(pp->boolvars.size())-1), $2);
                 delete arg;
             } else {
                 pp->boolvars.push_back(varspec($4, new BoolVarSpec($2,print,introduced,looks_introduced)));
@@ -642,9 +642,9 @@ vardecl_item :
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = $7 && $7->hasAtom("output_var");
-            pp->setvarTable.put($6, pp->setvars.size());
+            pp->setvarTable.put($6, static_cast<int>(pp->setvars.size()));
             if (print) {
-                pp->output(std::string($6), new AST::SetVar(pp->setvars.size()));
+                pp->output(std::string($6), new AST::SetVar(static_cast<int>(pp->setvars.size())));
             }
             bool introduced = $7 && $7->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp($6, "X_INTRODUCED_", 13) == 0);
@@ -663,7 +663,7 @@ vardecl_item :
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_subset",
-                        new AST::SetVar(pp->setvars.size()-1), $4);
+                        new AST::SetVar(static_cast<int>(pp->setvars.size())-1), $4);
             } else {
                 pp->setvars.push_back(varspec($6, new SetVarSpec($4,print,introduced,looks_introduced)));
             }
@@ -739,7 +739,7 @@ vardecl_item :
                                 if (ivsv->alias) {
                                     vars[i] = ivsv->i;
                                 } else {
-                                    vars[i] = pp->intvars.size();
+                                    vars[i] = static_cast<int>(pp->intvars.size());
                                     pp->intvars.push_back(varspec($11, ivsv));
                                 }
                                 if (!pp->hadError && $9()) {
@@ -754,10 +754,10 @@ vardecl_item :
                         IntVarSpec* ispec = new IntVarSpec($9,print,!print,false);
                         std::string arrayname = "["; arrayname += $11;
                         for (int i = 0; i < $5-1; i++) {
-                            vars[i] = pp->intvars.size();
+                            vars[i] = static_cast<int>(pp->intvars.size());
                             pp->intvars.push_back(varspec(arrayname, ispec));
                         }                    
-                        vars[$5-1] = pp->intvars.size();
+                        vars[$5-1] = static_cast<int>(pp->intvars.size());
                         pp->intvars.push_back(varspec($11, ispec));
                     }
                 }
@@ -794,7 +794,7 @@ vardecl_item :
                             if (bvsv->alias)
                                 vars[i] = bvsv->i;
                             else {
-                                vars[i] = pp->boolvars.size();
+                                vars[i] = static_cast<int>(pp->boolvars.size());
                                 pp->boolvars.push_back(varspec($11, (*vsv)[i]));
                             }
                             if (!pp->hadError && $9()) {
@@ -807,7 +807,7 @@ vardecl_item :
                     delete vsv;
                 } else {
                     for (int i = 0; i < $5; i++) {
-                        vars[i] = pp->boolvars.size();
+                        vars[i] = static_cast<int>(pp->boolvars.size());
                         pp->boolvars.push_back(varspec($11,
                             new BoolVarSpec($9,print,!print,false)));
                     }                    
@@ -853,7 +853,7 @@ vardecl_item :
                             if (svsv->alias)
                                 vars[i] = svsv->i;
                             else {
-                                vars[i] = pp->setvars.size();
+                                vars[i] = static_cast<int>(pp->setvars.size());
                                 pp->setvars.push_back(varspec($13, (*vsv)[i]));
                             }
                             if (!pp->hadError && $11()) {
@@ -868,10 +868,10 @@ vardecl_item :
                     SetVarSpec* ispec = new SetVarSpec($11,print,!print, false);
                     std::string arrayname = "["; arrayname += $13;
                     for (int i = 0; i < $5-1; i++) {
-                        vars[i] = pp->setvars.size();
+                        vars[i] = static_cast<int>(pp->setvars.size());
                         pp->setvars.push_back(varspec(arrayname, ispec));
                     }                    
-                    vars[$5-1] = pp->setvars.size();
+                    vars[$5-1] = static_cast<int>(pp->setvars.size());
                     pp->setvars.push_back(varspec($13, ispec));
                 }
                 if (print) {
@@ -1395,7 +1395,7 @@ bool_ti_expr_tail :
         { 
             bool haveTrue = false;
             bool haveFalse = false;
-            for (int i = $2->size(); i--;) {
+            for (auto i = $2->size(); i--;) {
                 haveTrue |= ((*$2)[i] == 1);
                 haveFalse |= ((*$2)[i] == 0);
             }
@@ -1571,18 +1571,18 @@ non_array_expr :
             std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::IntVar(as[i]);
                 $$ = ia;
             } else if (pp->boolvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::BoolVar(as[i]);
                 $$ = ia;
             } else if (pp->setvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::SetVar(as[i]);
                 $$ = ia;
             } else {
@@ -1591,18 +1591,18 @@ non_array_expr :
                 int ival = 0;
                 bool bval = false;
                 if (pp->intvalarrays.get($1, is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::IntLit(is[i]);
                     $$ = v;
                 } else if (pp->boolvalarrays.get($1, is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::BoolLit(is[i]);
                     $$ = v;
                 } else if (pp->setvalarrays.get($1, isS)) {
-                    AST::Array *v = new AST::Array(isS.size());
-                    for (int i = isS.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(isS.size()));
+                    for (auto i = isS.size(); i--;)
                         v->a[i] = new AST::SetLit(isS[i]);
                     $$ = v;                      
                 } else if (pp->intvals.get($1, ival)) {
@@ -1657,7 +1657,7 @@ solve_expr:
         {
             ParserState *pp = static_cast<ParserState*>(parm);
             // Create a new variable in the parser and append at the end
-            const int i = pp->intvars.size();
+            const int i = static_cast<int>(pp->intvars.size());
             const std::string objname = "X_INTRODUCED_CHUFFEDOBJ";
             pp->intvarTable.put(objname, i);
             pp->intvars.push_back(varspec(objname,
@@ -1679,7 +1679,7 @@ solve_expr:
             // Check whether the Objective variable is an integer constant
             if (pp->intvals.get($1, tmp) && !pp->intvarTable.get($1, $$)) {
                 // Create a new variable in the parser and append at the end
-                const int i = pp->intvars.size();
+                const int i = static_cast<int>(pp->intvars.size());
                 pp->intvarTable.put($1, i);
                 pp->intvars.push_back(varspec($1,
                     new IntVarSpec(tmp,false,true,false)));
@@ -1814,18 +1814,18 @@ ann_non_array_expr :
             std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::IntVar(as[i]);
                 $$ = ia;
             } else if (pp->boolvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::BoolVar(as[i]);
                 $$ = ia;
             } else if (pp->setvararrays.get($1, as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::SetVar(as[i]);
                 $$ = ia;
             } else {
@@ -1833,13 +1833,13 @@ ann_non_array_expr :
                 int ival = 0;
                 bool bval = false;
                 if (pp->intvalarrays.get($1, is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::IntLit(is[i]);
                     $$ = v;
                 } else if (pp->boolvalarrays.get($1, is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::BoolLit(is[i]);
                     $$ = v;
                 } else if (pp->intvals.get($1, ival)) {

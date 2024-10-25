@@ -24,7 +24,7 @@ public:
 		// set priority
 		priority = 2;
 		// attach to var events
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			x[i].attach(this, i, EVENT_F);
 		}
 	}

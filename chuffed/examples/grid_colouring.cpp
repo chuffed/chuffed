@@ -221,7 +221,7 @@ public:
 	}
 
 	bool propagate() override {
-		for (int i = 0; i < new_fixed.size(); i++) {
+		for (unsigned int i = 0; i < new_fixed.size(); i++) {
 			const int r = new_fixed[i] / p.m;
 			const int c = new_fixed[i] % p.m;
 			if (TEST && r != row) {

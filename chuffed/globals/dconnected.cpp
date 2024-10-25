@@ -259,7 +259,7 @@ bool DReachabilityPropagator::remove_deg1(int u) {
 				ps.push(getNodeVar(u).getValLit());
 				r = Reason_new(ps);
 			}  //*/
-			for (int i = 0; i < ou[u].size(); i++) {
+			for (unsigned int i = 0; i < ou[u].size(); i++) {
 				const int oe = ou[u][i];
 				if (!remove_deg1(getHead(oe))) {
 					if (DEBUG) {
@@ -303,21 +303,21 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 																								 vec<vec<int> >& _en)
 		: GraphPropagator(_vs, _es, _en), root(_r), in_nodes_tsize(0) {
 	adj = std::vector<std::vector<int> >(_in.size(), std::vector<int>());
-	for (int i = 0; i < _in.size(); i++) {
-		for (int j = 0; j < _in[i].size(); j++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			adj[i].push_back(_in[i][j]);
 		}
-		for (int j = 0; j < _out[i].size(); j++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			adj[i].push_back(_out[i][j]);
 		}
 	}
 
-	for (int i = 0; i < _in.size(); i++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
 		if (DEBUG) {
 			std::cout << "Incident to " << i << ": ";
 		}
 		in.emplace_back();
-		for (int j = 0; j < _in[i].size(); j++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			in[i].push_back(_in[i][j]);
 			if (DEBUG) {
 				std::cout << _in[i][j] << ", ";
@@ -328,12 +328,12 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 		}
 	}
 
-	for (int i = 0; i < _out.size(); i++) {
+	for (unsigned int i = 0; i < _out.size(); i++) {
 		ou.emplace_back();
 		if (DEBUG) {
 			std::cout << "Outgoing from " << i << ": ";
 		}
-		for (int j = 0; j < _out[i].size(); j++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			ou[i].push_back(_out[i][j]);
 			if (DEBUG) {
 				std::cout << _out[i][j] << ", ";
@@ -354,26 +354,26 @@ DReachabilityPropagator::DReachabilityPropagator(int _r, vec<BoolView>& _vs, vec
 
 	last_state_n = new Tint[nbNodes()];
 	last_state_e = new Tint[nbEdges()];
-	memset(last_state_n, UNK, sizeof(Tint) * nbNodes());
-	memset(last_state_e, UNK, sizeof(Tint) * nbEdges());
+	memset((int*)last_state_n, UNK, sizeof(Tint) * nbNodes());
+	memset((int*)last_state_e, UNK, sizeof(Tint) * nbEdges());
 
 	std::vector<std::vector<int> > en(nbEdges(), std::vector<int>());
-	for (int i = 0; i < _en.size(); i++) {
-		for (int j = 0; j < _en[i].size(); j++) {
+	for (unsigned int i = 0; i < _en.size(); i++) {
+		for (unsigned int j = 0; j < _en[i].size(); j++) {
 			en[i].push_back(_en[i][j]);
 		}
 	}
 
 	std::vector<std::vector<int> > in(nbNodes(), std::vector<int>());
-	for (int i = 0; i < _in.size(); i++) {
-		for (int j = 0; j < _in[i].size(); j++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			in[i].push_back(_in[i][j]);
 		}
 	}
 
 	std::vector<std::vector<int> > ou(nbNodes(), std::vector<int>());
-	for (int i = 0; i < _out.size(); i++) {
-		for (int j = 0; j < _out[i].size(); j++) {
+	for (unsigned int i = 0; i < _out.size(); i++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			ou[i].push_back(_out[i][j]);
 		}
 	}
@@ -888,6 +888,7 @@ void DReachabilityPropagator::verificationDFS(int r, std::vector<bool>& v) {
 void dconnected(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 								vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	auto* dr = new DReachabilityPropagator(r, _vs, _es, _in, _out, _en);
+	(void)dr;
 	// if (so.check_prop)
 	//     engine.propagators.push(dr);
 	// return dr;

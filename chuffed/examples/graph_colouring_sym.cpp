@@ -54,7 +54,7 @@ public:
 			}
 		}
 
-		assert(x.size() == v);
+		assert(static_cast<int>(x.size()) == v);
 
 		createVar(colours, 0, v);
 
@@ -72,8 +72,8 @@ public:
 			int p1;
 			int p2;
 			rassert(fscanf(fp, "%d %d\n", &p1, &p2) == 2);
-			for (int j = 0; j < partitions[p1].size(); j++) {
-				for (int k = 0; k < partitions[p2].size(); k++) {
+			for (unsigned int j = 0; j < partitions[p1].size(); j++) {
+				for (unsigned int k = 0; k < partitions[p2].size(); k++) {
 					int_rel(partitions[p1][j], IRT_NE, partitions[p2][k]);
 				}
 			}
@@ -110,7 +110,7 @@ public:
 		for (int i = 0; i < sat.nVars(); i++) {
 			sat.flags[i] = LitFlags(false, false, false);
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
 			((IntVarEL*)x[i])->setVDecidable(true);
@@ -122,7 +122,7 @@ public:
 	void print(std::ostream& os) override {
 		for (int i = 0; i < p; i++) {
 			os << "|P" << i << ": ";
-			for (int j = 0; j < partitions[i].size(); j++) {
+			for (unsigned int j = 0; j < partitions[i].size(); j++) {
 				os << partitions[i][j]->getVal() << ", ";
 			}
 		}

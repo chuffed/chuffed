@@ -168,7 +168,7 @@ public:
 
 	// Solution-based phase saving
 	void saveCurrentPolarities() {
-		for (int i = 0; i < assigns.size(); i++) {
+		for (unsigned int i = 0; i < assigns.size(); i++) {
 			if (assigns[i] == toInt(l_True)) {
 				polarity[i] = false;  // False means to branch 'true' on this SAT variable
 			} else if (assigns[i] == toInt(l_False)) {
@@ -187,7 +187,7 @@ public:
 	void clearSeen();
 	int findBackTrackLevel();
 
-	bool consistent() const { return qhead.last() == trail.last().size(); }
+	bool consistent() const { return static_cast<unsigned int>(qhead.last()) == trail.last().size(); }
 	int nVars() const { return assigns.size(); }
 	int decisionLevel() const { return trail.size() - 1; }
 	Lit decLit(int i) const { return trail[i][0]; }

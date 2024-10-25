@@ -141,7 +141,7 @@ EdExplFinder::FindEdExplanation(int _max_char, const vec<int>* _insertion_cost,
 		}
 	}
 
-	const int totalClauseLength = litVector.size();
+	const int totalClauseLength = static_cast<int>(litVector.size());
 
 	// generate full clause
 	Clause* r = Reason_new(totalClauseLength + 1);

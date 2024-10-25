@@ -30,7 +30,7 @@ public:
 		// u = index of first x that must be true
 		// y <= u because x[u]
 
-		const int ol = y.getMin();
+		const int ol = static_cast<int>(y.getMin());
 		for (int i = 0; i < ol - offset; i++) {
 			if (x[i].setValNotR(false)) {
 				Clause* r = nullptr;
@@ -45,7 +45,7 @@ public:
 		}
 
 		if (y.isFixed()) {
-			const int yl = y.getVal() - offset;
+			const int yl = static_cast<int>(y.getVal()) - offset;
 			if (x[yl].setValNotR(true)) {
 				Clause* r = nullptr;
 				if (so.lazy) {
@@ -77,7 +77,7 @@ public:
 				break;
 			}
 		}
-		for (int i = 0; i < toFix.size(); i++) {
+		for (unsigned int i = 0; i < toFix.size(); i++) {
 			Clause* r = nullptr;
 			if (so.lazy) {
 				r = Reason_new(2);
@@ -112,7 +112,7 @@ public:
 		}
 
 		if (y.isFixed()) {
-			const int yl = y.getVal() - offset;
+			const int yl = static_cast<int>(y.getVal()) - offset;
 			if (x[yl].setValNotR(true)) {
 				Clause* r = nullptr;
 				if (so.lazy) {
@@ -124,7 +124,7 @@ public:
 				}
 			}
 		}
-		const int nl = y.getMin();
+		const int nl = static_cast<int>(y.getMin());
 		for (int i = ol - offset; i < nl - offset; i++) {
 			if (x[i].setValNotR(false)) {
 				Clause* r = nullptr;
@@ -144,7 +144,7 @@ public:
 
 void bool_arg_max(vec<BoolView>& x, int offset, IntVar* y) {
 	vec<BoolView> w;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		w.push(BoolView(x[i]));
 	}
 	new BoolArgMax(w, offset, IntView<>(y));

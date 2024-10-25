@@ -26,15 +26,15 @@ T circ_gcc(T fff, vec<vec<T> >& xs, CardOp rel, const vec<int>& cards) {
 	assert(cards.size() > 0);
 
 	vec<vec<T> > vals(cards.size());
-	for (int ii = 0; ii < xs.size(); ii++) {
+	for (unsigned int ii = 0; ii < xs.size(); ii++) {
 		assert(xs[ii].size() == cards.size());
-		for (int jj = 0; jj < cards.size(); jj++) {
+		for (unsigned int jj = 0; jj < cards.size(); jj++) {
 			vals[jj].push(xs[ii][jj]);
 		}
 	}
 
 	T ret = card(fff, vals[0], rel, cards[0]);
-	for (int jj = 1; jj < cards.size(); jj++) {
+	for (unsigned int jj = 1; jj < cards.size(); jj++) {
 		assert(vals[jj].size() == xs.size());
 		ret = ret & (card(fff, vals[jj], rel, cards[jj]));
 	}
@@ -45,9 +45,9 @@ void mdd_gcc(vec<IntVar*>& vs, CardOp op, const vec<int>& cards) {
 	MDDTable tab(vs.size());
 
 	vec<vec<MDD> > vars;
-	for (int ii = 0; ii < vs.size(); ii++) {
+	for (unsigned int ii = 0; ii < vs.size(); ii++) {
 		vars.push();
-		for (int jj = 0; jj < cards.size(); jj++) {
+		for (unsigned int jj = 0; jj < cards.size(); jj++) {
 			vars.last().push(tab.vareq(ii, jj));
 		}
 	}
@@ -60,7 +60,7 @@ void mdd_gcc(vec<IntVar*>& vs, CardOp op, const vec<int>& cards) {
 MDD multi_sequence(MDDTable& tab, int nDays, vec<int>& bmin, vec<int>& bmax, vec<int>& bsz) {
 	MDD seq = tab.ttt();
 
-	for (int ii = 0; ii < bsz.size(); ii++) {
+	for (unsigned int ii = 0; ii < bsz.size(); ii++) {
 		vec<MDD> terms;
 		for (int jj = 0; jj < nDays; jj++) {
 			terms.push(tab.vareq(jj, ii));
@@ -119,7 +119,7 @@ public:
 		// Shifts:   n1 n2 n3 ... nN  n1 n2 ...   nN
 		//          [      Day 1   ][      ....        ]
 		createVars(xs, nNurses * nDays, 0, nShifts - 1, true);  // Eager literals
-		assert(xs.size() == nNurses * nDays);
+		assert(static_cast<int>(xs.size()) == nNurses * nDays);
 
 		//    for(int xi = 0; xi < xs.size(); xi++)
 		//      fprintf(out, "var x%d %d %d\n", xs[xi]->var_id, xs[xi]->getMin(), xs[xi]->getMax());

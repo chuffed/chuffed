@@ -128,7 +128,7 @@ static inline double wallClockTime() {
 }
 */
 
-static int mylog2(int val) {
+inline int mylog2(int val) {
 	int ret = -1;
 	while (val != 0) {
 		val >>= 1;
@@ -137,7 +137,7 @@ static int mylog2(int val) {
 	return ret;
 }
 
-static double memUsed() {
+inline double memUsed() {
 	return 0;
 	/* char name[256]; */
 	/* sprintf(name, "/proc/%d/statm", getpid()); */
@@ -163,7 +163,7 @@ template <class T, class U>
 T conv(const U& x) {
 	static_assert(sizeof(T) == sizeof(U), "Must bit-cast between values of equal size.");
 	T ret;
-	memcpy(&ret, &x, sizeof(U));
+	memcpy((char*)&ret, (char*)&x, sizeof(U));
 	return ret;
 }
 

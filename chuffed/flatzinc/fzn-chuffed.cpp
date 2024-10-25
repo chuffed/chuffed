@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
 			std::cout << "% [";
 			if (ng.size() > 0) {
 				std::cout << get_bv_string(ng[0], so.assump_int);
-				for (int ii = 1; ii < ng.size(); ii++) {
+				for (unsigned int ii = 1; ii < ng.size(); ii++) {
 					std::cout << ", " << get_bv_string(ng[ii], so.assump_int);
 				}
 			}

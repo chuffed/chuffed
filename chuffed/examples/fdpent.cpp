@@ -475,11 +475,11 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 			while (!dfa.is_empty()) {
 				const intpair node = head(dfa);
 
-				assert(transition.size() == count);
+				assert(static_cast<int>(transition.size()) == count);
 				transition.push();
 				for (int v = 0; v < domain; v++) {
 					// NOLINTBEGIN
-					assert(transition.last().size() == v);
+					assert(static_cast<int>(transition.last().size()) == v);
 					if (v == val) {
 						/*
 						 dfa_trans t = {
@@ -537,11 +537,11 @@ static MDD pentFD(MDDTable& tab, int domain, int val, int height, int width,
 				while (!dfa.is_empty()) {
 					const intpair node = head(dfa);
 
-					assert(transition.size() == count);
+					assert(static_cast<int>(transition.size()) == count);
 					transition.push();
 					for (int v = 0; v < domain; v++) {
 						// NOLINTBEGIN
-						assert(transition.last().size() == v);
+						assert(static_cast<int>(transition.last().size()) == v);
 						if (v == val) {
 							/*
 							 dfa_trans t = {

@@ -528,11 +528,11 @@ void int_rel_half_reif_real(IntVar* x, IntRelType t, int c, BoolView r) {
 }
 
 void process_ircs() {
-	for (int i = 0; i < ircs.size(); i++) {
+	for (unsigned int i = 0; i < ircs.size(); i++) {
 		int_rel_reif_real(ircs[i].x, ircs[i].t, ircs[i].c, ircs[i].r);
 	}
 	ircs.clear(true);
-	for (int j = 0; j < ihrcs.size(); ++j) {
+	for (unsigned int j = 0; j < ihrcs.size(); ++j) {
 		int_rel_half_reif_real(ihrcs[j].x, ihrcs[j].t, ihrcs[j].c, ihrcs[j].r);
 	}
 	ihrcs.clear(true);

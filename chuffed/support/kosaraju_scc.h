@@ -44,7 +44,7 @@ public:
 	void run();
 	inline int scc_of(int u) { return scc[u]; }
 	inline std::vector<int> get_scc(int i) { return sccs[i]; }
-	inline int nb_sccs() { return sccs.size(); }
+	inline int nb_sccs() { return static_cast<int>(sccs.size()); }
 
 	// Levels
 	void _set_levels(int start, int sink);

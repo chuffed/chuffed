@@ -130,7 +130,7 @@ public:
 						int j = j0;
 						int chainLength = 1;
 						do {
-							j = x[j].getVal();
+							j = static_cast<int>(x[j].getVal());
 							chainLength++;
 						} while (x[j].isFixed());
 
@@ -152,7 +152,7 @@ public:
 						int j = j0;
 						for (int index = 1; index < lengthChain[j0]; index++) {
 							(*r)[index] = x[j].getValLit();
-							j = x[j].getVal();
+							j = static_cast<int>(x[j].getVal());
 						}
 					} else {
 						// find the vars in the start of the chain and those not in the chain
@@ -167,9 +167,9 @@ public:
 						for (int index = 1; index < lengthChain[j0]; index++) {
 							inStartChain.push(j);
 							outside.remove(j);
-							j = x[j].getVal();
+							j = static_cast<int>(x[j].getVal());
 						}
-						assert(inStartChain.size() + outside.size() + 1 == size);
+						assert(inStartChain.size() + outside.size() + 1 == static_cast<unsigned int>(size));
 						// reason is nothing in start of chain can reach outside chain
 						r = Reason_new(inStartChain.size() * outside.size() + 1);
 						explainAcantreachB(r, 1, 1 + inStartChain.size() * outside.size(), inStartChain,
@@ -198,9 +198,9 @@ public:
 													vec<int> B, int a1 = -1, int b1 = -1) {
 		// fprintf(stderr, "explaining");
 		bool found = false;
-		for (int a = 0; a < A.size(); a++) {
+		for (unsigned int a = 0; a < A.size(); a++) {
 			assert(A[a] < size && A[a] >= 0);
-			for (int b = 0; b < B.size(); b++) {
+			for (unsigned int b = 0; b < B.size(); b++) {
 				assert(B[b] < size && B[b] >= 0);
 				if (A[a] != a1 || B[b] != b1) {
 					assert(!x[A[a]].indomain(B[b]));
@@ -217,7 +217,7 @@ public:
 
 	void addEqLits(Clause* r) {
 		if (so.rootSelection == 5 || so.rootSelection == 6) {
-			for (int i = 0; i < preRoot.size(); i++) {
+			for (unsigned int i = 0; i < preRoot.size(); i++) {
 				(*r)[i + 1] = x[preRoot[i]].getValLit();
 			}
 		}
@@ -279,7 +279,7 @@ public:
 					}
 
 					assert(outside.size() > 0);
-					assert(inside.size() + outside.size() == size - 1);
+					assert(inside.size() + outside.size() == static_cast<unsigned int>(size - 1));
 					/*fprintf(stderr, " this node is %d, it's index is %d\n", thisNode, index[thisNode]);
 					fprintf(stderr, "inside:\n");
 					for(int i = 0; i < inside.size(); i++)
@@ -297,7 +297,7 @@ public:
 					}
 					addPropagation(false, thisNode, child, r);
 
-					for (int i = 0; i < outside.size(); i++) {
+					for (unsigned int i = 0; i < outside.size(); i++) {
 						if (x[outside[i]].remValNotR(thisNode)) {
 							// fprintf(stderr, "setting x[%d] neq %d\n", outside[i], thisNode);
 							addPropagation(false, outside[i], thisNode, r);
@@ -333,10 +333,10 @@ public:
 						// in the prev subtree can reach later subtrees.
 						vec<int> prevAndLater;
 						prevAndLater.reserve(prev.size() + later.size());
-						for (int i = 0; i < prev.size(); i++) {
+						for (unsigned int i = 0; i < prev.size(); i++) {
 							prevAndLater.push(prev[i]);
 						}
-						for (int i = 0; i < later.size(); i++) {
+						for (unsigned int i = 0; i < later.size(); i++) {
 							prevAndLater.push(later[i]);
 						}
 						r = Reason_new(earlier.size() * prevAndLater.size() + prev.size() * later.size() + 1 +
@@ -407,7 +407,7 @@ public:
 		}
 		for (int i = 0; i < size; i++) {
 			if (x[i].isFixed()) {
-				chainStarts.remove(x[i].getVal());
+				chainStarts.remove(static_cast<int>(x[i].getVal()));
 			}
 		}
 
@@ -420,12 +420,12 @@ public:
 		// now for each chain find the length and the end variable
 		vec<int> chainLengths;
 		vec<int> chainEnds;
-		for (int i = 0; i < chainStarts.size(); i++) {
+		for (unsigned int i = 0; i < chainStarts.size(); i++) {
 			int length = 1;
 			int currIndex = chainStarts[i];
 			while (x[currIndex].isFixed()) {
 				length++;
-				currIndex = x[currIndex].getVal();
+				currIndex = static_cast<int>(x[currIndex].getVal());
 			}
 			chainLengths.push(length);
 			chainEnds.push(currIndex);
@@ -455,7 +455,7 @@ public:
 			case 3:  // end of shortest chain,
 				len = chainLengths[0];
 				root = chainEnds[0];
-				for (int i = 1; i < chainLengths.size(); i++) {
+				for (unsigned int i = 1; i < chainLengths.size(); i++) {
 					if (chainLengths[i] < len) {
 						len = chainLengths[i];
 						root = chainEnds[i];
@@ -465,7 +465,7 @@ public:
 			case 4:  // end of longest chain,
 				len = chainLengths[0];
 				root = chainEnds[0];
-				for (int i = 1; i < chainLengths.size(); i++) {
+				for (unsigned int i = 1; i < chainLengths.size(); i++) {
 					if (chainLengths[i] > len) {
 						len = chainLengths[i];
 						root = chainEnds[i];
@@ -476,7 +476,7 @@ public:
 				len = chainLengths[0];
 				root = chainStarts[0];
 				chosenChain = 0;
-				for (int i = 1; i < chainLengths.size(); i++) {
+				for (unsigned int i = 1; i < chainLengths.size(); i++) {
 					if (chainLengths[i] < len) {
 						len = chainLengths[i];
 						root = chainStarts[i];
@@ -488,7 +488,7 @@ public:
 				len = chainLengths[0];
 				root = chainStarts[0];
 				chosenChain = 0;
-				for (int i = 1; i < chainLengths.size(); i++) {
+				for (unsigned int i = 1; i < chainLengths.size(); i++) {
 					if (chainLengths[i] > len) {
 						len = chainLengths[i];
 						root = chainStarts[i];
@@ -548,7 +548,7 @@ public:
 			while (x[rootEnd].isFixed()) {
 				// fprintf(stderr, "preroot %d\n", rootEnd);
 				preRoot.push(rootEnd);
-				rootEnd = x[rootEnd].getVal();
+				rootEnd = static_cast<int>(x[rootEnd].getVal());
 				index[rootEnd] = 0;
 				nodesSeen++;
 				lowlink[rootEnd] = 0;
@@ -597,11 +597,12 @@ public:
 						// subtree can't reach the unexplored nodes or the root.
 						if (prev.size() == 0) {
 							vec<int> alloutside;
-							for (int i = 0; i < later.size(); i++) {
+							for (unsigned int i = 0; i < later.size(); i++) {
 								alloutside.push(later[i]);
 							}
 							alloutside.push(root);
-							assert(thisSubtree.size() + alloutside.size() + preRoot.size() == size);
+							assert(thisSubtree.size() + alloutside.size() + preRoot.size() ==
+										 static_cast<unsigned int>(size));
 							Clause* r = Reason_new(thisSubtree.size() * alloutside.size() + preRoot.size());
 							addEqLits(r);
 							// This subtree can't reach outside
@@ -622,24 +623,24 @@ public:
 						// 3. and nodes in this subtree can't reach the
 						// previous one or unexplored ones.
 						vec<int> prev_later;
-						for (int i = 0; i < prev.size(); i++) {
+						for (unsigned int i = 0; i < prev.size(); i++) {
 							prev_later.push(prev[i]);
 						}
-						for (int i = 0; i < later.size(); i++) {
+						for (unsigned int i = 0; i < later.size(); i++) {
 							prev_later.push(later[i]);
 						}
 						vec<int> prev_this_later;
-						for (int i = 0; i < prev_later.size(); i++) {
+						for (unsigned int i = 0; i < prev_later.size(); i++) {
 							prev_this_later.push(prev_later[i]);
 						}
-						for (int i = 0; i < thisSubtree.size(); i++) {
+						for (unsigned int i = 0; i < thisSubtree.size(); i++) {
 							prev_this_later.push(thisSubtree[i]);
 						}
 						vec<int> this_later;
-						for (int i = 0; i < thisSubtree.size(); i++) {
+						for (unsigned int i = 0; i < thisSubtree.size(); i++) {
 							this_later.push(thisSubtree[i]);
 						}
-						for (int i = 0; i < later.size(); i++) {
+						for (unsigned int i = 0; i < later.size(); i++) {
 							this_later.push(later[i]);
 						}
 
@@ -649,7 +650,7 @@ public:
 						assert(prev_later.size() > 0);
 						assert(earlier.size() + prev.size() + later.size() + thisSubtree.size() +
 											 preRoot.size() ==
-									 size - 1);
+									 static_cast<unsigned int>(size - 1));
 						Clause* r = Reason_new(size1 + size2 + size3 + preRoot.size());
 						addEqLits(r);
 						// 1. Earlier can't reach prev, this or later
@@ -681,13 +682,14 @@ public:
 						// including the root
 						if (prev.size() == 0) {
 							vec<int> alloutside;
-							for (int i = 0; i < later.size(); i++) {
+							for (unsigned int i = 0; i < later.size(); i++) {
 								alloutside.push(later[i]);
 							}
 							alloutside.push(root);
 							r = Reason_new(thisSubtree.size() * alloutside.size() + preRoot.size());
 							addEqLits(r);
-							assert(thisSubtree.size() + alloutside.size() + preRoot.size() == size);
+							assert(thisSubtree.size() + alloutside.size() + preRoot.size() ==
+										 static_cast<unsigned int>(size));
 
 							// This subtree can't reach outside (except backfrom to backto)
 							explainAcantreachB(r, 1 + preRoot.size(),
@@ -699,24 +701,24 @@ public:
 							// Otherwise we have at least one previous subtree.
 							// The reason is the same as when failing above
 							vec<int> prev_later;
-							for (int i = 0; i < prev.size(); i++) {
+							for (unsigned int i = 0; i < prev.size(); i++) {
 								prev_later.push(prev[i]);
 							}
-							for (int i = 0; i < later.size(); i++) {
+							for (unsigned int i = 0; i < later.size(); i++) {
 								prev_later.push(later[i]);
 							}
 							vec<int> prev_this_later;
-							for (int i = 0; i < prev_later.size(); i++) {
+							for (unsigned int i = 0; i < prev_later.size(); i++) {
 								prev_this_later.push(prev_later[i]);
 							}
-							for (int i = 0; i < thisSubtree.size(); i++) {
+							for (unsigned int i = 0; i < thisSubtree.size(); i++) {
 								prev_this_later.push(thisSubtree[i]);
 							}
 							vec<int> this_later;
-							for (int i = 0; i < thisSubtree.size(); i++) {
+							for (unsigned int i = 0; i < thisSubtree.size(); i++) {
 								this_later.push(thisSubtree[i]);
 							}
-							for (int i = 0; i < later.size(); i++) {
+							for (unsigned int i = 0; i < later.size(); i++) {
 								this_later.push(later[i]);
 							}
 
@@ -741,7 +743,7 @@ public:
 
 							assert(earlier.size() + prev.size() + later.size() + thisSubtree.size() +
 												 preRoot.size() ==
-										 size - 1);
+										 static_cast<unsigned int>(size - 1));
 						}
 					}
 					addPropagation(true, backfrom, backto, r);
@@ -750,11 +752,11 @@ public:
 				// When a new subtree has been explored, update the prev, earlier and later vectors (only
 				// necessary if explaining)
 				if (so.lazy) {
-					for (int i = 0; i < prev.size(); i++) {
+					for (unsigned int i = 0; i < prev.size(); i++) {
 						earlier.push(prev[i]);
 					}
 					prev.clear();
-					for (int i = 0; i < thisSubtree.size(); i++) {
+					for (unsigned int i = 0; i < thisSubtree.size(); i++) {
 						prev.push(thisSubtree[i]);
 					}
 				}
@@ -786,7 +788,7 @@ public:
 					}
 				}
 				const int numNotSeen = notseen.size();
-				assert(seen.size() == nodesSeen);
+				assert(seen.size() == static_cast<unsigned int>(nodesSeen));
 				assert(numNotSeen + nodesSeen == size);
 
 				// Now build the reason - seen can't reach notseen (but don't include the last literal)
@@ -836,7 +838,7 @@ public:
 		}
 
 		// Perform the propagations
-		for (int i = 0; i < propQueue.size(); i++) {
+		for (unsigned int i = 0; i < propQueue.size(); i++) {
 			PROP const p = propQueue[i];
 			// fprintf(stderr, "propagating\n");
 			if (p.fix) {
@@ -970,10 +972,10 @@ public:
 					thisIsCycle = true;
 					break;
 				}
-				nextVar = x[nextVar].getVal();
+				nextVar = static_cast<int>(x[nextVar].getVal());
 			}
 			// fprintf(stderr,"end chain\n");
-			if (thisCycle.size() == size) {
+			if (static_cast<int>(thisCycle.size()) == size) {
 				break;  // all variables are included in this cycle
 			}
 			if (thisIsCycle) {
@@ -1084,7 +1086,7 @@ public:
 						(*r)[start] = x[varIndex].getLit(smallestIn - 1, LR_LE);  // x <= smallest-1
 					}
 					(*r)[start + 1] = x[varIndex].getLit(largestIn + 1, LR_GE);  // x >= largest+1
-					for (int j = 0; j < outsidebetween.size(); j++) {
+					for (unsigned int j = 0; j < outsidebetween.size(); j++) {
 						(*r)[start + 2 + j] = x[varIndex].getLit(outsidebetween[j], LR_EQ);  // x == k
 					}
 				}
@@ -1095,7 +1097,7 @@ public:
 				// find the vars in and not in the cycle
 				for (int i = 0; i < size; i++) {
 					bool cycleContains = false;
-					for (int j = 0; j < bestCycle.size(); j++) {
+					for (unsigned int j = 0; j < bestCycle.size(); j++) {
 						if (bestCycle[j] == i) {
 							cycleContains = true;
 							break;
@@ -1146,23 +1148,23 @@ void circuit(vec<IntVar*>& _x, int offset) {
 	// fprintf(stderr,"\ncircuit constraint");
 	all_different(_x, CL_DOM);
 	vec<IntView<> > x;
-	for (int i = 0; i < _x.size(); i++) {
+	for (unsigned int i = 0; i < _x.size(); i++) {
 		_x[i]->specialiseToEL();
 	}
 
 	if (offset == 0) {
-		for (int i = 0; i < _x.size(); i++) {
+		for (unsigned int i = 0; i < _x.size(); i++) {
 			int_rel(_x[i], IRT_NE, i);
 		}
-		for (int i = 0; i < _x.size(); i++) {
+		for (unsigned int i = 0; i < _x.size(); i++) {
 			x.push(IntView<>(_x[i]));
 		}
 		new Circuit<0>(x);
 	} else {
-		for (int i = 0; i < _x.size(); i++) {
+		for (unsigned int i = 0; i < _x.size(); i++) {
 			int_rel(_x[i], IRT_NE, i + offset);
 		}
-		for (int i = 0; i < _x.size(); i++) {
+		for (unsigned int i = 0; i < _x.size(); i++) {
 			x.push(IntView<4>(_x[i], 1, -offset));
 		}
 		new Circuit<4>(x);

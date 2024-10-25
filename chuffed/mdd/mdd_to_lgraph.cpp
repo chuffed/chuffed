@@ -27,7 +27,7 @@ EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& co
 
 	// Compute the set of edges.
 	// We're assuming they're collected in topological order.
-	int qhead = 0;
+	unsigned int qhead = 0;
 	while (qhead < node_queue.size()) {
 		const int nID = node_queue[qhead];
 
@@ -54,16 +54,17 @@ EVLayerGraph::NodeID mdd_to_layergraph(EVLayerGraph& graph, MDD& r, vec<int>& co
 
 		vec<EVLayerGraph::EInfo> edges;
 		for (unsigned int j = 0; j < nodeptr->sz; j++) {
-			if (nodeptr->edges[j].val > costs.size()) {
+			if (nodeptr->edges[j].val > static_cast<int>(costs.size())) {
 				break;
 			}
 
 			if (nodeptr->edges[j].dest != MDDFALSE) {
 				const EVLayerGraph::NodeID dest = status[nodeptr->edges[j].dest];
 				const unsigned int start = std::max(0, nodeptr->edges[j].val);
-				const unsigned int end = (j + 1 < nodeptr->sz && nodeptr->edges[j + 1].val <= costs.size())
-																		 ? nodeptr->edges[j + 1].val
-																		 : costs.size();
+				const unsigned int end =
+						(j + 1 < nodeptr->sz && nodeptr->edges[j + 1].val <= static_cast<int>(costs.size()))
+								? nodeptr->edges[j + 1].val
+								: costs.size();
 				for (unsigned int k = start; k < end; k++) {
 					const EVLayerGraph::EInfo einfo = {static_cast<int>(k), costs[k], dest};
 					edges.push(einfo);

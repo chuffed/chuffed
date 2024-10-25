@@ -66,13 +66,13 @@ public:
 	bool propagate() override {
 		trailed_pinfo_sz = false;
 
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			old_est[i] = est(i);
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			int b = INT_MIN;
 			int e = INT_MIN;
-			for (int ests_i = 0; ests_i < x.size(); ests_i++) {
+			for (unsigned int ests_i = 0; ests_i < x.size(); ests_i++) {
 				const int j = ests[ests_i];
 				if (!pred[j][i].isTrue()) {
 					continue;
@@ -122,7 +122,7 @@ public:
 
 		// can lift!
 		int lb = pi.est;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			const BoolView& p = pred[i][pi.var];
 			if (p.isTrue() && old_est[i] >= pi.est) {
 				ps.push(p.getValLit());
@@ -231,11 +231,11 @@ public:
 
 		// create all intermediate precedence literals
 		pred = (BoolView**)malloc(x.size() * sizeof(BoolView*));
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			pred[i] = (BoolView*)malloc(x.size() * sizeof(BoolView));
 		}
-		for (int i = 0; i < x.size(); i++) {
-			for (int j = i + 1; j < x.size(); j++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
+			for (unsigned int j = i + 1; j < x.size(); j++) {
 				BoolView r = newBoolVar();
 				pred[i][j] = r;
 				pred[j][i] = ~r;
@@ -253,12 +253,12 @@ public:
 		ests = (int*)malloc(x.size() * sizeof(int));
 		lets = (int*)malloc(x.size() * sizeof(int));
 
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			ests[i] = lets[i] = i;
 		}
 
 		// attach to var events
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			x[i]->attach(this, i, EVENT_LU);
 		}
 
@@ -271,13 +271,13 @@ public:
 		//		int eet[x.size()];
 		//		int lst[x.size()];
 
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			eet[i] = x[i]->getMin() + dur[i];
 			lst[i] = x[i]->getMax();
 		}
 
-		for (int i = 0; i < x.size(); i++) {
-			for (int j = i + 1; j < x.size(); j++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
+			for (unsigned int j = i + 1; j < x.size(); j++) {
 				// Can lift these explanations
 				//				if (prop_id == 1 && i == 0 && j == 2) {
 				//					fprintf(stderr, "lst(0) = %d, eet(0) = %d, lst(2) = %d, eet(2) = %d\n", lst[0],
@@ -307,17 +307,17 @@ public:
 	}
 
 	bool doEdgeFinding() {
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			residual[i] = dur[i];
 		}
 
 		// create pre-emptive schedule
 
-		int ests_i = 0;
-		int ps_i = 0;
+		unsigned int ests_i = 0;
+		unsigned int ps_i = 0;
 		int cur_time = est(ests[0]);
 		int next_lb = 0;
-		int lets_comp = x.size();
+		unsigned int lets_comp = x.size();
 
 		Heap<SortLetAsc> pqueue(sort_let_asc);
 
@@ -365,7 +365,7 @@ public:
 
 				// precedences can be inferred
 				const Reason r = createReason(ps_i, task, let(lets[lets_i]));
-				for (int i = lets_i; i < lets_comp; i++) {
+				for (unsigned int i = lets_i; i < lets_comp; i++) {
 					if (residual[lets[i]] == 0) {
 						continue;
 					}
@@ -443,7 +443,7 @@ public:
 
 				fprintf(stderr, "task = %d, cur_time = %d, in: \n", task, ps_times[ps_i]);
 		*/
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			in[i] = false;
 		}
 		in[task] = true;
@@ -466,7 +466,7 @@ public:
 		vec<Lit> ps;
 
 		// can lift!
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			if (!in[i]) {
 				continue;
 			}
@@ -525,7 +525,7 @@ public:
 		int ps_i = pi.ps_i;
 		int set_est = ps_times[ps_i];
 
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			if (let(i) <= pi.let && residual[i] > 0) {
 				in[i] = true;
 				if (est(i) < set_est) {
@@ -583,7 +583,7 @@ public:
 
 		// can lift!
 		ps.push(x[pi.var]->getMinLit());
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			if (!in[i]) {
 				continue;
 			}

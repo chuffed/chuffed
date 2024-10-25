@@ -144,7 +144,7 @@ void Simplex::init() {
 	for (int i = 0; i < m; i++) {
 		AH[i] = cur_A;
 		LinearIneq& li = mip->ineqs[i];
-		for (int j = 0; j < li.x.size(); j++) {
+		for (unsigned int j = 0; j < li.x.size(); j++) {
 			const int c = mip->var_map.find(li.x[j])->second;
 			assert(0 <= c && c < n);
 			long double v = (li.lb_notR ? -li.a[j] : li.a[j]);
@@ -156,7 +156,7 @@ void Simplex::init() {
 			//			fprintf(stderr, "%d:%.0Lf ", c, v);
 		}
 		//		fprintf(stderr, "%.0Lf %.0Lf\n", mip->ineqs[i].lb, mip->ineqs[i].ub);
-		AH_nz[i] = cur_A - AH[i];
+		AH_nz[i] = static_cast<int>(cur_A - AH[i]);
 		lb[n + i] = (int)(li.lb_notR ? mip->ineqs[i].lb : -mip->ineqs[i].ub);
 		ub[n + i] = (int)(li.lb_notR ? mip->ineqs[i].ub : -mip->ineqs[i].lb);
 		//		for (int j = 0; j < n; j++) fprintf(stderr, "%.0Lf ", A[j][i]); fprintf(stderr, "\n");
@@ -167,10 +167,10 @@ void Simplex::init() {
 	cur_A = AV_mem;
 	for (int i = 0; i < n; i++) {
 		AV[i] = cur_A;
-		for (int j = 0; j < temp_A[i].size(); j++) {
+		for (unsigned int j = 0; j < temp_A[i].size(); j++) {
 			*cur_A++ = temp_A[i][j];
 		}
-		AV_nz[i] = cur_A - AV[i];
+		AV_nz[i] = static_cast<int>(cur_A - AV[i]);
 	}
 	for (int i = 0; i < m; i++) {
 		AV[n + i] = cur_A;
@@ -423,7 +423,7 @@ bool Simplex::findPivotCol() {
 	long double pivot_inc = 1e100;
 	pivot_col = -1;
 
-	for (int i = 0; i < R_nz.size(); i++) {
+	for (unsigned int i = 0; i < R_nz.size(); i++) {
 		const int k = R_nz[i];
 		if ((shift[k] == 0 && row[k] < -pivot_limit) || (shift[k] == 1 && row[k] > pivot_limit)) {
 			const long double a = -obj[k] / row[k];
@@ -457,7 +457,7 @@ bool Simplex::findPivotCol2() {
 
 	vec<int> pivot_cands;
 
-	for (int i = 0; i < R_nz.size(); i++) {
+	for (unsigned int i = 0; i < R_nz.size(); i++) {
 		const int k = R_nz[i];
 		if ((shift[k] == 0 && row[k] < 0) || (shift[k] == 1 && row[k] > 0)) {
 			assert(ctor[k] == -1);
@@ -475,7 +475,7 @@ bool Simplex::findPivotCol2() {
 
 	long double best_psize = 0;
 
-	for (int i = 0; i < pivot_cands.size(); i++) {
+	for (unsigned int i = 0; i < pivot_cands.size(); i++) {
 		const int k = pivot_cands[i];
 		const long double r = (shift[k] != 0 ? row[k] : -row[k]);
 		if (r > best_psize || (!AVOID_SMALL_PIVOT && r >= 0.001)) {
@@ -522,7 +522,7 @@ void Simplex::pivot() {
 
 	// update objective row
 	const long double a = obj[pivot_col] / row[pivot_col];
-	for (int i = 0; i < R_nz.size(); i++) {
+	for (unsigned int i = 0; i < R_nz.size(); i++) {
 		const int k = R_nz[i];
 		obj[k] -= a * row[k];
 		checkZero13(obj[k]);

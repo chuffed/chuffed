@@ -49,9 +49,10 @@ class Heap {
 
 	inline void percolateDown(int i) {
 		const int x = heap[i];
-		while (left(i) < heap.size()) {
+		while (left(i) < static_cast<int>(heap.size())) {
 			const int child =
-					right(i) < heap.size() && lt(heap[right(i)], heap[left(i)]) ? right(i) : left(i);
+					right(i) < static_cast<int>(heap.size()) && lt(heap[right(i)], heap[left(i)]) ? right(i)
+																																												: left(i);
 			if (!lt(heap[child], x)) {
 				break;
 			}
@@ -73,9 +74,9 @@ public:
 
 	int size() const { return heap.size(); }
 	bool empty() const { return heap.size() == 0; }
-	bool inHeap(int n) const { return n < indices.size() && indices[n] >= 0; }
+	bool inHeap(int n) const { return n < static_cast<int>(indices.size()) && indices[n] >= 0; }
 	int operator[](int index) const {
-		assert(index < heap.size());
+		assert(index < static_cast<int>(heap.size()));
 		return heap[index];
 	}
 

@@ -216,12 +216,12 @@ public:
 
 		// Creating a copy of the calendars
 		calendar = (int**)malloc(calendar2.size() * sizeof(int*));
-		for (int i = 0; i < calendar2.size(); i++) {
+		for (unsigned int i = 0; i < calendar2.size(); i++) {
 			calendar[i] = (int*)malloc(calendar2[0].size() * sizeof(int));
 		}
 
-		for (int i = 0; i < calendar2.size(); i++) {
-			for (int j = 0; j < calendar2[0].size(); j++) {
+		for (unsigned int i = 0; i < calendar2.size(); i++) {
+			for (unsigned int j = 0; j < calendar2[0].size(); j++) {
 				calendar[i][j] = calendar2[i][j];
 			}
 		}
@@ -229,15 +229,15 @@ public:
 		// Memory allocation for the working periods
 		workingPeriods = (int**)malloc(calendar2.size() * sizeof(int*));
 		CUMU_MEMCHECK(workingPeriods);
-		for (int i = 0; i < calendar2.size(); i++) {
+		for (unsigned int i = 0; i < calendar2.size(); i++) {
 			workingPeriods[i] = (int*)malloc(calendar2[0].size() * sizeof(int));
 			CUMU_MEMCHECK(workingPeriods[i]);
 		}
 
 		// Initialisation of the working periods
-		for (int i = 0; i < calendar2.size(); i++) {
+		for (unsigned int i = 0; i < calendar2.size(); i++) {
 			workingPeriods[i][calendar2[0].size() - 1] = calendar[i][calendar2[0].size() - 1];
-			for (int j = calendar2[0].size() - 2; j >= 0; j--) {
+			for (unsigned int j = calendar2[0].size() - 2; j >= 0; j--) {
 				workingPeriods[i][j] = workingPeriods[i][j + 1] + calendar[i][j];
 			}
 		}
@@ -300,7 +300,7 @@ public:
 			}
 
 			// Initialisation of some arrays
-			for (int i = 0; i < start.size(); i++) {
+			for (unsigned int i = 0; i < start.size(); i++) {
 				min_energy2_global[i] = min_dur(i);
 			}
 		} else {
@@ -320,7 +320,7 @@ public:
 		fprintf(stderr, "\tCumulative with n = %d\n", start.size());
 #endif
 		// Attach to var events
-		for (int i = 0; i < start.size(); i++) {
+		for (unsigned int i = 0; i < start.size(); i++) {
 #if CUMUVERB > 1
 			fprintf(stderr, "\t%d: %p\n", i, start[i]);
 #endif
@@ -334,7 +334,7 @@ public:
 		}
 		limit->attach(this, start.size(), EVENT_UF);
 
-		for (int i = 0; i < start.size(); i++) {
+		for (unsigned int i = 0; i < start.size(); i++) {
 			task_id.push(i);
 		}
 		last_unfixed = start.size() - 1;
@@ -860,7 +860,6 @@ public:
 		auto iter = changes.begin();
 		int cur_profile = 0;
 		int cur_time = iter->time;
-		ProfileChange cur_change = iter->change;
 		int no_starts = 1;
 		for (; iter != changes.end(); iter++) {
 			if (iter->time > cur_time && no_starts > 1) {
@@ -873,7 +872,6 @@ public:
 				cur_profile++;
 			}
 			no_starts += (iter->change == PROFINC ? 1 : -1);
-			cur_change = iter->change;
 			cur_time = iter->time;
 		}
 	}
@@ -1527,8 +1525,7 @@ void CumulativeCalProp::submit_conflict_explanation(vec<Lit>& expl) {
 	Clause* reason = nullptr;
 	if (so.lazy) {
 		reason = Reason_new(expl.size());
-		int i = 0;
-		for (; i < expl.size(); i++) {
+		for (unsigned int i = 0; i < expl.size(); i++) {
 			(*reason)[i] = expl[i];
 		}
 	}
@@ -1537,7 +1534,7 @@ void CumulativeCalProp::submit_conflict_explanation(vec<Lit>& expl) {
 
 Clause* CumulativeCalProp::get_reason_for_update(vec<Lit>& expl) {
 	Clause* reason = Reason_new(expl.size() + 1);
-	for (int i = 1; i <= expl.size(); i++) {
+	for (unsigned int i = 1; i <= expl.size(); i++) {
 		(*reason)[i] = expl[i - 1];
 	}
 	return reason;
@@ -1562,7 +1559,7 @@ void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* l
 	vec<int> taskCal_new;
 	int r_sum = 0;
 
-	for (int i = 0; i < s.size(); i++) {
+	for (unsigned int i = 0; i < s.size(); i++) {
 		if (r[i]->getMax() > 0 && d[i]->getMax() > 0) {
 			s_new.push(s[i]);
 			d_new.push(d[i]);
@@ -2726,7 +2723,7 @@ int CumulativeCalProp::ttef_retrieve_tasks(const int shift_in, const int begin, 
 	int dur_shift;
 	int dur_in;
 	// Getting fixed tasks
-	for (int ii = 0; ii < task_id.size(); ii++) {
+	for (unsigned int ii = 0; ii < task_id.size(); ii++) {
 		const int i = task_id[ii];
 		if (i == fb_id || lct_2[i] <= begin || end <= est_2[i]) {
 			continue;

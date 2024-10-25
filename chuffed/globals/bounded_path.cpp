@@ -50,25 +50,25 @@
 void BoundedPathPropagator::constructGraph(vec<vec<edge_id> >& _in, vec<vec<edge_id> >& _out,
 																					 vec<vec<int> >& /*en*/) {
 	adj = std::vector<std::vector<int> >(_in.size(), std::vector<int>());
-	for (int i = 0; i < _in.size(); i++) {
-		for (int j = 0; j < _in[i].size(); j++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			adj[i].push_back(_in[i][j]);
 		}
-		for (int j = 0; j < _out[i].size(); j++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			adj[i].push_back(_out[i][j]);
 		}
 	}
 
 	in = std::vector<std::vector<int> >(nbNodes(), std::vector<int>());
-	for (int i = 0; i < _in.size(); i++) {
-		for (int j = 0; j < _in[i].size(); j++) {
+	for (unsigned int i = 0; i < _in.size(); i++) {
+		for (unsigned int j = 0; j < _in[i].size(); j++) {
 			in[i].push_back(_in[i][j]);
 		}
 	}
 
 	ou = std::vector<std::vector<int> >(nbNodes(), std::vector<int>());
-	for (int i = 0; i < _out.size(); i++) {
-		for (int j = 0; j < _out[i].size(); j++) {
+	for (unsigned int i = 0; i < _out.size(); i++) {
+		for (unsigned int j = 0; j < _out[i].size(); j++) {
 			ou[i].push_back(_out[i][j]);
 		}
 	}
@@ -82,10 +82,10 @@ void BoundedPathPropagator::constructGraph(vec<vec<edge_id> >& _in, vec<vec<edge
 	}
 
 	last_state_e = new Tint[nbEdges()];
-	memset(last_state_e, UNK, sizeof(Tint) * nbEdges());
+	memset((int*)last_state_e, UNK, sizeof(Tint) * nbEdges());
 
 	was_shortest = new Tint[nbEdges()];
-	memset(was_shortest, 0, sizeof(Tint) * nbEdges());
+	memset((int*)was_shortest, 0, sizeof(Tint) * nbEdges());
 
 	for (int j = 0; j < nbEdges(); j++) {
 		getEdgeVar(j).attach(this, j, EVENT_LU);
@@ -97,7 +97,7 @@ void BoundedPathPropagator::constructGraph(vec<vec<edge_id> >& _in, vec<vec<edge
 	}
 
 	last_state_n = new Tint[nbNodes()];
-	memset(last_state_n, UNK, sizeof(Tint) * nbNodes());
+	memset((int*)last_state_n, UNK, sizeof(Tint) * nbNodes());
 	for (int j = 0; j < nbNodes(); j++) {
 		getNodeVar(j).attach(this, nbEdges() + j, EVENT_LU);
 	}
@@ -208,8 +208,8 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 	constructWeights(_ws, _w);
 
 	std::vector<std::vector<int> > en(nbEdges(), std::vector<int>());
-	for (int i = 0; i < _en.size(); i++) {
-		for (int j = 0; j < _en[i].size(); j++) {
+	for (unsigned int i = 0; i < _en.size(); i++) {
+		for (unsigned int j = 0; j < _en[i].size(); j++) {
 			en[i].push_back(_en[i][j]);
 		}
 	}
@@ -264,15 +264,15 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 	constructWeights(_wst, _w);
 
 	std::vector<std::vector<int> > en(nbEdges(), std::vector<int>());
-	for (int i = 0; i < _en.size(); i++) {
-		for (int j = 0; j < _en[i].size(); j++) {
+	for (unsigned int i = 0; i < _en.size(); i++) {
+		for (unsigned int j = 0; j < _en[i].size(); j++) {
 			en[i].push_back(_en[i][j]);
 		}
 	}
 
 	std::vector<std::vector<int> > weights(nbEdges(), std::vector<int>());
 	for (int i = 0; i < nbEdges(); i++) {
-		for (int j = 0; j < _wst[i].size(); j++) {
+		for (unsigned int j = 0; j < _wst[i].size(); j++) {
 			weights[i].push_back(_wst[i][j]);
 		}
 	}
@@ -299,8 +299,8 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 
 	std::vector<std::vector<int> > arrivalTime =
 			std::vector<std::vector<int> >(wst.size(), std::vector<int>(wst[0].size(), -1));
-	for (int i = 0; i < wst.size(); i++) {
-		for (int j = 0; j < wst[i].size(); j++) {
+	for (unsigned int i = 0; i < wst.size(); i++) {
+		for (unsigned int j = 0; j < wst[i].size(); j++) {
 			arrivalTime[i][j] = wst[i][j] + j;
 		}
 	}
@@ -311,7 +311,7 @@ BoundedPathPropagator::BoundedPathPropagator(int _s, int _d, vec<BoolView>& _vs,
 		latest[i] = std::vector<int>(arrivalTime[i][arrivalTime[i].size() - 1] + 1, -1);
 		for (unsigned int x = 0; x < arrivalTime[i].size(); x++) {
 			int v = arrivalTime[i][x];
-			int v2 = latest[i].size();
+			int v2 = static_cast<int>(latest[i].size());
 			if (x < arrivalTime[i].size() - 1) {
 				v2 = arrivalTime[i][x + 1];
 			}
@@ -1135,7 +1135,7 @@ public:
 		}
 
 		if (di == nullptr) {
-			for (int i = 0; i < x.size(); i++) {
+			for (unsigned int i = 0; i < x.size(); i++) {
 				if (!x[i]->finished()) {
 					// di = new DecInfo(x[i],0,1);
 					di = new DecInfo(nullptr, toInt(bounded_path_p->getEdgeVar(i).getLit(false)));

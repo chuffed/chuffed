@@ -114,19 +114,19 @@ MDDNodeInt MDDTable::insert(unsigned int var, unsigned int low, unsigned int sta
 
 	std::memcpy(act, intermed, sizeof(MDDNodeEl) + (((int)intermed->sz) - 1) * (sizeof(MDDEdge)));
 
-	varcache[act] = nodes.size();
+	varcache[act] = static_cast<int>(nodes.size());
 	nodes.push_back(act);
 	status.push_back(0);
 
 	stack.resize(start);  // Remove the current node from the stack.
-	return nodes.size() - 1;
+	return static_cast<int>(nodes.size() - 1);
 }
 
 template <class T>
 MDDNodeInt MDDTable::tuple(vec<T>& tpl) {
 	MDDNodeInt res = MDDTRUE;
 
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 	for (int i = tpl.size() - 1; i >= 0; i--) {
 		stack.push_back(mkedge(tpl[i], res));
 		stack.push_back(mkedge(tpl[i] + 1, MDDFALSE));
@@ -141,7 +141,7 @@ template MDDNodeInt MDDTable::tuple(vec<int>& tpl);
 MDDNodeInt MDDTable::mdd_vareq(int var, int val) {
 	assert(var < nvars);
 
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 
 	stack.push_back(mkedge(val, MDDTRUE));
 	stack.push_back(mkedge(val + 1, MDDFALSE));
@@ -153,7 +153,7 @@ MDDNodeInt MDDTable::mdd_vareq(int var, int val) {
 }
 
 MDDNodeInt MDDTable::mdd_varlt(int var, int val) {
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 
 	stack.push_back(mkedge(val, MDDFALSE));
 	const MDDNodeInt res = insert(var, MDDTRUE, start);
@@ -164,7 +164,7 @@ MDDNodeInt MDDTable::mdd_varlt(int var, int val) {
 }
 
 MDDNodeInt MDDTable::mdd_vargt(int var, int val) {
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 	stack.push_back(mkedge(val + 1, MDDTRUE));
 
 	const MDDNodeInt res = insert(var, MDDFALSE, start);
@@ -247,7 +247,7 @@ MDDNodeInt MDDTable::expand(int var, MDDNodeInt r) {
 	const int cvar = (r == MDDTRUE) ? nvars : nodes[r]->var;
 	assert(cvar >= var && var <= nvars);
 
-	const int start = stack.size();
+	const int start = static_cast<int>(stack.size());
 	int low;
 
 	if (cvar == var) {
@@ -288,7 +288,7 @@ MDDNodeInt MDDTable::mdd_and(MDDNodeInt a, MDDNodeInt b) {
 		return res;
 	}
 
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 	unsigned int var;
 	unsigned int low;
 	if (nodes[a]->var < nodes[b]->var) {
@@ -376,7 +376,7 @@ MDDNodeInt MDDTable::mdd_or(MDDNodeInt a, MDDNodeInt b) {
 		return res;
 	}
 
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 	unsigned int var;
 	unsigned int low;
 	if (nodes[a]->var < nodes[b]->var) {
@@ -472,7 +472,7 @@ MDDNodeInt MDDTable::mdd_exist(MDDNodeInt root, unsigned int var) {
 	}
 
 	// r_var < var
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 	const unsigned int low = mdd_exist(nodes[root]->low, var);
 	for (unsigned int ii = 0; ii < nodes[root]->sz; ii++) {
 		stack.push_back(
@@ -492,7 +492,7 @@ MDDNodeInt MDDTable::mdd_not(MDDNodeInt root) {
 	}
 
 	const unsigned int var = nodes[root]->var;
-	const unsigned int start = stack.size();
+	const unsigned int start = static_cast<int>(stack.size());
 
 	const unsigned int low = mdd_not(nodes[root]->low);
 

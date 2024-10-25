@@ -99,13 +99,13 @@ void IntVarLL::freeLazyVar(int val) {
 		ni = li;
 		while (ld[ni].val > val) {
 			ni = ld[ni].prev;
-			assert(0 <= ni && ni < ld.size());
+			assert(0 <= ni && ni < static_cast<int>(ld.size()));
 		}
 	} else if (val >= max) {
 		ni = hi;
 		while (ld[ni].val < val) {
 			ni = ld[ni].next;
-			assert(0 <= ni && ni < ld.size());
+			assert(0 <= ni && ni < static_cast<int>(ld.size()));
 		}
 	} else {
 		NEVER;
@@ -122,13 +122,13 @@ inline Lit IntVarLL::getGELit(int v) {
 	}
 	assert(v >= min);
 	int ni = li;
-	const int prev = prevDomVal(v);
+	const int prev = static_cast<int>(prevDomVal(v));
 	if ((vals != nullptr) && (vals[v] == 0)) {
-		v = nextDomVal(v);
+		v = static_cast<int>(nextDomVal(v));
 	}
 	while (ld[ni].val < prev) {
 		ni = ld[ni].next;
-		assert(0 <= ni && ni < ld.size());
+		assert(0 <= ni && ni < static_cast<int>(ld.size()));
 	}
 	if (ld[ni].val == prev) {
 		return Lit(ld[ni].var, true);
@@ -177,9 +177,9 @@ Lit IntVarLL::getLit(int64_t v, LitRel t) {
 	}
 	switch (t) {
 		case LR_GE:
-			return getGELit(v);
+			return getGELit(static_cast<int>(v));
 		case LR_LE:
-			return getLELit(v);
+			return getLELit(static_cast<int>(v));
 		default:
 			NEVER;
 	}
@@ -189,7 +189,7 @@ Lit IntVarLL::getLit(int64_t v, LitRel t) {
 inline void IntVarLL::channelMin(int v, Lit p) {
 	const Reason r(~p);
 	int ni;
-	const int prev = prevDomVal(v);
+	const int prev = static_cast<int>(prevDomVal(v));
 	for (ni = ld[li].next; ld[ni].val < prev; ni = ld[ni].next) {
 		sat.cEnqueue(Lit(ld[ni].var, true), r);
 	}
@@ -222,7 +222,7 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = nextDomVal(v);
 	}
-	const Lit p = getGELit(v);
+	const Lit p = getGELit(static_cast<int>(v));
 	if (channel) {
 		sat.cEnqueue(p, r);
 	}
@@ -230,8 +230,8 @@ bool IntVarLL::setMin(int64_t v, Reason r, bool channel) {
 		assert(sat.confl);
 		return false;
 	}
-	channelMin(v, p);
-	min = v;
+	channelMin(static_cast<int>(v), p);
+	min = static_cast<int>(v);
 	changes |= EVENT_C | EVENT_L;
 	updateFixed();
 	pushInQueue();
@@ -243,7 +243,7 @@ bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 	if ((vals != nullptr) && (vals[v] == 0)) {
 		v = prevDomVal(v);
 	}
-	const Lit p = getLELit(v);
+	const Lit p = getLELit(static_cast<int>(v));
 	if (channel) {
 		sat.cEnqueue(p, r);
 	}
@@ -251,8 +251,8 @@ bool IntVarLL::setMax(int64_t v, Reason r, bool channel) {
 		assert(sat.confl);
 		return false;
 	}
-	channelMax(v, p);
-	max = v;
+	channelMax(static_cast<int>(v), p);
+	max = static_cast<int>(v);
 	changes |= EVENT_C | EVENT_U;
 	updateFixed();
 	pushInQueue();
@@ -289,7 +289,7 @@ Lit IntVarLL::createLit(int _v) {
 	int ni = 1;
 	while (ld[ni].val > v) {
 		ni = ld[ni].prev;
-		assert(0 <= ni && ni < ld.size());
+		assert(0 <= ni && ni < static_cast<int>(ld.size()));
 	}
 	if (ld[ni].val == v) {
 		return Lit(ld[ni].var, s != 0);

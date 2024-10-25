@@ -56,7 +56,7 @@ class value_precede : public Propagator {
 public:
 	value_precede(int _s, int _t, vec<IntVar*>& vs) : s(_s), t(_t), satisfied(0) {
 		// Find the first possible occurrence of s.
-		int ii = 0;
+		unsigned int ii = 0;
 		// Can't do remVal before initialization.
 		for (; ii < vs.size(); ii++) {
 			if (vs[ii]->indomain(t)) {
@@ -92,7 +92,7 @@ public:
 			return;
 		}
 
-		for (int ii = 0; ii < xs.size(); ii++) {
+		for (unsigned int ii = 0; ii < xs.size(); ii++) {
 			IntVar* x(xs[ii]);
 			x->specialiseToEL();
 			if (x->indomain(s)) {
@@ -106,7 +106,7 @@ public:
 		first_t = xs.size() - static_cast<int>(t_seen);
 
 		int si = 1;
-		for (; si < xs.size(); ++si) {
+		for (; si < static_cast<int>(xs.size()); ++si) {
 			if (xs[si]->indomain(s)) {
 				break;
 			}
@@ -465,7 +465,7 @@ public:
 		fprintf(stderr, "LB: [");
 		if (xs.size() > 0) {
 			fprintf(stderr, "%d", xs[0]->getMin());
-			for (int ii = 1; ii < xs.size(); ii++) {
+			for (unsigned int ii = 1; ii < xs.size(); ii++) {
 				fprintf(stderr, ", %d", xs[ii]->getMin());
 			}
 		}
@@ -473,7 +473,7 @@ public:
 		fprintf(stderr, "UB: [");
 		if (xs.size() > 0) {
 			fprintf(stderr, "%d", xs[0]->getMax());
-			for (int ii = 1; ii < xs.size(); ii++) {
+			for (unsigned int ii = 1; ii < xs.size(); ii++) {
 				fprintf(stderr, ", %d", xs[ii]->getMax());
 			}
 		}
@@ -482,7 +482,7 @@ public:
 		fprintf(stderr, "FS: [");
 		if (first.size() > 0) {
 			fprintf(stderr, "%d", first[0].v);
-			for (int ii = 1; ii < first.size(); ii++) {
+			for (unsigned int ii = 1; ii < first.size(); ii++) {
 				fprintf(stderr, ", %d", first[ii].v);
 			}
 		}
@@ -491,7 +491,7 @@ public:
 		fprintf(stderr, "LM: [");
 		if (limit.size() > 0) {
 			fprintf(stderr, "%d", limit[0].v);
-			for (int ii = 1; ii < limit.size(); ii++) {
+			for (unsigned int ii = 1; ii < limit.size(); ii++) {
 				fprintf(stderr, ", %d", limit[ii].v);
 			}
 		}
@@ -500,7 +500,7 @@ public:
 		fprintf(stderr, "FV: [");
 		if (first_val.size() > 0) {
 			fprintf(stderr, "%d", first_val[0].v);
-			for (int ii = 1; ii < first_val.size(); ii++) {
+			for (unsigned int ii = 1; ii < first_val.size(); ii++) {
 				fprintf(stderr, ", %d", first_val[ii].v);
 			}
 		}
@@ -509,7 +509,7 @@ public:
 		fprintf(stderr, "LV: [");
 		if (limit_val.size() > 0) {
 			fprintf(stderr, "%d", limit_val[0].v);
-			for (int ii = 1; ii < limit_val.size(); ii++) {
+			for (unsigned int ii = 1; ii < limit_val.size(); ii++) {
 				fprintf(stderr, ", %d", limit_val[ii].v);
 			}
 		}
@@ -517,9 +517,9 @@ public:
 	}
 
 	void check_firsts() {
-		for (int ii = 1; ii < first.size(); ii++) {
+		for (unsigned int ii = 1; ii < first.size(); ii++) {
 			for (int jj = 0; jj < first[ii]; ++jj) {
-				assert(xs[jj]->getMax() < ii);
+				assert(xs[jj]->getMax() < static_cast<int>(ii));
 			}
 		}
 	}
@@ -529,14 +529,14 @@ public:
 		// fprintf(stderr, "BEFORE value-precede-chain:\n");
 		// log_state();
 		// fprintf(stderr, "Queues: [%d, %d].\n", first_change.size(), limit_change.size());
-		for (int fi = 0; fi < first_change.size(); fi++) {
+		for (unsigned int fi = 0; fi < first_change.size(); fi++) {
 			if (!repair_upper(first_change[fi])) {
 				return false;
 			}
 		}
 		first_change.clear();
 
-		for (int li = 0; li < limit_change.size(); li++) {
+		for (unsigned int li = 0; li < limit_change.size(); li++) {
 			if (!repair_limit(limit_change[li])) {
 				return false;
 			}
@@ -626,7 +626,7 @@ public:
 				// Check if we need to continue with k+1
 				++k;
 				// ++ii;
-				if (k == max_val || ii < first[k]) {
+				if (k == max_val || static_cast<int>(ii) < first[k]) {
 					return true;
 				}
 				lim = limit[k + 1];
@@ -638,7 +638,7 @@ public:
 			// Failure: no occurrence of
 			if (so.lazy) {
 				vec<Lit> ex;
-				for (int xi = 0; xi < ii; ++xi) {
+				for (unsigned int xi = 0; xi < ii; ++xi) {
 					assert(xs[xi]->getMax() < k);
 					ex.push(xs[xi]->getLit(k, LR_GE));
 				}
@@ -708,7 +708,7 @@ public:
 void value_precede_seq(vec<IntVar*>& xs) {
 	vec<IntVar*> nxs;
 	std::unordered_set<IntVar*> set;
-	for (size_t i = 0; i < xs.size(); ++i) {
+	for (unsigned int i = 0; i < xs.size(); ++i) {
 		if (set.find(xs[i]) != set.end()  // Same variable appears earlier in the same chain
 				|| xs[i]->getMax() < 1) {     // Variable cannot take a value that influences the chain
 			continue;

@@ -78,7 +78,7 @@ public:
 		}
 
 		for (int i = 0; i < n_tasks; i++) {
-			for (int j = 0; j < succ[i].size(); j++) {
+			for (unsigned int j = 0; j < succ[i].size(); j++) {
 				const int k = succ[i][j];
 				if (k == n_tasks) {
 					continue;

@@ -128,7 +128,7 @@ enum RewindStyle { REWIND_OMIT_SKIPPED, REWIND_SEND_SKIPPED };
 
 std::string showVector(const std::vector<int>& v) {
 	std::stringstream ss;
-	for (int i = 0; i < v.size(); i++) {
+	for (unsigned int i = 0; i < v.size(); i++) {
 		if (i > 0) {
 			ss << " ";
 		}
@@ -139,7 +139,7 @@ std::string showVector(const std::vector<int>& v) {
 
 std::string showVec(const vec<int>& v) {
 	std::stringstream ss;
-	for (int i = 0; i < v.size(); i++) {
+	for (unsigned int i = 0; i < v.size(); i++) {
 		if (i > 0) {
 			ss << " ";
 		}
@@ -151,7 +151,6 @@ std::string showVec(const vec<int>& v) {
 // Rewind nodepath and altpath after a backjump.
 void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle rewindStyle,
 								 long /*timestamp*/) {
-	int currentDecisionLevel;
 	switch (rewindStyle) {
 		case REWIND_OMIT_SKIPPED:
 			nodepath.resize(decisionLevelTip[newDecisionLevel]);
@@ -172,11 +171,10 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 			// child" for that node or any others at this level.
 			nodepath.resize(decisionLevelTip[previousDecisionLevel - 1]);
 			altpath.resize(decisionLevelTip[previousDecisionLevel - 1] - 1);
-			currentDecisionLevel = previousDecisionLevel - 1;
 
 			// Now walk back through the decision levels, sending a
 			// "skipped" node for each child that was never visited.
-			while (nodepath.size() > decisionLevelTip[newDecisionLevel]) {
+			while (static_cast<int>(nodepath.size()) > decisionLevelTip[newDecisionLevel]) {
 				const int nodeid = nextnodeid;
 				nextnodeid++;
 				const int parent = (nodepath.empty()) ? (-1) : (nodepath[nodepath.size() - 1]);
@@ -196,7 +194,6 @@ void rewindPaths(int previousDecisionLevel, int newDecisionLevel, RewindStyle re
 #endif
 				nodepath.resize(nodepath.size() - 1);
 				altpath.resize(altpath.size() - 1);
-				currentDecisionLevel--;
 			}
 #if DEBUG_VERBOSE
 			std::cerr << "after, nodepath is: " << showVector(nodepath) << "\n";
@@ -243,13 +240,13 @@ inline void Engine::newDecisionLevel() {
 	if (so.mip) {
 		mip->newDecisionLevel();
 	}
-	assert(dec_info.size() == decisionLevel());
+	assert(static_cast<int>(dec_info.size()) == decisionLevel());
 	peak_depth = std::max(peak_depth, decisionLevel());
 }
 
 inline void Engine::doFixPointStuff() {
 	// ask other objects to do fix point things
-	for (int i = 0; i < pseudo_props.size(); i++) {
+	for (unsigned int i = 0; i < pseudo_props.size(); i++) {
 		pseudo_props[i]->doFixPointStuff();
 	}
 }
@@ -395,8 +392,8 @@ inline bool Engine::constrain() {
 
 // Solution-based phase saving
 void Engine::saveCurrentSolution() {
-	sat.saveCurrentPolarities();             // SAT vars
-	for (int i = 0; i < vars.size(); i++) {  // Int vars
+	sat.saveCurrentPolarities();                      // SAT vars
+	for (unsigned int i = 0; i < vars.size(); i++) {  // Int vars
 		vars[i]->saveCurrentValue();
 	}
 }
@@ -416,7 +413,7 @@ WakeUp:
 		return false;
 	}
 
-	for (int i = 0; i < v_queue.size(); i++) {
+	for (unsigned int i = 0; i < v_queue.size(); i++) {
 		v_queue[i]->wakePropagators();
 	}
 	v_queue.clear();
@@ -446,13 +443,13 @@ WakeUp:
 
 // Clear all uncleared intermediate propagation states
 void Engine::clearPropState() {
-	for (int i = 0; i < v_queue.size(); i++) {
+	for (unsigned int i = 0; i < v_queue.size(); i++) {
 		v_queue[i]->clearPropState();
 	}
 	v_queue.clear();
 
 	for (int i = 0; i < num_queues; i++) {
-		for (int j = 0; j < p_queue[i].size(); j++) {
+		for (unsigned int j = 0; j < p_queue[i].size(); j++) {
 			p_queue[i][j]->clearPropState();
 		}
 		p_queue[i].clear();
@@ -498,11 +495,11 @@ void Engine::topLevelCleanUp() {
 
 void Engine::simplifyDB() {
 	int cost = 0;
-	for (int i = 0; i < propagators.size(); i++) {
+	for (unsigned int i = 0; i < propagators.size(); i++) {
 		cost += propagators[i]->checkSatisfied();
 	}
 	cost += propagators.size();
-	for (int i = 0; i < vars.size(); i++) {
+	for (unsigned int i = 0; i < vars.size(); i++) {
 		cost += vars[i]->simplifyWatches();
 	}
 	cost += vars.size();
@@ -514,7 +511,7 @@ void Engine::simplifyDB() {
 void Engine::blockCurrentSol() {
 	Clause& c = *Reason_new(outputs.size());
 	bool root_failure = true;
-	for (int i = 0; i < outputs.size(); i++) {
+	for (unsigned int i = 0; i < outputs.size(); i++) {
 		Var* v = (Var*)outputs[i];
 		if (v->getType() == BOOL_VAR) {
 			c[i] = ((BoolView*)outputs[i])->getValLit();
@@ -569,7 +566,7 @@ void Engine::toggleVSIDS() const {
 		vec<Branching*> old_x;
 		branching->x.moveTo(old_x);
 		branching->add(&sat);
-		for (int i = 0; i < old_x.size(); i++) {
+		for (unsigned int i = 0; i < old_x.size(); i++) {
 			branching->add(old_x[i]);
 		}
 		branching->fin = 0;
@@ -578,7 +575,7 @@ void Engine::toggleVSIDS() const {
 	} else {
 		vec<Branching*> old_x;
 		branching->x.moveTo(old_x);
-		for (int i = 1; i < old_x.size(); i++) {
+		for (unsigned int i = 1; i < old_x.size(); i++) {
 			branching->add(old_x[i]);
 		}
 		branching->fin = 0;
@@ -590,7 +587,7 @@ void Engine::toggleVSIDS() const {
 void Engine::set_assumptions(vec<BoolView>& xs) {
 	// Push the assumptions, then search as usual.
 	assumptions.clear();
-	for (int li = 0; li < xs.size(); li++) {
+	for (unsigned int li = 0; li < xs.size(); li++) {
 		assumptions.push(toInt(xs[li].getLit(true)));
 	}
 	// constrain will overwrite the last assumption;
@@ -603,7 +600,7 @@ void Engine::set_assumptions(vec<BoolView>& xs) {
 void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
 	vec<Lit> out_nogood;
 	const int assump_sz = sat.decisionLevel();
-	assert(assump_sz < engine.assumptions.size());
+	assert(assump_sz < static_cast<int>(engine.assumptions.size()));
 
 	const Lit q(toLit(engine.assumptions[assump_sz]));
 	assert(sat.value(q) == l_False);
@@ -618,7 +615,7 @@ void Engine::retrieve_assumption_nogood(vec<BoolView>& xs) {
 	// pushback_reason([](Lit p) { return sat.seen[var(p)]&2; }, q, out_nogood);
 	pushback_reason_lazy([](Lit p) { return sat.seen[var(p)] & 2; }, q, out_nogood);
 
-	for (int ii = 0; ii < out_nogood.size(); ii++) {
+	for (unsigned int ii = 0; ii < out_nogood.size(); ii++) {
 		xs.push(out_nogood[ii]);
 	}
 
@@ -698,10 +695,10 @@ RESULT Engine::search(const std::string& problemLabel) {
 		}
 		std::cerr << ")\n";
 #endif
-		if (decisionLevel() >= decisionLevelTip.size()) {
+		if (decisionLevel() >= static_cast<int>(decisionLevelTip.size())) {
 			decisionLevelTip.resize(decisionLevel() + 1);
 		}
-		decisionLevelTip[decisionLevel()] = nodepath.size();
+		decisionLevelTip[decisionLevel()] = static_cast<int>(nodepath.size());
 #if DEBUG_VERBOSE
 		std::cerr << "setting decisionLevelTip[" << decisionLevel() << "] to " << nodepath.size()
 							<< "\n";
@@ -756,7 +753,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 #ifdef HAS_PROFILER
 				if (doProfiling()) {
 					std::stringstream ss;
-					for (int i = 0; i < sat.out_learnt.size(); i++) {
+					for (unsigned int i = 0; i < sat.out_learnt.size(); i++) {
 						ss << " " << getLitString(toInt(sat.out_learnt[i]));
 					}
 					std::stringstream contribString;
@@ -769,7 +766,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 					// We leave duplicates in the list of blocks, so
 					// that the profiler can make use of them.
 					std::set<int> levels;
-					for (int i = 0; i < sat.out_learnt_level.size(); i++) {
+					for (unsigned int i = 0; i < sat.out_learnt_level.size(); i++) {
 						const int rawLevel = sat.out_learnt_level[i];
 						// We increment the "raw level" by one,
 						// because internally (on the trail) the first
@@ -784,13 +781,13 @@ RESULT Engine::search(const std::string& problemLabel) {
 					contribString << "]}";
 
 					// Calculate block level distance.
-					const int bld = levels.size();
+					//					const int bld = levels.size();
 
 					// Does this nogood involve literals that are
 					// derived from assumption literals?
 					const int numAssumptions = assumptions.size();
 					bool usesAssumptions = false;
-					for (int i = 0; i < sat.out_learnt_level.size(); i++) {
+					for (unsigned int i = 0; i < sat.out_learnt_level.size(); i++) {
 						if (sat.out_learnt_level[i] < numAssumptions) {
 							usesAssumptions = true;
 						}
@@ -800,7 +797,7 @@ RESULT Engine::search(const std::string& problemLabel) {
 						std::cerr << "uses assumptions: " << usesAssumptions << "\n";
 					}
 
-					const int backjumpDistance = previousDecisionLevel - decisionLevel();
+					//					const int backjumpDistance = previousDecisionLevel - decisionLevel();
 
 					if (doProfiling()) {
 						sendNode(profilerConnector
@@ -864,7 +861,8 @@ RESULT Engine::search(const std::string& problemLabel) {
 				makeDecision(di, 1);
 			}
 
-			if (!so.vsids && !so.toggle_vsids && conflictC >= so.switch_to_vsids_after) {
+			if (!so.vsids && !so.toggle_vsids &&
+					static_cast<int>(conflictC) >= so.switch_to_vsids_after) {
 				if (so.restart_scale >= 1000000000) {
 					so.restart_scale = 100;
 				}
@@ -933,11 +931,11 @@ RESULT Engine::search(const std::string& problemLabel) {
 			DecInfo* di = nullptr;
 
 			// Propagate assumptions
-			while (decisionLevel() < assumptions.size()) {
+			while (decisionLevel() < static_cast<int>(assumptions.size())) {
 				const int p = assumptions[decisionLevel()];
 				if (sat.value(toLit(p)) == l_True) {
 					// Dummy decision level:
-					assert(sat.trail.last().size() == sat.qhead.last());
+					assert(static_cast<int>(sat.trail.last().size()) == sat.qhead.last());
 					engine.dec_info.push(DecInfo(nullptr, p));
 					newDecisionLevel();
 				} else if (sat.value(toLit(p)) == l_False) {
@@ -1135,7 +1133,7 @@ void Engine::solve(Problem* p, const std::string& problemLabel) {
 	}
 
 	if (so.learnt_stats) {
-		for (int i = 0; i < sat.learnts.size(); i++) {
+		for (unsigned int i = 0; i < sat.learnts.size(); i++) {
 			Clause& c = *(sat.learnts[i]);
 			//        std::cerr << "clausescore," << c.clauseID() << ","
 			//        << c.rawActivity() << "\n";

@@ -29,7 +29,7 @@ void timed_cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b) {
 	//	bool in[s.size()];
 	bool* in = new bool[s.size()];
 	vec<int> a;
-	for (int i = 0; i < s.size(); i++) {
+	for (unsigned int i = 0; i < s.size(); i++) {
 		in[i] = (d[i] > 0 && r[i] > 0);
 		if (!in[i]) {
 			continue;
@@ -45,7 +45,7 @@ void timed_cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int b) {
 	}
 	for (int t = min; t <= max; t++) {
 		vec<IntVar*> x;
-		for (int i = 0; i < s.size(); i++) {
+		for (unsigned int i = 0; i < s.size(); i++) {
 			if (!in[i]) {
 				continue;
 			}
@@ -249,7 +249,7 @@ public:
 		fprintf(stderr, "\tCumulative with n = %d\n", start.size());
 #endif
 		// Attach to var events
-		for (int i = 0; i < start.size(); i++) {
+		for (unsigned int i = 0; i < start.size(); i++) {
 #if CUMUVERB > 1
 			fprintf(stderr, "\t%d: %p\n", i, start[i]);
 #endif
@@ -263,7 +263,7 @@ public:
 		}
 		limit->attach(this, start.size(), EVENT_UF);
 
-		for (int i = 0; i < start.size(); i++) {
+		for (unsigned int i = 0; i < start.size(); i++) {
 			task_id.push(i);
 		}
 		last_unfixed = start.size() - 1;
@@ -505,7 +505,6 @@ public:
 		auto iter = changes.begin();
 		int cur_profile = 0;
 		int cur_time = iter->time;
-		ProfileChange cur_change = iter->change;
 		int no_starts = 1;
 		for (; iter != changes.end(); iter++) {
 			if (iter->time > cur_time && no_starts > 1) {
@@ -518,7 +517,6 @@ public:
 				cur_profile++;
 			}
 			no_starts += (iter->change == PROFINC ? 1 : -1);
-			cur_change = iter->change;
 			cur_time = iter->time;
 		}
 	}
@@ -1268,8 +1266,7 @@ void CumulativeProp::submit_conflict_explanation(vec<Lit>& expl) {
 	Clause* reason = nullptr;
 	if (so.lazy) {
 		reason = Reason_new(expl.size());
-		int i = 0;
-		for (; i < expl.size(); i++) {
+		for (unsigned int i = 0; i < expl.size(); i++) {
 			(*reason)[i] = expl[i];
 		}
 	}
@@ -1278,7 +1275,7 @@ void CumulativeProp::submit_conflict_explanation(vec<Lit>& expl) {
 
 Clause* CumulativeProp::get_reason_for_update(vec<Lit>& expl) {
 	Clause* reason = Reason_new(expl.size() + 1);
-	for (int i = 1; i <= expl.size(); i++) {
+	for (unsigned int i = 1; i <= expl.size(); i++) {
 		(*reason)[i] = expl[i - 1];
 	}
 	return reason;
@@ -1286,7 +1283,7 @@ Clause* CumulativeProp::get_reason_for_update(vec<Lit>& expl) {
 
 int fixed_profile_max(vec<int>& t, vec<int>& delta) {
 	vec<int> perm;
-	for (int ii = 0; ii < t.size(); ++ii) {
+	for (unsigned int ii = 0; ii < t.size(); ++ii) {
 		perm.push(ii);
 	}
 	std::sort((int*)perm, ((int*)perm) + perm.size(), [&t](int i, int j) { return t[i] < t[j]; });
@@ -1295,7 +1292,7 @@ int fixed_profile_max(vec<int>& t, vec<int>& delta) {
 	int time = INT_MIN;
 	int level = 0;
 	int limit = 0;
-	for (int ii = 0; ii < perm.size(); ii++) {
+	for (unsigned int ii = 0; ii < perm.size(); ii++) {
 		const int ti(perm[ii]);
 		assert(time <= t[ti]);
 		if (time < t[ti]) {
@@ -1336,7 +1333,7 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
 		// First, find the earliest/latest unfixed regions.
 		int sMin = INT_MAX;
 		int sMax = INT_MIN;
-		for (int i = 0; i < s.size(); i++) {
+		for (unsigned int i = 0; i < s.size(); i++) {
 			if (r[i] > 0 && d[i] > 0) {
 				if (s[i]->isFixed()) {
 					fix_t.push(s[i]->getMin());
@@ -1356,7 +1353,7 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
 
 		const vec<int> fixed_t;
 		const vec<int> fixed_delta;
-		for (int i = 0; i < s.size(); i++) {
+		for (unsigned int i = 0; i < s.size(); i++) {
 			if (r[i] > 0 && d[i] > 0) {
 				if (s[i]->getMax() + d[i] <= sMin || sMax <= s[i]->getMin()) {
 					continue;
@@ -1379,7 +1376,7 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
 		vec<int> d_new;
 		vec<int> r_new;
 		int r_sum = 0;
-		for (int i = 0; i < s.size(); i++) {
+		for (unsigned int i = 0; i < s.size(); i++) {
 			if (r[i] > 0 && d[i] > 0) {
 				s_new.push(s[i]);
 				d_new.push(d[i]);
@@ -1398,7 +1395,6 @@ void cumulative(vec<IntVar*>& s, vec<int>& d, vec<int>& r, int limit,
 }
 
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit) {
-std:
 	const std::list<std::string> opt;
 	cumulative2(s, d, r, limit, opt);
 }
@@ -1418,7 +1414,7 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 
 	int sMin = INT_MAX;
 	int sMax = INT_MIN;
-	for (int i = 0; i < s.size(); i++) {
+	for (unsigned int i = 0; i < s.size(); i++) {
 		if (r[i]->getMax() > 0 && d[i]->getMax() > 0) {
 			if (s[i]->isFixed() && d[i]->isFixed() && r[i]->isFixed()) {
 				fix_t.push(s[i]->getMin());
@@ -1434,7 +1430,7 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 	const int fixed_top = fixed_profile_max(fix_t, fix_delta);
 	TL_SET(limit, setMin, fixed_top);
 
-	for (int i = 0; i < s.size(); i++) {
+	for (unsigned int i = 0; i < s.size(); i++) {
 		if (r[i]->getMax() > 0 && d[i]->getMax() > 0) {
 			// TODO: Check fixed section of the profile.
 			if (s[i]->getMax() + d[i]->getMax() <= sMin || sMax <= s[i]->getMin()) {
@@ -2122,7 +2118,7 @@ int CumulativeProp::ttef_retrieve_tasks(int shift_in(const int, const int, const
 	int en_req = 0;
 	// printf("* [%d, %d): #tasks %d; fixed %d\n", begin, end, task_id.size(), (int) last_unfixed);
 	//  Getting fixed tasks
-	for (int ii = 0; ii < task_id.size(); ii++) {
+	for (unsigned int ii = 0; ii < task_id.size(); ii++) {
 		const int i = task_id[ii];
 		if (i == fb_id || min_energy(i) == 0) {
 			continue;

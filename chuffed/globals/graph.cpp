@@ -61,9 +61,9 @@ std::vector<Lit> GraphPropagator::fullExpl(bool fail) {
 GraphPropagator::GraphPropagator(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _en)
 		: vs(_vs), es(_es) {
 	endnodes = std::vector<std::vector<int> >(_en.size(), std::vector<int>());
-	for (int i = 0; i < _en.size(); i++) {
-		for (int j = 0; j < _en[i].size(); j++) {  // when directed:
-			endnodes[i].push_back(_en[i][j]);        //[0] ---> [1]
+	for (unsigned int i = 0; i < _en.size(); i++) {
+		for (unsigned int j = 0; j < _en[i].size(); j++) {  // when directed:
+			endnodes[i].push_back(_en[i][j]);                 //[0] ---> [1]
 		}
 	}
 	if (DEBUG) {
@@ -117,7 +117,7 @@ bool GraphPropagator::coherence_outedges(int node) {
  * return true if no conflict, false otherwise (explanation built inside)
  */
 bool GraphPropagator::coherence_outedges(int node, std::vector<edge_id>& remvd_e) {
-	for (int i = 0; i < adj[node].size(); i++) {
+	for (unsigned int i = 0; i < adj[node].size(); i++) {
 		const edge_id edge = adj[node][i];
 		// Edge with missing an endnode
 		if (es[edge].isFixed() && es[edge].getVal() == 1) {
@@ -159,7 +159,7 @@ bool GraphPropagator::coherence_innodes(int edge) {
  * return true if no conflict, false otherwise (explanation built inside)
  */
 bool GraphPropagator::coherence_innodes(int edge, std::vector<node_id>& added_n) {
-	for (int i = 0; i < endnodes[edge].size(); i++) {
+	for (unsigned int i = 0; i < endnodes[edge].size(); i++) {
 		const int u = endnodes[edge][i];
 		if (vs[u].isFixed() && vs[u].getVal() == 0) {
 			if (so.lazy) {

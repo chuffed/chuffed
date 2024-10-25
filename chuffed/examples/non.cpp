@@ -86,7 +86,7 @@ public:
 		}
 
 		vec<IntVar*> pref_order;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			pref_order.push(x[i]);
 		}
 
@@ -95,7 +95,7 @@ public:
 	}
 
 	void print(std::ostream& os) override {
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			const int v = x[i]->getVal();
 			os << i << ": " << v << "\n";
 		}
@@ -134,7 +134,7 @@ static void nonogramDFA(vec<int>& blocks, vec<vec<int> >& output) {
 	output.last().push(1);
 	output.last().push(2);
 
-	for (int i = 0; i < blocks.size() - 1; i++) {
+	for (unsigned int i = 0; i < blocks.size() - 1; i++) {
 		for (int j = 1; j < blocks[i]; j++) {
 			output.push();
 			output.last().push(0);

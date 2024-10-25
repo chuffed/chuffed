@@ -52,7 +52,7 @@ inline void SAT::varDecayActivity() {
 		for (int i = 0; i < nVars(); i++) {
 			activity[i] *= 1e-100;
 		}
-		for (int i = 0; i < engine.vars.size(); i++) {
+		for (unsigned int i = 0; i < engine.vars.size(); i++) {
 			engine.vars[i]->activity *= 1e-100;
 		}
 		var_inc *= 1e-100;
@@ -91,7 +91,7 @@ inline void SAT::claDecayActivity() {
 	// counts by scaling everything down by a factor of 1e20.
 	if (cla_inc > 1e20) {
 		cla_inc *= 1e-20;
-		for (int i = 0; i < learnts.size(); i++) {
+		for (unsigned int i = 0; i < learnts.size(); i++) {
 			learnts[i]->activity() *= 1e-20;
 		}
 	}
@@ -212,7 +212,8 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 		engine.async_fail = true;
 	}
 
-	if (learnts.size() >= so.nof_learnts || learnts_literals >= so.learnts_mlimit / 4) {
+	if (static_cast<int>(learnts.size()) >= so.nof_learnts ||
+			learnts_literals >= so.learnts_mlimit / 4) {
 		reduceDB();
 	}
 }
@@ -227,7 +228,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 
 	if (so.debug) {
 		std::cerr << "trail of conflict level:";
-		for (int i = 0; i < ctrail.size(); i++) {
+		for (unsigned int i = 0; i < ctrail.size(); i++) {
 			std::cerr << " ";
 			std::cerr << getLitString(toInt(ctrail[i]));
 		}
@@ -283,7 +284,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 				implication_stream << getLitString(toInt(p));
 			}
 			implication_stream << ",";
-			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
+			for (unsigned int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
 				implication_stream << " " << getLitString(toInt(~c[i]));
 			}
 			implication_stream << "\n";
@@ -301,13 +302,13 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 				std::cerr << getLitString(toInt(p));
 			}
 			std::cerr << "  <-";
-			for (int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
+			for (unsigned int i = (p == lit_Undef ? 0 : 1); i < c.size(); i++) {
 				std::cerr << "  \t" << getLitString(toInt(~c[i]));
 			}
 			std::cerr << "\n";
 		}
 
-		for (int j = (p == lit_Undef) ? 0 : 1; j < c.size(); j++) {
+		for (unsigned int j = (p == lit_Undef) ? 0 : 1; j < c.size(); j++) {
 			const Lit q = c[j];
 			const int x = var(q);
 			/* if (so.debug) { */
@@ -382,7 +383,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 
 int SAT::findConflictLevel() {
 	int tp = -1;
-	for (int i = 0; i < confl->size(); i++) {
+	for (unsigned int i = 0; i < confl->size(); i++) {
 		const int l = trailpos[var((*confl)[i])];
 		if (l > tp) {
 			tp = l;
@@ -420,7 +421,7 @@ void SAT::explainUnlearnable(std::set<int>& /*contributingNogoods*/) {
 	const time_point start = chuffed_clock::now();
 
 	vec<Lit> removed;
-	for (int i = 1; i < out_learnt.size(); i++) {
+	for (unsigned int i = 1; i < out_learnt.size(); i++) {
 		const Lit p = out_learnt[i];
 		if (flags[var(p)].learnable()) {
 			continue;
@@ -432,7 +433,7 @@ void SAT::explainUnlearnable(std::set<int>& /*contributingNogoods*/) {
 		out_learnt.pop();
 		out_learnt_level.pop();
 		i--;
-		for (int j = 1; j < c.size(); j++) {
+		for (unsigned int j = 1; j < c.size(); j++) {
 			const Lit q = c[j];
 			if (seen[var(q)] == 0) {
 				seen[var(q)] = 1;
@@ -442,7 +443,7 @@ void SAT::explainUnlearnable(std::set<int>& /*contributingNogoods*/) {
 		}
 	}
 
-	for (int i = 0; i < removed.size(); i++) {
+	for (unsigned int i = 0; i < removed.size(); i++) {
 		seen[var(removed[i])] = 0;
 	}
 
@@ -514,7 +515,7 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 	vec<Lit> old_out_learnt(out_learnt);
 	vec<int> old_out_learnt_level(out_learnt_level);
 
-	for (int i = 0; i < out_learnt.size(); i++) {
+	for (unsigned int i = 0; i < out_learnt.size(); i++) {
 		const Lit p = out_learnt[i];
 		assert(!reason[var(p)].isLazy());
 		Clause* cp = getExpl(~p);
@@ -536,7 +537,7 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 		out_learnt.pop();
 		out_learnt_level.pop();
 		i--;
-		for (int j = 1; j < c.size(); j++) {
+		for (unsigned int j = 1; j < c.size(); j++) {
 			const Lit q = c[j];
 			if (so.debug) {
 				std::cerr << "adding literal " << getLitString(toInt(q));
@@ -562,12 +563,12 @@ void SAT::explainToExhaustion(std::set<int>& contributingNogoods) {
 }
 
 void SAT::clearSeen() {
-	for (int i = 0; i < ivseen_toclear.size(); i++) {
+	for (unsigned int i = 0; i < ivseen_toclear.size(); i++) {
 		ivseen[ivseen_toclear[i]] = false;
 	}
 	ivseen_toclear.clear();
 
-	for (int i = 0; i < out_learnt.size(); i++) {
+	for (unsigned int i = 0; i < out_learnt.size(); i++) {
 		seen[var(out_learnt[i])] = 0;  // ('seen[]' is now cleared)
 	}
 }
@@ -579,7 +580,7 @@ int SAT::findBackTrackLevel() {
 	}
 
 	int max_i = 1;
-	for (int i = 2; i < out_learnt.size(); i++) {
+	for (unsigned int i = 2; i < out_learnt.size(); i++) {
 		if (trailpos[var(out_learnt[i])] > trailpos[var(out_learnt[max_i])]) {
 			max_i = i;
 		}
@@ -620,7 +621,7 @@ void SAT::printClause(T& c) {
 	printf("Size:%d - ", c.size());
 	printLit(c[0]);
 	printf(" <- ");
-	for (int i = 1; i < c.size(); i++) {
+	for (unsigned int i = 1; i < c.size(); i++) {
 		printLit(~c[i]);
 	}
 	printf("\n");
@@ -628,7 +629,7 @@ void SAT::printClause(T& c) {
 
 void SAT::checkConflict() const {
 	assert(confl != nullptr);
-	for (int i = 0; i < confl->size(); i++) {
+	for (unsigned int i = 0; i < confl->size(); i++) {
 		if (value((*confl)[i]) != l_False) {
 			printf("Analyze: %dth lit is not false\n", i);
 		}
@@ -644,16 +645,16 @@ void SAT::checkConflict() const {
 
 void SAT::checkExplanation(Clause& c, int clevel, int index) {
 	NOT_SUPPORTED;
-	for (int i = 1; i < c.size(); i++) {
+	for (unsigned int i = 1; i < c.size(); i++) {
 		assert(value(c[i]) == l_False);
 		assert(trailpos[var(c[i])] < engine.trail_lim[clevel]);
 		vec<Lit>& ctrail = trail[trailpos[var(c[i])]];
 		int pos = -1;
-		for (int j = 0; j < ctrail.size(); j++) {
+		for (unsigned int j = 0; j < ctrail.size(); j++) {
 			if (var(ctrail[j]) == var(c[i])) {
 				pos = j;
 				if (trailpos[var(c[i])] == clevel) {
-					assert(j <= index);
+					assert(static_cast<int>(j) <= index);
 				}
 				break;
 			}

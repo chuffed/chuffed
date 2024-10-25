@@ -207,7 +207,7 @@ public:
 		os << "]";
 	}
 	~Array() override {
-		for (int i = a.size(); (i--) != 0;) {
+		for (auto i = a.size(); (i--) != 0;) {
 			delete a[i];
 		}
 	}
@@ -281,7 +281,7 @@ inline void Node::append(Node* newNode) {
 
 inline bool Node::hasAtom(const std::string& id) {
 	if (auto* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); (i--) != 0;) {
+		for (auto i = a->a.size(); (i--) != 0;) {
 			if (Atom* at = dynamic_cast<Atom*>(a->a[i])) {
 				if (at->id == id) {
 					return true;
@@ -312,7 +312,7 @@ inline Call* Node::getCall() {
 
 inline bool Node::hasCall(const std::string& id) {
 	if (auto* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); (i--) != 0;) {
+		for (auto i = a->a.size(); (i--) != 0;) {
 			if (Call* at = dynamic_cast<Call*>(a->a[i])) {
 				if (at->id == id) {
 					return true;
@@ -335,7 +335,7 @@ inline bool Node::isInt(int& i) {
 
 inline Call* Node::getCall(const std::string& id) {
 	if (auto* a = dynamic_cast<Array*>(this)) {
-		for (int i = a->a.size(); (i--) != 0;) {
+		for (auto i = a->a.size(); (i--) != 0;) {
 			if (Call* at = dynamic_cast<Call*>(a->a[i])) {
 				if (at->id == id) {
 					return at;

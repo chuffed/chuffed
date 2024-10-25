@@ -332,6 +332,7 @@ bool DAGPropagator::check_correctness(int r, std::vector<int>& v) {
 void dag(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<edge_id> >& _in,
 				 vec<vec<edge_id> >& _out, vec<vec<int> >& _en) {
 	auto* dag = new DAGPropagator(r, _vs, _es, _in, _out, _en);
+	(void)dag;
 	// if (so.check_prop)
 	//     engine.propagators.push(dag);
 }

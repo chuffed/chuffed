@@ -45,7 +45,7 @@ public:
 				ps(R + _x.size()) {
 		priority = 2;
 
-		for (int i = 0; i < _x.size(); i++) {
+		for (unsigned int i = 0; i < _x.size(); i++) {
 			assert(a[i]);
 			if (a[i] > 0) {
 				pos[i] = x.size();
@@ -75,10 +75,10 @@ public:
 
 		int64_t max_sum = fix_sum;
 
-		for (int i = fix_x; i < x.size(); i++) {
+		for (unsigned int i = fix_x; i < x.size(); i++) {
 			max_sum += x[i].getMax();
 		}
-		for (int i = fix_y; i < y.size(); i++) {
+		for (unsigned int i = fix_y; i < y.size(); i++) {
 			max_sum += y[i].getMax();
 		}
 
@@ -89,10 +89,10 @@ public:
 			if (r.setValNotR(v != 0)) {
 				Reason expl;
 				if (so.lazy) {
-					for (int j = 0; j < x.size(); j++) {
+					for (unsigned int j = 0; j < x.size(); j++) {
 						ps[j + 1] = x[j].getMaxLit();
 					}
-					for (int j = 0; j < y.size(); j++) {
+					for (unsigned int j = 0; j < y.size(); j++) {
 						ps[j + 1 + x.size()] = y[j].getMaxLit();
 					}
 					expl = Reason_new(ps);
@@ -115,7 +115,7 @@ public:
 		//			setDom2(y[i], setMin, y[i].getMax()-max_sum, x.size()+i);
 		//		}
 
-		for (int i = fix_x; i < x.size(); i++) {
+		for (unsigned int i = fix_x; i < x.size(); i++) {
 			const int64_t v = x[i].getMax() - max_sum;
 			if (x[i].setMinNotR(v)) {
 				Reason expl;
@@ -123,10 +123,10 @@ public:
 					if ((R != 0) && r.isFixed()) {
 						ps[0] = r.getValLit();
 					}
-					for (int j = 0; j < x.size(); j++) {
+					for (unsigned int j = 0; j < x.size(); j++) {
 						ps[j + R] = x[j].getMaxLit();
 					}
-					for (int j = 0; j < y.size(); j++) {
+					for (unsigned int j = 0; j < y.size(); j++) {
 						ps[j + R + x.size()] = y[j].getMaxLit();
 					}
 					ps[R + i] = ps[0];
@@ -138,7 +138,7 @@ public:
 			}
 		}
 
-		for (int i = fix_y; i < y.size(); i++) {
+		for (unsigned int i = fix_y; i < y.size(); i++) {
 			const int64_t v = y[i].getMax() - max_sum;
 			if (y[i].setMinNotR(v)) {
 				Reason expl;
@@ -146,10 +146,10 @@ public:
 					if ((R != 0) && r.isFixed()) {
 						ps[0] = r.getValLit();
 					}
-					for (int j = 0; j < x.size(); j++) {
+					for (unsigned int j = 0; j < x.size(); j++) {
 						ps[j + R] = x[j].getMaxLit();
 					}
-					for (int j = 0; j < y.size(); j++) {
+					for (unsigned int j = 0; j < y.size(); j++) {
 						ps[j + R + x.size()] = y[j].getMaxLit();
 					}
 					ps[R + x.size() + i] = ps[0];
@@ -165,16 +165,16 @@ public:
 	}
 
 	Clause* explain(Lit /*p*/, int inf_id) override {
-		if (inf_id == x.size() + y.size()) {
+		if (inf_id == static_cast<int>(x.size() + y.size())) {
 			inf_id = -1;
 		}
 		if ((R != 0) && r.isFixed()) {
 			ps[0] = r.getValLit();
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			ps[i + R] = x[i].getMaxLit();
 		}
-		for (int i = 0; i < y.size(); i++) {
+		for (unsigned int i = 0; i < y.size(); i++) {
 			ps[i + R + x.size()] = y[i].getMaxLit();
 		}
 		ps[R + inf_id] = ps[0];
@@ -204,13 +204,13 @@ public:
 	LinearNE(vec<int>& a, vec<IntVar*>& _x, int _c, BoolView _r = bv_true)
 			: sz(_x.size()), c(_c), r(std::move(_r)), num_unfixed(sz), sum_fixed(-c) {
 		vec<IntView<0> > w;
-		for (int i = 0; i < a.size(); i++) {
+		for (unsigned int i = 0; i < a.size(); i++) {
 			if (a[i] >= 0) {
 				w.push(IntView<0>(_x[i], a[i]));
 			}
 		}
 		sp = w.size();
-		for (int i = 0; i < a.size(); i++) {
+		for (unsigned int i = 0; i < a.size(); i++) {
 			if (a[i] < 0) {
 				w.push(IntView<0>(_x[i], -a[i]));
 			}
@@ -317,7 +317,7 @@ public:
 template <int S>
 void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c) {
 	vec<int> b;
-	for (int i = 0; i < a.size(); i++) {
+	for (unsigned int i = 0; i < a.size(); i++) {
 		b.push(-a[i]);
 	}
 	switch (t) {
@@ -355,7 +355,7 @@ void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c) {
 template <int S>
 void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
 	vec<int> b;
-	for (int i = 0; i < a.size(); i++) {
+	for (unsigned int i = 0; i < a.size(); i++) {
 		b.push(-a[i]);
 	}
 	switch (t) {
@@ -388,7 +388,7 @@ void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView 
 template <int S>
 void int_linear_reif(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, BoolView r) {
 	vec<int> b;
-	for (int i = 0; i < a.size(); i++) {
+	for (unsigned int i = 0; i < a.size(); i++) {
 		b.push(-a[i]);
 	}
 	switch (t) {
@@ -424,7 +424,7 @@ void int_linear_imp(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const Boo
 
 	bool scale = false;
 	double limit = abs(c);
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		assert(a[i]);
 		if (a[i] != 1 && a[i] != -1) {
 			scale = true;
@@ -457,7 +457,7 @@ void int_linear(vec<int>& a, vec<IntVar*>& x, IntRelType t, int c, const BoolVie
 
 	bool scale = false;
 	double limit = abs(c);
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		assert(a[i]);
 		if (a[i] != 1 && a[i] != -1) {
 			scale = true;
@@ -538,12 +538,12 @@ void int_linear(vec<IntVar*>& x, IntRelType t, int c, const BoolView& r) {
 
 void int_linear(vec<int>& _a, vec<IntVar*>& _x, IntRelType t, IntVar* y, const BoolView& r) {
 	vec<int> a;
-	for (int i = 0; i < _a.size(); i++) {
+	for (unsigned int i = 0; i < _a.size(); i++) {
 		a.push(_a[i]);
 	}
 	a.push(-1);
 	vec<IntVar*> x;
-	for (int i = 0; i < _x.size(); i++) {
+	for (unsigned int i = 0; i < _x.size(); i++) {
 		x.push(_x[i]);
 	}
 	x.push(y);
@@ -562,7 +562,7 @@ void table_GAC(vec<IntVar*>& x, vec<vec<int> >& t);
 void int_linear_dom(vec<int>& a, vec<IntVar*>& x, int c) {
 	assert(a.size() == 3 && x.size() == 3);
 
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		x[i]->specialiseToEL();
 	}
 

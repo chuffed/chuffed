@@ -23,21 +23,21 @@ public:
 	vec<Lit> ps;
 
 	BoolLinearLE(vec<BoolView>& _x, IntView<U> _y) : x(_x), y(_y), ones(0) {
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			x[i].attach(this, i, EVENT_L);
 		}
 		y.attach(this, x.size(), EVENT_U);
 	}
 
 	void wakeup(int i, int /*c*/) override {
-		if (i < x.size()) {
+		if (i < static_cast<int>(x.size())) {
 			ones++;
 		}
 		pushInQueue();
 	}
 
 	bool propagate() override {
-		const int y_max = y.getMax();
+		const int y_max = static_cast<int>(y.getMax());
 
 		if (ones > y_max) {
 			ones = y_max + 1;
@@ -46,7 +46,7 @@ public:
 		setDom2(y, setMin, ones, 1);
 
 		if (ones == y_max) {
-			for (int i = 0; i < x.size(); i++) {
+			for (unsigned int i = 0; i < x.size(); i++) {
 				if (!x[i].isFixed()) {
 					x[i].setVal2(false, Reason(prop_id, 0));
 				}
@@ -77,7 +77,7 @@ public:
 
 void bool_linear(vec<BoolView>& x, IntRelType t, IntVar* y) {
 	vec<BoolView> x2;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		x2.push(~x[i]);
 	}
 	switch (t) {

@@ -309,7 +309,7 @@ public:
 			os << "]\n";
 		}
 		os << "Hours worked: " << (1.0 * cost->getVal() / 4) << "\n";
-		for (int ww = 0; ww < xv.size(); ww++) {
+		for (unsigned int ww = 0; ww < xv.size(); ww++) {
 			os << "[";
 			for (int ii = 0; ii < shifts; ii++) {
 				//        if(ii)

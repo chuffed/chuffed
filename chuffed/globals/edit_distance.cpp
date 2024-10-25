@@ -441,25 +441,25 @@ void edit_distance(int max_char, vec<int>& insertion_cost, vec<int>& deletion_co
 									 vec<int>& substitution_cost, vec<IntVar*>& seq1, vec<IntVar*>& seq2,
 									 IntVar* ed) {
 	vec<IntView<> > s1;
-	for (int i = 0; i < seq1.size(); i++) {
+	for (unsigned int i = 0; i < seq1.size(); i++) {
 		seq1[i]->specialiseToEL();
 		s1.push(IntView<>(seq1[i]));
 	}
 	vec<IntView<> > s2;
-	for (int i = 0; i < seq2.size(); i++) {
+	for (unsigned int i = 0; i < seq2.size(); i++) {
 		seq2[i]->specialiseToEL();
 		s2.push(IntView<>(seq2[i]));
 	}
 
 	// insert clauses to ensure 0 values appear only at the end of each sequence
-	for (int i = 0; i < seq1.size() - 1; i++) {
+	for (unsigned int i = 0; i < seq1.size() - 1; i++) {
 		// x_i >= 1 v x_i+1 <= 0
 		vec<Lit> cl;
 		cl.push(seq1[i]->getLit(1, LR_GE));
 		cl.push(seq1[i + 1]->getLit(0, LR_LE));
 		sat.addClause(cl);
 	}
-	for (int i = 0; i < seq2.size() - 1; i++) {
+	for (unsigned int i = 0; i < seq2.size() - 1; i++) {
 		// x_i >= 1 v x_i+1 <= 0
 		vec<Lit> cl;
 		cl.push(seq2[i]->getLit(1, LR_GE));

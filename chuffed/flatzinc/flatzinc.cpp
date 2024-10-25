@@ -141,7 +141,7 @@ FlatZincSpace::FlatZincSpace(int intVars, int boolVars, int /*setVars*/)
 
 void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 	// Resizing of the vectors if required
-	if (intVarCount == iv.size()) {
+	if (intVarCount == static_cast<int>(iv.size())) {
 		const int newSize = intVarCount > 0 ? 2 * intVarCount : 1;
 		iv.growTo(newSize);
 		iv_introduced.resize(newSize);
@@ -174,8 +174,9 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 				std::sort((int*)d, (int*)d + d.size());
 				v = ::newIntVar(d[0], d.last());
 				intVarString.insert(std::pair<IntVar*, std::string>(v, name));
-				if ((d.last() - d[0] >= d.size() * mylog2(d.size())) ||
-						(d.size() <= so.eager_limit && (d.last() - d[0] + 1) > so.eager_limit)) {
+				if ((d.last() - d[0] >= static_cast<int>(d.size() * mylog2(d.size()))) ||
+						(static_cast<int>(d.size()) <= so.eager_limit &&
+						 (d.last() - d[0] + 1) > so.eager_limit)) {
 					new (v) IntVarSL(*v, d);
 				} else {
 					if (!v->allowSet(d)) {
@@ -201,7 +202,7 @@ void FlatZincSpace::newIntVar(IntVarSpec* vs, const std::string& name) {
 
 void FlatZincSpace::newBoolVar(BoolVarSpec* vs) {
 	// Resizing of the vectors if required
-	if (boolVarCount == bv.size()) {
+	if (boolVarCount == static_cast<int>(bv.size())) {
 		const int newSize = boolVarCount > 0 ? 2 * boolVarCount : 1;
 		bv.growTo(newSize);
 		bv_introduced.resize(newSize);
@@ -333,8 +334,8 @@ void FlatZincSpace::parseSolveAnnBoolSearch(AST::Node* elemAnn, BranchGroup* bra
 		AST::Call* call = elemAnn->getCall("bool_search");
 		AST::Array* args = call->getArgs(4);
 		AST::Array* vars = args->a[0]->getArray();
-		vec<Branching*> va(vars->a.size());
-		for (int i = vars->a.size(); (i--) != 0;) {
+		vec<Branching*> va(static_cast<unsigned int>(vars->a.size()));
+		for (auto i = va.size(); (i--) != 0;) {
 			va[i] = new BoolView(bv[vars->a[i]->getBoolVar()]);
 		}
 		branching->add(createBranch(va, ann2ivarsel(args->a[1]), ann2ivalsel(args->a[2])));
@@ -379,7 +380,7 @@ void FlatZincSpace::parseSolveAnnPrioritySearch(AST::Node* elemAnn, BranchGroup*
 		// Parse search annotations
 		int nbChildSearchAnnotations = 0;
 		parseSolveAnn(annotations, priorityBranching, nbChildSearchAnnotations);
-		if (vars->a.size() != nbChildSearchAnnotations) {
+		if (static_cast<int>(vars->a.size()) != nbChildSearchAnnotations) {
 			throw FlatZinc::Error("Type error in priority_search annotation",
 														"Variable and annotation array must have the same size");
 		}
@@ -406,8 +407,8 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_bool annotation.\n");
 		}
-		const int sz = std::min(vars->a.size(), vals->a.size());
-		for (int ii = 0; ii < sz; ii++) {
+		const auto sz = std::min(vars->a.size(), vals->a.size());
+		for (unsigned int ii = 0; ii < sz; ii++) {
 			// Ignore constants
 			if (vars->a[ii]->isBoolVar()) {
 				decs.push(bv[vars->a[ii]->getBoolVar()].getLit(vals->a[ii]->getBool()));
@@ -421,8 +422,8 @@ void FlatZincSpace::parseSolveAnnWarmStart(AST::Node* elemAnn, BranchGroup* bran
 		if (vars->a.size() != vals->a.size()) {
 			fprintf(stderr, "WARNING: length mismatch in warm_start_int annotation.\n");
 		}
-		const int sz = std::min(vars->a.size(), vals->a.size());
-		for (int ii = 0; ii < sz; ii++) {
+		const auto sz = std::min(vars->a.size(), vals->a.size());
+		for (unsigned int ii = 0; ii < sz; ii++) {
 			if (vars->a[ii]->isInt()) {
 				// Ignore constants
 				continue;
@@ -633,8 +634,8 @@ void FlatZincSpace::setOutput() const {
 	for (auto* ai : output->a) {
 		if (ai->isArray()) {
 			AST::Array* aia = ai->getArray();
-			const int size = aia->a.size();
-			for (int j = 0; j < size; j++) {
+			const auto size = aia->a.size();
+			for (unsigned int j = 0; j < size; j++) {
 				setOutputElem(aia->a[j]);
 			}
 		} else if (ai->isCall("ifthenelse")) {

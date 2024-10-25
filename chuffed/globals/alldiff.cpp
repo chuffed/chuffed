@@ -61,9 +61,9 @@ public:
 
 	bool propagate() override {
 		// fprintf(stderr, "AllDiffValue::propagate()\n");
-		for (int i = 0; i < new_fixed.size(); i++) {
+		for (unsigned int i = 0; i < new_fixed.size(); i++) {
 			const int a = new_fixed[i];
-			const int b = x[a].getVal();
+			const int b = static_cast<int>(x[a].getVal());
 			// fprintf(stderr, "var %d == %d:\n", a, b);
 			Clause* r = nullptr;
 			if (so.lazy) {
@@ -186,7 +186,7 @@ public:
 
 		for (int i = sz - 1; i >= 0; --i) {
 			const int t = minsorted[i];
-			iv[t].min = x[t].getMin();
+			iv[t].min = static_cast<int>(x[t].getMin());
 			int j;
 			for (j = i; j < sz - 1; ++j) {
 				if (iv[t].min < iv[minsorted[j + 1]].min) {
@@ -198,7 +198,7 @@ public:
 		}
 		for (int i = sz - 1; i >= 0; --i) {
 			const int t = maxsorted[i];
-			iv[t].max = x[t].getMax() + 1;
+			iv[t].max = static_cast<int>(x[t].getMax()) + 1;
 			int j;
 			for (j = i; j < sz - 1; ++j) {
 				if (iv[t].max < iv[maxsorted[j + 1]].max) {
@@ -720,7 +720,7 @@ public:
 
 		for (int i = sz - 1; i >= 0; --i) {
 			const int t = minsorted[i];
-			iv[t].min = x[t].getMin();
+			iv[t].min = static_cast<int>(x[t].getMin());
 			int j;
 			for (j = i; j < sz - 1; ++j) {
 				if (iv[t].min < iv[minsorted[j + 1]].min) {
@@ -732,7 +732,7 @@ public:
 		}
 		for (int i = sz - 1; i >= 0; --i) {
 			const int t = maxsorted[i];
-			iv[t].max = x[t].getMax() + 1;
+			iv[t].max = static_cast<int>(x[t].getMax()) + 1;
 			int j;
 			for (j = i; j < sz - 1; ++j) {
 				if (iv[t].max < iv[maxsorted[j + 1]].max) {
@@ -943,7 +943,7 @@ public:
 void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl) {
 	int min = INT_MAX;
 	int max = INT_MIN;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		if (x[i]->getMin() < min) {
 			min = x[i]->getMin();
 		}
@@ -956,7 +956,7 @@ void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl) {
 		NOT_SUPPORTED;
 	}
 	vec<IntView<> > u;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		u.push(IntView<>(x[i], 1, -min));
 	}
 	if (min == 0) {
@@ -969,7 +969,7 @@ void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl) {
 void all_different(vec<IntVar*>& x, ConLevel cl) {
 	int min = INT_MAX;
 	int max = INT_MIN;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		if (x[i]->getMin() < min) {
 			min = x[i]->getMin();
 		}
@@ -980,7 +980,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 	const int range = max + 1 - min;
 	if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, -min));
 		}
 		if (min == 0) {
@@ -998,7 +998,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		// (see Issue #10). In the future, it needs to be decided how to
 		// permanently fix this issue.
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, -min));
 		}
 		if (min == 0) {
@@ -1011,7 +1011,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 		}
 	}
 	vec<IntView<> > u;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		u.push(IntView<>(x[i], 1, -min));
 	}
 	if (min == 0) {
@@ -1024,7 +1024,7 @@ void all_different(vec<IntVar*>& x, ConLevel cl) {
 void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
 	int min = INT_MAX;
 	int max = INT_MIN;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		if (a[i] + x[i]->getMin() < min) {
 			min = a[i] + x[i]->getMin();
 		}
@@ -1035,7 +1035,7 @@ void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
 	const int range = max + 1 - min;
 	if (cl == CL_BND) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, a[i] - min));
 		}
 		new AllDiffBounds<4>(u, range);
@@ -1044,7 +1044,7 @@ void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
 		}
 	} else if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, a[i] - min));
 		}
 		new AllDiffDomain<4>(u, range);
@@ -1053,7 +1053,7 @@ void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
 		}
 	}
 	vec<IntView<> > u;
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		u.push(IntView<>(x[i], 1, a[i] - min));
 	}
 	new AllDiffValue<4>(u, range);
@@ -1065,7 +1065,7 @@ void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl) {
 
 void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 	assert(x.size() == y.size());
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		TL_SET(x[i], setMin, o1);
 		TL_SET(x[i], setMax, o1 + x.size() - 1);
 		TL_SET(y[i], setMin, o2);
@@ -1073,7 +1073,7 @@ void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 	}
 	if (cl == CL_BND) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, -o1));
 		}
 		if (o1 == 0) {
@@ -1083,7 +1083,7 @@ void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 		}
 	} else if (cl == CL_DOM) {
 		vec<IntView<> > u;
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			u.push(IntView<>(x[i], 1, -o1));
 		}
 		if (o1 == 0) {
@@ -1092,14 +1092,14 @@ void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1, int o2, ConLevel cl) {
 			new AllDiffDomain<4>(u, x.size());
 		}
 	}
-	for (int i = 0; i < x.size(); i++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
 		x[i]->specialiseToEL();
 	}
-	for (int i = 0; i < y.size(); i++) {
+	for (unsigned int i = 0; i < y.size(); i++) {
 		y[i]->specialiseToEL();
 	}
-	for (int i = 0; i < x.size(); i++) {
-		for (int j = 0; j < y.size(); j++) {
+	for (unsigned int i = 0; i < x.size(); i++) {
+		for (unsigned int j = 0; j < y.size(); j++) {
 			sat.addClause(x[i]->getLit(o1 + j, LR_NE), y[j]->getLit(o2 + i, LR_EQ));
 			sat.addClause(x[i]->getLit(o1 + j, LR_EQ), y[j]->getLit(o2 + i, LR_NE));
 		}

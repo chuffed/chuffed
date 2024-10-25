@@ -111,7 +111,7 @@ public:
 
 	// Wake up only parts relevant to this event
 	void wakeup(int i, int c) override {
-		if (i == boolvars.size()) {
+		if (i == static_cast<int>(boolvars.size())) {
 			// Cost has changed.
 			assert(c & EVENT_U);
 			cost_changed = true;

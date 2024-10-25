@@ -77,7 +77,7 @@ public:
 		clusters = std::vector<std::set<int> >(this->clusters_count, std::set<int>());
 		centroids = std::vector<int>(this->clusters_count, -1);
 		// Special case
-		if (this->clusters_count == to_cluster.size()) {
+		if (this->clusters_count == static_cast<int>(to_cluster.size())) {
 			// Each node a cluster
 			for (unsigned int i = 0; i < to_cluster.size(); i++) {
 				centroids[i] = to_cluster[i];
@@ -90,7 +90,7 @@ public:
 
 		// Initialize: randomly choose centroids and cluster IDs
 		std::shuffle(to_cluster.begin(), to_cluster.end(), engine.rnd);
-		for (unsigned int i = 0; i < this->clusters_count; i++) {
+		for (int i = 0; i < this->clusters_count; i++) {
 			centroids[i] = to_cluster[i];
 			cluster_id[to_cluster[i]] = i;
 		}
@@ -100,7 +100,7 @@ public:
 		for (const int n : to_cluster) {
 			int min = -1;
 			int arg_min = -1;
-			for (unsigned int j = 0; j < this->clusters_count; j++) {
+			for (int j = 0; j < this->clusters_count; j++) {
 				const int cent = centroids[j];
 				int inf = 0;
 				int inf2 = 0;
@@ -137,7 +137,7 @@ public:
 			// The node int he cluster with minimum sum of distances to
 			// other nodes in the cluster
 
-			for (unsigned int cl = 0; cl < this->clusters_count; cl++) {
+			for (int cl = 0; cl < this->clusters_count; cl++) {
 				int min = -1;
 				std::set<int>::iterator it;
 				for (it = clusters[cl].begin(); it != clusters[cl].end(); ++it) {
@@ -181,7 +181,7 @@ public:
 			for (const int n : to_cluster) {
 				int min = -1;
 				int arg_min = -1;
-				for (unsigned int j = 0; j < this->clusters_count; j++) {
+				for (int j = 0; j < this->clusters_count; j++) {
 					const int cent = centroids[j];
 					int inf = 0;
 					int inf2 = 0;

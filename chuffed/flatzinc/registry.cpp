@@ -79,24 +79,24 @@ ConLevel ann2icl(AST::Node* ann) {
 
 inline void arg2intargs(vec<int>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
-	ia.growTo(a->a.size());
-	for (int i = a->a.size(); (i--) != 0;) {
+	ia.growTo(static_cast<unsigned int>(a->a.size()));
+	for (unsigned int i = ia.size(); (i--) != 0;) {
 		ia[i] = a->a[i]->getInt();
 	}
 }
 
 inline void arg2boolargs(vec<bool>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
-	ia.growTo(a->a.size());
-	for (int i = a->a.size(); (i--) != 0;) {
+	ia.growTo(static_cast<unsigned int>(a->a.size()));
+	for (unsigned int i = ia.size(); (i--) != 0;) {
 		ia[i] = a->a[i]->getBool();
 	}
 }
 
 inline void arg2intvarargs(vec<IntVar*>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
-	ia.growTo(a->a.size());
-	for (int i = a->a.size(); (i--) != 0;) {
+	ia.growTo(static_cast<unsigned int>(a->a.size()));
+	for (unsigned int i = ia.size(); (i--) != 0;) {
 		if (a->a[i]->isIntVar()) {
 			ia[i] = s->iv[a->a[i]->getIntVar()];
 		} else {
@@ -108,8 +108,8 @@ inline void arg2intvarargs(vec<IntVar*>& ia, AST::Node* arg) {
 
 inline void arg2BoolVarArgs(vec<BoolView>& ia, AST::Node* arg) {
 	AST::Array* a = arg->getArray();
-	ia.growTo(a->a.size());
-	for (int i = a->a.size(); (i--) != 0;) {
+	ia.growTo(static_cast<unsigned int>(a->a.size()));
+	for (unsigned int i = ia.size(); (i--) != 0;) {
 		if (a->a[i]->isBoolVar()) {
 			ia[i] = s->bv[a->a[i]->getBoolVar()];
 		} else {
@@ -552,7 +552,7 @@ void p_set_in(const ConExpr& ce, AST::Node* /*unused*/) {
 		int_rel(v, IRT_GE, sl->min);
 		int_rel(v, IRT_LE, sl->max);
 	} else {
-		vec<int> is(sl->s.size());
+		vec<int> is(static_cast<unsigned int>(sl->s.size()));
 		for (unsigned int i = 0; i < sl->s.size(); i++) {
 			is[i] = sl->s[i];
 		}
@@ -636,7 +636,7 @@ void p_table_int(const ConExpr& ce, AST::Node* ann) {
 	vec<vec<int> > ts;
 	for (int i = 0; i < noOfTuples; i++) {
 		ts.push();
-		for (int j = 0; j < x.size(); j++) {
+		for (unsigned int j = 0; j < x.size(); j++) {
 			ts.last().push(tuples[i * noOfVars + j]);
 		}
 	}
@@ -656,7 +656,7 @@ void p_regular(const ConExpr& ce, AST::Node* ann) {
 	arg2intargs(d_flat, ce[3]);
 	const int q0 = ce[4]->getInt();
 
-	assert(d_flat.size() == q * s);
+	assert(static_cast<int>(d_flat.size()) == q * s);
 
 	vec<vec<int> > d;
 	for (int i = 0; i < q; i++) {
@@ -697,7 +697,7 @@ void p_cost_regular(const ConExpr& ce, AST::Node* ann) {
 	arg2intargs(w_flat, ce[4]);
 	const int q0 = ce[5]->getInt();
 
-	assert(d_flat.size() == q * s);
+	assert(static_cast<int>(d_flat.size()) == q * s);
 
 	vec<vec<int> > d;
 	vec<vec<int> > w;
@@ -1123,9 +1123,9 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ad;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ad_flat[i * es.size() + j]) {
 				ad[i].push(j);
 			}
@@ -1135,7 +1135,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	try {
 		vec<bool> en_flat_b;
 		arg2boolargs(en_flat_b, ce[3]);
-		for (int i = 0; i < en_flat_b.size(); i++) {
+		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
 	} catch (FlatZinc::AST::TypeError& e) {
@@ -1146,10 +1146,9 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			const int check = 0;
-			for (int j = 0; j < vs.size(); j++) {
+			for (unsigned int j = 0; j < vs.size(); j++) {
 				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
@@ -1160,7 +1159,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
 			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
@@ -1209,9 +1208,9 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ad;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ad_flat[i * es.size() + j]) {
 				ad[i].push(j);
 			}
@@ -1221,7 +1220,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 	try {
 		vec<bool> en_flat_b;
 		arg2boolargs(en_flat_b, ce[3]);
-		for (int i = 0; i < en_flat_b.size(); i++) {
+		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
 	} catch (FlatZinc::AST::TypeError& e) {
@@ -1232,10 +1231,9 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			const int check = 0;
-			for (int j = 0; j < vs.size(); j++) {
+			for (unsigned int j = 0; j < vs.size(); j++) {
 				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
@@ -1246,7 +1244,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
 			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
@@ -1299,9 +1297,9 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ad;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ad_flat[i * es.size() + j]) {
 				ad[i].push(j);
 			}
@@ -1312,7 +1310,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	try {
 		vec<bool> en_flat_b;
 		arg2boolargs(en_flat_b, ce[3]);
-		for (int i = 0; i < en_flat_b.size(); i++) {
+		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
 	} catch (FlatZinc::AST::TypeError& e) {
@@ -1323,10 +1321,9 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			const int check = 0;
-			for (int j = 0; j < vs.size(); j++) {
+			for (unsigned int j = 0; j < vs.size(); j++) {
 				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
@@ -1337,7 +1334,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
 			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
@@ -1391,9 +1388,9 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ad;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ad_flat[i * es.size() + j]) {
 				ad[i].push(j);
 			}
@@ -1403,7 +1400,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 	try {
 		vec<bool> en_flat_b;
 		arg2boolargs(en_flat_b, ce[3]);
-		for (int i = 0; i < en_flat_b.size(); i++) {
+		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
 	} catch (FlatZinc::AST::TypeError& e) {
@@ -1414,10 +1411,9 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
-			const int check = 0;
-			for (int j = 0; j < vs.size(); j++) {
+			for (unsigned int j = 0; j < vs.size(); j++) {
 				if (en_flat[i * vs.size() + j] != 0) {
 					en[i].push(j);
 				}
@@ -1428,7 +1424,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 		}
 	} else if (en_flat.size() == es.size() * 2) {
 		// New format
-		for (int i = 0; i < es.size(); i++) {
+		for (unsigned int i = 0; i < es.size(); i++) {
 			en.push(vec<int>());
 			// The -1 is because indexes in MZ start at 1
 			en[i].push(en_flat[i] - 1);
@@ -1486,9 +1482,9 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(in_flat, ce[3]);
 	assert(in_flat.size() == vs.size() * es.size());
 	vec<vec<int> > in;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (in_flat[i * es.size() + j]) {
 				in[i].push(j);
 			}
@@ -1498,9 +1494,9 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ou_flat, ce[4]);
 	assert(ou_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ou;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ou_flat[i * es.size() + j]) {
 				ou[i].push(j);
 			}
@@ -1511,7 +1507,7 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
 	vec<vec<int> > en;
-	for (int i = 0; i < es.size(); i++) {
+	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
@@ -1565,9 +1561,9 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(in_flat, ce[3]);
 	assert(in_flat.size() == vs.size() * es.size());
 	vec<vec<int> > in;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (in_flat[i * es.size() + j]) {
 				in[i].push(j);
 			}
@@ -1577,9 +1573,9 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ou_flat, ce[4]);
 	assert(ou_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ou;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ou_flat[i * es.size() + j]) {
 				ou[i].push(j);
 			}
@@ -1590,7 +1586,7 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
 	vec<vec<int> > en;
-	for (int i = 0; i < es.size(); i++) {
+	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
@@ -1657,9 +1653,9 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(in_flat, ce[4]);
 	assert(in_flat.size() == vs.size() * es.size());
 	vec<vec<int> > in;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (in_flat[i * es.size() + j]) {
 				in[i].push(j);
 			}
@@ -1669,9 +1665,9 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ou_flat, ce[5]);
 	assert(ou_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ou;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ou_flat[i * es.size() + j]) {
 				ou[i].push(j);
 			}
@@ -1682,7 +1678,7 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
 	vec<vec<int> > en;
-	for (int i = 0; i < es.size(); i++) {
+	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
@@ -1739,9 +1735,9 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(in_flat, ce[4]);
 	assert(in_flat.size() == vs.size() * es.size());
 	vec<vec<int> > in;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (in_flat[i * es.size() + j]) {
 				in[i].push(j);
 			}
@@ -1751,9 +1747,9 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2boolargs(ou_flat, ce[5]);
 	assert(ou_flat.size() == vs.size() * es.size());
 	vec<vec<int> > ou;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
-		for (int j = 0; j < es.size(); j++) {
+		for (unsigned int j = 0; j < es.size(); j++) {
 			if (ou_flat[i * es.size() + j]) {
 				ou[i].push(j);
 			}
@@ -1765,7 +1761,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
 	vec<vec<int> > en;
-	for (int i = 0; i < es.size(); i++) {
+	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
 		en[i].push(en_flat[i] - 1);
@@ -1776,12 +1772,12 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	IntVar* w = getIntVar(ce[8]);
 
 	vec<int> ds;
-	for (int i = 0; i < vs.size(); i++) {
+	for (unsigned int i = 0; i < vs.size(); i++) {
 		ds.push(0);
 	}
 
 	vec<vec<int> > ws2;
-	for (int i = 0; i < ws.size(); i++) {
+	for (unsigned int i = 0; i < ws.size(); i++) {
 		ws2.push(vec<int>());
 		for (int j = 0; j < 100; j++) {
 			ws2[ws2.size() - 1].push(ws[i]);

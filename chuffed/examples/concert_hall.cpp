@@ -120,20 +120,20 @@ public:
 		for (int i = 0; i < sat.nVars(); i++) {
 			sat.flags[i] = LitFlags(false, false, false);
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
 		}
-		for (int i = 0; i < bi.size(); i++) {
+		for (unsigned int i = 0; i < bi.size(); i++) {
 			assert(bi[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)bi[i])->setVLearnable();
 			((IntVarEL*)bi[i])->setBLearnable();
 		}
-		for (int i = 0; i < t.size(); i++) {
+		for (unsigned int i = 0; i < t.size(); i++) {
 			sat.flags[var(t[i].getLit(false))].setLearnable(true);
 			sat.flags[var(t[i].getLit(false))].setUIPable(true);
 		}
-		for (int i = 0; i < qs.size(); i++) {
+		for (unsigned int i = 0; i < qs.size(); i++) {
 			sat.flags[var(qs[i].getLit(false))].setLearnable(true);
 			sat.flags[var(qs[i].getLit(false))].setUIPable(true);
 		}

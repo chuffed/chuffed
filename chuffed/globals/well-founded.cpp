@@ -31,7 +31,7 @@ public:
 	int body[1];
 
 	ConjRule(int h, vec<int>& b, Lit bl) : head(h), sz(b.size()), body_lit(bl) {
-		for (int i = 0; i < b.size(); i++) {
+		for (unsigned int i = 0; i < b.size(); i++) {
 			body[i] = b[i];
 		}
 	}
@@ -40,7 +40,7 @@ public:
 };
 
 ConjRule* ConjRule_new(int h, vec<int>& b, Lit bl) {
-	void* mem = malloc(sizeof(ConjRule) + (b.size()==0 ? 0 : b.size() - 1) * sizeof(int));
+	void* mem = malloc(sizeof(ConjRule) + (b.size() == 0 ? 0 : b.size() - 1) * sizeof(int));
 	return new (mem) ConjRule(h, b, bl);
 }
 
@@ -120,11 +120,11 @@ public:
 	}
 
 	void preprocess() {
-		for (int i = 0; i < raw_heads.size(); i++) {
+		for (unsigned int i = 0; i < raw_heads.size(); i++) {
 			raw_head_to_body.insert(std::pair<int, int>(toInt((Lit)raw_heads[i]), i));
 		}
 
-		for (int i = 0; i < raw_heads.size(); i++) {
+		for (unsigned int i = 0; i < raw_heads.size(); i++) {
 			if (raw_posb[i].size() == 1 && raw_negb[i].size() == 0) {
 				if (raw_head_to_body.count(toInt((Lit)raw_posb[i][0])) == 1) {
 					const int r = raw_head_to_body.find(toInt((Lit)raw_posb[i][0]))->second;
@@ -136,7 +136,7 @@ public:
 			}
 		}
 
-		for (int i = 0; i < raw_heads.size(); i++) {
+		for (unsigned int i = 0; i < raw_heads.size(); i++) {
 			if (raw_heads[i] == bv_false) {
 				continue;
 			}
@@ -183,7 +183,7 @@ public:
 
 	static void getStaticEdges(WellFounded* wf, int v, vec<int>& edges) {
 		edges.clear();
-		for (int i = 0; i < wf->head_occ_rules[v].size(); i++) {
+		for (unsigned int i = 0; i < wf->head_occ_rules[v].size(); i++) {
 			const ConjRule& r = *wf->head_occ_rules[v][i];
 			for (int j = 0; j < r.sz; j++) {
 				edges.push(r.body[j]);
@@ -193,7 +193,7 @@ public:
 
 	static void getDynamicEdges(WellFounded* wf, int v, vec<int>& edges) {
 		edges.clear();
-		for (int i = 0; i < wf->head_occ_rules[v].size(); i++) {
+		for (unsigned int i = 0; i < wf->head_occ_rules[v].size(); i++) {
 			const ConjRule& r = *wf->head_occ_rules[v][i];
 			if (r.isFalse()) {
 				continue;
@@ -215,7 +215,7 @@ public:
 		vec<int> edges;
 		getEdges(this, v, edges);
 
-		for (int i = 0; i < edges.size(); i++) {
+		for (unsigned int i = 0; i < edges.size(); i++) {
 			const int w = edges[i];
 			if (indices[w] == -1) {
 				strongconnect(w, getEdges);
@@ -257,7 +257,7 @@ public:
 		if (PREPROCESS) {
 			preprocess();
 		} else {
-			for (int i = 0; i < raw_heads.size(); i++) {
+			for (unsigned int i = 0; i < raw_heads.size(); i++) {
 				getId(raw_heads[i]);
 			}
 		}
@@ -277,7 +277,7 @@ public:
 		ufset_bool.growTo(lits.size(), false);
 
 		// form rules
-		for (int i = 0; i < raw_heads.size(); i++) {
+		for (unsigned int i = 0; i < raw_heads.size(); i++) {
 			if (raw_heads[i] == bv_false) {
 				continue;
 			}
@@ -286,10 +286,10 @@ public:
 			}
 			if (FLIP_NEG) {
 				vec<BoolView> b;
-				for (int j = 0; j < raw_posb[i].size(); j++) {
+				for (unsigned int j = 0; j < raw_posb[i].size(); j++) {
 					b.push(raw_posb[i][j]);
 				}
-				for (int j = 0; j < raw_negb[i].size(); j++) {
+				for (unsigned int j = 0; j < raw_negb[i].size(); j++) {
 					b.push(raw_negb[i][j]);
 				}
 				array_bool_and(b, raw_bl[i]);
@@ -301,7 +301,7 @@ public:
 			}
 
 			vec<int> b;
-			for (int j = 0; j < raw_posb[i].size(); j++) {
+			for (unsigned int j = 0; j < raw_posb[i].size(); j++) {
 				auto it = lit_to_index.find(toInt((Lit)raw_posb[i][j]));
 				if (it == lit_to_index.end()) {
 					continue;
@@ -312,7 +312,7 @@ public:
 			rules.push(r);
 		}
 
-		for (int i = 0; i < rules.size(); i++) {
+		for (unsigned int i = 0; i < rules.size(); i++) {
 			ConjRule& r = *rules[i];
 			for (int j = 0; j < r.sz; j++) {
 				body_occ_rules[r.body[j]].push(&r);
@@ -322,9 +322,9 @@ public:
 
 		// post array_bool_or's
 
-		for (int i = 0; i < lits.size(); i++) {
+		for (unsigned int i = 0; i < lits.size(); i++) {
 			vec<BoolView> b;
-			for (int j = 0; j < head_occ_rules[i].size(); j++) {
+			for (unsigned int j = 0; j < head_occ_rules[i].size(); j++) {
 				b.push(BoolView(head_occ_rules[i][j]->body_lit));
 				if (!COMPLETE) {
 					bool_rel(~BoolView(head_occ_rules[i][j]->body_lit), BRT_OR, BoolView(lits[i]));
@@ -339,13 +339,13 @@ public:
 		if (CALC_SCC) {
 			index = 0;
 			assert(S.size() == 0);
-			for (int i = 0; i < indices.size(); i++) {
+			for (unsigned int i = 0; i < indices.size(); i++) {
 				indices[i] = -1;
 				lowlink[i] = -1;
 			}
 			sccs.clear();
 
-			for (int i = 0; i < lits.size(); i++) {
+			for (unsigned int i = 0; i < lits.size(); i++) {
 				if (indices[i] == -1) {
 					//					printf("SCC root: %d\n", i);
 					strongconnect(i, &getStaticEdges);
@@ -354,15 +354,15 @@ public:
 			}
 			assert(S.size() == 0);
 
-			for (int i = 0; i < sccs.size(); i++) {
-				for (int j = 0; j < sccs[i].size(); j++) {
+			for (unsigned int i = 0; i < sccs.size(); i++) {
+				for (unsigned int j = 0; j < sccs[i].size(); j++) {
 					scc_ids[sccs[i][j]] = i;
 				}
 			}
 
 		} else {
 			sccs.push();
-			for (int i = 0; i < lits.size(); i++) {
+			for (unsigned int i = 0; i < lits.size(); i++) {
 				scc_ids[i] = 0;
 			}
 		}
@@ -371,12 +371,12 @@ public:
 		ushead.growTo(sccs.size(), 0);
 		pufhead.growTo(sccs.size(), 0);
 
-		for (int i = 0; i < lits.size(); i++) {
+		for (unsigned int i = 0; i < lits.size(); i++) {
 			if (BoolView(lits[i]).isFalse()) {
 				continue;
 			}
 			assert(scc_ids[i] >= 0);
-			assert(scc_ids[i] < no_support.size());
+			assert(scc_ids[i] < static_cast<int>(no_support.size()));
 			//			fprintf(stderr, "%d ", scc_ids[i]);
 			no_support[scc_ids[i]].push(i);
 			no_support_bool[i] = true;
@@ -389,7 +389,7 @@ public:
 		//		}
 
 		if (DEBUG) {
-			for (int i = 0; i < rules.size(); i++) {
+			for (unsigned int i = 0; i < rules.size(); i++) {
 				const ConjRule& r = *rules[i];
 				printf("Rule %d: ", i);
 				printf("%d <- ", r.head);
@@ -434,14 +434,14 @@ public:
 			printf("propagating\n");
 		}
 
-		for (int i = 0; i < dead_rules.size(); i++) {
+		for (unsigned int i = 0; i < dead_rules.size(); i++) {
 			killSupport(rules[dead_rules[i]]);
 		}
 
-		for (int i = 0; i < no_support.size(); i++) {
-			while (ushead[i] < no_support[i].size()) {
+		for (unsigned int i = 0; i < no_support.size(); i++) {
+			while (ushead[i] < static_cast<int>(no_support[i].size())) {
 				const int x = no_support[i][ushead[i]++];
-				for (int j = 0; j < body_occ_rules[x].size(); j++) {
+				for (unsigned int j = 0; j < body_occ_rules[x].size(); j++) {
 					killSupport(body_occ_rules[x][j]);
 				}
 			}
@@ -455,8 +455,8 @@ public:
 			printf("No support: ");
 		}
 		if (DEBUG) {
-			for (int i = 0; i < no_support.size(); i++) {
-				for (int j = 0; j < no_support[i].size(); j++) {
+			for (unsigned int i = 0; i < no_support.size(); i++) {
+				for (unsigned int j = 0; j < no_support[i].size(); j++) {
 					printf("%d, ", no_support[i][j]);
 				}
 			}
@@ -467,8 +467,8 @@ public:
 
 		int start = -1;
 		// pick one to start building unfounded set
-		for (int i = 0; i < no_support.size(); i++) {
-			for (; pufhead[i] < no_support[i].size(); pufhead[i]++) {
+		for (unsigned int i = 0; i < no_support.size(); i++) {
+			for (; pufhead[i] < static_cast<int>(no_support[i].size()); pufhead[i]++) {
 				const int x = no_support[i][pufhead[i]];
 				if (no_support_bool[x] && !BoolView(lits[x]).isFalse()) {
 					start = x;
@@ -485,7 +485,7 @@ public:
 			if (DEBUG) {
 				printf("all done\n");
 			}
-			for (int i = 0; i < no_support.size(); i++) {
+			for (unsigned int i = 0; i < no_support.size(); i++) {
 				no_support[i].clear();
 				ushead[i] = 0;
 				pufhead[i] = 0;
@@ -506,18 +506,18 @@ public:
 		nfset.clear();
 		int nfshead = 0;
 
-		for (int uf = 0; uf < ufset.size(); uf++) {
+		for (unsigned int uf = 0; uf < ufset.size(); uf++) {
 			const int h = ufset[uf];
 			if (!no_support_bool[h]) {
 				fprintf(stderr, "not no_support %d!\n", h);
-				for (int k = 0; k < ufset.size(); k++) {
+				for (unsigned int k = 0; k < ufset.size(); k++) {
 					fprintf(stderr, "%d ", ufset[k]);
 				}
 				fprintf(stderr, "- %d %d\n", uf, h);
 			}
 			assert(no_support_bool[h]);
 			// add rules with h as head
-			for (int i = 0; i < head_occ_rules[h].size(); i++) {
+			for (unsigned int i = 0; i < head_occ_rules[h].size(); i++) {
 				if (DEBUG) {
 					printf("checking %dth rule for %d\n", i, h);
 				}
@@ -536,9 +536,9 @@ public:
 
 			// propagate nfset
 
-			while (nfshead < nfset.size()) {
+			while (nfshead < static_cast<int>(nfset.size())) {
 				const int x = nfset[nfshead++];
-				for (int i = 0; i < watches[x].size(); i++) {
+				for (unsigned int i = 0; i < watches[x].size(); i++) {
 					ConjRule* r = watches[x][i];
 					// if head already founded by another rule, ignore
 					if (!no_support_bool[r->head]) {
@@ -563,13 +563,13 @@ public:
 
 		index = 0;
 		assert(S.size() == 0);
-		for (int i = 0; i < indices.size(); i++) {
+		for (unsigned int i = 0; i < indices.size(); i++) {
 			indices[i] = -1;
 			lowlink[i] = -1;
 		}
 		sccs.clear();
 
-		for (int i = 0; i < ufset.size(); i++) {
+		for (unsigned int i = 0; i < ufset.size(); i++) {
 			const int h = ufset[i];
 			if (!no_support_bool[h]) {
 				continue;
@@ -589,14 +589,14 @@ public:
 
 		vec<Lit> ps(1);
 
-		for (int i = 0; i < ufset.size(); i++) {
+		for (unsigned int i = 0; i < ufset.size(); i++) {
 			ufset_bool[ufset[i]] = false;
 			watches[ufset[i]].clear();
 			const int h = ufset[i];
 			if (!no_support_bool[h]) {
 				continue;
 			}
-			for (int i = 0; i < head_occ_rules[h].size(); i++) {
+			for (unsigned int i = 0; i < head_occ_rules[h].size(); i++) {
 				ConjRule* r = head_occ_rules[h][i];
 				if (r->isFalse()) {
 					ps.push(r->body_lit);
@@ -605,10 +605,10 @@ public:
 		}
 
 		Clause* expl = Reason_new(ps.size());
-		for (int i = 1; i < ps.size(); i++) {
+		for (unsigned int i = 1; i < ps.size(); i++) {
 			(*expl)[i] = ps[i];
 		}
-		for (int i = 0; i < ufset.size(); i++) {
+		for (unsigned int i = 0; i < ufset.size(); i++) {
 			const int h = ufset[i];
 			if (!no_support_bool[h]) {
 				continue;
@@ -669,8 +669,8 @@ public:
 		in_queue = false;
 		dead_rules.clear();
 		if (sat.confl != nullptr) {
-			for (int i = 0; i < no_support.size(); i++) {
-				for (; pufhead[i] < no_support[i].size(); pufhead[i]++) {
+			for (unsigned int i = 0; i < no_support.size(); i++) {
+				for (; pufhead[i] < static_cast<int>(no_support[i].size()); pufhead[i]++) {
 					no_support_bool[no_support[i][pufhead[i]]] = false;
 				}
 				no_support[i].clear();
@@ -689,7 +689,7 @@ void add_inductive_rule(const BoolView& hl, vec<BoolView>& posb, vec<BoolView>& 
 }
 
 void wf_init() {
-	for (int i = 0; i < wf_props.size(); i++) {
+	for (unsigned int i = 0; i < wf_props.size(); i++) {
 		wf_props[i].init();
 	}
 	//	exit(0);

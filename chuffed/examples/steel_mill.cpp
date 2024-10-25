@@ -80,7 +80,7 @@ public:
 				max_loss = loss_table[j];
 			}
 		}
-		for (int i = 0; i < capacities.size() - 1; i++) {
+		for (unsigned int i = 0; i < capacities.size() - 1; i++) {
 			for (int j = capacities[i] + 1; j < capacities[i + 1]; j++) {
 				loss_table[j] = capacities[i + 1] - j;
 				if (loss_table[j] > max_loss) {
@@ -176,7 +176,7 @@ public:
 		for (int i = 0; i < sat.nVars(); i++) {
 			sat.flags[i] = LitFlags(false, false, false);
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
 			((IntVarEL*)x[i])->setVDecidable(true);

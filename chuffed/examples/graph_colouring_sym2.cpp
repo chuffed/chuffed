@@ -90,7 +90,7 @@ public:
 		for (int i = 0; i < sat.nVars(); i++) {
 			sat.flags[i] = LitFlags(false, false, false);
 		}
-		for (int i = 0; i < x.size(); i++) {
+		for (unsigned int i = 0; i < x.size(); i++) {
 			assert(x[i]->getType() == INT_VAR_EL);
 			((IntVarEL*)x[i])->setVLearnable();
 			((IntVarEL*)x[i])->setVDecidable(true);
