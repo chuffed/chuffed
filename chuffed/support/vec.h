@@ -66,14 +66,14 @@ public:
 	// Stack interface:
 	void push() {
 		if (sz == cap) {
-			cap = std::max(2u, (cap * 3 + 1) >> 1);
+			cap = cap <= 1 ? 2 : (cap * 3 + 1) >> 1;
 			data = (T*)realloc((char*)data, cap * sizeof(T));
 		}
 		new (&data[sz++]) T();
 	}
 	void push(const T& elem) {
 		if (sz == cap) {
-			cap = std::max(2u, (cap * 3 + 1) >> 1);
+            cap = cap <= 1 ? 2 : (cap * 3 + 1) >> 1;
 			data = (T*)realloc((char*)data, cap * sizeof(T));
 		}
 		new (&data[sz++]) T(elem);
