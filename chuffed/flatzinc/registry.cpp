@@ -1138,7 +1138,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
-	} catch (FlatZinc::AST::TypeError& e) {
+	} catch (FlatZinc::AST::TypeError& /*e*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
@@ -1223,7 +1223,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
-	} catch (FlatZinc::AST::TypeError& e) {
+	} catch (FlatZinc::AST::TypeError& /*e*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
@@ -1313,7 +1313,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
-	} catch (FlatZinc::AST::TypeError& e) {
+	} catch (FlatZinc::AST::TypeError& /*e*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
@@ -1403,7 +1403,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 		for (unsigned int i = 0; i < en_flat_b.size(); i++) {
 			en_flat.push(en_flat_b[i] ? 1 : 0);
 		}
-	} catch (FlatZinc::AST::TypeError& e) {
+	} catch (FlatZinc::AST::TypeError& /*e*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 

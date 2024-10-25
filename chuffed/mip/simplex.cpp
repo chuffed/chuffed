@@ -320,7 +320,7 @@ bool Simplex::findPivotRow() {
 			continue;
 		}
 		float a;
-		const float val = rhs[i] + (shift[v] != 0 ? ub[v] : lb[v]);
+		const float val = static_cast<float>(rhs[i] + (shift[v] != 0 ? ub[v] : lb[v]));
 		//		fprintf(stderr, "cr %d: %.3Lf %d %d\n", i, val, (int) lb[v], (int) ub[v]);
 		// check lower bound
 		a = lb[v] - val;

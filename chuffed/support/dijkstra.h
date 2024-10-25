@@ -158,7 +158,7 @@ public:
 	using map_type = std::unordered_map<size_t, tuple>;
 	static inline unsigned long hash_fn(std::vector<bool>& b) {
 		const std::hash<std::vector<bool>> h;
-		return h(b);
+		return static_cast<unsigned long>(h(b));
 	}
 	using table_iterator = std::unordered_map<size_t, tuple>::const_iterator;
 	using table_type = std::vector<map_type>;

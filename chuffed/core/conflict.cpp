@@ -92,7 +92,7 @@ inline void SAT::claDecayActivity() {
 	if (cla_inc > 1e20) {
 		cla_inc *= 1e-20;
 		for (unsigned int i = 0; i < learnts.size(); i++) {
-			learnts[i]->activity() *= 1e-20;
+			learnts[i]->activity() *= 1e-20f;
 		}
 	}
 }
@@ -172,7 +172,7 @@ void SAT::analyze(int nodeid, std::set<int>& contributingNogoods) {
 #endif
 
 	Clause* c = Clause_new(out_learnt, true);
-	c->activity() = cla_inc;
+	c->activity() = static_cast<float>(cla_inc);
 	c->rawActivity() = 1;
 	c->clauseID() = nodeid;
 
@@ -253,7 +253,7 @@ void SAT::getLearntClause(int nodeid, std::set<int>& contributingNogoods) {
 		}
 
 		if (c.learnt) {
-			c.activity() += cla_inc;
+			c.activity() += static_cast<float>(cla_inc);
 			c.rawActivity() += 1;
 			contributingNogoods.insert(c.clauseID());
 		}

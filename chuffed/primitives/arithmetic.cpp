@@ -174,12 +174,12 @@ public:
 		// Propagation on the lower bound
 		const double z_min_new = pow(x.getMin(), y.getMin());
 		if (z_min_new > (double)IntVar::min_limit) {
-			setDom(z, setMin, z_min_new, x.getMinLit(), y.getMinLit());
+			setDom(z, setMin, static_cast<int64_t>(z_min_new), x.getMinLit(), y.getMinLit());
 		}
 		// Propagation on the upper bound
 		const double z_max_new = pow(x.getMax(), y.getMax());
 		if (z_max_new < (double)IntVar::max_limit) {
-			setDom(z, setMax, z_max_new, x.getMaxLit(), y.getMaxLit());
+			setDom(z, setMax, static_cast<int64_t>(z_max_new), x.getMaxLit(), y.getMaxLit());
 		}
 		return true;
 	}
@@ -189,7 +189,7 @@ public:
 		// Propagation on the lower bound
 		double pow_res;
 		pow_res = pow(z.getMin(), 1 / (double)y.getMax());
-		int64_t x_min_new = ceil(pow_res);
+		int64_t x_min_new = static_cast<int64_t>(ceil(pow_res));
 		if (x_min_new > x.getMin()) {
 			// Check for numerical errors and correct them
 			if (z.getMin() <= my_pow(x_min_new - 1, y.getMax())) {
@@ -199,7 +199,7 @@ public:
 		}
 		// Propagation on the upper bound
 		pow_res = pow(z.getMax(), 1 / (double)y.getMin());
-		int64_t x_max_new = floor(pow_res);
+		int64_t x_max_new = static_cast<int64_t>(floor(pow_res));
 		if (x_max_new < x.getMax()) {
 			// Check for numerical errors and correct them
 			if (z.getMax() >= my_pow(x_max_new + 1, y.getMin())) {
@@ -216,7 +216,7 @@ public:
 		// Propagation on the lower bound
 		if (z.getMin() > 0 && x.getMax() > 1) {
 			log_res = log2(z.getMin()) / log2(x.getMax());
-			int64_t y_min_new = ceil(log_res);
+			int64_t y_min_new = static_cast<int64_t>(ceil(log_res));
 			if (y_min_new > y.getMin()) {
 				// Check for numerical errors and correct them
 				if (z.getMin() <= my_pow(x.getMax(), y_min_new - 1)) {
@@ -228,7 +228,7 @@ public:
 		// Propagation on the upper bound
 		if (x.getMin() > 1) {
 			log_res = log2(z.getMax()) / log2(x.getMin());
-			int64_t y_max_new = floor(log_res);
+			int64_t y_max_new = static_cast<int64_t>(floor(log_res));
 			if (y_max_new < y.getMax()) {
 				// Check for numerical errors and correct them
 				if (z.getMax() <= my_pow(x.getMin(), y_max_new + 1)) {

@@ -308,14 +308,14 @@ void Simplex::updateNorms() const {
 	assert(Y[pivot_row] != 0);
 	for (int i = 0; i < m; i++) {
 		if (i == pivot_row) {
-			norm2[pivot_row] /= Y[pivot_row] * Y[pivot_row];
+			norm2[pivot_row] /= static_cast<float>(Y[pivot_row] * Y[pivot_row]);
 		} else {
 			checkZero13(Y[i]);
 			if (Y[i] == 0) {
 				continue;
 			}
 			const long double y_ratio = Y[i] / Y[pivot_row];
-			norm2[i] += -2 * y_ratio * BZ[i] + y_ratio * y_ratio * Z_norm2;
+			norm2[i] += static_cast<float>(-2 * y_ratio * BZ[i] + y_ratio * y_ratio * Z_norm2);
 		}
 		//		fprintf(stderr, "%d:%.3Lf ", i, norm2[i]);
 		if (norm2[i] < 1) {

@@ -52,7 +52,7 @@ public:
 				x.push(IntView<2 * S>(_x[i], a[i]));
 				_x[i]->attach(this, i, EVENT_U);
 			} else {
-				pos[i] = -y.size() - 1;
+				pos[i] = -static_cast<int>(y.size()) - 1;
 				y.push(IntView<2 * S + 1>(_x[i], -a[i]));
 				_x[i]->attach(this, i, EVENT_L);
 			}
