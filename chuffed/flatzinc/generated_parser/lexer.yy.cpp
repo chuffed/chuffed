@@ -615,8 +615,8 @@ static const flex_int32_t yy_rule_can_match_eol[56] =
 void yyerror(void*, const char*);
 #define yyerror(s) yyerror(yyextra, s)
 
-#include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/flatzinc/generated_parser/parser.tab.h>
+#include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/flatzinc/generated_parser/parser.tab.h"
 
 const char* stringbuf;
 int stringbuflen;

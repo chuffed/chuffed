@@ -75,8 +75,8 @@
 #include <fstream>
 #include <sstream>
 
-#include <chuffed/flatzinc/flatzinc.h>
-#include <chuffed/flatzinc/generated_parser/parser.tab.h>
+#include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/flatzinc/generated_parser/parser.tab.h"
 
 #ifdef HAVE_MMAP
 #include <cstdio>
@@ -228,9 +228,9 @@ void initfg(ParserState* pp) {
 #endif
 
     if (!pp->hadError)
-        pp->fg = new FlatZincSpace(pp->intvars.size(),
-                                   pp->boolvars.size(),
-                                   pp->setvars.size());
+        pp->fg = new FlatZincSpace(static_cast<int>(pp->intvars.size()),
+                                   static_cast<int>(pp->boolvars.size()),
+                                   static_cast<int>(pp->setvars.size()));
 
     for (unsigned int i = 0; i < pp->intvars.size(); i++) {
         if (!pp->hadError) {
@@ -283,7 +283,7 @@ void initfg(ParserState* pp) {
             pp->setvars[i].second = nullptr;
         }
     }
-    for (unsigned int i = pp->domainConstraints.size(); i--;) {
+    for (auto i = pp->domainConstraints.size(); i--;) {
         if (!pp->hadError) {
             try {
                 assert(pp->domainConstraints[i]->args->a.size() == 2);
@@ -2080,9 +2080,9 @@ yyreduce:
             ParserState* pp = static_cast<ParserState*>(parm);
             yyassert(pp, !(yyvsp[-4].oSet)() || !(yyvsp[-4].oSet).some()->empty(), "Empty var int domain.");
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("output_var");
-            pp->intvarTable.put((yyvsp[-2].sValue), pp->intvars.size());
+            pp->intvarTable.put((yyvsp[-2].sValue), static_cast<int>(pp->intvars.size()));
             if (print) {
-                pp->output(std::string((yyvsp[-2].sValue)), new AST::IntVar(pp->intvars.size()));
+                pp->output(std::string((yyvsp[-2].sValue)), new AST::IntVar(static_cast<int>(pp->intvars.size())));
             }
             bool introduced = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp((yyvsp[-2].sValue), "X_INTRODUCED_", 13) == 0);
@@ -2099,7 +2099,7 @@ yyreduce:
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_in",
-                        new AST::IntVar(pp->intvars.size()-1), (yyvsp[-4].oSet));
+                        new AST::IntVar(static_cast<int>(pp->intvars.size())-1), (yyvsp[-4].oSet));
                 delete arg;
             } else {
                 pp->intvars.push_back(varspec((yyvsp[-2].sValue), new IntVarSpec((yyvsp[-4].oSet),print,introduced,looks_introduced)));
@@ -2113,9 +2113,9 @@ yyreduce:
         {
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("output_var");
-            pp->boolvarTable.put((yyvsp[-2].sValue), pp->boolvars.size());
+            pp->boolvarTable.put((yyvsp[-2].sValue), static_cast<int>(pp->boolvars.size()));
             if (print) {
-                pp->output(std::string((yyvsp[-2].sValue)), new AST::BoolVar(pp->boolvars.size()));
+                pp->output(std::string((yyvsp[-2].sValue)), new AST::BoolVar(static_cast<int>(pp->boolvars.size())));
             }
             bool introduced = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp((yyvsp[-2].sValue), "X_INTRODUCED_", 13) == 0);
@@ -2132,7 +2132,7 @@ yyreduce:
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_in",
-                        new AST::BoolVar(pp->boolvars.size()-1), (yyvsp[-4].oSet));
+                        new AST::BoolVar(static_cast<int>(pp->boolvars.size())-1), (yyvsp[-4].oSet));
                 delete arg;
             } else {
                 pp->boolvars.push_back(varspec((yyvsp[-2].sValue), new BoolVarSpec((yyvsp[-4].oSet),print,introduced,looks_introduced)));
@@ -2155,9 +2155,9 @@ yyreduce:
         { 
             ParserState* pp = static_cast<ParserState*>(parm);
             bool print = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("output_var");
-            pp->setvarTable.put((yyvsp[-2].sValue), pp->setvars.size());
+            pp->setvarTable.put((yyvsp[-2].sValue), static_cast<int>(pp->setvars.size()));
             if (print) {
-                pp->output(std::string((yyvsp[-2].sValue)), new AST::SetVar(pp->setvars.size()));
+                pp->output(std::string((yyvsp[-2].sValue)), new AST::SetVar(static_cast<int>(pp->setvars.size())));
             }
             bool introduced = (yyvsp[-1].argVec) && (yyvsp[-1].argVec)->hasAtom("var_is_introduced");
             bool looks_introduced = (strncmp((yyvsp[-2].sValue), "X_INTRODUCED_", 13) == 0);
@@ -2176,7 +2176,7 @@ yyreduce:
                 }
                 if (!pp->hadError)
                     addDomainConstraint(pp, "set_subset",
-                        new AST::SetVar(pp->setvars.size()-1), (yyvsp[-4].oSet));
+                        new AST::SetVar(static_cast<int>(pp->setvars.size())-1), (yyvsp[-4].oSet));
             } else {
                 pp->setvars.push_back(varspec((yyvsp[-2].sValue), new SetVarSpec((yyvsp[-4].oSet),print,introduced,looks_introduced)));
             }
@@ -2259,7 +2259,7 @@ yyreduce:
                                 if (ivsv->alias) {
                                     vars[i] = ivsv->i;
                                 } else {
-                                    vars[i] = pp->intvars.size();
+                                    vars[i] = static_cast<int>(pp->intvars.size());
                                     pp->intvars.push_back(varspec((yyvsp[-2].sValue), ivsv));
                                 }
                                 if (!pp->hadError && (yyvsp[-4].oSet)()) {
@@ -2274,10 +2274,10 @@ yyreduce:
                         IntVarSpec* ispec = new IntVarSpec((yyvsp[-4].oSet),print,!print,false);
                         std::string arrayname = "["; arrayname += (yyvsp[-2].sValue);
                         for (int i = 0; i < (yyvsp[-8].iValue)-1; i++) {
-                            vars[i] = pp->intvars.size();
+                            vars[i] = static_cast<int>(pp->intvars.size());
                             pp->intvars.push_back(varspec(arrayname, ispec));
                         }                    
-                        vars[(yyvsp[-8].iValue)-1] = pp->intvars.size();
+                        vars[(yyvsp[-8].iValue)-1] = static_cast<int>(pp->intvars.size());
                         pp->intvars.push_back(varspec((yyvsp[-2].sValue), ispec));
                     }
                 }
@@ -2315,7 +2315,7 @@ yyreduce:
                             if (bvsv->alias)
                                 vars[i] = bvsv->i;
                             else {
-                                vars[i] = pp->boolvars.size();
+                                vars[i] = static_cast<int>(pp->boolvars.size());
                                 pp->boolvars.push_back(varspec((yyvsp[-2].sValue), (*vsv)[i]));
                             }
                             if (!pp->hadError && (yyvsp[-4].oSet)()) {
@@ -2328,7 +2328,7 @@ yyreduce:
                     delete vsv;
                 } else {
                     for (int i = 0; i < (yyvsp[-8].iValue); i++) {
-                        vars[i] = pp->boolvars.size();
+                        vars[i] = static_cast<int>(pp->boolvars.size());
                         pp->boolvars.push_back(varspec((yyvsp[-2].sValue),
                             new BoolVarSpec((yyvsp[-4].oSet),print,!print,false)));
                     }                    
@@ -2376,7 +2376,7 @@ yyreduce:
                             if (svsv->alias)
                                 vars[i] = svsv->i;
                             else {
-                                vars[i] = pp->setvars.size();
+                                vars[i] = static_cast<int>(pp->setvars.size());
                                 pp->setvars.push_back(varspec((yyvsp[-2].sValue), (*vsv)[i]));
                             }
                             if (!pp->hadError && (yyvsp[-4].oSet)()) {
@@ -2391,10 +2391,10 @@ yyreduce:
                     SetVarSpec* ispec = new SetVarSpec((yyvsp[-4].oSet),print,!print, false);
                     std::string arrayname = "["; arrayname += (yyvsp[-2].sValue);
                     for (int i = 0; i < (yyvsp[-10].iValue)-1; i++) {
-                        vars[i] = pp->setvars.size();
+                        vars[i] = static_cast<int>(pp->setvars.size());
                         pp->setvars.push_back(varspec(arrayname, ispec));
                     }                    
-                    vars[(yyvsp[-10].iValue)-1] = pp->setvars.size();
+                    vars[(yyvsp[-10].iValue)-1] = static_cast<int>(pp->setvars.size());
                     pp->setvars.push_back(varspec((yyvsp[-2].sValue), ispec));
                 }
                 if (print) {
@@ -2967,7 +2967,7 @@ yyreduce:
         { 
             bool haveTrue = false;
             bool haveFalse = false;
-            for (int i = (yyvsp[-2].setValue)->size(); i--;) {
+            for (auto i = (yyvsp[-2].setValue)->size(); i--;) {
                 haveTrue |= ((*(yyvsp[-2].setValue))[i] == 1);
                 haveFalse |= ((*(yyvsp[-2].setValue))[i] == 0);
             }
@@ -3161,18 +3161,18 @@ yyreduce:
             std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::IntVar(as[i]);
                 (yyval.arg) = ia;
             } else if (pp->boolvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::BoolVar(as[i]);
                 (yyval.arg) = ia;
             } else if (pp->setvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::SetVar(as[i]);
                 (yyval.arg) = ia;
             } else {
@@ -3181,18 +3181,18 @@ yyreduce:
                 int ival = 0;
                 bool bval = false;
                 if (pp->intvalarrays.get((yyvsp[0].sValue), is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::IntLit(is[i]);
                     (yyval.arg) = v;
                 } else if (pp->boolvalarrays.get((yyvsp[0].sValue), is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::BoolLit(is[i]);
                     (yyval.arg) = v;
                 } else if (pp->setvalarrays.get((yyvsp[0].sValue), isS)) {
-                    AST::Array *v = new AST::Array(isS.size());
-                    for (int i = isS.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(isS.size()));
+                    for (auto i = isS.size(); i--;)
                         v->a[i] = new AST::SetLit(isS[i]);
                     (yyval.arg) = v;                      
                 } else if (pp->intvals.get((yyvsp[0].sValue), ival)) {
@@ -3249,7 +3249,7 @@ yyreduce:
         {
             ParserState *pp = static_cast<ParserState*>(parm);
             // Create a new variable in the parser and append at the end
-            const int i = pp->intvars.size();
+            const int i = static_cast<int>(pp->intvars.size());
             const std::string objname = "X_INTRODUCED_CHUFFEDOBJ";
             pp->intvarTable.put(objname, i);
             pp->intvars.push_back(varspec(objname,
@@ -3273,7 +3273,7 @@ yyreduce:
             // Check whether the Objective variable is an integer constant
             if (pp->intvals.get((yyvsp[0].sValue), tmp) && !pp->intvarTable.get((yyvsp[0].sValue), (yyval.iValue))) {
                 // Create a new variable in the parser and append at the end
-                const int i = pp->intvars.size();
+                const int i = static_cast<int>(pp->intvars.size());
                 pp->intvarTable.put((yyvsp[0].sValue), i);
                 pp->intvars.push_back(varspec((yyvsp[0].sValue),
                     new IntVarSpec(tmp,false,true,false)));
@@ -3422,18 +3422,18 @@ yyreduce:
             std::vector<int> as;
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::IntVar(as[i]);
                 (yyval.arg) = ia;
             } else if (pp->boolvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::BoolVar(as[i]);
                 (yyval.arg) = ia;
             } else if (pp->setvararrays.get((yyvsp[0].sValue), as)) {
-                AST::Array *ia = new AST::Array(as.size());
-                for (int i = as.size(); i--;)
+                AST::Array *ia = new AST::Array(static_cast<int>(as.size()));
+                for (auto i = as.size(); i--;)
                     ia->a[i] = new AST::SetVar(as[i]);
                 (yyval.arg) = ia;
             } else {
@@ -3441,13 +3441,13 @@ yyreduce:
                 int ival = 0;
                 bool bval = false;
                 if (pp->intvalarrays.get((yyvsp[0].sValue), is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::IntLit(is[i]);
                     (yyval.arg) = v;
                 } else if (pp->boolvalarrays.get((yyvsp[0].sValue), is)) {
-                    AST::Array *v = new AST::Array(is.size());
-                    for (int i = is.size(); i--;)
+                    AST::Array *v = new AST::Array(static_cast<int>(is.size()));
+                    for (auto i = is.size(); i--;)
                         v->a[i] = new AST::BoolLit(is[i]);
                     (yyval.arg) = v;
                 } else if (pp->intvals.get((yyvsp[0].sValue), ival)) {
