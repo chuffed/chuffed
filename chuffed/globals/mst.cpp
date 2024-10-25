@@ -531,7 +531,7 @@ public:
 				decisions.clear();
 				// Will go to decisions.empty()
 			} else {
-				struct const Action failed = decisions.back();
+				const auto failed = decisions.back();
 				// if (failed.act != 0)
 				//     cout <<"failed.act "<<failed.act<<endl;
 				assert(failed.act == 0 || so.lazy);
