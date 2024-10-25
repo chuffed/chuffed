@@ -73,7 +73,7 @@ public:
 	}
 	void push(const T& elem) {
 		if (sz == cap) {
-            cap = cap <= 1 ? 2 : (cap * 3 + 1) >> 1;
+			cap = cap <= 1 ? 2 : (cap * 3 + 1) >> 1;
 			data = (T*)realloc((char*)data, cap * sizeof(T));
 		}
 		new (&data[sz++]) T(elem);
