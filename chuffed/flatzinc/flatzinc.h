@@ -219,6 +219,18 @@ public:
 		assigned = false;
 		domain = d;
 	}
+	FloatVarSpec(double d, bool output, bool introduced, bool looks = false)
+			: VarSpec(output, introduced, looks) {
+		alias = false;
+		assigned = true;
+		if (d == 0.0) {
+			i = 0;
+		} else if (d == 1.0) {
+			i = 1;
+		} else {
+			domain = Option<std::vector<double>*>::some(new std::vector<double>(d));
+		}
+	}
 	FloatVarSpec(bool b, bool output, bool introduced, bool looks = false)
 			: VarSpec(output, introduced, looks) {
 		alias = false;

@@ -283,7 +283,7 @@ void initfg(ParserState* pp) {
             pp->setvars[i].second = nullptr;
         }
     }
-    for (auto i = pp->domainConstraints.size(); (i--) != 0u;) {
+    for (auto i = pp->domainConstraints.size(); (i--) != 0U;) {
         if (!pp->hadError) {
             try {
                 assert(pp->domainConstraints[i]->args->a.size() == 2);
@@ -2871,7 +2871,7 @@ yyreduce:
   case 91: /* constraint_item: CONSTRAINT ID annotations  */
         {
             ParserState *pp = static_cast<ParserState*>(parm);
-            AST::Array* args = new AST::Array(2);
+            auto* args = new AST::Array(2);
             args->a[0] = getVarRefArg(pp,(yyvsp[-1].sValue));
             args->a[1] = new AST::BoolLit(true);
 #if EXPOSE_INT_LITS
@@ -2967,7 +2967,7 @@ yyreduce:
         {
             bool haveTrue = false;
             bool haveFalse = false;
-            for (auto i = (yyvsp[-2].setValue)->size(); (i--) != 0u;) {
+            for (auto i = (yyvsp[-2].setValue)->size(); (i--) != 0U;) {
                 haveTrue |= ((*(yyvsp[-2].setValue))[i] == 1);
                 haveFalse |= ((*(yyvsp[-2].setValue))[i] == 0);
             }
@@ -3134,7 +3134,7 @@ yyreduce:
 
   case 126: /* non_array_expr: BOOL_LIT  */
         {
-            (yyval.arg) = new AST::BoolLit((yyvsp[0].iValue));
+            (yyval.arg) = new AST::BoolLit((yyvsp[0].iValue) != 0);
         }
     break;
 
@@ -3162,19 +3162,19 @@ yyreduce:
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::IntVar(as[i]);
                 }
                 (yyval.arg) = ia;
             } else if (pp->boolvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::BoolVar(as[i]);
                 }
                 (yyval.arg) = ia;
             } else if (pp->setvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::SetVar(as[i]);
                 }
                 (yyval.arg) = ia;
@@ -3185,19 +3185,19 @@ yyreduce:
                 bool bval = false;
                 if (pp->intvalarrays.get((yyvsp[0].sValue), is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
+                    for (auto i = is.size(); (i--) != 0U;) {
                       v->a[i] = new AST::IntLit(is[i]);
                     }
                     (yyval.arg) = v;
                 } else if (pp->boolvalarrays.get((yyvsp[0].sValue), is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
-                      v->a[i] = new AST::BoolLit(is[i]);
+                    for (auto i = is.size(); (i--) != 0U;) {
+                      v->a[i] = new AST::BoolLit(is[i] != 0);
                     }
                     (yyval.arg) = v;
                 } else if (pp->setvalarrays.get((yyvsp[0].sValue), isS)) {
                     auto* v = new AST::Array(static_cast<int>(isS.size()));
-                    for (auto i = isS.size(); (i--) != 0u;) {
+                    for (auto i = isS.size(); (i--) != 0U;) {
                       v->a[i] = new AST::SetLit(isS[i]);
                     }
                     (yyval.arg) = v;
@@ -3429,19 +3429,19 @@ yyreduce:
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;){
+                for (auto i = as.size(); (i--) != 0U;){
                   ia->a[i] = new AST::IntVar(as[i]);
                 }
                 (yyval.arg) = ia;
             } else if (pp->boolvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::BoolVar(as[i]);
                 }
                 (yyval.arg) = ia;
             } else if (pp->setvararrays.get((yyvsp[0].sValue), as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::SetVar(as[i]);
                 }
                 (yyval.arg) = ia;
@@ -3451,14 +3451,14 @@ yyreduce:
                 bool bval = false;
                 if (pp->intvalarrays.get((yyvsp[0].sValue), is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
+                    for (auto i = is.size(); (i--) != 0U;) {
                       v->a[i] = new AST::IntLit(is[i]);
                     }
                     (yyval.arg) = v;
                 } else if (pp->boolvalarrays.get((yyvsp[0].sValue), is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
-                      v->a[i] = new AST::BoolLit(is[i]);
+                    for (auto i = is.size(); (i--) != 0U;) {
+                      v->a[i] = new AST::BoolLit(is[i] != 0);
                     }
                     (yyval.arg) = v;
                 } else if (pp->intvals.get((yyvsp[0].sValue), ival)) {

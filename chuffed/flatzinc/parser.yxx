@@ -241,7 +241,7 @@ void initfg(ParserState* pp) {
             pp->setvars[i].second = nullptr;
         }
     }
-    for (auto i = pp->domainConstraints.size(); (i--) != 0u;) {
+    for (auto i = pp->domainConstraints.size(); (i--) != 0U;) {
         if (!pp->hadError) {
             try {
                 assert(pp->domainConstraints[i]->args->a.size() == 2);
@@ -1305,7 +1305,7 @@ constraint_item :
     |   CONSTRAINT ID annotations
         {
             ParserState *pp = static_cast<ParserState*>(parm);
-            AST::Array* args = new AST::Array(2);
+            auto* args = new AST::Array(2);
             args->a[0] = getVarRefArg(pp,$2);
             args->a[1] = new AST::BoolLit(true);
 #if EXPOSE_INT_LITS
@@ -1395,7 +1395,7 @@ bool_ti_expr_tail :
         {
             bool haveTrue = false;
             bool haveFalse = false;
-            for (auto i = $2->size(); (i--) != 0u;) {
+            for (auto i = $2->size(); (i--) != 0U;) {
                 haveTrue |= ((*$2)[i] == 1);
                 haveFalse |= ((*$2)[i] == 0);
             }
@@ -1552,7 +1552,7 @@ non_array_expr_opt :
 non_array_expr :
         BOOL_LIT
         {
-            $$ = new AST::BoolLit($1);
+            $$ = new AST::BoolLit($1 != 0);
         }
     |   INT_LIT
         {
@@ -1572,19 +1572,19 @@ non_array_expr :
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::IntVar(as[i]);
                 }
                 $$ = ia;
             } else if (pp->boolvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::BoolVar(as[i]);
                 }
                 $$ = ia;
             } else if (pp->setvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::SetVar(as[i]);
                 }
                 $$ = ia;
@@ -1595,19 +1595,19 @@ non_array_expr :
                 bool bval = false;
                 if (pp->intvalarrays.get($1, is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
+                    for (auto i = is.size(); (i--) != 0U;) {
                       v->a[i] = new AST::IntLit(is[i]);
                     }
                     $$ = v;
                 } else if (pp->boolvalarrays.get($1, is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
-                      v->a[i] = new AST::BoolLit(is[i]);
+                    for (auto i = is.size(); (i--) != 0U;) {
+                      v->a[i] = new AST::BoolLit(is[i] != 0);
                     }
                     $$ = v;
                 } else if (pp->setvalarrays.get($1, isS)) {
                     auto* v = new AST::Array(static_cast<int>(isS.size()));
-                    for (auto i = isS.size(); (i--) != 0u;) {
+                    for (auto i = isS.size(); (i--) != 0U;) {
                       v->a[i] = new AST::SetLit(isS[i]);
                     }
                     $$ = v;
@@ -1821,19 +1821,19 @@ ann_non_array_expr :
             ParserState* pp = static_cast<ParserState*>(parm);
             if (pp->intvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;){
+                for (auto i = as.size(); (i--) != 0U;){
                   ia->a[i] = new AST::IntVar(as[i]);
                 }
                 $$ = ia;
             } else if (pp->boolvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::BoolVar(as[i]);
                 }
                 $$ = ia;
             } else if (pp->setvararrays.get($1, as)) {
                 auto* ia = new AST::Array(static_cast<int>(as.size()));
-                for (auto i = as.size(); (i--) != 0u;) {
+                for (auto i = as.size(); (i--) != 0U;) {
                   ia->a[i] = new AST::SetVar(as[i]);
                 }
                 $$ = ia;
@@ -1843,14 +1843,14 @@ ann_non_array_expr :
                 bool bval = false;
                 if (pp->intvalarrays.get($1, is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
+                    for (auto i = is.size(); (i--) != 0U;) {
                       v->a[i] = new AST::IntLit(is[i]);
                     }
                     $$ = v;
                 } else if (pp->boolvalarrays.get($1, is)) {
                     auto* v = new AST::Array(static_cast<int>(is.size()));
-                    for (auto i = is.size(); (i--) != 0u;) {
-                      v->a[i] = new AST::BoolLit(is[i]);
+                    for (auto i = is.size(); (i--) != 0U;) {
+                      v->a[i] = new AST::BoolLit(is[i] != 0);
                     }
                     $$ = v;
                 } else if (pp->intvals.get($1, ival)) {
