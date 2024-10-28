@@ -92,7 +92,7 @@ inline void SAT::claDecayActivity() {
 	if (cla_inc > 1e20) {
 		cla_inc *= 1e-20;
 		for (unsigned int i = 0; i < learnts.size(); i++) {
-			learnts[i]->activity() *= 1e-20f;
+			learnts[i]->activity() *= 1e-20F;
 		}
 	}
 }

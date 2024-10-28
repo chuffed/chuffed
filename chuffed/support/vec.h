@@ -1,7 +1,6 @@
 #ifndef vec_h
 #define vec_h
 
-#include <algorithm>
 #include <cassert>
 #include <cstdlib>
 

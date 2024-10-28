@@ -2,7 +2,6 @@
 Checks: '-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
-  -bugprone-narrowing-conversions,
   -bugprone-sizeof-expression,
   -bugprone-undefined-memory-manipulation,
   misc-const-correctness,

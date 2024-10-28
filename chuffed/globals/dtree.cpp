@@ -327,8 +327,7 @@ DTreeParenthoodPropagator::DTreeParenthoodPropagator(int _r, vec<BoolView>& _vs,
 		for (int j = 0; j < nbNodes(); j++) {
 			const int e = findEdge(j, i);
 			if (e != -1) {
-				if (!getEdgeVar(e).isFixed() || getEdgeVar(e).isTrue()) {
-				} else {
+				if (getEdgeVar(e).isFixed() && getEdgeVar(e).isFalse()) {
 					if (i != j && parents[i]->remValNotR(j)) {
 						parents[i]->remVal(j, nullptr);
 					}

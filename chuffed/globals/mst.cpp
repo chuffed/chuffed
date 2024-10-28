@@ -54,7 +54,7 @@ std::pair<int, int> Kruskal_weight(std::vector<int>& weights, int n,
 	}
 
 	// Maximum ST
-	unsigned int i2 = static_cast<unsigned int>(sorted.size() - 1);
+	auto i2 = static_cast<unsigned int>(sorted.size() - 1);
 	int in2 = 0;
 	int cost2 = 0;
 	UF<int> uf2(n);

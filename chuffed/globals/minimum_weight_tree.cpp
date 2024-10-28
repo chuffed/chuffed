@@ -606,12 +606,12 @@ public:
 
 		// cout<<"4. spC[0] = "<<spC[0]<<endl;
 
-		// const int old = splb;
 		int sum = 0;
 		int minspC = -1;
 		const int ccc = ccs;
 
 #if TREEPROP_DEBUG
+		const int old = splb;
 		for (int i = 0; i < nbNodes(); i++)
 			if (getNodeVar(i).isFixed() && getNodeVar(i).isTrue() && uf.find(i) == i) ccc++;
 

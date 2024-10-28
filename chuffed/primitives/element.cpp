@@ -175,12 +175,12 @@ public:
 	}
 
 	void wakeup(int i, int c) override {
-		if (i == static_cast<int>(a.size()) + 2 && (c & EVENT_F)) {
+		if (i == static_cast<int>(a.size()) + 2 && ((c & EVENT_F) != 0)) {
 			if (b.getVal() == 0) {
 				return;
 			}
 		}
-		if (i == static_cast<int>(a.size()) + 1 && (c & EVENT_F)) {
+		if (i == static_cast<int>(a.size()) + 1 && ((c & EVENT_F) != 0)) {
 			is_fixed = 1;
 			fixed_index = static_cast<int>(x.getVal());
 			no_min_support = no_max_support = false;
@@ -220,7 +220,7 @@ public:
 		}
 
 		// x is out of bounds
-		if (is_fixed && (fixed_index < 0 || fixed_index >= static_cast<int>(a.size()))) {
+		if ((is_fixed != 0) && (fixed_index < 0 || fixed_index >= static_cast<int>(a.size()))) {
 			return b.setVal(false, x.getValLit());
 		}
 
@@ -430,7 +430,7 @@ public:
 	}
 
 	void wakeup(int i, int c) override {
-		if (i == static_cast<int>(a.size()) + 1 && (c & EVENT_F)) {
+		if (i == static_cast<int>(a.size()) + 1 && ((c & EVENT_F) != 0)) {
 			fixed_index = static_cast<int>(x.getVal());
 			no_min_support = no_max_support = false;
 			pushInQueue();

@@ -1,9 +1,7 @@
 #ifndef UNION_FIND_H
 #define UNION_FIND_H
 
-#include "chuffed/branching/branching.h"
-
-#include <cstring>
+#include <cassert>
 #include <iostream>
 #include <vector>
 

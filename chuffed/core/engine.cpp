@@ -780,9 +780,6 @@ RESULT Engine::search(const std::string& problemLabel) {
 					}
 					contribString << "]}";
 
-					// Calculate block level distance.
-					//					const int bld = levels.size();
-
 					// Does this nogood involve literals that are
 					// derived from assumption literals?
 					const int numAssumptions = assumptions.size();
@@ -796,8 +793,6 @@ RESULT Engine::search(const std::string& problemLabel) {
 					if (so.debug) {
 						std::cerr << "uses assumptions: " << usesAssumptions << "\n";
 					}
-
-					//					const int backjumpDistance = previousDecisionLevel - decisionLevel();
 
 					if (doProfiling()) {
 						sendNode(profilerConnector
