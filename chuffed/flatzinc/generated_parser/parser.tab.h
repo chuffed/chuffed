@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_USERS_GUIDOT_PROGRAMMING_MINIZINC_CHUFFED_BUILD_GCC_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED
-# define YY_YY_USERS_GUIDOT_PROGRAMMING_MINIZINC_CHUFFED_BUILD_GCC_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_USERS_DEKKER1_CODE_GITHUB_COM_CHUFFED_BUILD_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED
+# define YY_YY_USERS_DEKKER1_CODE_GITHUB_COM_CHUFFED_BUILD_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -106,10 +106,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
- 
-    int iValue; 
-    char* sValue; 
-    bool bValue; 
+
+    int iValue;
+    char* sValue;
+    bool bValue;
     double dValue;
     std::vector<int>* setValue;
     FlatZinc::AST::SetLit* setLit;
@@ -136,4 +136,4 @@ typedef union YYSTYPE YYSTYPE;
 int yyparse (void *parm);
 
 
-#endif /* !YY_YY_USERS_GUIDOT_PROGRAMMING_MINIZINC_CHUFFED_BUILD_GCC_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_USERS_DEKKER1_CODE_GITHUB_COM_CHUFFED_BUILD_CHUFFED_FLATZINC_GENERATED_PARSER_PARSER_TAB_H_INCLUDED  */
