@@ -11,7 +11,7 @@
 #ifdef HAS_PROFILER
 #include <winsock2.h>
 #endif
-#include <windows.h>
+#include <Windows.h>
 #define SEP_ '\\'
 #else
 #include <sys/time.h>

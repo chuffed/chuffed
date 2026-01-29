@@ -85,6 +85,7 @@ add_library(chuffed
   chuffed/vars/bool-view.cpp
   chuffed/vars/int-var-ll.cpp
   chuffed/ldsb/ldsb.cpp
+  chuffed/globals/blackbox.cpp
   chuffed/globals/subcircuit.cpp
   chuffed/globals/mddglobals.cpp
   chuffed/globals/sym-break.cpp
@@ -256,7 +257,7 @@ add_library(chuffed_fzn
 )
 
 add_executable(fzn-chuffed chuffed/flatzinc/fzn-chuffed.cpp)
-target_link_libraries(fzn-chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(fzn-chuffed chuffed_fzn chuffed ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 
 # ------------- Chuffed Examples -------------
 

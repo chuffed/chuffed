@@ -182,6 +182,9 @@ int main(int argc, char** argv) {
 	} catch (const FlatZinc::Error& e) {
 		std::cerr << e.toString() << '\n';
 		std::exit(EXIT_FAILURE);
+	} catch (const std::string& e) {
+		std::cerr << e << '\n';
+		std::exit(EXIT_FAILURE);
 	} catch (...) {
 		std::cerr << "  UNKNOWN EXCEPTION." << '\n';
 		std::exit(EXIT_FAILURE);

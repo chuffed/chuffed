@@ -2,9 +2,11 @@
 #define globals_h
 
 #include "chuffed/core/propagator.h"
+#include "chuffed/globals/blackbox.h"
 #include "chuffed/primitives/primitives.h"
 
 #include <list>
+#include <string>
 
 //-----
 // Directives
@@ -27,6 +29,14 @@ void all_different(vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void all_different_offset(vec<int>& a, vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void all_different_imp(const BoolView& b, vec<IntVar*>& x, ConLevel cl = CL_DEF);
 void inverse(vec<IntVar*>& x, vec<IntVar*>& y, int o1 = 0, int o2 = 0, ConLevel cl = CL_DEF);
+
+// blackbox.c
+
+void blackbox(vec<IntVar*>& int_in, vec<IntVar*>& int_out, const std::string& mode,
+							const std::string& instantiation, const std::vector<std::string>& args);
+void blackbox_bounds(vec<IntVar*>& ivar, std::vector<std::vector<std::pair<int, PropBnd>>> reason,
+										 const std::string& mode, const std::string& instantiation,
+										 const std::vector<std::string>& args);
 
 // circuit.c
 
@@ -55,11 +65,11 @@ void bool_arg_max(vec<BoolView>& x, int offset, IntVar* y);
 
 // table.c
 
-void table(vec<IntVar*>& x, vec<vec<int> >& t);
+void table(vec<IntVar*>& x, vec<vec<int>>& t);
 
 // regular.c
 
-void regular(vec<IntVar*>& x, int q, int s, vec<vec<int> >& d, int q0, vec<int>& f);
+void regular(vec<IntVar*>& x, int q, int s, vec<vec<int>>& d, int q0, vec<int>& f);
 
 // disjunctive.c
 
@@ -74,9 +84,9 @@ void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limi
 void cumulative2(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
 								 const std::list<std::string>& opt);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
-										vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal);
+										vec<vec<int>>& cal, vec<int>& taskCal, int rho, int resCal);
 void cumulative_cal(vec<IntVar*>& s, vec<IntVar*>& d, vec<IntVar*>& r, IntVar* limit,
-										vec<vec<int> >& cal, vec<int>& taskCal, int rho, int resCal,
+										vec<vec<int>>& cal, vec<int>& taskCal, int rho, int resCal,
 										const std::list<std::string>& opt);
 
 // lex.c
@@ -97,35 +107,35 @@ void value_precede_int(int s, int t, vec<IntVar*>& x);
 void value_precede_seq(vec<IntVar*>& x);
 
 // tree.c
-void tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _adj, vec<vec<int> >& _en);
-void connected(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _adj, vec<vec<int> >& _en);
+void tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _adj, vec<vec<int>>& _en);
+void connected(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _adj, vec<vec<int>>& _en);
 
 // mst.c
-void mst(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _adj, vec<vec<int> >& _en,
+void mst(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _adj, vec<vec<int>>& _en,
 				 IntVar* _w, vec<int>& _ws);
 
 // minimum_weight_tree.c
-void steiner_tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _adj, vec<vec<int> >& _en,
+void steiner_tree(vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _adj, vec<vec<int>>& _en,
 									IntVar* _w, vec<int> _ws);
 
 // dconnected.c
-void dconnected(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in,
-								vec<vec<int> >& _out, vec<vec<int> >& _en);
+void dconnected(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in,
+								vec<vec<int>>& _out, vec<vec<int>>& _en);
 
 // dtree.c
-void dtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in, vec<vec<int> >& _out,
-					 vec<vec<int> >& _en);
-void reversedtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in,
-									vec<vec<int> >& _out, vec<vec<int> >& _en);
-void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in,
-					vec<vec<int> >& _out, vec<vec<int> >& _en);
+void dtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in, vec<vec<int>>& _out,
+					 vec<vec<int>>& _en);
+void reversedtree(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in,
+									vec<vec<int>>& _out, vec<vec<int>>& _en);
+void path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in,
+					vec<vec<int>>& _out, vec<vec<int>>& _en);
 
 // dag.c
-void dag(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in, vec<vec<int> >& _out,
-				 vec<vec<int> >& _en);
+void dag(int r, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in, vec<vec<int>>& _out,
+				 vec<vec<int>>& _en);
 
 // bounded_path.c
-void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int> >& _in,
-									vec<vec<int> >& _out, vec<vec<int> >& _en, vec<int>& _ws, IntVar* w);
+void bounded_path(int from, int to, vec<BoolView>& _vs, vec<BoolView>& _es, vec<vec<int>>& _in,
+									vec<vec<int>>& _out, vec<vec<int>>& _en, vec<int>& _ws, IntVar* w);
 
 #endif

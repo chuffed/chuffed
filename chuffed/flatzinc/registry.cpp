@@ -26,6 +26,7 @@
 #include "chuffed/core/sat.h"
 #include "chuffed/flatzinc/ast.h"
 #include "chuffed/flatzinc/flatzinc.h"
+#include "chuffed/globals/blackbox.h"
 #include "chuffed/globals/globals.h"
 #include "chuffed/globals/mddglobals.h"
 #include "chuffed/ldsb/ldsb.h"
@@ -37,10 +38,13 @@
 #include "chuffed/vars/int-var.h"
 
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 #include <list>
 #include <ostream>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace FlatZinc {
 
@@ -633,7 +637,7 @@ void p_table_int(const ConExpr& ce, AST::Node* ann) {
 	arg2intargs(tuples, ce[1]);
 	const int noOfVars = x.size();
 	const int noOfTuples = tuples.size() / noOfVars;
-	vec<vec<int> > ts;
+	vec<vec<int>> ts;
 	for (int i = 0; i < noOfTuples; i++) {
 		ts.push();
 		for (unsigned int j = 0; j < x.size(); j++) {
@@ -658,7 +662,7 @@ void p_regular(const ConExpr& ce, AST::Node* ann) {
 
 	assert(static_cast<int>(d_flat.size()) == q * s);
 
-	vec<vec<int> > d;
+	vec<vec<int>> d;
 	for (int i = 0; i < q; i++) {
 		d.push();
 		for (int j = 0; j < s; j++) {
@@ -699,8 +703,8 @@ void p_cost_regular(const ConExpr& ce, AST::Node* ann) {
 
 	assert(static_cast<int>(d_flat.size()) == q * s);
 
-	vec<vec<int> > d;
-	vec<vec<int> > w;
+	vec<vec<int>> d;
+	vec<vec<int>> w;
 	// State 0 is garbage
 	d.push();
 	for (int j = 0; j <= s; j++) {
@@ -783,7 +787,7 @@ void p_cumulative_cal(const ConExpr& ce, AST::Node* ann) {
 	vec<int> cal_in;
 	arg2intargs(cal_in, ce[6]);
 
-	vec<vec<int> > cal;
+	vec<vec<int>> cal;
 	for (int i = 0; i < index1; i++) {
 		cal.push();
 		for (int j = 0; j < index2; j++) {
@@ -1122,7 +1126,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ad_flat;
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ad;
+	vec<vec<int>> ad;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1142,7 +1146,7 @@ void p_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
@@ -1181,8 +1185,8 @@ void p_tree_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<BoolView> es;
 	arg2BoolVarArgs(es, ce[5]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > ad;
+	vec<vec<int>> en;
+	vec<vec<int>> ad;
 	for (int i = 0; i < nb_nodes; i++) {
 		ad.push(vec<int>());
 	}
@@ -1207,7 +1211,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ad_flat;
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ad;
+	vec<vec<int>> ad;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1227,7 +1231,7 @@ void p_connected(const ConExpr& ce, AST::Node* /*ann*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
@@ -1266,8 +1270,8 @@ void p_connected_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<int> to;
 	arg2intargs(to, ce[1]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > ad;
+	vec<vec<int>> en;
+	vec<vec<int>> ad;
 	for (int i = 0; i < nb_nodes; i++) {
 		ad.push(vec<int>());
 	}
@@ -1296,7 +1300,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ad_flat;
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ad;
+	vec<vec<int>> ad;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1317,7 +1321,7 @@ void p_steiner_tree(const ConExpr& ce, AST::Node* /*ann*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
@@ -1360,8 +1364,8 @@ void p_steiner_tree_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2BoolVarArgs(es, ce[6]);
 	IntVar* w = getIntVar(ce[7]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > ad;
+	vec<vec<int>> en;
+	vec<vec<int>> ad;
 	for (int i = 0; i < nb_nodes; i++) {
 		ad.push(vec<int>());
 	}
@@ -1387,7 +1391,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ad_flat;
 	arg2boolargs(ad_flat, ce[2]);
 	assert(ad_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ad;
+	vec<vec<int>> ad;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ad.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1407,7 +1411,7 @@ void p_mst(const ConExpr& ce, AST::Node* /*ann*/) {
 		arg2intargs(en_flat, ce[3]);
 	}
 
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 
 	if (en_flat.size() == es.size() * vs.size()) {
 		// Old format!
@@ -1453,8 +1457,8 @@ void p_mst_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2BoolVarArgs(es, ce[6]);
 	IntVar* w = getIntVar(ce[7]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > ad;
+	vec<vec<int>> en;
+	vec<vec<int>> ad;
 	for (int i = 0; i < nb_nodes; i++) {
 		ad.push(vec<int>());
 	}
@@ -1481,7 +1485,7 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> in_flat;
 	arg2boolargs(in_flat, ce[3]);
 	assert(in_flat.size() == vs.size() * es.size());
-	vec<vec<int> > in;
+	vec<vec<int>> in;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1493,7 +1497,7 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ou_flat;
 	arg2boolargs(ou_flat, ce[4]);
 	assert(ou_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ou;
+	vec<vec<int>> ou;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1506,7 +1510,7 @@ void p_dtree(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2intargs(en_flat, ce[5]);
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
@@ -1530,9 +1534,9 @@ void p_dtree_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<BoolView> es;
 	arg2BoolVarArgs(es, ce[6]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > in;
-	vec<vec<int> > ou;
+	vec<vec<int>> en;
+	vec<vec<int>> in;
+	vec<vec<int>> ou;
 	for (int i = 0; i < nb_nodes; i++) {
 		in.push(vec<int>());
 		ou.push(vec<int>());
@@ -1560,7 +1564,7 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> in_flat;
 	arg2boolargs(in_flat, ce[3]);
 	assert(in_flat.size() == vs.size() * es.size());
-	vec<vec<int> > in;
+	vec<vec<int>> in;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1572,7 +1576,7 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ou_flat;
 	arg2boolargs(ou_flat, ce[4]);
 	assert(ou_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ou;
+	vec<vec<int>> ou;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1585,7 +1589,7 @@ void p_dag(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2intargs(en_flat, ce[5]);
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
@@ -1618,9 +1622,9 @@ void p_dag_new(const ConExpr& ce, AST::Node* /*ann*/) {
 		new_edges.push(new_edge);
 	}
 
-	vec<vec<int> > en;
-	vec<vec<int> > in;
-	vec<vec<int> > ou;
+	vec<vec<int>> en;
+	vec<vec<int>> in;
+	vec<vec<int>> ou;
 	nb_nodes = vs.size();
 	for (int i = 0; i < nb_nodes; i++) {
 		in.push(vec<int>());
@@ -1652,7 +1656,7 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> in_flat;
 	arg2boolargs(in_flat, ce[4]);
 	assert(in_flat.size() == vs.size() * es.size());
-	vec<vec<int> > in;
+	vec<vec<int>> in;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1664,7 +1668,7 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ou_flat;
 	arg2boolargs(ou_flat, ce[5]);
 	assert(ou_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ou;
+	vec<vec<int>> ou;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1677,7 +1681,7 @@ void p_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2intargs(en_flat, ce[6]);
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
@@ -1702,9 +1706,9 @@ void p_path_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<BoolView> es;
 	arg2BoolVarArgs(es, ce[7]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > in;
-	vec<vec<int> > ou;
+	vec<vec<int>> en;
+	vec<vec<int>> in;
+	vec<vec<int>> ou;
 	for (int i = 0; i < nb_nodes; i++) {
 		in.push(vec<int>());
 		ou.push(vec<int>());
@@ -1734,7 +1738,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> in_flat;
 	arg2boolargs(in_flat, ce[4]);
 	assert(in_flat.size() == vs.size() * es.size());
-	vec<vec<int> > in;
+	vec<vec<int>> in;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		in.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1746,7 +1750,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	vec<bool> ou_flat;
 	arg2boolargs(ou_flat, ce[5]);
 	assert(ou_flat.size() == vs.size() * es.size());
-	vec<vec<int> > ou;
+	vec<vec<int>> ou;
 	for (unsigned int i = 0; i < vs.size(); i++) {
 		ou.push(vec<int>());
 		for (unsigned int j = 0; j < es.size(); j++) {
@@ -1760,7 +1764,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2intargs(en_flat, ce[6]);
 	// assert(en_flat.size() == es.size()*vs.size());
 	assert(en_flat.size() == es.size() * 2);
-	vec<vec<int> > en;
+	vec<vec<int>> en;
 	for (unsigned int i = 0; i < es.size(); i++) {
 		en.push(vec<int>());
 		// The -1 is because indexes in MZ start at 1
@@ -1776,7 +1780,7 @@ void p_bounded_path(const ConExpr& ce, AST::Node* /*ann*/) {
 		ds.push(0);
 	}
 
-	vec<vec<int> > ws2;
+	vec<vec<int>> ws2;
 	for (unsigned int i = 0; i < ws.size(); i++) {
 		ws2.push(vec<int>());
 		for (int j = 0; j < 100; j++) {
@@ -1813,9 +1817,9 @@ void p_bounded_path_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	arg2BoolVarArgs(es, ce[8]);
 	IntVar* w = getIntVar(ce[9]);
 
-	vec<vec<int> > en;
-	vec<vec<int> > in;
-	vec<vec<int> > ou;
+	vec<vec<int>> en;
+	vec<vec<int>> in;
+	vec<vec<int>> ou;
 	for (int i = 0; i < nb_nodes; i++) {
 		in.push(vec<int>());
 		ou.push(vec<int>());
@@ -1843,6 +1847,110 @@ void p_assume(const ConExpr& ce, AST::Node* /*ann*/) {
 	for (unsigned int i = 0; i < bvs.size(); i++) {
 		s->assumptions.push(bvs[i]);
 	}
+}
+
+// Read a `blackbox_exec` / `blackbox_dll` source annotation into `mode`,
+// `instantiation` (the executable/library) and `args` (its argument list).
+// Supports both the single-argument form (no arguments) and the
+// `(target, args)` form.
+void blackbox_source(AST::Node* ann, std::string& mode, std::string& instantiation,
+										 std::vector<std::string>& args) {
+	const AST::Call* c = nullptr;
+	if (ann->hasCall("blackbox_dll")) {
+		c = ann->getCall("blackbox_dll");
+		mode = "dll";
+	} else if (ann->hasCall("blackbox_exec")) {
+		c = ann->getCall("blackbox_exec");
+		mode = "exec";
+	} else {
+		throw std::string(
+				"p_blackbox: blackbox constraint is missing a valid annotation specifying execution "
+				"method.");
+	}
+	// For a single-argument call `args` is the bare argument node; for the
+	// `(target, args)` form it is an array of the two arguments.
+	if (const auto* arr = dynamic_cast<const AST::Array*>(c->args)) {
+		instantiation = arr->a[0]->getString();
+		if (arr->a.size() > 1) {
+			const AST::Array* al = arr->a[1]->getArray();
+			for (auto* arg : al->a) {
+				args.push_back(arg->getString());
+			}
+		}
+	} else {
+		instantiation = c->args->getString();
+	}
+}
+
+void p_blackbox(const ConExpr& ce, AST::Node* ann) {
+	vec<IntVar*> iv0;
+	arg2intvarargs(iv0, ce[0]);
+	vec<IntVar*> iv1;
+	arg2intvarargs(iv1, ce[1]);
+
+	std::string mode;
+	std::string instantiation;
+	std::vector<std::string> args;
+	blackbox_source(ann, mode, instantiation, args);
+
+	blackbox(iv0, iv1, mode, instantiation, args);
+}
+
+void p_blackbox_bounds(const ConExpr& ce, AST::Node* ann) {
+	vec<IntVar*> iv0;
+	arg2intvarargs(iv0, ce[0]);
+
+	vec<int> r;
+	arg2intargs(r, ce[1]);
+
+	// The flat reason is one entry per variable: [idx, |R_lb|, (var, bound)...,
+	// |R_ub|, (var, bound)...], with 1-based variable indices. `r_trans` is
+	// indexed by [variable*2 + (bound-1)] to match the propagator.
+	std::vector<std::vector<std::pair<int, PropBnd>>> r_trans(static_cast<std::size_t>(iv0.size()) *
+																														2);
+	int i = 0;
+	int entries = 0;
+	// Read the next reason value, guarding against a truncated stream.
+	auto next = [&]() -> int {
+		if (i >= r.size()) {
+			throw std::string("p_blackbox_bounds: malformed reason (unexpected end of stream).");
+		}
+		return r[i++];
+	};
+	while (i < r.size()) {
+		const int idx = next() - 1;  // 1-based variable index -> 0-based
+		if (idx < 0 || idx >= iv0.size()) {
+			throw std::string("p_blackbox_bounds: reason variable index out of range.");
+		}
+		for (int side = 0; side < 2; ++side) {  // 0 = lower bound, 1 = upper bound
+			const int len = next();
+			for (int j = 0; j < len; ++j) {
+				const int var = next() - 1;
+				const int bound = next();
+				if (var < 0 || var >= iv0.size()) {
+					throw std::string("p_blackbox_bounds: reason literal variable index out of range.");
+				}
+				if (bound != PR_LB && bound != PR_UB) {
+					throw std::string("p_blackbox_bounds: invalid reason bound code.");
+				}
+				r_trans[(idx * 2) + side].emplace_back(var, static_cast<PropBnd>(bound));
+			}
+		}
+		++entries;
+	}
+
+	if (iv0.size() != entries) {
+		throw std::string("p_blackbox_bounds: expected " + std::to_string(iv0.size()) +
+											" reason descriptions for the " + std::to_string(iv0.size()) +
+											" decision variables, but found " + std::to_string(entries) + ".");
+	}
+
+	std::string mode;
+	std::string instantiation;
+	std::vector<std::string> args;
+	blackbox_source(ann, mode, instantiation, args);
+
+	blackbox_bounds(iv0, r_trans, mode, instantiation, args);
 }
 
 class IntPoster {
@@ -1998,6 +2106,9 @@ public:
 		registry().add("chuffed_dpath", &p_path_new);
 		registry().add("chuffed_dag", &p_dag_new);
 		registry().add("chuffed_bounded_dpath", &p_bounded_path_new);
+
+		registry().add("chuffed_blackbox", &p_blackbox);
+		registry().add("chuffed_blackbox_bounds", &p_blackbox_bounds);
 	}
 };
 IntPoster _int_poster;
