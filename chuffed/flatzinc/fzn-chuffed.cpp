@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 			engine.solve(FlatZinc::s, commandLine);
 		}
 
-		if (engine.status == RES_LUN) {
+		if (engine.status == RES_LUN && !FlatZinc::s->assumptions.empty()) {
 			vec<BoolView> ng;
 			Engine::retrieve_assumption_nogood(ng);
 			std::cout << "% [";
