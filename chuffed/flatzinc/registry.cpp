@@ -1834,6 +1834,17 @@ void p_bounded_path_new(const ConExpr& ce, AST::Node* /*ann*/) {
 	bounded_path(s, t, vs, es, in, ou, en, ws, w);
 }
 
+void p_assume(const ConExpr& ce, AST::Node* /*ann*/) {
+	// Mark the Boolean variables in the array argument as assumptions. Boolean constants are
+	// handled gracefully by arg2BoolVarArgs (mapped to bv_true / bv_false), so a fixed-false
+	// assumption simply makes the model unsatisfiable rather than crashing.
+	vec<BoolView> bvs;
+	arg2BoolVarArgs(bvs, ce[0]);
+	for (unsigned int i = 0; i < bvs.size(); i++) {
+		s->assumptions.push(bvs[i]);
+	}
+}
+
 class IntPoster {
 public:
 	IntPoster() {
@@ -1907,6 +1918,7 @@ public:
 		registry().add("array_bool_or", &p_array_bool_or);
 		registry().add("bool_clause", &p_array_bool_clause);
 		registry().add("bool_clause_reif", &p_array_bool_clause_reif);
+		registry().add("chuffed_assume", &p_assume);
 		registry().add("array_int_element", &p_array_int_element);
 		registry().add("array_var_int_element", &p_array_var_int_element);
 		registry().add("array_var_int_element_imp", &p_array_var_int_element_imp);

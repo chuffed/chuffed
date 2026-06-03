@@ -466,7 +466,8 @@ void FlatZincSpace::parseSolveAnnAux(AST::Node* elemAnn, BranchGroup* branching,
 
 // Entry function for parsing the solve annotation
 void FlatZincSpace::parseSolveAnn(AST::Array* ann) {
-	assumptions.clear();
+	// Note: assumptions are collected from `fzn_assume` constraints during constraint posting
+	// (which happens before the solve item is parsed).
 	int nbNonEmptySearchAnnotations = 0;
 	try {
 		// Parse the search annotation
@@ -531,12 +532,6 @@ void FlatZincSpace::parseSolveAnn(AST::Array* ann, BranchGroup* branching,
 				}
 				if (so.restart_scale_override) {
 					so.restart_scale = static_cast<unsigned int>(args->a[1]->getInt());
-				}
-			} else if (i->isCall("assume")) {
-				AST::Call* call = i->getCall("assume");
-				AST::Array* vars = call->args->getArray();
-				for (auto& ii : vars->a) {
-					assumptions.push(bv[ii->getBoolVar()]);
 				}
 			} else if (i->isCall("seq_search") || i->isCall("warm_start_array")) {
 				// Get the call

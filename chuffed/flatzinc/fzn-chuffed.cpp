@@ -53,6 +53,13 @@ const char* irel_str[] = {" = ", " != ", " <= ", " > "};
 std::string get_bv_string(const BoolView& b, bool tryIntDom) {
 	std::string s;
 
+	// A constant literal uses the reserved constant variable (variable 0), which has no name and
+	// no integer channel; report its value directly to avoid dereferencing invalid channel info.
+	const Lit cl(b.getLit(true));
+	if (var(cl) == 0) {
+		return sat.value(cl) == l_True ? "true" : "false";
+	}
+
 	if (tryIntDom) {
 		// Alternate version: prioritise intvars.
 		const Lit l(b.getLit(true));
@@ -153,15 +160,19 @@ int main(int argc, char** argv) {
 			engine.solve(FlatZinc::s, commandLine);
 		}
 
-		if (engine.status == RES_LUN) {
+		if (engine.status == RES_LUN && FlatZinc::s->assumptions.size() > 0) {
 			vec<BoolView> ng;
 			Engine::retrieve_assumption_nogood(ng);
-			std::cout << "% [";
-			if (ng.size() > 0) {
-				std::cout << get_bv_string(ng[0], so.assump_int);
-				for (unsigned int ii = 1; ii < ng.size(); ii++) {
-					std::cout << ", " << get_bv_string(ng[ii], so.assump_int);
+			std::cout << "%%%mzn-core: [";
+			for (unsigned int ii = 0; ii < ng.size(); ii++) {
+				// The nogood holds the negation of each assumption in the core; report the
+				// assumption itself (the literal that was assumed) so that MiniZinc can map it back.
+				BoolView a(ng[ii]);
+				a.setSign(!a.getSign());
+				if (ii > 0) {
+					std::cout << ", ";
 				}
+				std::cout << get_bv_string(a, so.assump_int);
 			}
 			std::cout << "]" << '\n';
 		}
