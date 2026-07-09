@@ -261,7 +261,7 @@ inline int64_t Tint64_t::operator=(int64_t o) {
 class Problem {
 public:
 	virtual void print(std::ostream&) = 0;
-	virtual void restrict_learnable(){};
+	virtual void restrict_learnable() {};
 };
 
 #endif

@@ -739,7 +739,7 @@ bool FlatZincSpace::onRestart(Engine* e) {
 		}
 	};
 	auto assume_bool_val = [&](BoolView bv, bool v) {
-		BoolView const nv = v ? bv : ~bv;
+		const BoolView nv = v ? bv : ~bv;
 		e->assumptions.push(toInt(nv));
 	};
 
