@@ -27,6 +27,47 @@
 #include <unistd.h>
 #endif
 
+namespace {
+
+/// Resolve \a name from a loaded \a library. On 32-bit Windows also try the
+/// stdcall-decorated forms `_name@bytes` and `name@bytes`.
+template <class T>
+T library_symbol(void* library, const char* name, unsigned int stdcall_bytes) {
+#ifdef _WIN32
+	FARPROC symbol = GetProcAddress(static_cast<HMODULE>(library), name);
+#if defined(_M_IX86) || defined(__i386__)
+	if (symbol == nullptr) {
+		const std::string decorated = std::string("_") + name + "@" + std::to_string(stdcall_bytes);
+		symbol = GetProcAddress(static_cast<HMODULE>(library), decorated.c_str());
+	}
+	if (symbol == nullptr) {
+		const std::string decorated = std::string(name) + "@" + std::to_string(stdcall_bytes);
+		symbol = GetProcAddress(static_cast<HMODULE>(library), decorated.c_str());
+	}
+#else
+	(void)stdcall_bytes;
+#endif
+	return reinterpret_cast<T>(symbol);
+#else
+	(void)stdcall_bytes;
+	T symbol = nullptr;
+	*reinterpret_cast<void**>(&symbol) = dlsym(library, name);
+	return symbol;
+#endif
+}
+
+/// Validate that a black-box output fits in Chuffed's integer range, returning
+/// it as an `int`.
+int check_int(int64_t v, const char* source, int index) {
+	if (v < IntVar::min_limit || v > IntVar::max_limit) {
+		throw std::string("BlackBox: ") + source + " integer " + std::to_string(index) +
+				" is outside Chuffed's integer range";
+	}
+	return static_cast<int>(v);
+}
+
+}  // namespace
+
 BlackBoxDLL::BlackBoxDLL(const std::string& name, const std::vector<std::string>& args) {
 	std::string loadError;
 #ifdef _WIN32
@@ -47,49 +88,61 @@ BlackBoxDLL::BlackBoxDLL(const std::string& name, const std::vector<std::string>
 	if (library == nullptr) {
 		library = dlopen((std::string("lib") + name + ".so").c_str(), RTLD_NOW);
 	}
+#ifdef __APPLE__
+	if (library == nullptr) {
+		library = dlopen((name + ".dylib").c_str(), RTLD_NOW);
+	}
+	if (library == nullptr) {
+		library = dlopen((std::string("lib") + name + ".dylib").c_str(), RTLD_NOW);
+	}
+#endif
 #endif
 	if (library == nullptr) {
 		throw std::string("BlackboxDLL: Unable to open dynamic library: " + loadError);
 	}
 
-	// find symbol for blacbox function
-#ifdef _WIN32
-	dll_fzn_blackbox = reinterpret_cast<decltype(dll_fzn_blackbox)>(
-			GetProcAddress((HMODULE)library, "fzn_blackbox"));
-	std::string symError = ".";
-#else
-	*(void**)(&dll_fzn_blackbox) = dlsym(library, "fzn_blackbox");
-	std::string symError(": ");
-	if (dll_fzn_blackbox == nullptr) {
-		symError += std::string(dlerror());
-	}
-#endif
-	if (dll_fzn_blackbox == nullptr) {
-		throw std::string("BlackboxDLL: Unable to find symbol `fzn_blackbox` in dynamic library" +
-											symError);
-	}
-
-	// Optionally call the initialisation function with the given arguments. It is
-	// not an error for the library to omit `fzn_initialize`.
-	// NOLINTNEXTLINE(misc-const-correctness): assigned below via dlsym/GetProcAddress
-	void(__stdcall * dll_fzn_initialize)(const char**, size_t) = nullptr;
-#ifdef _WIN32
-	dll_fzn_initialize = reinterpret_cast<decltype(dll_fzn_initialize)>(
-			GetProcAddress((HMODULE)library, "fzn_initialize"));
-#else
-	*(void**)(&dll_fzn_initialize) = dlsym(library, "fzn_initialize");
-#endif
-	if (dll_fzn_initialize != nullptr) {
-		std::vector<const char*> argv;
-		argv.reserve(args.size());
-		for (const std::string& a : args) {
-			argv.push_back(a.c_str());
+	// fzn_blackbox is the only required entry point; fzn_init / fzn_clone /
+	// fzn_free are optional. A library exporting fzn_init must also export
+	// fzn_clone, and its instance is released with fzn_free (see blackbox.h).
+	root_instance = nullptr;
+	dll_fzn_free = nullptr;
+	try {
+		dll_fzn_blackbox = library_symbol<decltype(dll_fzn_blackbox)>(library, "fzn_blackbox", 36);
+		if (dll_fzn_blackbox == nullptr) {
+			throw std::string("BlackBoxDLL: Unable to find symbol `fzn_blackbox' in dynamic library");
 		}
-		dll_fzn_initialize(argv.data(), argv.size());
+		auto init_fn = library_symbol<void*(__stdcall*)(const char**, size_t)>(library, "fzn_init", 8);
+		auto clone_fn = library_symbol<void*(__stdcall*)(void*)>(library, "fzn_clone", 4);
+		dll_fzn_free = library_symbol<decltype(dll_fzn_free)>(library, "fzn_free", 4);
+		if ((init_fn != nullptr) && (clone_fn == nullptr)) {
+			throw std::string("BlackBoxDLL: dynamic library exports `fzn_init' but not `fzn_clone'");
+		}
+		if (init_fn != nullptr) {
+			std::vector<const char*> argv;
+			argv.reserve(args.size());
+			for (const std::string& a : args) {
+				argv.push_back(a.c_str());
+			}
+			root_instance = init_fn(argv.data(), argv.size());
+		}
+	} catch (...) {
+		if (root_instance != nullptr && dll_fzn_free != nullptr) {
+			dll_fzn_free(root_instance);
+		}
+#ifdef _WIN32
+		FreeLibrary(static_cast<HMODULE>(library));
+#else
+		dlclose(library);
+#endif
+		library = nullptr;
+		throw;
 	}
 }
 
 BlackBoxDLL::~BlackBoxDLL() {
+	if (root_instance != nullptr && dll_fzn_free != nullptr) {
+		dll_fzn_free(root_instance);
+	}
 	if (library != nullptr) {
 #ifdef _WIN32
 		FreeLibrary((HMODULE)library);
@@ -97,6 +150,13 @@ BlackBoxDLL::~BlackBoxDLL() {
 		dlclose(library);
 #endif
 	}
+}
+
+void BlackBoxDLL::run(const std::vector<int64_t>& int_in, const std::vector<double>& float_in,
+											std::vector<int64_t>& int_out, std::vector<double>& float_out) {
+	// Chuffed is single-threaded, so the root instance is used directly.
+	dll_fzn_blackbox(root_instance, int_in.data(), int_in.size(), float_in.data(), float_in.size(),
+									 int_out.data(), int_out.size(), float_out.data(), float_out.size());
 }
 
 BlackBoxExec::BlackBoxExec(const std::string& program, const std::vector<std::string>& args) {
@@ -374,7 +434,7 @@ public:
 		Clause* reason = nullptr;
 		for (int i = 0; i < sz_out; i++) {
 			// std::cerr << int_out[i] << " ";
-			const int val = static_cast<int>(int_out[i]);
+			const int val = check_int(int_out[i], "value output", i);
 			if (int_output[i].setValNotR(val)) {
 				if (reason == nullptr) {
 					reason = Reason_new(sz_in + 1);
@@ -460,8 +520,8 @@ public:
 		for (int i = 0; i < sz; i++) {
 			// std::cerr << bounds_out[i*2] << " " << bounds_out[i*2+1] << " ";
 			const size_t idx = static_cast<size_t>(i) * 2;
-			const int lb = static_cast<int>(bounds_out[idx]);
-			const int ub = static_cast<int>(bounds_out[idx + 1]);
+			const int lb = check_int(bounds_out[idx], "bounds output", i);
+			const int ub = check_int(bounds_out[idx + 1], "bounds output", i);
 			if (x[i].setMinNotR(lb)) {
 				if (!x[i].setMin(lb, create_reason(i, PR_LB))) {
 					return false;

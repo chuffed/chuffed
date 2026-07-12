@@ -1,6 +1,7 @@
 #ifndef BLACKBOX_H
 #define BLACKBOX_H
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -19,26 +20,32 @@
 /// Abstract class implemented by different methods to run blackbox functions
 class BlackBoxFn {
 public:
+	virtual ~BlackBoxFn() = default;
 	virtual void run(const std::vector<int64_t>& int_in, const std::vector<double>& float_in,
 									 std::vector<int64_t>& int_out, std::vector<double>& float_out) = 0;
 };
 
 /// Implementation of a black box function that dynamically loads a library and
-/// run a contained function.
+/// runs a contained function.
+///
+/// A library exporting `fzn_init` creates a per-constraint instance that is
+/// passed to every `fzn_blackbox` call and released with `fzn_free`; such a
+/// library must also export `fzn_clone`. A library without `fzn_init` is
+/// stateless and receives a null instance. Chuffed is single-threaded, so the
+/// root instance is used directly and never cloned.
 class BlackBoxDLL : public BlackBoxFn {
 public:
 	BlackBoxDLL(const std::string& name, const std::vector<std::string>& args);
-	~BlackBoxDLL();
+	~BlackBoxDLL() override;
 	void run(const std::vector<int64_t>& int_in, const std::vector<double>& float_in,
-					 std::vector<int64_t>& int_out, std::vector<double>& float_out) override {
-		dll_fzn_blackbox(int_in.data(), int_in.size(), float_in.data(), float_in.size(), int_out.data(),
-										 int_out.size(), float_out.data(), float_out.size());
-	}
+					 std::vector<int64_t>& int_out, std::vector<double>& float_out) override;
 
 protected:
 	void* library;
-	void(__stdcall* dll_fzn_blackbox)(const int64_t*, size_t, const double*, size_t, int64_t*, size_t,
-																		double*, size_t);
+	void* root_instance;
+	void(__stdcall* dll_fzn_blackbox)(void*, const int64_t*, size_t, const double*, size_t, int64_t*,
+																		size_t, double*, size_t);
+	void(__stdcall* dll_fzn_free)(void*);
 };
 
 /// Implementation of a black function that starts a seperate process to
@@ -46,7 +53,7 @@ protected:
 class BlackBoxExec : public BlackBoxFn {
 public:
 	BlackBoxExec(const std::string& program, const std::vector<std::string>& args);
-	~BlackBoxExec();
+	~BlackBoxExec() override;
 	void run(const std::vector<int64_t>& int_in, const std::vector<double>& float_in,
 					 std::vector<int64_t>& int_out, std::vector<double>& float_out) override;
 
